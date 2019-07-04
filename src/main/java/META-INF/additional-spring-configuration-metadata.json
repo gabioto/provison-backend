@@ -1,0 +1,102 @@
+{"properties": [
+  {
+    "name": "pe.telefonica.provision.server",
+    "type": "java.lang.String",
+    "description": "A description for 'pe.telefonica.provision.server'"
+  },
+  {
+    "name": "pe.telefonica.provision.database",
+    "type": "java.lang.String",
+    "description": "A description for 'pe.telefonica.provision.database'"
+  },
+  {
+    "name": "external.api.sendSMS",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendSMS'"
+  },
+  {
+    "name": "external.api.sendRequestToBO",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendRequestToBO'"
+  },
+  {
+    "name": "sms.text.provision.webUrl",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.webUrl'"
+  },
+  {
+    "name": "sms.text.provision.addressUpdated",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.addressUpdated'"
+  },
+  {
+    "name": "sms.text.provision.unreachable",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.unreachable'"
+  },
+  {
+    "name": "sms.text.provision.cancelled",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.cancelled'"
+  },
+  {
+    "name": "external.api.sendSMS",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendSMS'"
+  },
+  {
+    "name": "external.api.sendSMS",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendSMS'"
+  },
+  {
+    "name": "sms.text.provision.addressUpdated",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.addressUpdated'"
+  },
+  {
+    "name": "sms.text.provision.addressUpdated",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.addressUpdated'"
+  },
+  {
+    "name": "external.api.sendSMS",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendSMS'"
+  },
+  {
+    "name": "external.api.sendSMS",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendSMS'"
+  },
+  {
+    "name": "external.api.sendSMS",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendSMS'"
+  },
+  {
+    "name": "external.api.sendSMS",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendSMS'"
+  },
+  {
+    "name": "external.api.securityUrl",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.securityUrl'"
+  },
+  {
+    "name": "external.api.scheduleUrl",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.scheduleUrl'"
+  },
+  {
+    "name": "external.api.provisionUrl",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.provisionUrl'"
+  },
+  {
+    "name": "external.api.boUrl",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.boUrl'"
+  }
+]}

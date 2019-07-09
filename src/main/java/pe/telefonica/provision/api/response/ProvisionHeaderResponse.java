@@ -1,4 +1,4 @@
-package pe.telefonica.provision.api;
+package pe.telefonica.provision.api.response;
 
 import java.util.Date;
 

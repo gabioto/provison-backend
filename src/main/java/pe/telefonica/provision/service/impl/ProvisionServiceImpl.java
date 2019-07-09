@@ -19,9 +19,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import pe.telefonica.provision.api.ProvisionHeaderResponse;
-import pe.telefonica.provision.api.ProvisionRequest;
-import pe.telefonica.provision.api.ProvisionResponse;
+import pe.telefonica.provision.api.request.ProvisionRequest;
+import pe.telefonica.provision.api.response.ProvisionArrayResponse;
+import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
+import pe.telefonica.provision.api.response.ProvisionResponse;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.ProvisionTexts;
@@ -49,37 +50,47 @@ public class ProvisionServiceImpl implements ProvisionService {
 		this.provisionRepository = provisionRepository;
 	}
 
-	/*
-	 * public User findByUserId(String userId) { Optional<User> user =
-	 * userRepository.findOne(userId); if (user.isPresent()) {
-	 * log.debug(String.format("Read userId '{}'", userId)); return user.get();
-	 * }else throw new UserNotFoundException(userId); }
-	 */
+	@Override
+	public ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest){
+		Optional<Provision> fault = provisionRepository.getOrder(provisionRequest);
+		ProvisionResponse<Customer> response = new ProvisionResponse<Customer>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+		
+		if (fault.isPresent() && fault.get().getCustomer() != null) {
+			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+			response.setHeader(header).setData(fault.get().getCustomer());
+		} else {
+			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron datos del cliente");
+			response.setHeader(header);
+		}
+
+		return response;
+	}
 
 	@Override
-	public ProvisionResponse<Provision> getAll(ProvisionRequest provisionRequest) {
+	public ProvisionArrayResponse<Provision> getAll(ProvisionRequest provisionRequest) {
 		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest);
-		ProvisionResponse<Provision> response = new ProvisionResponse<Provision>();
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 		if (!provisions.get().isEmpty()) {
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
 			response.setHeader(header).setData(provisions.get());
 		} else {
-			header.setCode(HttpStatus.METHOD_FAILURE.value()).setMessage("No se encontraron provisiones");
+			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
 			response.setHeader(header);
 		}
 		return response;
 	}
 
 	@Override
-	public ProvisionResponse<Provision> insertProvisionList(List<Provision> provisionList) {
+	public ProvisionArrayResponse<Provision> insertProvisionList(List<Provision> provisionList) {
 		Optional<List<Provision>> provisions = provisionRepository.insertProvisionList(provisionList);
-		ProvisionResponse<Provision> response = new ProvisionResponse<Provision>();
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 		if (provisions.get().size() == provisionList.size()) {
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
 		} else {
-			header.setCode(HttpStatus.METHOD_FAILURE.value()).setMessage("No se encontraron provisiones");
+			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
 		}
 		response.setHeader(header);
 		return response;

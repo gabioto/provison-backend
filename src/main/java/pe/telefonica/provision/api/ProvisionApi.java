@@ -16,19 +16,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.api.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.api.request.SetContactInfoUpdateRequest;
 import pe.telefonica.provision.api.response.OrderCancellationResponse;
+import pe.telefonica.provision.api.response.ProvisionArrayResponse;
+import pe.telefonica.provision.api.response.ProvisionResponse;
 import pe.telefonica.provision.api.response.ReceiveAddressUpdateBOResponse;
 import pe.telefonica.provision.api.response.RequestAddressUpdateResponse;
 import pe.telefonica.provision.api.response.ResponseHeader;
 import pe.telefonica.provision.api.response.SetContactInfoUpdateResponse;
 import pe.telefonica.provision.api.response.SetProvisionValidatedResponse;
+import pe.telefonica.provision.dto.Customer;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.service.ProvisionService;
 
 @RestController
 @CrossOrigin(origins = "*")
+@RequestMapping("provision")
 public class ProvisionApi {
 	
 	private static final Log log = LogFactory.getLog(ProvisionApi.class);
@@ -47,15 +52,22 @@ public class ProvisionApi {
     }
 	
     
+    @RequestMapping(value = "/validateUserExist", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionResponse<Customer>> validateUserExist(@RequestBody @Valid ProvisionRequest provisionRequest) {
+		return ResponseEntity.ok(provisionService.validateUser(provisionRequest));
+	}
+    
     /**
      * 
      * @param provisionRequest
      * @return ProvisionResponse<Provision>
      * @description get all provisions related to type and number of the document
      */
-	@RequestMapping(value="/getOrders", method=RequestMethod.POST)
-	public ResponseEntity<ProvisionResponse<Provision>> getOrders(@RequestBody @Valid ProvisionRequest provisionRequest){
-		return ResponseEntity.ok(provisionService.getAll(provisionRequest));
+	@RequestMapping(value="/getOrders", method=RequestMethod.GET)
+	public ResponseEntity<ProvisionArrayResponse<Provision>> getOrders(
+			@RequestParam(value = "documentType", required = true) String documentType, 
+			@RequestParam(value = "documentNumber", required = true) String documentNumber){
+		return ResponseEntity.ok(provisionService.getAll(new ProvisionRequest(documentType, documentNumber)));
 	}
 	
 	/**
@@ -65,7 +77,7 @@ public class ProvisionApi {
      * @description insert a list of provisions
      */
 	@RequestMapping(value="/insertOrders", method=RequestMethod.POST)
-	public ResponseEntity<ProvisionResponse<Provision>> insertOrders(@RequestBody @Valid List<Provision> provisionListReq){
+	public ResponseEntity<ProvisionArrayResponse<Provision>> insertOrders(@RequestBody @Valid List<Provision> provisionListReq){
 		return ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 	

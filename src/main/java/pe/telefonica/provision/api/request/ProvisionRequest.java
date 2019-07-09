@@ -1,4 +1,4 @@
-package pe.telefonica.provision.api;
+package pe.telefonica.provision.api.request;
 
 public class ProvisionRequest {
 
@@ -20,6 +20,15 @@ public class ProvisionRequest {
 	public void setDocumentNumber(String documentNumber) {
 		this.documentNumber = documentNumber;
 	}
-	
-	
+
+	public ProvisionRequest(String documentType, String documentNumber) {
+		super();
+		this.documentType = documentType;
+		this.documentNumber = documentNumber;
+	}
+
+	public ProvisionRequest() {
+		super();
+		// TODO Auto-generated constructor stub
+	}	
 }

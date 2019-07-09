@@ -1,6 +1,7 @@
 package pe.telefonica.provision.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Id;
 
@@ -78,6 +79,9 @@ public class Provision implements Serializable {
 	
 	@Field("validated_address")
 	private String validatedAddress;
+	
+	@Field("register_date")
+	private Date registerDate = new Date();
 	
 	@Field("internet_detail")
 	private Internet internetDetail;
@@ -257,6 +261,14 @@ public class Provision implements Serializable {
 
 	public void setValidatedAddress(String validatedAddress) {
 		this.validatedAddress = validatedAddress;
+	}
+
+	public Date getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(Date registerDate) {
+		this.registerDate = registerDate;
 	}
 
 	public Internet getInternetDetail() {

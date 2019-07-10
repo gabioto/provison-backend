@@ -8,12 +8,17 @@ import org.springframework.data.mongodb.core.query.Update;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.dto.Provision;
 
-public interface ProvisionRepository{
+public interface ProvisionRepository {
 
 	Optional<List<Provision>> findAll(ProvisionRequest provisionRequest);
+
 	Optional<Provision> getOrder(ProvisionRequest provisionRequest);
+
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
-	
+
 	Optional<Provision> getProvisionById(String provisionId);
+	
+	boolean updateContactInfoPsi(Provision provision);
+
 	boolean updateProvision(Provision provision, Update update);
 }

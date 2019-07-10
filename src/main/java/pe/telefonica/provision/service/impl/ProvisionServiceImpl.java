@@ -51,11 +51,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest){
+	public ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest) {
 		Optional<Provision> fault = provisionRepository.getOrder(provisionRequest);
 		ProvisionResponse<Customer> response = new ProvisionResponse<Customer>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
-		
+
 		if (fault.isPresent() && fault.get().getCustomer() != null) {
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
 			response.setHeader(header).setData(fault.get().getCustomer());
@@ -149,29 +149,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
-			
+
 			if (action.equals(Constants.ADDRESS_CANCELLED_BY_CUSTOMER)
 					|| (action.equals(Constants.ADDRESS_CANCELLED_BY_CHANGE))) {
-				
+
 				Update update = new Update();
 				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 
 				boolean updated = provisionRepository.updateProvision(provision, update);
 
-				/*if (updated) {
-					if (action.equals(Constants.ADDRESS_CANCELLED_BY_CUSTOMER)) {
-						// TODO: capturar respuesta del envio de sms?
-						sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), "");
-					}
-					return true;
-				} else {
-					return false;
-				}*/
-				
+				/*
+				 * if (updated) { if (action.equals(Constants.ADDRESS_CANCELLED_BY_CUSTOMER)) {
+				 * // TODO: capturar respuesta del envio de sms?
+				 * sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), ""); } return
+				 * true; } else { return false; }
+				 */
+
 				if (isSMSRequired) {
 					sendSMS(provision.getCustomer(), provisionTexts.getUnreachable(), "");
 				}
-				
+
 				return updated;
 			} else if (action.equals(Constants.ADDRESS_UNREACHABLE)) {
 				sendSMS(provision.getCustomer(), provisionTexts.getUnreachable(), "");
@@ -208,7 +205,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provision = optional.get();
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
-			
+
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
 			if (updated) {
@@ -239,11 +236,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		smsRequest.setCustomerPhoneIsMovistar(customerPhoneIsMovistar);
 		smsRequest.setContactPhone(String.valueOf(customer.getContactPhoneNumber()));
 		Boolean contactrPhoneIsMovistar = false;
-		//TODO: Aplicar Validacion
+		// TODO: Aplicar Validacion
 		contactrPhoneIsMovistar = true;
-		/*if (customer.getContactCarrier().equals("true")) {
-			contactrPhoneIsMovistar = true;
-		}*/
+		/*
+		 * if (customer.getContactCarrier().equals("true")) { contactrPhoneIsMovistar =
+		 * true; }
+		 */
 		smsRequest.setContactPhoneIsMovistar(contactrPhoneIsMovistar);
 		smsRequest.setMessage(message);
 		smsRequest.setWebURL("");
@@ -261,22 +259,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Boolean contactCellphoneIsMovistar) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
-		log.info("provisionTexts.getSendSMS = " + provisionTexts.getWebUrl());
-		log.info("provisionTexts.getAddressUpdated = " + provisionTexts.getAddressUpdated());
-		log.info("provisionTexts.getCancelled = " + provisionTexts.getCancelled());
-		log.info("provisionTexts.getUnreachable = " + provisionTexts.getUnreachable());
-
-		log.info("api.getSecurityUrl = " + api.getSecurityUrl());
-		log.info("api.getScheduleUrl = " + api.getScheduleUrl());
-		log.info("api.getProvisionUrl = " + api.getProvisionUrl());
-		log.info("api.getBoUrl = " + api.getBoUrl());
-
-		log.info("api.getSendSMS = " + api.getSendSMS());
-		log.info("api.getSendRequestToBO = " + api.getSendRequestToBO());
-
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
-			
+
 			Update update = new Update();
 			update.set("customer.contact_name", contactFullname);
 			update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
@@ -288,9 +273,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
 			if (updated) {
-				// TODO: capturar respuesta del BO?
-				sendContactChangeRequest(provision);
-				return true;
+				
+				boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
+				return contactUpdated;
 			} else {
 				return false;
 			}
@@ -298,6 +283,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} else {
 			return false;
 		}
+		
+		/*ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+		if (provisions.get().size() == provisionList.size()) {
+			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+		} else {
+			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+		}
+		response.setHeader(header);
+		return response;*/
 	}
 
 	private Boolean sendAddressChangeRequest(Provision provision) {
@@ -306,10 +301,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private Boolean sendCancellation(Provision provision) {
 		return sendRequestToBO(provision, "4");
-	}
-
-	private Boolean sendContactChangeRequest(Provision provision) {
-		return sendRequestToBO(provision, "2");
 	}
 
 	private Boolean sendRequestToBO(Provision provision, String action) {
@@ -360,7 +351,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendRequestBO, entityBO, String.class);
 
 			log.info("sendRequestToBO - BO - Response: " + responseEntity.getBody());
-			
+
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				return true;
 			} else {

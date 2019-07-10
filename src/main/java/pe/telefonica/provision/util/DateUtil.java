@@ -10,12 +10,11 @@ import pe.telefonica.provision.conf.Constants;
 
 public class DateUtil {
 
-	
 	public static String dateToString(Date date) {
 		DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_WS);
 		return dateFormat.format(date);
 	}
-	
+
 	public static Date stringToDate(String stringDate) {
 		DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_WS);
 		try {
@@ -26,13 +25,19 @@ public class DateUtil {
 			return null;
 		}
 	}
-	
+
 	public static Date getToday() {
-        Calendar now = Calendar.getInstance();
-        now.set(Calendar.HOUR, 0);
-        now.set(Calendar.MINUTE, 0);
-        now.set(Calendar.SECOND, 0);
-        now.set(Calendar.HOUR_OF_DAY, 0);
-        return now.getTime();
+		Calendar now = Calendar.getInstance();
+		now.set(Calendar.HOUR, 0);
+		now.set(Calendar.MINUTE, 0);
+		now.set(Calendar.SECOND, 0);
+		now.set(Calendar.HOUR_OF_DAY, 0);
+		return now.getTime();
+	}
+
+	public static String getNowPsi(String format) {
+		Date date = new Date();
+		DateFormat dateFormat = new SimpleDateFormat(format);
+		return dateFormat.format(date);
 	}
 }

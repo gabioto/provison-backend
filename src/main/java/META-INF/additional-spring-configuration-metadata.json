@@ -98,5 +98,20 @@
     "name": "external.api.boUrl",
     "type": "java.lang.String",
     "description": "A description for 'external.api.boUrl'"
+  },
+  {
+    "name": "external.api.sendRequestToBO",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendRequestToBO'"
+  },
+  {
+    "name": "external.api.sendRequestToBO",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendRequestToBO'"
+  },
+  {
+    "name": "external.api.sendRequestToBO",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendRequestToBO'"
   }
 ]}

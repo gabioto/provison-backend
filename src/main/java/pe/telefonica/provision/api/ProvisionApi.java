@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,19 +40,15 @@ public class ProvisionApi {
 	@Autowired
 	ProvisionService contactService;
 	
-	@Autowired
-	Mapper mapper;
-	
 	private final ProvisionService provisionService;
    
     @Autowired
     public ProvisionApi(ProvisionService provisionService) {
         this.provisionService = provisionService;
     }
-	
     
-    @RequestMapping(value = "/validateUserExist", method = RequestMethod.POST)
-	public ResponseEntity<ProvisionResponse<Customer>> validateUserExist(@RequestBody @Valid ProvisionRequest provisionRequest) {
+    @RequestMapping(value = "/getCustomerByDocument", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionResponse<Customer>> getCustomerByDocument(@RequestBody @Valid ProvisionRequest provisionRequest) {
 		return ResponseEntity.ok(provisionService.validateUser(provisionRequest));
 	}
     

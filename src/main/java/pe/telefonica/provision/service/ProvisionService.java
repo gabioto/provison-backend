@@ -13,6 +13,8 @@ public interface ProvisionService {
 	ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest);
 
 	ProvisionArrayResponse<Provision> getAll(ProvisionRequest provisionRequest);
+	
+	ProvisionResponse<String> getStatus(String provisionId);
 
 	ProvisionArrayResponse<Provision> insertProvisionList(List<Provision> provisionList);
 

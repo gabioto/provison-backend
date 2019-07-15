@@ -1,9 +1,6 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +27,6 @@ import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.dto.Provision;
-import pe.telefonica.provision.exception.DataNotFoundException;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
@@ -71,6 +67,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
+		return optionalOrder;
+	}
+
+	@Override
+	public Optional<String> getStatus(String provisionId) {
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))),
+				Provision.class);
+		Optional<String> optionalOrder = Optional.ofNullable(provision.getActiveStatus());
 		return optionalOrder;
 	}
 

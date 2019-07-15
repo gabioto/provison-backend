@@ -13,6 +13,8 @@ public interface ProvisionRepository {
 	Optional<List<Provision>> findAll(ProvisionRequest provisionRequest);
 
 	Optional<Provision> getOrder(ProvisionRequest provisionRequest);
+	
+	Optional<String> getStatus(String provisionId);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
 

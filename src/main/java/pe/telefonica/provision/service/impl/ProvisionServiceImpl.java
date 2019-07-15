@@ -273,7 +273,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
 			if (updated) {
-				
+
 				boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
 				return contactUpdated;
 			} else {
@@ -283,16 +283,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} else {
 			return false;
 		}
-		
-		/*ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
-		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
-		if (provisions.get().size() == provisionList.size()) {
-			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-		} else {
-			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
-		}
-		response.setHeader(header);
-		return response;*/
+
+		/*
+		 * ProvisionArrayResponse<Provision> response = new
+		 * ProvisionArrayResponse<Provision>(); ProvisionHeaderResponse header = new
+		 * ProvisionHeaderResponse(); if (provisions.get().size() ==
+		 * provisionList.size()) {
+		 * header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name()); }
+		 * else { header.setCode(HttpStatus.OK.value()).
+		 * setMessage("No se encontraron provisiones"); } response.setHeader(header);
+		 * return response;
+		 */
 	}
 
 	private Boolean sendAddressChangeRequest(Provision provision) {
@@ -361,5 +362,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 			log.info("Exception = " + e.getMessage());
 			return false;
 		}
+	}
+
+	@Override
+	public ProvisionResponse<String> getStatus(String provisionId) {
+		Optional<String> optional = provisionRepository.getStatus(provisionId);
+		ProvisionResponse<String> response = new ProvisionResponse<String>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+
+		if (optional.isPresent()) {
+			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+			response.setHeader(header).setData(optional.get());
+		} else {
+			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+			response.setHeader(header);
+		}
+
+		return response;
 	}
 }

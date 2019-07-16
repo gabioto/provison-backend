@@ -97,48 +97,43 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Boolean setProvisionIsValidated(String provisionId) {
+	public Provision setProvisionIsValidated(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
 			Update update = new Update();
-			update.set("validated_address", "true"); // TODO: CAMBIAR A BOOLEAN!!!
+			update.set("validated_address", "true");
+			provision.setValidatedAddress("true");
 
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
-			if (updated) {
-				return true;
-			} else {
-				return false;
-			}
-
+			return updated ? provision : null;
 		} else {
-			return false;
+			return null;
 		}
 	}
 
 	@Override
-	public Boolean requestAddressUpdate(String provisionId) {
+	public Provision requestAddressUpdate(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_ADDRESS_CHANGED);
+			provision.setActiveStatus(Constants.PROVISION_STATUS_ADDRESS_CHANGED);
 
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
 			if (updated) {
-				// TODO: capturar respuesta del BO?
-				sendAddressChangeRequest(provision);
-				return true;
+				boolean sent = sendAddressChangeRequest(provision);
+				return sent ? provision : null;
 			} else {
-				return false;
+				return null;
 			}
-
 		} else {
-			return false;
+			return null;
 		}
 	}
 
@@ -157,13 +152,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 
 				boolean updated = provisionRepository.updateProvision(provision, update);
-
-				/*
-				 * if (updated) { if (action.equals(Constants.ADDRESS_CANCELLED_BY_CUSTOMER)) {
-				 * // TODO: capturar respuesta del envio de sms?
-				 * sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), ""); } return
-				 * true; } else { return false; }
-				 */
 
 				if (isSMSRequired) {
 					sendSMS(provision.getCustomer(), provisionTexts.getUnreachable(), "");
@@ -198,28 +186,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Boolean orderCancellation(String provisionId) {
+	public Provision orderCancellation(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
+			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
 
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
 			if (updated) {
-				// TODO: capturar respuesta del envio de sms?
 				sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), "");
-				// TODO: capturar respuesta del BO?
-				sendCancellation(provision);
-				return true;
+				boolean sent = sendCancellation(provision);
+				return sent ? provision : null;
 			} else {
-				return false;
+				return null;
 			}
-
 		} else {
-			return false;
+			return null;
 		}
 	}
 
@@ -255,7 +241,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Boolean setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
+	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
@@ -273,15 +259,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
 			if (updated) {
-
 				boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-				return contactUpdated;
+				return contactUpdated ? provision : null;
 			} else {
-				return false;
+				return null;
 			}
-
 		} else {
-			return false;
+			return null;
 		}
 
 		/*

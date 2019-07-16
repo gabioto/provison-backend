@@ -34,4 +34,14 @@ public class ProvisionHeaderResponse {
 		this.datetime = new Date().toString();
 	}
 	
+	public ProvisionHeaderResponse generateHeader(int code, String message) {
+		ProvisionHeaderResponse result = new ProvisionHeaderResponse();
+		
+		result.setDatetime(new Date().toString());
+		result.setCode(code);
+		result.setMessage(message);
+		
+		return result;
+	}
+	
 }

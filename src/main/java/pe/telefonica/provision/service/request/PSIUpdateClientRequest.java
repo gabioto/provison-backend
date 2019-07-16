@@ -147,7 +147,6 @@ public class PSIUpdateClientRequest {
 		private String nombre_completo;
 		private String correo;
 		private String telefono1;
-		private String telefono2;
 		
 		public BodyUpdateClient() {
 			user = new User();
@@ -182,12 +181,6 @@ public class PSIUpdateClientRequest {
 		}
 		public void setTelefono1(String telefono1) {
 			this.telefono1 = telefono1;
-		}
-		public String getTelefono2() {
-			return telefono2;
-		}
-		public void setTelefono2(String telefono2) {
-			this.telefono2 = telefono2;
 		}
 
 		public class User{

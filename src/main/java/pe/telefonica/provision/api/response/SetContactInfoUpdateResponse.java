@@ -1,9 +1,11 @@
 package pe.telefonica.provision.api.response;
 
+import pe.telefonica.provision.dto.Provision;
+
 public class SetContactInfoUpdateResponse {
 
 	private ResponseHeader header;
-	private Boolean result;
+	private Provision result;
 
 	public ResponseHeader getHeader() {
 		return header;
@@ -13,11 +15,11 @@ public class SetContactInfoUpdateResponse {
 		this.header = header;
 	}
 
-	public Boolean getResult() {
+	public Provision getResult() {
 		return result;
 	}
 
-	public void setResult(Boolean result) {
+	public void setResult(Provision result) {
 		this.result = result;
 	}
 

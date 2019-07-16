@@ -1,5 +1,6 @@
 package pe.telefonica.provision.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -7,6 +8,7 @@ import javax.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,14 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.api.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.api.request.SetContactInfoUpdateRequest;
-import pe.telefonica.provision.api.response.OrderCancellationResponse;
 import pe.telefonica.provision.api.response.ProvisionArrayResponse;
+import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.api.response.ProvisionResponse;
 import pe.telefonica.provision.api.response.ReceiveAddressUpdateBOResponse;
-import pe.telefonica.provision.api.response.RequestAddressUpdateResponse;
 import pe.telefonica.provision.api.response.ResponseHeader;
-import pe.telefonica.provision.api.response.SetContactInfoUpdateResponse;
-import pe.telefonica.provision.api.response.SetProvisionValidatedResponse;
 import pe.telefonica.provision.dto.Customer;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.service.ProvisionService;
@@ -90,20 +89,20 @@ public class ProvisionApi {
 	 * @return
 	 */
 	@RequestMapping(value = "/setProvisionValidated", method = RequestMethod.POST)
-	public ResponseEntity<SetProvisionValidatedResponse> setProvisionValidated(
+	public ResponseEntity<ProvisionArrayResponse<Provision>> setProvisionValidated(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		log.info(this.getClass().getName() + " - " + "setProvisionValidated");
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		Provision result = provisionService.setProvisionIsValidated(provisionId);
 
-		Boolean result = provisionService.setProvisionIsValidated(provisionId);
-
-		SetProvisionValidatedResponse response = new SetProvisionValidatedResponse();
-		response.setResult(result);
-
-		if (result) {
-			response.setHeader(new ResponseHeader().generateHeader("ok", "ok"));
+		if (result != null) {
+			List<Provision> provisions = new ArrayList<>();
+			provisions.add(result);
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+			response.setData(provisions);
 			return ResponseEntity.ok(response);
 		} else {
-			response.setHeader(new ResponseHeader().generateHeader("err", "error"));
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
@@ -114,21 +113,21 @@ public class ProvisionApi {
 	 * @return
 	 */
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
-	public ResponseEntity<SetContactInfoUpdateResponse> setContactInfoUpdate(
+	public ResponseEntity<ProvisionArrayResponse<Provision>> setContactInfoUpdate(
 			@RequestBody SetContactInfoUpdateRequest request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
-
-		Boolean result = provisionService.setContactInfoUpdate(request.getProvisionId(), request.getContactFullname(),
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		Provision result = provisionService.setContactInfoUpdate(request.getProvisionId(), request.getContactFullname(),
 				request.getContactCellphone(), request.getContactCellphoneIsMovistar());
 
-		SetContactInfoUpdateResponse response = new SetContactInfoUpdateResponse();
-		response.setResult(result);
-
-		if (result) {
-			response.setHeader(new ResponseHeader().generateHeader("ok", "ok"));
+		if (result != null) {
+			List<Provision> provisions = new ArrayList<>();
+			provisions.add(result);
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+			response.setData(provisions);
 			return ResponseEntity.ok(response);
 		} else {
-			response.setHeader(new ResponseHeader().generateHeader("err", "error"));
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
@@ -139,20 +138,20 @@ public class ProvisionApi {
 	 * @return
 	 */
 	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
-	public ResponseEntity<RequestAddressUpdateResponse> requestAddressUpdate(
+	public ResponseEntity<ProvisionArrayResponse<Provision>> requestAddressUpdate(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		Provision result = provisionService.requestAddressUpdate(provisionId);
 
-		Boolean result = provisionService.requestAddressUpdate(provisionId);
-
-		RequestAddressUpdateResponse response = new RequestAddressUpdateResponse();
-		response.setResult(result);
-
-		if (result) {
-			response.setHeader(new ResponseHeader().generateHeader("ok", "ok"));
+		if (result != null) {
+			List<Provision> provisions = new ArrayList<>();
+			provisions.add(result);
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+			response.setData(provisions);
 			return ResponseEntity.ok(response);
 		} else {
-			response.setHeader(new ResponseHeader().generateHeader("err", "error"));
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
@@ -189,33 +188,21 @@ public class ProvisionApi {
 	 * @return
 	 */
 	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
-	public ResponseEntity<OrderCancellationResponse> orderCancellation(
+	public ResponseEntity<ProvisionArrayResponse<Provision>> orderCancellation(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		log.info(this.getClass().getName() + " - " + "orderCancellation");
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		Provision result = provisionService.orderCancellation(provisionId);
 
-		Boolean result = provisionService.orderCancellation(provisionId);
-
-		OrderCancellationResponse response = new OrderCancellationResponse();
-		response.setResult(result);
-
-		if (result) {
-			response.setHeader(new ResponseHeader().generateHeader("ok", "ok"));
+		if (result != null) {
+			List<Provision> provisions = new ArrayList<>();
+			provisions.add(result);
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+			response.setData(provisions);
 			return ResponseEntity.ok(response);
 		} else {
-			response.setHeader(new ResponseHeader().generateHeader("err", "error"));
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
-
-	/*
-	 * @RequestMapping(value="/receiveCancellationBOResponse",
-	 * method=RequestMethod.PUT) public
-	 * ResponseEntity<ReceiveCancellationBOResponse> receiveCancellationBOResponse(
-	 * 
-	 * @RequestParam(value = "provisionId", required = true) String provisionId){
-	 * 
-	 * 
-	 * return null; }
-	 */
-
 }

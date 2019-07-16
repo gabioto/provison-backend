@@ -18,15 +18,15 @@ public interface ProvisionService {
 
 	ProvisionArrayResponse<Provision> insertProvisionList(List<Provision> provisionList);
 
-	public Boolean setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
+	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
 
-	public Boolean setProvisionIsValidated(String provisionId);
+	public Provision setProvisionIsValidated(String provisionId);
 
-	public Boolean requestAddressUpdate(String provisionId);
+	public Provision requestAddressUpdate(String provisionId);
 
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);
 
-	public Boolean orderCancellation(String provisionId);
+	public Provision orderCancellation(String provisionId);
 }

@@ -29,4 +29,6 @@ public interface ProvisionService {
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);
 
 	public Provision orderCancellation(String provisionId);
+	
+	ProvisionResponse<Boolean> validateQueue();
 }

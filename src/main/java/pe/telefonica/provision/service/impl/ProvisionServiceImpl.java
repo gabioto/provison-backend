@@ -28,6 +28,7 @@ import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.dto.Customer;
 import pe.telefonica.provision.dto.Provision;
+import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.BORequest;
@@ -247,37 +248,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
-
-			Update update = new Update();
-			update.set("customer.contact_name", contactFullname);
-			update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
-			update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
 			provision.getCustomer().setContactName(contactFullname);
 			provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
 			provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());
 
-			boolean updated = provisionRepository.updateProvision(provision, update);
-
-			if (updated) {
-				boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-				return contactUpdated ? provision : null;
+			boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
+			
+			if (contactUpdated) {
+				Update update = new Update();
+				update.set("customer.contact_name", contactFullname);
+				update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
+				update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
+				boolean updated = provisionRepository.updateProvision(provision, update);
+				return updated ? provision : null;
 			} else {
 				return null;
 			}
 		} else {
 			return null;
 		}
-
-		/*
-		 * ProvisionArrayResponse<Provision> response = new
-		 * ProvisionArrayResponse<Provision>(); ProvisionHeaderResponse header = new
-		 * ProvisionHeaderResponse(); if (provisions.get().size() ==
-		 * provisionList.size()) {
-		 * header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name()); }
-		 * else { header.setCode(HttpStatus.OK.value()).
-		 * setMessage("No se encontraron provisiones"); } response.setHeader(header);
-		 * return response;
-		 */
 	}
 
 	private Boolean sendAddressChangeRequest(Provision provision) {
@@ -362,6 +351,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 			response.setHeader(header);
 		}
 
+		return response;
+	}
+
+	@Override
+	public ProvisionResponse<Boolean> validateQueue() {
+		Optional<Queue> optional = provisionRepository.isQueueAvailable();
+		ProvisionResponse<Boolean> response = new ProvisionResponse<Boolean>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+
+		if (optional.isPresent()) {
+			Queue queue = optional.get();
+			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+			response.setHeader(header).setData(queue.getActive());
+		} else {
+			header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron datos");
+			response.setHeader(header);
+		}
 		return response;
 	}
 }

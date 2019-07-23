@@ -27,6 +27,7 @@ import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.dto.Provision;
+import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
@@ -72,8 +73,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<String> getStatus(String provisionId) {
-		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))),
-				Provision.class);
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), Provision.class);
 		Optional<String> optionalOrder = Optional.ofNullable(provision.getActiveStatus());
 		return optionalOrder;
 	}
@@ -192,5 +193,19 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		String passMD5 = stringToMD5("aPpM0v1S7@R");
 		String authString = stringToMD5(DateUtil.getNowPsi(Constants.DATE_FORMAT_PSI_AUTH) + passMD5);
 		return authString;
+	}
+
+	@Override
+	public Optional<Queue> isQueueAvailable() {
+		Queue queue = null;
+		try {
+			queue = this.mongoOperations.findOne(new Query(Criteria.where("idContingencia").is("1")), Queue.class);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+		}
+
+		Optional<Queue> optionalQueue = Optional.ofNullable(queue);
+
+		return optionalQueue;
 	}
 }

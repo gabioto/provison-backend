@@ -65,6 +65,11 @@ public class ProvisionApi {
 		return ResponseEntity.ok(provisionService.getAll(new ProvisionRequest(documentType, documentNumber)));
 	}
 
+	/**
+	 * 
+	 * @param provisionId
+	 * @return
+	 */
 	@RequestMapping(value = "/getOrderStatus", method = RequestMethod.GET)
 	public ResponseEntity<ProvisionResponse<String>> getOrderStatus(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
@@ -204,5 +209,10 @@ public class ProvisionApi {
 			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);
 		}
+	}
+	
+	@RequestMapping(value = "/validateContingency", method = RequestMethod.GET)
+	public ResponseEntity<ProvisionResponse<Boolean>> getOrderStatus() {
+		return ResponseEntity.ok(provisionService.validateQueue());
 	}
 }

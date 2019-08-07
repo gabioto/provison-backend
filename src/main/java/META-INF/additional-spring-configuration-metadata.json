@@ -123,5 +123,10 @@
     "name": "external.api.psiUpdateClient",
     "type": "java.lang.String",
     "description": "A description for 'external.api.psiUpdateClient'"
+  },
+  {
+    "name": "external.api.updateSchedule",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.updateSchedule'"
   }
 ]}

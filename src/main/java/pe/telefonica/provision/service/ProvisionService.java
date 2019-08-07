@@ -31,4 +31,6 @@ public interface ProvisionService {
 	public Provision orderCancellation(String provisionId);
 	
 	ProvisionResponse<Boolean> validateQueue();
+	
+	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId, boolean hasSchedule);
 }

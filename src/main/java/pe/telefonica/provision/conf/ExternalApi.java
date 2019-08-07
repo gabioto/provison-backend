@@ -16,6 +16,7 @@ public class ExternalApi {
 	String sendSMS;
 	String sendRequestToBO;
 	String psiUpdateClient;
+	String updateSchedule;
 
 	public String getSendRequestToBO() {
 		return sendRequestToBO;
@@ -81,4 +82,11 @@ public class ExternalApi {
 		this.psiUrl = psiUrl;
 	}
 
+	public String getUpdateSchedule() {
+		return updateSchedule;
+	}
+
+	public void setUpdateSchedule(String updateSchedule) {
+		this.updateSchedule = updateSchedule;
+	}
 }

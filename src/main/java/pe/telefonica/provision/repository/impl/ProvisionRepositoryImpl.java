@@ -21,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.JsonObject;
 import com.mongodb.client.result.UpdateResult;
 
 import pe.telefonica.provision.api.request.ProvisionRequest;
@@ -118,6 +119,43 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		log.info(this.getClass().getName() + " - " + "updateContactInfoPsi");
 		boolean contactUpdated = updatePSIClient(provision);
 		return contactUpdated;
+	}
+	
+	@Override
+	public boolean updateCancelSchedule(Provision provision) {
+    	RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String urlProvisionUser = api.getScheduleUrl() + api.getUpdateSchedule();
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", "Basic dHJhY2VhYmlsaXR5VXNlcjptMFYxc3RAUkBnM25kNG0xM250MA==");
+		headersMap.add("X-IBM-Client-Id", "7c675f8f-3e95-4305-bd73-d7d0514180f4");
+		headersMap.add("X-IBM-Client-Secret", "0f03efb6-b288-4135-940e-8051790b0fe6");
+		
+		JsonObject jObject = new JsonObject();
+		jObject.addProperty("requestId", provision.getIdProvision());
+		jObject.addProperty("requestType", "provision");
+
+		HttpEntity<JsonObject> entityProvision = new HttpEntity<JsonObject>(jObject, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlProvisionUser, entityProvision, String.class);
+			log.info("responseEntity: " + responseEntity.getBody());
+			
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				
+				return true;
+			} else {
+				return false;
+			}
+
+			
+		} catch (Exception e) {
+			log.info("Exception = " + e.getMessage());
+			return false;
+		}
 	}
 
 	private Boolean updatePSIClient(Provision provision) {

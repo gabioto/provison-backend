@@ -188,6 +188,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public Provision orderCancellation(String provisionId) {
+		boolean sentBOCancellation;
+		boolean messageSent;
+		boolean provisionUpdated;
+		boolean scheduleUdated;
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
@@ -196,15 +200,29 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
 
-			boolean updated = provisionRepository.updateProvision(provision, update);
+			sentBOCancellation = sendCancellation(provision);
 
-			if (updated) {
-				sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), "");
-				boolean sent = sendCancellation(provision);
-				return sent ? provision : null;
-			} else {
+			if (!sentBOCancellation) {
 				return null;
 			}
+
+			if (provision.getHasSchedule()) {
+				scheduleUdated = provisionRepository.updateCancelSchedule(provision);
+
+				if (!scheduleUdated) {
+					return null;
+				}
+			}
+
+			provisionUpdated = provisionRepository.updateProvision(provision, update);
+
+			if (!provisionUpdated) {
+				return null;
+			}
+
+			messageSent = sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), "");
+
+			return messageSent ? provision : null;
 		} else {
 			return null;
 		}
@@ -223,17 +241,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 		smsRequest.setCustomerPhoneIsMovistar(customerPhoneIsMovistar);
 		smsRequest.setContactPhone(String.valueOf(customer.getContactPhoneNumber()));
 		Boolean contactrPhoneIsMovistar = false;
-		// TODO: Aplicar Validacion
 		contactrPhoneIsMovistar = true;
-		/*
-		 * if (customer.getContactCarrier().equals("true")) { contactrPhoneIsMovistar =
-		 * true; }
-		 */
 		smsRequest.setContactPhoneIsMovistar(contactrPhoneIsMovistar);
 		smsRequest.setMessage(message);
 		smsRequest.setWebURL("");
+		
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", "Basic dHJhY2VhYmlsaXR5VXNlcjpsM0RaM3A5ZUwxblByMFYxc0kwbg==");
+		headersMap.add("X-IBM-Client-Id", "ddbc640b-e355-49a5-a4d9-f60a2e209f72");
+		headersMap.add("X-IBM-Client-Secret", "8a22ad5f-0de2-417f-9924-89dd904fb113");
 
-		ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendSMSUrl, smsRequest, String.class);
+		HttpEntity<SMSRequest> entitySMS = new HttpEntity<SMSRequest>(smsRequest, headersMap);
+
+		ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendSMSUrl, entitySMS, String.class);
 		if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 			return true;
 		} else {
@@ -253,7 +274,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());
 
 			boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-			
+
 			if (contactUpdated) {
 				Update update = new Update();
 				update.set("customer.contact_name", contactFullname);
@@ -368,6 +389,33 @@ public class ProvisionServiceImpl implements ProvisionService {
 			header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron datos");
 			response.setHeader(header);
 		}
+		return response;
+	}
+
+	@Override
+	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId, boolean hasSchedule) {
+		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
+		ProvisionResponse<Boolean> response = new ProvisionResponse<Boolean>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+
+		if (optional.isPresent()) {
+			Provision provision = optional.get();
+			Update update = new Update();
+			update.set("has_schedule", hasSchedule);
+			boolean updated = provisionRepository.updateProvision(provision, update);
+
+			if (updated) {
+				header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+				response.setHeader(header).setData(true);
+			} else {
+				header.setCode(HttpStatus.BAD_REQUEST.value()).setMessage("No se pudo actualizar");
+				response.setHeader(header).setData(false);
+			}
+		} else {
+			header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron provisiones");
+			response.setHeader(header).setData(false);
+		}
+		
 		return response;
 	}
 }

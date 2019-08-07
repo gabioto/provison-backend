@@ -215,4 +215,11 @@ public class ProvisionApi {
 	public ResponseEntity<ProvisionResponse<Boolean>> getOrderStatus() {
 		return ResponseEntity.ok(provisionService.validateQueue());
 	}
+	
+	@RequestMapping(value = "/updateOrderSchedule", method = RequestMethod.PUT)
+	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(
+			@RequestParam(value = "provisionId", required = true) String provisionId,
+			@RequestParam(value = "hasScheduled", required = true) boolean hasSchedule) {
+		return ResponseEntity.ok(provisionService.updateOrderSchedule(provisionId, hasSchedule));
+	}
 }

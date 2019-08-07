@@ -25,5 +25,7 @@ public interface ProvisionRepository {
 
 	boolean updateProvision(Provision provision, Update update);
 	
+	boolean updateCancelSchedule(Provision provision);
+	
 	Optional<Queue> isQueueAvailable();
 }

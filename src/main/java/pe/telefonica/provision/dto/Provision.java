@@ -83,6 +83,9 @@ public class Provision implements Serializable {
 	@Field("register_date")
 	private Date registerDate = new Date();
 	
+	@Field("has_schedule")
+	private Boolean hasSchedule = false;
+	
 	@Field("internet_detail")
 	private Internet internetDetail;
 	
@@ -269,6 +272,14 @@ public class Provision implements Serializable {
 
 	public void setRegisterDate(Date registerDate) {
 		this.registerDate = registerDate;
+	}
+
+	public Boolean getHasSchedule() {
+		return hasSchedule;
+	}
+
+	public void setHasSchedule(Boolean hasSchedule) {
+		this.hasSchedule = hasSchedule;
 	}
 
 	public Internet getInternetDetail() {

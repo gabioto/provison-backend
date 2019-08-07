@@ -144,14 +144,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlProvisionUser, entityProvision, String.class);
 			log.info("responseEntity: " + responseEntity.getBody());
 			
-			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-				
-				return true;
-			} else {
-				return false;
-			}
-
-			
+			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());
 			return false;

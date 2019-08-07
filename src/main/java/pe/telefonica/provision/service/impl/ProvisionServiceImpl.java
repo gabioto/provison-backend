@@ -191,7 +191,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		boolean sentBOCancellation;
 		boolean messageSent;
 		boolean provisionUpdated;
-		boolean scheduleUdated;
+		boolean scheduleUpdated;
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
@@ -207,9 +207,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provision.getHasSchedule()) {
-				scheduleUdated = provisionRepository.updateCancelSchedule(provision);
+				scheduleUpdated = provisionRepository.updateCancelSchedule(provision);
 
-				if (!scheduleUdated) {
+				if (!scheduleUpdated) {
 					return null;
 				}
 			}

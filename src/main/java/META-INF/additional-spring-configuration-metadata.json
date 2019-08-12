@@ -128,5 +128,65 @@
     "name": "external.api.updateSchedule",
     "type": "java.lang.String",
     "description": "A description for 'external.api.updateSchedule'"
+  },
+  {
+    "name": "security.ibm.seguridad.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.seguridad.clientId'"
+  },
+  {
+    "name": "security.ibm.seguridad.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.seguridad.clientSecret'"
+  },
+  {
+    "name": "security.ibm.seguridad.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.seguridad.auth'"
+  },
+  {
+    "name": "security.ibm.agendamiento.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.agendamiento.clientId'"
+  },
+  {
+    "name": "security.ibm.agendamiento.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.agendamiento.clientSecret'"
+  },
+  {
+    "name": "security.ibm.agendamiento.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.agendamiento.auth'"
+  },
+  {
+    "name": "security.ibm.provision.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.provision.clientId'"
+  },
+  {
+    "name": "security.ibm.provision.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.provision.clientSecret'"
+  },
+  {
+    "name": "security.ibm.provision.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.provision.auth'"
+  },
+  {
+    "name": "security.ibm.averia.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.averia.clientId'"
+  },
+  {
+    "name": "security.ibm.averia.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.averia.clientSecret'"
+  },
+  {
+    "name": "security.ibm.averia.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.averia.auth'"
   }
 ]}

@@ -18,6 +18,7 @@ public class BORequest {
 	private String codigoTraza;
 	private String codigostpsi;
 	private String codigopedido;
+	private Boolean carrier;
 	
 	public String getCodigoTraza() {
 		return codigoTraza;
@@ -114,5 +115,11 @@ public class BORequest {
 	}
 	public void setCodaction(String codaction) {
 		this.codaction = codaction;
+	}
+	public Boolean getCarrier() {
+		return carrier;
+	}
+	public void setCarrier(Boolean carrier) {
+		this.carrier = carrier;
 	}
 }

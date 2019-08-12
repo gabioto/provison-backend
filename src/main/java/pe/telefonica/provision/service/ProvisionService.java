@@ -32,5 +32,5 @@ public interface ProvisionService {
 	
 	ProvisionResponse<Boolean> validateQueue();
 	
-	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId, boolean hasSchedule);
+	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId);
 }

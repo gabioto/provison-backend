@@ -27,6 +27,7 @@ import com.mongodb.client.result.UpdateResult;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
+import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
@@ -42,6 +43,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private ExternalApi api;
+
+	@Autowired
+	private IBMSecurityAgendamiento securitySchedule;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -120,20 +124,20 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		boolean contactUpdated = updatePSIClient(provision);
 		return contactUpdated;
 	}
-	
+
 	@Override
 	public boolean updateCancelSchedule(Provision provision) {
-    	RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String urlProvisionUser = api.getScheduleUrl() + api.getUpdateSchedule();
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization", "Basic dHJhY2VhYmlsaXR5VXNlcjptMFYxc3RAUkBnM25kNG0xM250MA==");
-		headersMap.add("X-IBM-Client-Id", "7c675f8f-3e95-4305-bd73-d7d0514180f4");
-		headersMap.add("X-IBM-Client-Secret", "0f03efb6-b288-4135-940e-8051790b0fe6");
-		
+		headersMap.add("Authorization", securitySchedule.getAuth());
+		headersMap.add("X-IBM-Client-Id", securitySchedule.getClientId());
+		headersMap.add("X-IBM-Client-Secret", securitySchedule.getClientSecret());
+
 		JsonObject jObject = new JsonObject();
 		jObject.addProperty("requestId", provision.getIdProvision());
 		jObject.addProperty("requestType", "provision");
@@ -141,9 +145,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		HttpEntity<JsonObject> entityProvision = new HttpEntity<JsonObject>(jObject, headersMap);
 
 		try {
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlProvisionUser, entityProvision, String.class);
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlProvisionUser, entityProvision,
+					String.class);
 			log.info("responseEntity: " + responseEntity.getBody());
-			
+
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());

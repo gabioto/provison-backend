@@ -59,4 +59,10 @@ public class ReceiveAddressUpdateBORequest {
 	public void setIsSMSRequired(Boolean isSMSRequired) {
 		this.isSMSRequired = isSMSRequired;
 	}
+	@Override
+	public String toString() {
+		return "ReceiveAddressUpdateBORequest [action=" + action + ", isSMSRequired=" + isSMSRequired + ", provisionId="
+				+ provisionId + ", newDepartment=" + newDepartment + ", newProvince=" + newProvince + ", newDistrict="
+				+ newDistrict + ", newAddress=" + newAddress + ", newReference=" + newReference + "]";
+	}
 }

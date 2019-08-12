@@ -61,6 +61,8 @@ public class Customer implements Serializable{
 	
 	@Field("longitude")
 	private Double longitude;
+	
+	private String productName;
 
 	public String getDocumentType() {
 		return documentType;
@@ -205,5 +207,12 @@ public class Customer implements Serializable{
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 }

@@ -170,7 +170,7 @@ public class ProvisionApi {
 	public ResponseEntity<ReceiveAddressUpdateBOResponse> receiveAddressUpdateBO(
 			@RequestBody ReceiveAddressUpdateBORequest request) {
 		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO");
-
+		log.info(this.getClass().getName() + " - " + request.toString());
 		Boolean result = provisionService.receiveAddressUpdateBO(request.getAction(), request.getProvisionId(),
 				request.getNewDepartment(), request.getNewProvince(), request.getNewDistrict(), request.getNewAddress(),
 				request.getNewReference(), request.getIsSMSRequired());
@@ -218,8 +218,7 @@ public class ProvisionApi {
 	
 	@RequestMapping(value = "/updateOrderSchedule", method = RequestMethod.PUT)
 	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(
-			@RequestParam(value = "provisionId", required = true) String provisionId,
-			@RequestParam(value = "hasScheduled", required = true) boolean hasSchedule) {
-		return ResponseEntity.ok(provisionService.updateOrderSchedule(provisionId, hasSchedule));
+			@RequestParam(value = "provisionId", required = true) String provisionId) {
+		return ResponseEntity.ok(provisionService.updateOrderSchedule(provisionId));
 	}
 }

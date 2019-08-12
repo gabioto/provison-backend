@@ -25,6 +25,7 @@ import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.api.response.ProvisionResponse;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
+import pe.telefonica.provision.conf.IBMSecurity;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.dto.Customer;
 import pe.telefonica.provision.dto.Provision;
@@ -47,19 +48,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private ProvisionTexts provisionTexts;
 
 	@Autowired
+	private IBMSecurity security;
+
+	@Autowired
 	public ProvisionServiceImpl(ProvisionRepository provisionRepository) {
 		this.provisionRepository = provisionRepository;
 	}
 
 	@Override
 	public ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest) {
-		Optional<Provision> fault = provisionRepository.getOrder(provisionRequest);
+		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest);
 		ProvisionResponse<Customer> response = new ProvisionResponse<Customer>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 
-		if (fault.isPresent() && fault.get().getCustomer() != null) {
+		if (provision.isPresent() && provision.get().getCustomer() != null) {
+			Provision prov = provision.get();
+			prov.getCustomer().setProductName(prov.getProductName());
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(fault.get().getCustomer());
+			response.setHeader(header).setData(prov.getCustomer());
 		} else {
 			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron datos del cliente");
 			response.setHeader(header);
@@ -245,12 +251,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		smsRequest.setContactPhoneIsMovistar(contactrPhoneIsMovistar);
 		smsRequest.setMessage(message);
 		smsRequest.setWebURL("");
-		
+
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization", "Basic dHJhY2VhYmlsaXR5VXNlcjpsM0RaM3A5ZUwxblByMFYxc0kwbg==");
-		headersMap.add("X-IBM-Client-Id", "ddbc640b-e355-49a5-a4d9-f60a2e209f72");
-		headersMap.add("X-IBM-Client-Secret", "8a22ad5f-0de2-417f-9924-89dd904fb113");
+		headersMap.add("Authorization", security.getAuth());
+		headersMap.add("X-IBM-Client-Id", security.getClientId());
+		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
 
 		HttpEntity<SMSRequest> entitySMS = new HttpEntity<SMSRequest>(smsRequest, headersMap);
 
@@ -334,6 +340,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		boRequest.setCodigoTraza(provision.getIdProvision());
 		boRequest.setCodigostpsi(provision.getXaIdSt());
 		boRequest.setCodigopedido(provision.getXaRequest());
+		boRequest.setCarrier(Boolean.valueOf(provision.getCustomer().getCarrier()));
 
 		// TODO: poner en parametros o properties
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
@@ -393,7 +400,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId, boolean hasSchedule) {
+	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 		ProvisionResponse<Boolean> response = new ProvisionResponse<Boolean>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
@@ -401,7 +408,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
 			Update update = new Update();
-			update.set("has_schedule", hasSchedule);
+			update.set("has_schedule", true);
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
 			if (updated) {
@@ -415,7 +422,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron provisiones");
 			response.setHeader(header).setData(false);
 		}
-		
+
 		return response;
 	}
 }

@@ -161,12 +161,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 				boolean updated = provisionRepository.updateProvision(provision, update);
 
 				if (isSMSRequired) {
-					sendSMS(provision.getCustomer(), provisionTexts.getUnreachable(), "");
+					String name = provision.getCustomer().getName().split(" ")[0];
+					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
+					messageSMS = provisionTexts.getCancelledByCustomer().replace("[$product]", provision.getProductName());
+					sendSMS(provision.getCustomer(), messageSMS, "");
 				}
 
 				return updated;
 			} else if (action.equals(Constants.ADDRESS_UNREACHABLE)) {
-				sendSMS(provision.getCustomer(), provisionTexts.getUnreachable(), "");
+				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
+				sendSMS(provision.getCustomer(), messageSMS, provisionTexts.getMainWeb());
 				return true;
 			} else {
 				Update update = new Update();

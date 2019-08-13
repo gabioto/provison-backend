@@ -203,17 +203,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		if(profiles.length > 0) {
 			activeProfile = profiles[0];
-			log.info("getCapacityPSI - getActiveProfiles: " + activeProfile);
+			log.info("updatePSIClient - getActiveProfiles: " + activeProfile);
 		}
 		
 		if(activeProfile != null) {
 			if(activeProfile.equals(Constants.ENVIROMENT_PROD)){
 				PSIToken psiToken = new PSIToken();
-				if(psiTokenRepository.getRefreshToken().isPresent()) {
-					authString = getPSIProductionToken(psiToken);
-				} else {
-					authString = "AALAPyPKMd0Sa8y9jslJPfG1qw91zVDv3ZVohOcoPL3YeUItFXdQ94FJnJY3vS4ABHVi62rFn_yXIx4l1O_E4YRZrdvBSFxkXpHuwdnqlFcGVpo8Imb8gqFa9rWkAcPV-M0";
-				}
+				//TODO: consumir metodo de tokens PSI de agendamiento
 				clientId = "f8ffe5b5-75ec-4d65-b0d6-869cf642b642";
 			}
 		}

@@ -12,11 +12,13 @@ public class ExternalApi {
 	String provisionUrl;
 	String boUrl;
 	String psiUrl;
+	String oauth2Url;
 
 	String sendSMS;
 	String sendRequestToBO;
 	String psiUpdateClient;
 	String updateSchedule;
+	String oauth2Token;
 
 	public String getSendRequestToBO() {
 		return sendRequestToBO;

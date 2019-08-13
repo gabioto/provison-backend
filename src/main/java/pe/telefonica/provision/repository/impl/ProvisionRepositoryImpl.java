@@ -8,12 +8,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Repository;
@@ -28,6 +31,7 @@ import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
+import pe.telefonica.provision.dto.PSIToken;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
@@ -43,7 +47,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private ExternalApi api;
-
+	@Autowired
+	private Environment environment;
 	@Autowired
 	private IBMSecurityAgendamiento securitySchedule;
 
@@ -189,6 +194,35 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
 		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
 
+		//Aqui se emplea un token diferente (estatico o dinamico) dependiendo del ambiente desplegado
+		String authString = "Bearer AAIkNjcxMjg5ZWItM2EyMC00ZTE4LWIzNTMtMjMxZGU5MmJiMDQ3SntvyuX56u439Ar0wfEzFRqGphAxBr7D6N7A5k_XjkEgCG-vUd-oM3iC1DlZonaoxBOM6Tk_LKcx9-dV0j-WsX1vCeQ5laESZouTkfl0lNA";
+		String clientId   = "671289eb-3a20-4e18-b353-231de92bb047";
+		
+		String[] profiles = environment.getActiveProfiles();
+		String activeProfile = null;
+
+		if(profiles.length > 0) {
+			activeProfile = profiles[0];
+			log.info("getCapacityPSI - getActiveProfiles: " + activeProfile);
+		}
+		
+		if(activeProfile != null) {
+			if(activeProfile.equals(Constants.ENVIROMENT_PROD)){
+				PSIToken psiToken = new PSIToken();
+				if(psiTokenRepository.getRefreshToken().isPresent()) {
+					authString = getPSIProductionToken(psiToken);
+				} else {
+					authString = "AALAPyPKMd0Sa8y9jslJPfG1qw91zVDv3ZVohOcoPL3YeUItFXdQ94FJnJY3vS4ABHVi62rFn_yXIx4l1O_E4YRZrdvBSFxkXpHuwdnqlFcGVpo8Imb8gqFa9rWkAcPV-M0";
+				}
+				clientId = "f8ffe5b5-75ec-4d65-b0d6-869cf642b642";
+			}
+		}
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("Authorization", authString);
+		headers.set("X-IBM-Client-Id", clientId);
+		
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
 		headersMap.add("Authorization",

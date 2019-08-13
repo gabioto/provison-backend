@@ -17,4 +17,6 @@ public final class Constants {
 	public static final String DATE_FORMAT_PSI_AUTH = "yyyy-MM-dd";
 	public static final String TIMESTAMP_FORMAT_PSI  = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String TIMESTAMP_FORMAT_USER = "yyyy-MM-dd HH:mm:ss";
+	
+	public static final String ENVIROMENT_PROD = "prod";
 }

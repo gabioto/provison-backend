@@ -151,6 +151,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
+			String name = provision.getCustomer().getName().split(" ")[0];
 
 			if (action.equals(Constants.ADDRESS_CANCELLED_BY_CUSTOMER)
 					|| (action.equals(Constants.ADDRESS_CANCELLED_BY_CHANGE))) {
@@ -161,17 +162,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 				boolean updated = provisionRepository.updateProvision(provision, update);
 
 				if (isSMSRequired) {
-					String name = provision.getCustomer().getName().split(" ")[0];
 					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
-					messageSMS = provisionTexts.getCancelledByCustomer().replace("[$product]", provision.getProductName());
+					messageSMS = messageSMS.replace("[$product]", provision.getProductName());
 					sendSMS(provision.getCustomer(), messageSMS, "");
+					provisionRepository.sendCancelledMail(provision, name, "177970");
 				}
 
 				return updated;
 			} else if (action.equals(Constants.ADDRESS_UNREACHABLE)) {
+				Update update = new Update();
+				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
+				boolean updated = provisionRepository.updateProvision(provision, update);
+				
 				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
 				sendSMS(provision.getCustomer(), messageSMS, provisionTexts.getMainWeb());
-				return true;
+				provisionRepository.sendCancelledMail(provision, name, "177968");
+				return updated;
 			} else {
 				Update update = new Update();
 				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);

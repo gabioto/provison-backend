@@ -15,6 +15,7 @@ public class ExternalApi {
 	String oauth2Url;
 
 	String sendSMS;
+	String sendMail;
 	String sendRequestToBO;
 	String psiUpdateClient;
 	String updateSchedule;
@@ -90,5 +91,13 @@ public class ExternalApi {
 
 	public void setUpdateSchedule(String updateSchedule) {
 		this.updateSchedule = updateSchedule;
+	}
+
+	public String getSendMail() {
+		return sendMail;
+	}
+
+	public void setSendMail(String sendMail) {
+		this.sendMail = sendMail;
 	}
 }

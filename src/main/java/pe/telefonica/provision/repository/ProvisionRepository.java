@@ -28,4 +28,6 @@ public interface ProvisionRepository {
 	boolean updateCancelSchedule(Provision provision);
 	
 	Optional<Queue> isQueueAvailable();
+	
+	boolean sendCancelledMail(Provision provision, String name, String idTemplate);
 }

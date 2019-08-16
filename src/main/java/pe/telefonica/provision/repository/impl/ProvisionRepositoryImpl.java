@@ -1,7 +1,11 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -24,9 +28,12 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.JsonObject;
 import com.mongodb.client.result.UpdateResult;
 
+import pe.telefonica.provision.api.request.MailRequest;
+import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
+import pe.telefonica.provision.conf.IBMSecurity;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
@@ -46,6 +53,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private IBMSecurityAgendamiento securitySchedule;
+	
+	@Autowired
+	private IBMSecurity security;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -128,9 +138,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public boolean updateCancelSchedule(Provision provision) {
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
 		String urlProvisionUser = api.getScheduleUrl() + api.getUpdateSchedule();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
@@ -243,5 +252,70 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<Queue> optionalQueue = Optional.ofNullable(queue);
 
 		return optionalQueue;
+	}
+
+	@Override
+	public boolean sendCancelledMail(Provision provision, String name, String idTemplate) {
+		RestTemplate restTemplate = new RestTemplate();
+		String urlSendMail = api.getSecurityUrl() + api.getSendMail();
+		Calendar cancelationDate = Calendar.getInstance();
+		cancelationDate.setTime(new Date());
+		String month = cancelationDate.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+		month = month.substring(0, 1).toUpperCase() + month.substring(1);
+		int day = cancelationDate.get(Calendar.DAY_OF_MONTH);
+		int year = cancelationDate.get(Calendar.YEAR);
+		
+		ArrayList<MailParameter> mailParameters = new ArrayList<>();
+		
+		MailParameter mailParameter1 = new MailParameter();
+		mailParameter1.setParamKey("SHORTNAME");
+		mailParameter1.setParamValue(name);
+		mailParameters.add(mailParameter1);
+		
+		MailParameter mailParameter2 = new MailParameter();
+		mailParameter2.setParamKey("EMAIL");
+		mailParameter2.setParamValue(provision.getCustomer().getMail());
+		mailParameters.add(mailParameter2);
+		
+		MailParameter mailParameter3 = new MailParameter();
+		mailParameter3.setParamKey("PROVISIONNAME");
+		mailParameter3.setParamValue(provision.getProductName());
+		mailParameters.add(mailParameter3);
+		
+		MailParameter mailParameter4 = new MailParameter();
+		mailParameter4.setParamKey("CANCELATIONDATE");
+		mailParameter4.setParamValue(day + " de " + month + " de " + year);
+		mailParameters.add(mailParameter4);
+		
+		MailParameter mailParameter5 = new MailParameter();
+		mailParameter5.setParamKey("STOREURL");
+		mailParameter5.setParamValue(api.getSecurityUrl());
+		mailParameters.add(mailParameter5);
+
+		
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", security.getAuth());
+		headersMap.add("X-IBM-Client-Id", security.getClientId());
+		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
+
+		MailRequest mailRequest = new MailRequest();
+		mailRequest.setMailParameters(mailParameters.toArray(new MailParameter[mailParameters.size()]));
+		mailRequest.setMailTemplateId(idTemplate);
+
+		HttpEntity<MailRequest> entityMail = new HttpEntity<MailRequest>(mailRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSendMail, entityMail,
+					String.class);
+			log.info("responseEntity: " + responseEntity.getBody());
+
+			return responseEntity.getStatusCode().equals(HttpStatus.OK);
+		} catch (Exception e) {
+			log.info("Exception = " + e.getMessage());
+			return false;
+		}
 	}
 }

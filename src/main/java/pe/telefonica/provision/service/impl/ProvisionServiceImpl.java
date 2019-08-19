@@ -1,6 +1,8 @@
 package pe.telefonica.provision.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import pe.telefonica.provision.api.request.MailRequest;
+import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.api.response.ProvisionArrayResponse;
 import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
@@ -236,11 +240,113 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return null;
 			}
 
+			sendCancelledMail(provision);
 			messageSent = sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), "");
 
 			return messageSent ? provision : null;
 		} else {
 			return null;
+		}
+	}
+	
+	private Boolean sendContactInfoChangedMail(Provision provision) {
+		ArrayList<MailParameter> mailParameters = new ArrayList<>();
+		String customerFullName = provision.getCustomer().getName();
+		
+		MailParameter mailParameter1 = new MailParameter();
+		mailParameter1.setParamKey("SHORTNAME");
+		if(customerFullName.trim().length() > 0) {
+			String[] customerFullNameArrStr = customerFullName.split(" ");
+			mailParameter1.setParamValue(customerFullNameArrStr[0]);			
+		} else {
+			mailParameter1.setParamValue("");	
+		}
+		mailParameters.add(mailParameter1);
+		
+		MailParameter mailParameter2 = new MailParameter();
+		mailParameter2.setParamKey("EMAIL");
+		mailParameter2.setParamValue(provision.getCustomer().getMail());
+		mailParameters.add(mailParameter2);
+		
+		MailParameter mailParameter3 = new MailParameter();
+		mailParameter3.setParamKey("CONTACTFULLNAME");
+		mailParameter3.setParamValue(provision.getCustomer().getContactName());
+		mailParameters.add(mailParameter3);
+		
+		MailParameter mailParameter4 = new MailParameter();
+		mailParameter4.setParamKey("CONTACTID");
+		mailParameter4.setParamValue(provision.getCustomer().getContactPhoneNumber().toString());
+		mailParameters.add(mailParameter4);
+		
+		MailParameter mailParameter5 = new MailParameter();
+		mailParameter5.setParamKey("STOREURL");
+		mailParameter5.setParamValue("http://www.movistar.com.pe");
+		mailParameters.add(mailParameter5);
+		
+		return sendMail("177972", mailParameters.toArray(new MailParameter[0]));
+	}
+	
+	private Boolean sendCancelledMail(Provision provision) {
+		ArrayList<MailParameter> mailParameters = new ArrayList<>();
+		String customerFullName = provision.getCustomer().getName();
+		
+		MailParameter mailParameter1 = new MailParameter();
+		mailParameter1.setParamKey("SHORTNAME");
+		if(customerFullName.trim().length() > 0) {
+			String[] customerFullNameArrStr = customerFullName.split(" ");
+			mailParameter1.setParamValue(customerFullNameArrStr[0]);			
+		} else {
+			mailParameter1.setParamValue("");	
+		}
+		mailParameters.add(mailParameter1);
+		
+		MailParameter mailParameter2 = new MailParameter();
+		mailParameter2.setParamKey("EMAIL");
+		mailParameter2.setParamValue(provision.getCustomer().getMail());
+		mailParameters.add(mailParameter2);
+		
+		MailParameter mailParameter3 = new MailParameter();
+		mailParameter3.setParamKey("CANCELATIONMOTIVE");
+		mailParameter3.setParamValue(""); //TODO: no existe un motivo de cancelacion...
+		mailParameters.add(mailParameter3);
+		
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_WS);
+		
+		MailParameter mailParameter4 = new MailParameter();
+		mailParameter4.setParamKey("CANCELATIONDATE");
+		mailParameter4.setParamValue(sdf.format(cal.getTime()));
+		mailParameters.add(mailParameter4);
+		
+		MailParameter mailParameter5 = new MailParameter();
+		mailParameter5.setParamKey("STOREURL");
+		mailParameter5.setParamValue("http://www.movistar.com.pe");
+		mailParameters.add(mailParameter5);
+		
+		return sendMail("177970", mailParameters.toArray(new MailParameter[0]));
+	}
+	
+	private Boolean sendMail(String templateId, MailParameter[] mailParameters) {
+		RestTemplate restTemplate = new RestTemplate();
+
+		String sendMailUrl = api.getSecurityUrl() + api.getSendMail();
+		MailRequest mailRequest = new MailRequest();
+		mailRequest.setMailTemplateId(templateId);
+		mailRequest.setMailParameters(mailParameters);
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", security.getAuth());
+		headersMap.add("X-IBM-Client-Id", security.getClientId());
+		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
+
+		HttpEntity<MailRequest> entity = new HttpEntity<MailRequest>(mailRequest, headersMap);
+
+		ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendMailUrl, entity, String.class);
+		if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -292,6 +398,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
 
 			if (contactUpdated) {
+				sendContactInfoChangedMail(provision);
+				
 				Update update = new Update();
 				update.set("customer.contact_name", contactFullname);
 				update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));

@@ -38,11 +38,11 @@ import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurity;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
-import pe.telefonica.provision.dto.PSIToken;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
+import pe.telefonica.provision.service.response.GetPSITokenResponse;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
 import pe.telefonica.provision.util.DateUtil;
 
@@ -61,6 +61,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	
 	@Autowired
 	private IBMSecurity security;
+	@Autowired
+	private IBMSecurityAgendamiento securityAgendamiento;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -202,7 +204,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().getContactName());
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
 		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
-
+		
 		//Aqui se emplea un token diferente (estatico o dinamico) dependiendo del ambiente desplegado
 		String authString = "Bearer AAIkNjcxMjg5ZWItM2EyMC00ZTE4LWIzNTMtMjMxZGU5MmJiMDQ3SntvyuX56u439Ar0wfEzFRqGphAxBr7D6N7A5k_XjkEgCG-vUd-oM3iC1DlZonaoxBOM6Tk_LKcx9-dV0j-WsX1vCeQ5laESZouTkfl0lNA";
 		String clientId   = "671289eb-3a20-4e18-b353-231de92bb047";
@@ -217,8 +219,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		if(activeProfile != null) {
 			if(activeProfile.equals(Constants.ENVIROMENT_PROD)){
-				PSIToken psiToken = new PSIToken();
-				//TODO: consumir metodo de tokens PSI de agendamiento
+				authString = "Bearer " + getTokenFromPSI();
 				clientId = "f8ffe5b5-75ec-4d65-b0d6-869cf642b642";
 			}
 		}
@@ -227,14 +228,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Authorization", authString);
 		headers.set("X-IBM-Client-Id", clientId);
-		
-		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
-		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization",
-				"Bearer AAIkNjcxMjg5ZWItM2EyMC00ZTE4LWIzNTMtMjMxZGU5MmJiMDQ3A64HPWrsJq7VB9o6hCBJwBgamLHvKGNE2r4v8I5VRuINqlNU6wAO36ZhWzFwwD2-Gti_ca3vMAwaycR6P6UkNZFq685zKjWAk9RBoO1_5q4");
-		headersMap.add("X-IBM-Client-Id", "671289eb-3a20-4e18-b353-231de92bb047");
 
-		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headersMap);
+		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
 
 		try {
 			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
@@ -246,6 +241,29 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());
 			return false;
+		}
+	}
+	
+	private String getTokenFromPSI() {
+		RestTemplate restTemplate = new RestTemplate();
+		String urlToken = api.getScheduleUrl() + api.getGetPSIToken();
+		
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", securityAgendamiento.getAuth());
+		headersMap.add("X-IBM-Client-Id", securityAgendamiento.getClientId());
+		headersMap.add("X-IBM-Client-Secret", securityAgendamiento.getClientSecret());
+
+		HttpEntity<String> entityMail = new HttpEntity<String>(null, headersMap);
+
+		try {
+			ResponseEntity<GetPSITokenResponse> responseEntity = restTemplate.postForEntity(urlToken, entityMail, GetPSITokenResponse.class);
+			log.info("responseEntity: " + responseEntity.getBody());
+
+			return responseEntity.getBody().getPSIToken().getOuath2Token();
+		} catch (Exception e) {
+			log.info("Exception = " + e.getMessage());
+			return "";
 		}
 	}
 

@@ -12,14 +12,21 @@ public class ExternalApi {
 	String provisionUrl;
 	String boUrl;
 	String psiUrl;
-	String oauth2Url;
 
 	String sendSMS;
 	String sendMail;
 	String sendRequestToBO;
 	String psiUpdateClient;
 	String updateSchedule;
-	String oauth2Token;
+	String getPSIToken;
+
+	public String getGetPSIToken() {
+		return getPSIToken;
+	}
+
+	public void setGetPSIToken(String getPSIToken) {
+		this.getPSIToken = getPSIToken;
+	}
 
 	public String getSendRequestToBO() {
 		return sendRequestToBO;

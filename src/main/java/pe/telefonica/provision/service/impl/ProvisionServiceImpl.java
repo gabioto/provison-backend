@@ -1,10 +1,12 @@
 package pe.telefonica.provision.service.impl;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -169,7 +171,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
 					messageSMS = messageSMS.replace("[$product]", provision.getProductName());
 					sendSMS(provision.getCustomer(), messageSMS, "");
-					provisionRepository.sendCancelledMail(provision, name, "177970");
+					provisionRepository.sendCancelledMail(provision, name, "177970", Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
 				}
 
 				return updated;
@@ -180,7 +182,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				
 				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
 				sendSMS(provision.getCustomer(), messageSMS, provisionTexts.getMainWeb());
-				provisionRepository.sendCancelledMail(provision, name, "177968");
+				provisionRepository.sendCancelledMail(provision, name, "177968", Constants.ADDRESS_UNREACHABLE);
 				return updated;
 			} else {
 				Update update = new Update();
@@ -240,7 +242,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return null;
 			}
 
-			sendCancelledMail(provision);
+			sendCancelledMail(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
 			messageSent = sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), "");
 
 			return messageSent ? provision : null;
@@ -286,7 +288,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return sendMail("177972", mailParameters.toArray(new MailParameter[0]));
 	}
 	
-	private Boolean sendCancelledMail(Provision provision) {
+	private Boolean sendCancelledMail(Provision provision, String cancellationReason) {
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
 		String customerFullName = provision.getCustomer().getName();
 		
@@ -305,23 +307,35 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter2.setParamValue(provision.getCustomer().getMail());
 		mailParameters.add(mailParameter2);
 		
+		String reasonStr = "Solicitaste cancelar el pedido"; 
+		if(cancellationReason.equals(Constants.ADDRESS_UNREACHABLE)) {
+			reasonStr = "Dirección errada";
+		}
+		
 		MailParameter mailParameter3 = new MailParameter();
 		mailParameter3.setParamKey("CANCELATIONMOTIVE");
-		mailParameter3.setParamValue(""); //TODO: no existe un motivo de cancelacion...
+		mailParameter3.setParamValue(reasonStr);
 		mailParameters.add(mailParameter3);
 		
 		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_WS);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
+		String scheduleDateStr = sdf.format(cal.getTime());
 		
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CANCELATIONDATE");
-		mailParameter4.setParamValue(sdf.format(cal.getTime()));
+		mailParameter4.setParamValue(scheduleDateStr);
 		mailParameters.add(mailParameter4);
 		
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("STOREURL");
 		mailParameter5.setParamValue("http://www.movistar.com.pe");
 		mailParameters.add(mailParameter5);
+		
+		MailParameter mailParameter6 = new MailParameter();
+		mailParameter6.setParamKey("PROVISIONNAME");
+		mailParameter6.setParamValue(provision.getProductName());
+		mailParameters.add(mailParameter6);
 		
 		return sendMail("177970", mailParameters.toArray(new MailParameter[0]));
 	}
@@ -366,7 +380,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		contactrPhoneIsMovistar = true;
 		smsRequest.setContactPhoneIsMovistar(contactrPhoneIsMovistar);
 		smsRequest.setMessage(message);
-		smsRequest.setWebURL("");
+		smsRequest.setWebURL(webURL);
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");

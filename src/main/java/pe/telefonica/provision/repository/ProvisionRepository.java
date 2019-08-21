@@ -29,5 +29,5 @@ public interface ProvisionRepository {
 	
 	Optional<Queue> isQueueAvailable();
 	
-	boolean sendCancelledMail(Provision provision, String name, String idTemplate);
+	boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason);
 }

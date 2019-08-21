@@ -303,12 +303,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean sendCancelledMail(Provision provision, String name, String idTemplate) {
+	public boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSendMail = api.getSecurityUrl() + api.getSendMail();
 		Calendar cancelationDate = Calendar.getInstance();
 		cancelationDate.setTime(new Date());
-		String month = cancelationDate.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+		String month = cancelationDate.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("es", "ES"));
 		month = month.substring(0, 1).toUpperCase() + month.substring(1);
 		int day = cancelationDate.get(Calendar.DAY_OF_MONTH);
 		int year = cancelationDate.get(Calendar.YEAR);
@@ -330,6 +330,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		mailParameter3.setParamValue(provision.getProductName());
 		mailParameters.add(mailParameter3);
 		
+		String reasonStr = "Solicitaste cancelar el pedido"; 
+		if(cancellationReason.equals(Constants.ADDRESS_UNREACHABLE)) {
+			reasonStr = "Dirección errada";
+		}
+		
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CANCELATIONDATE");
 		mailParameter4.setParamValue(day + " de " + month + " de " + year);
@@ -337,9 +342,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("STOREURL");
-		mailParameter5.setParamValue(api.getSecurityUrl());
+		mailParameter5.setParamValue("http://www.movistar.com.pe");
 		mailParameters.add(mailParameter5);
 
+		MailParameter mailParameter6 = new MailParameter();
+		mailParameter6.setParamKey("CANCELATIONMOTIVE");
+		mailParameter6.setParamValue(reasonStr);
+		mailParameters.add(mailParameter6);
 		
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

@@ -279,8 +279,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameters.add(mailParameter4);
 		
 		MailParameter mailParameter5 = new MailParameter();
-		mailParameter5.setParamKey("STOREURL");
-		mailParameter5.setParamValue("http://www.movistar.com.pe");
+		mailParameter5.setParamKey("FOLLOWORDER");
+		mailParameter5.setParamValue(provisionTexts.getWebUrl());
 		mailParameters.add(mailParameter5);
 		
 		return sendMail("177972", mailParameters.toArray(new MailParameter[0]));

@@ -170,7 +170,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				if (isSMSRequired) {
 					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
 					messageSMS = messageSMS.replace("[$product]", provision.getProductName());
-					sendSMS(provision.getCustomer(), messageSMS, "");
+					sendSMS(provision.getCustomer(), messageSMS, "http://www.movistar.com.pe");
 					provisionRepository.sendCancelledMail(provision, name, "177970", Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
 				}
 
@@ -181,7 +181,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				boolean updated = provisionRepository.updateProvision(provision, update);
 				
 				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
-				sendSMS(provision.getCustomer(), messageSMS, provisionTexts.getMainWeb());
+				sendSMS(provision.getCustomer(), messageSMS, "http://www.movistar.com.pe");
 				provisionRepository.sendCancelledMail(provision, name, "177968", Constants.ADDRESS_UNREACHABLE);
 				return updated;
 			} else {

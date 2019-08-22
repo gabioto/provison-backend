@@ -1,6 +1,7 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -306,12 +307,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSendMail = api.getSecurityUrl() + api.getSendMail();
-		Calendar cancelationDate = Calendar.getInstance();
-		cancelationDate.setTime(new Date());
-		String month = cancelationDate.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("es", "ES"));
-		month = month.substring(0, 1).toUpperCase() + month.substring(1);
-		int day = cancelationDate.get(Calendar.DAY_OF_MONTH);
-		int year = cancelationDate.get(Calendar.YEAR);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
+		String scheduleDateStr = sdf.format(Calendar.getInstance().getTime());
 		
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
 		
@@ -337,7 +335,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CANCELATIONDATE");
-		mailParameter4.setParamValue(day + " de " + month + " de " + year);
+		mailParameter4.setParamValue(scheduleDateStr);
 		mailParameters.add(mailParameter4);
 		
 		MailParameter mailParameter5 = new MailParameter();

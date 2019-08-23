@@ -326,14 +326,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		mailParameter3.setParamValue(provision.getProductName());
 		mailParameters.add(mailParameter3);
 		
-		//Para los casos de falta de contacto, siempre enviara el de "Direccion errada"
-		if(!cancellationReason.equals(Constants.ADDRESS_UNREACHABLE)) {
-			MailParameter mailParameter6 = new MailParameter();
-			mailParameter6.setParamKey("CANCELATIONMOTIVE");
-			mailParameter6.setParamValue("Solicitaste cancelar el pedido");
-			mailParameters.add(mailParameter6);
-		}
-		
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CANCELATIONDATE");
 		mailParameter4.setParamValue(scheduleDateStr);
@@ -343,8 +335,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		mailParameter5.setParamKey("STOREURL");
 		mailParameter5.setParamValue("http://www.movistar.com.pe");
 		mailParameters.add(mailParameter5);
-
-		
 		
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

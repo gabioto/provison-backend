@@ -171,7 +171,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
 					messageSMS = messageSMS.replace("[$product]", provision.getProductName());
 					sendSMS(provision.getCustomer(), messageSMS, "");
-					provisionRepository.sendCancelledMail(provision, name, "177970",
+					provisionRepository.sendCancelledMail(provision, name, "179829",
 							Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
 				}
 
@@ -183,7 +183,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
 				sendSMS(provision.getCustomer(), messageSMS, "http://www.movistar.com.pe");
-				provisionRepository.sendCancelledMail(provision, name, "177968", Constants.ADDRESS_UNREACHABLE);
+				provisionRepository.sendCancelledMail(provision, name, "179824", Constants.ADDRESS_UNREACHABLE);
 				return updated;
 			} else {
 				Update update = new Update();
@@ -243,7 +243,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return null;
 			}
 
-			sendCancelledMail(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+			sendCancelledMailByUser(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
 
 			String name = provision.getCustomer().getName().split(" ")[0];
 			String messageSMS = provisionTexts.getCancelled().replace("[$name]", name);
@@ -291,10 +291,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter5.setParamValue(provisionTexts.getWebUrl());
 		mailParameters.add(mailParameter5);
 
-		return sendMail("177972", mailParameters.toArray(new MailParameter[0]));
+		return sendMail("179833", mailParameters.toArray(new MailParameter[0]));
 	}
 
-	private Boolean sendCancelledMail(Provision provision, String cancellationReason) {
+	private Boolean sendCancelledMailByUser(Provision provision, String cancellationReason) {
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
 		String customerFullName = provision.getCustomer().getName();
 
@@ -312,16 +312,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter2.setParamKey("EMAIL");
 		mailParameter2.setParamValue(provision.getCustomer().getMail());
 		mailParameters.add(mailParameter2);
-
-		String reasonStr = "Solicitaste cancelar el pedido";
-		if (cancellationReason.equals(Constants.ADDRESS_UNREACHABLE)) {
-			reasonStr = "Dirección errada";
-		}
-
-		MailParameter mailParameter3 = new MailParameter();
-		mailParameter3.setParamKey("CANCELATIONMOTIVE");
-		mailParameter3.setParamValue(reasonStr);
-		mailParameters.add(mailParameter3);
 
 		Calendar cal = Calendar.getInstance();
 
@@ -343,7 +333,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter6.setParamValue(provision.getProductName());
 		mailParameters.add(mailParameter6);
 
-		return sendMail("177970", mailParameters.toArray(new MailParameter[0]));
+		return sendMail("179829", mailParameters.toArray(new MailParameter[0]));
 	}
 
 	private Boolean sendMail(String templateId, MailParameter[] mailParameters) {

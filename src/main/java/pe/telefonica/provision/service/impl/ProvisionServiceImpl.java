@@ -134,6 +134,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provision = optional.get();
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_ADDRESS_CHANGED);
+			update.set("validated_address", "true");
 			provision.setActiveStatus(Constants.PROVISION_STATUS_ADDRESS_CHANGED);
 
 			boolean updated = provisionRepository.updateProvision(provision, update);

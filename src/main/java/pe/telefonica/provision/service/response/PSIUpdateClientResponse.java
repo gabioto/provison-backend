@@ -25,6 +25,15 @@ public class PSIUpdateClientResponse {
 		BodyOut = bodyOut;
 	}
 	
+	
+	
+	@Override
+	public String toString() {
+		return "PSIUpdateClientResponse [HeaderOut=" + HeaderOut + ", BodyOut=" + BodyOut + "]";
+	}
+
+
+
 	public class HeaderOut{
 		private String originator;
 		private String destination;
@@ -62,6 +71,13 @@ public class PSIUpdateClientResponse {
 		public void setMsgType(String msgType) {
 			this.msgType = msgType;
 		}
+		@Override
+		public String toString() {
+			return "HeaderOut [originator=" + originator + ", destination=" + destination + ", execId=" + execId
+					+ ", timestamp=" + timestamp + ", msgType=" + msgType + "]";
+		}
+		
+		
 	}
 	
 	public class BodyOut{
@@ -95,6 +111,13 @@ public class PSIUpdateClientResponse {
 		public void setSolicitud(String solicitud) {
 			this.solicitud = solicitud;
 		}
+		@Override
+		public String toString() {
+			return "BodyOut [error=" + error + ", code_error=" + code_error + ", message=" + message + ", solicitud="
+					+ solicitud + "]";
+		}
+		
+		
 	}
 	
 	

@@ -22,6 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.request.MailRequest;
 import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
@@ -230,7 +231,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provision.getHasSchedule()) {
-				scheduleUpdated = provisionRepository.updateCancelSchedule(provision);
+				//scheduleUpdated = faultRepository.cancelSchedule(new CancelRequest(fault.getIdFault(), "fault"));
+				scheduleUpdated = provisionRepository.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision"));
 
 				if (!scheduleUpdated) {
 					return null;

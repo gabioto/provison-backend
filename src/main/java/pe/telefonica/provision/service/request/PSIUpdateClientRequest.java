@@ -29,6 +29,15 @@ public class PSIUpdateClientRequest {
 	public void setBodyUpdateClient(BodyUpdateClient bodyUpdateClient) {
 		BodyUpdateClient = bodyUpdateClient;
 	}
+	
+	
+
+	@Override
+	public String toString() {
+		return "PSIUpdateClientRequest [HeaderIn=" + HeaderIn + ", BodyUpdateClient=" + BodyUpdateClient + "]";
+	}
+
+
 
 	public class HeaderIn{
 		
@@ -138,6 +147,13 @@ public class PSIUpdateClientRequest {
 		public void setMsgType(String msgType) {
 			this.msgType = msgType;
 		}
+		@Override
+		public String toString() {
+			return "HeaderIn [country=" + country + ", lang=" + lang + ", entity=" + entity + ", system=" + system
+					+ ", subsystem=" + subsystem + ", originator=" + originator + ", sender=" + sender + ", userId="
+					+ userId + ", wsId=" + wsId + ", wsIp=" + wsIp + ", operation=" + operation + ", destination="
+					+ destination + ", execId=" + execId + ", timestamp=" + timestamp + ", msgType=" + msgType + "]";
+		}
 	}
 	
 	public class BodyUpdateClient{
@@ -183,6 +199,16 @@ public class PSIUpdateClientRequest {
 			this.telefono1 = telefono1;
 		}
 
+		
+		
+		@Override
+		public String toString() {
+			return "BodyUpdateClient [user=" + user + ", solicitud=" + solicitud + ", nombre_completo="
+					+ nombre_completo + ", correo=" + correo + ", telefono1=" + telefono1 + "]";
+		}
+
+
+
 		public class User{
 			private String now;
 			private String login;
@@ -213,6 +239,13 @@ public class PSIUpdateClientRequest {
 			public void setAuth_string(String auth_string) {
 				this.auth_string = auth_string;
 			}
+			@Override
+			public String toString() {
+				return "User [now=" + now + ", login=" + login + ", company=" + company + ", auth_string=" + auth_string
+						+ "]";
+			}
+			
+			
 		}
 		
 		

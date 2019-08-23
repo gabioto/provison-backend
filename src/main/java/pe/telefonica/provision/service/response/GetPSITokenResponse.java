@@ -5,7 +5,7 @@ import pe.telefonica.provision.api.response.ResponseHeader;
 public class GetPSITokenResponse {
 	
 	private ResponseHeader header;
-	private PSIToken psiToken;
+	private String accessToken;
 	
 	public ResponseHeader getHeader() {
 		return header;
@@ -13,11 +13,11 @@ public class GetPSITokenResponse {
 	public void setHeader(ResponseHeader header) {
 		this.header = header;
 	}
-	public PSIToken getPSIToken() {
-		return psiToken;
+	public String getAccessToken() {
+		return accessToken;
 	}
-	public void setPSIToken(PSIToken psiToken) {
-		this.psiToken = psiToken;
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
 	}
 
 }

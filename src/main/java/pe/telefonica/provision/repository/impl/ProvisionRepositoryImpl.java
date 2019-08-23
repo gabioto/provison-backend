@@ -26,11 +26,13 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Repository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonObject;
 import com.mongodb.client.result.UpdateResult;
 
+import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.request.MailRequest;
 import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
@@ -145,7 +147,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean updateCancelSchedule(Provision provision) {
+	public boolean updateCancelSchedule(CancelRequest cancelRequest) {
+		log.info("updateCancelSchedule");
 		RestTemplate restTemplate = new RestTemplate();
 		String urlProvisionUser = api.getScheduleUrl() + api.getUpdateSchedule();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -156,11 +159,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		headersMap.add("X-IBM-Client-Id", securitySchedule.getClientId());
 		headersMap.add("X-IBM-Client-Secret", securitySchedule.getClientSecret());
 
-		JsonObject jObject = new JsonObject();
-		jObject.addProperty("requestId", provision.getIdProvision());
-		jObject.addProperty("requestType", "provision");
-
-		HttpEntity<JsonObject> entityProvision = new HttpEntity<JsonObject>(jObject, headersMap);
+		HttpEntity<CancelRequest> entityProvision = new HttpEntity<CancelRequest>(cancelRequest, headersMap);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlProvisionUser, entityProvision,
@@ -227,6 +226,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Authorization", "Bearer " + getTokenFromPSI());
 		headers.set("X-IBM-Client-Id", api.getOauth2Client());
+		
+		log.info("updatePSIClient - headers: " + headers.toString());
 
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
 
@@ -234,9 +235,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);
 
-			log.info("setSchedulePSI - Body: " + responseEntity.getBody());
+			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			log.info("HttpClientErrorException = " + e.getMessage());
+			log.info("getResponseBodyAsString = " + e.getResponseBodyAsString());
+			return false;
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());
 			return false;
@@ -259,7 +264,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			ResponseEntity<GetPSITokenResponse> responseEntity = restTemplate.postForEntity(urlToken, entityMail, GetPSITokenResponse.class);
 			log.info("responseEntity: " + responseEntity.getBody());
 
-			return responseEntity.getBody().getPSIToken().getOuath2Token();
+			return responseEntity.getBody().getAccessToken();
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());
 			return "";

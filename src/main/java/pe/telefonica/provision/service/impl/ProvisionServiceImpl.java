@@ -188,10 +188,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 				update.set("customer.department", newDepartment);
-				update.set("customer.province", newDepartment);
-				update.set("customer.district", newDepartment);
-				update.set("customer.address", newDepartment);
-				update.set("customer.reference", newDepartment);
+				update.set("customer.province", newProvince);
+				update.set("customer.district", newDistrict);
+				update.set("customer.address", newAddress);
+				update.set("customer.reference", newReference);
 
 				boolean updated = provisionRepository.updateProvision(provision, update);
 

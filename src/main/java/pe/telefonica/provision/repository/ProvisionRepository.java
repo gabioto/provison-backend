@@ -15,7 +15,7 @@ public interface ProvisionRepository {
 
 	Optional<Provision> getOrder(ProvisionRequest provisionRequest);
 	
-	Optional<String> getStatus(String provisionId);
+	Optional<Provision> getStatus(String provisionId);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
 

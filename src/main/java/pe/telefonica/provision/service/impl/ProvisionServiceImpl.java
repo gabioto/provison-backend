@@ -508,13 +508,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionResponse<String> getStatus(String provisionId) {
-		Optional<String> optional = provisionRepository.getStatus(provisionId);
+		Optional<Provision> optional = provisionRepository.getStatus(provisionId);
 		ProvisionResponse<String> response = new ProvisionResponse<String>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 
 		if (optional.isPresent()) {
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(optional.get());
+			response.setHeader(header).setData(optional.get().getActiveStatus());
 		} else {
 			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
 			response.setHeader(header);

@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -95,10 +94,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<String> getStatus(String provisionId) {
+	public Optional<Provision> getStatus(String provisionId) {
 		Provision provision = this.mongoOperations
 				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), Provision.class);
-		Optional<String> optionalOrder = Optional.ofNullable(provision.getActiveStatus());
+		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
 

@@ -39,6 +39,8 @@ import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurity;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
+import pe.telefonica.provision.conf.SSLClientFactory;
+import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
@@ -174,7 +176,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	private Boolean updatePSIClient(Provision provision) {
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
@@ -222,29 +224,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
 		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
 		
-		//Aqui se emplea un token diferente (estatico o dinamico) dependiendo del ambiente desplegado
-		String authString = "Bearer AAIkNjcxMjg5ZWItM2EyMC00ZTE4LWIzNTMtMjMxZGU5MmJiMDQ3SntvyuX56u439Ar0wfEzFRqGphAxBr7D6N7A5k_XjkEgCG-vUd-oM3iC1DlZonaoxBOM6Tk_LKcx9-dV0j-WsX1vCeQ5laESZouTkfl0lNA";
-		String clientId   = "671289eb-3a20-4e18-b353-231de92bb047";
-		
-		String[] profiles = environment.getActiveProfiles();
-		String activeProfile = null;
-
-		if(profiles.length > 0) {
-			activeProfile = profiles[0];
-			log.info("updatePSIClient - getActiveProfiles: " + activeProfile);
-		}
-		
-		if(activeProfile != null) {
-			if(activeProfile.equals(Constants.ENVIROMENT_PROD)){
-				authString = "Bearer " + getTokenFromPSI();
-				clientId = "f8ffe5b5-75ec-4d65-b0d6-869cf642b642";
-			}
-		}
-		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("Authorization", authString);
-		headers.set("X-IBM-Client-Id", clientId);
+		headers.set("Authorization", "Bearer " + getTokenFromPSI());
+		headers.set("X-IBM-Client-Id", api.getOauth2Client());
 
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
 

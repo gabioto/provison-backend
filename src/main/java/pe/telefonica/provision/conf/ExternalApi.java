@@ -12,6 +12,9 @@ public class ExternalApi {
 	String provisionUrl;
 	String boUrl;
 	String psiUrl;
+	
+	String oauth2Client;
+	String oauth2RefreshToken;
 
 	String sendSMS;
 	String sendMail;
@@ -19,6 +22,23 @@ public class ExternalApi {
 	String psiUpdateClient;
 	String updateSchedule;
 	String getPSIToken;
+
+	
+	public String getOauth2Client() {
+		return oauth2Client;
+	}
+
+	public void setOauth2Client(String oauth2Client) {
+		this.oauth2Client = oauth2Client;
+	}
+
+	public String getOauth2RefreshToken() {
+		return oauth2RefreshToken;
+	}
+
+	public void setOauth2RefreshToken(String oauth2RefreshToken) {
+		this.oauth2RefreshToken = oauth2RefreshToken;
+	}
 
 	public String getGetPSIToken() {
 		return getPSIToken;

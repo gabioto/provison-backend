@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -318,6 +319,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Calendar cal = Calendar.getInstance();
 
 		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
+		
 		String scheduleDateStr = sdf.format(cal.getTime());
 
 		MailParameter mailParameter4 = new MailParameter();

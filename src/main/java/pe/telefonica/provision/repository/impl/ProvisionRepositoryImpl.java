@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -312,6 +313,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		String urlSendMail = api.getSecurityUrl() + api.getSendMail();
 		
 		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
+		
 		String scheduleDateStr = sdf.format(Calendar.getInstance().getTime());
 		
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();

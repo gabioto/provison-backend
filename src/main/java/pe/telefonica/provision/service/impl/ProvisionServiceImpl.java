@@ -173,8 +173,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
 					messageSMS = messageSMS.replace("[$product]", provision.getProductName());
 					sendSMS(provision.getCustomer(), messageSMS, "");
-					provisionRepository.sendCancelledMail(provision, name, "179829",
-							Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+
+					try {
+						provisionRepository.sendCancelledMail(provision, name, "179829",
+								Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+					} catch (Exception e) {
+						log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+					}
+
 				}
 
 				return updated;
@@ -185,7 +191,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
 				sendSMS(provision.getCustomer(), messageSMS, "http://www.movistar.com.pe");
-				provisionRepository.sendCancelledMail(provision, name, "179824", Constants.ADDRESS_UNREACHABLE);
+
+				try {
+					provisionRepository.sendCancelledMail(provision, name, "179824", Constants.ADDRESS_UNREACHABLE);
+				} catch (Exception e) {
+					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+				}
+
 				return updated;
 			} else {
 				Update update = new Update();
@@ -232,8 +244,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provision.getHasSchedule()) {
-				//scheduleUpdated = faultRepository.cancelSchedule(new CancelRequest(fault.getIdFault(), "fault"));
-				scheduleUpdated = provisionRepository.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision"));
+				// scheduleUpdated = faultRepository.cancelSchedule(new
+				// CancelRequest(fault.getIdFault(), "fault"));
+				scheduleUpdated = provisionRepository
+						.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision"));
 
 				if (!scheduleUpdated) {
 					return null;
@@ -246,7 +260,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return null;
 			}
 
-			sendCancelledMailByUser(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+			try {
+				sendCancelledMailByUser(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+			} catch (Exception e) {
+				log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+			}
 
 			String name = provision.getCustomer().getName().split(" ")[0];
 			String messageSMS = provisionTexts.getCancelled().replace("[$name]", name);
@@ -263,6 +281,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private Boolean sendContactInfoChangedMail(Provision provision) {
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
 		String customerFullName = provision.getCustomer().getName();
+
+		if (provision.getCustomer().getMail() == null || provision.getCustomer().getMail().isEmpty()) {
+			return false;
+		}
 
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");
@@ -301,6 +323,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
 		String customerFullName = provision.getCustomer().getName();
 
+		if (provision.getCustomer().getMail() == null || provision.getCustomer().getMail().isEmpty()) {
+			return false;
+		}
+
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");
 		if (customerFullName.trim().length() > 0) {
@@ -320,7 +346,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
-		
+
 		String scheduleDateStr = sdf.format(cal.getTime());
 
 		MailParameter mailParameter4 = new MailParameter();
@@ -420,12 +446,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
 				updated = provisionRepository.updateProvision(provision, update);
 			}
-			
+
 			if (updated) {
-				sendContactInfoChangedMail(provision);
+				try {
+					sendContactInfoChangedMail(provision);
+				} catch (Exception e) {
+					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+				}
+				
 				sendSMS(provision.getCustomer(), provisionTexts.getContactUpdated(), provisionTexts.getWebUrl());
 				return provision;
-			}else {
+			} else {
 				return null;
 			}
 		} else {

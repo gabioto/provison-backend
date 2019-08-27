@@ -223,9 +223,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
 		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
 		
+		log.info("updatePSIClient - request: " + request.toString());
+		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("Authorization", "Bearer " + getTokenFromPSI());
+		//headers.set("Authorization", "Bearer " + getTokenFromPSI());
 		headers.set("X-IBM-Client-Id", api.getOauth2Client());
 		
 		log.info("updatePSIClient - headers: " + headers.toString());

@@ -454,6 +454,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_BO);
 		try {
 			dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_BO);
+			dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 			formattedDate = dateFormat.format(scheduledDate);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block

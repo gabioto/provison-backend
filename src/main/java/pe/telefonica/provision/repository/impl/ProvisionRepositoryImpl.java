@@ -313,13 +313,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSendMail = api.getSecurityUrl() + api.getSendMail();
-		
 		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
-		
 		String scheduleDateStr = sdf.format(Calendar.getInstance().getTime());
-		
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
+		
+		if (provision.getCustomer().getMail() == null || provision.getCustomer().getMail().isEmpty()) {
+			return false;
+		}
 		
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");

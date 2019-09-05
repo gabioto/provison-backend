@@ -97,6 +97,17 @@ public class Provision implements Serializable {
 	
 	@Field("customer")
 	private Customer customer;
+	
+	@Field("work_zone")
+	private String workZone;
+
+	public String getWorkZone() {
+		return workZone;
+	}
+
+	public void setWorkZone(String workZone) {
+		this.workZone = workZone;
+	}
 
 	public String getIdProvision() {
 		return idProvision;
@@ -327,7 +338,9 @@ public class Provision implements Serializable {
 				+ ", commercialOp=" + commercialOp + ", paymentMethod=" + paymentMethod + ", regularPrice="
 				+ regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency="
 				+ currency + ", installPrice=" + installPrice + ", activeStatus=" + activeStatus + ", statusToa="
-				+ statusToa + ", validatedAddress=" + validatedAddress + ", internetDetail=" + internetDetail
-				+ ", tvDetail=" + tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + "]";
+				+ statusToa + ", validatedAddress=" + validatedAddress + ", registerDate=" + registerDate
+				+ ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail
+				+ ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", workZone=" + workZone + "]";
 	}
+
 }

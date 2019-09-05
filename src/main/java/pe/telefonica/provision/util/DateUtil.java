@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import pe.telefonica.provision.conf.Constants;
 
@@ -12,6 +13,7 @@ public class DateUtil {
 
 	public static String dateToString(Date date) {
 		DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_WS);
+		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 		return dateFormat.format(date);
 	}
 
@@ -38,6 +40,7 @@ public class DateUtil {
 	public static String getNowPsi(String format) {
 		Date date = new Date();
 		DateFormat dateFormat = new SimpleDateFormat(format);
+		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 		return dateFormat.format(date);
 	}
 }

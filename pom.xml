@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>pe.telefonica</groupId>
 	<artifactId>tdp-provision</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>tdp-provision</name>
 	<description>Servicio web REST Provision</description>
 
@@ -61,6 +61,17 @@
 	    <dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
+		</dependency>
+		<!-- SSL Bypass  -->
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.5.9</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.squareup.okhttp3</groupId>
+		    <artifactId>okhttp</artifactId>
+		    <version>4.1.0</version>
 		</dependency>
 	</dependencies>
 

@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +23,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.request.MailRequest;
 import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
@@ -133,6 +136,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provision = optional.get();
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_ADDRESS_CHANGED);
+			update.set("validated_address", "true");
 			provision.setActiveStatus(Constants.PROVISION_STATUS_ADDRESS_CHANGED);
 
 			boolean updated = provisionRepository.updateProvision(provision, update);
@@ -169,7 +173,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
 					messageSMS = messageSMS.replace("[$product]", provision.getProductName());
 					sendSMS(provision.getCustomer(), messageSMS, "");
-					provisionRepository.sendCancelledMail(provision, name, "177970");
+
+					try {
+						provisionRepository.sendCancelledMail(provision, name, "179829",
+								Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+					} catch (Exception e) {
+						log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+					}
+
 				}
 
 				return updated;
@@ -177,24 +188,30 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 				boolean updated = provisionRepository.updateProvision(provision, update);
-				
+
 				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
-				sendSMS(provision.getCustomer(), messageSMS, provisionTexts.getMainWeb());
-				provisionRepository.sendCancelledMail(provision, name, "177968");
+				sendSMS(provision.getCustomer(), messageSMS, "http://www.movistar.com.pe");
+
+				try {
+					provisionRepository.sendCancelledMail(provision, name, "179824", Constants.ADDRESS_UNREACHABLE);
+				} catch (Exception e) {
+					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+				}
+
 				return updated;
 			} else {
 				Update update = new Update();
 				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 				update.set("customer.department", newDepartment);
-				update.set("customer.province", newDepartment);
-				update.set("customer.district", newDepartment);
-				update.set("customer.address", newDepartment);
-				update.set("customer.reference", newDepartment);
+				update.set("customer.province", newProvince);
+				update.set("customer.district", newDistrict);
+				update.set("customer.address", newAddress);
+				update.set("customer.reference", newReference);
 
 				boolean updated = provisionRepository.updateProvision(provision, update);
 
 				if (updated) {
-					sendSMS(provision.getCustomer(), provisionTexts.getAddressUpdated(), "");
+					sendSMS(provision.getCustomer(), provisionTexts.getAddressUpdated(), provisionTexts.getWebUrl());
 					return true;
 				} else {
 					return false;
@@ -227,7 +244,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provision.getHasSchedule()) {
-				scheduleUpdated = provisionRepository.updateCancelSchedule(provision);
+				// scheduleUpdated = faultRepository.cancelSchedule(new
+				// CancelRequest(fault.getIdFault(), "fault"));
+				scheduleUpdated = provisionRepository
+						.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision"));
 
 				if (!scheduleUpdated) {
 					return null;
@@ -240,92 +260,113 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return null;
 			}
 
-			sendCancelledMail(provision);
-			messageSent = sendSMS(provision.getCustomer(), provisionTexts.getCancelled(), "");
+			try {
+				sendCancelledMailByUser(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+			} catch (Exception e) {
+				log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+			}
+
+			String name = provision.getCustomer().getName().split(" ")[0];
+			String messageSMS = provisionTexts.getCancelled().replace("[$name]", name);
+			messageSMS = messageSMS.replace("[$product]", provision.getProductName());
+
+			messageSent = sendSMS(provision.getCustomer(), messageSMS, "");
 
 			return messageSent ? provision : null;
 		} else {
 			return null;
 		}
 	}
-	
+
 	private Boolean sendContactInfoChangedMail(Provision provision) {
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
 		String customerFullName = provision.getCustomer().getName();
-		
+
+		if (provision.getCustomer().getMail() == null || provision.getCustomer().getMail().isEmpty()) {
+			return false;
+		}
+
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");
-		if(customerFullName.trim().length() > 0) {
+		if (customerFullName.trim().length() > 0) {
 			String[] customerFullNameArrStr = customerFullName.split(" ");
-			mailParameter1.setParamValue(customerFullNameArrStr[0]);			
+			mailParameter1.setParamValue(customerFullNameArrStr[0]);
 		} else {
-			mailParameter1.setParamValue("");	
+			mailParameter1.setParamValue("");
 		}
 		mailParameters.add(mailParameter1);
-		
+
 		MailParameter mailParameter2 = new MailParameter();
 		mailParameter2.setParamKey("EMAIL");
 		mailParameter2.setParamValue(provision.getCustomer().getMail());
 		mailParameters.add(mailParameter2);
-		
+
 		MailParameter mailParameter3 = new MailParameter();
 		mailParameter3.setParamKey("CONTACTFULLNAME");
 		mailParameter3.setParamValue(provision.getCustomer().getContactName());
 		mailParameters.add(mailParameter3);
-		
+
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CONTACTID");
 		mailParameter4.setParamValue(provision.getCustomer().getContactPhoneNumber().toString());
 		mailParameters.add(mailParameter4);
-		
+
 		MailParameter mailParameter5 = new MailParameter();
-		mailParameter5.setParamKey("STOREURL");
-		mailParameter5.setParamValue("http://www.movistar.com.pe");
+		mailParameter5.setParamKey("FOLLOWORDER");
+		mailParameter5.setParamValue(provisionTexts.getWebUrl());
 		mailParameters.add(mailParameter5);
-		
-		return sendMail("177972", mailParameters.toArray(new MailParameter[0]));
+
+		return sendMail("179833", mailParameters.toArray(new MailParameter[0]));
 	}
-	
-	private Boolean sendCancelledMail(Provision provision) {
+
+	private Boolean sendCancelledMailByUser(Provision provision, String cancellationReason) {
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
 		String customerFullName = provision.getCustomer().getName();
-		
+
+		if (provision.getCustomer().getMail() == null || provision.getCustomer().getMail().isEmpty()) {
+			return false;
+		}
+
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");
-		if(customerFullName.trim().length() > 0) {
+		if (customerFullName.trim().length() > 0) {
 			String[] customerFullNameArrStr = customerFullName.split(" ");
-			mailParameter1.setParamValue(customerFullNameArrStr[0]);			
+			mailParameter1.setParamValue(customerFullNameArrStr[0]);
 		} else {
-			mailParameter1.setParamValue("");	
+			mailParameter1.setParamValue("");
 		}
 		mailParameters.add(mailParameter1);
-		
+
 		MailParameter mailParameter2 = new MailParameter();
 		mailParameter2.setParamKey("EMAIL");
 		mailParameter2.setParamValue(provision.getCustomer().getMail());
 		mailParameters.add(mailParameter2);
-		
-		MailParameter mailParameter3 = new MailParameter();
-		mailParameter3.setParamKey("CANCELATIONMOTIVE");
-		mailParameter3.setParamValue(""); //TODO: no existe un motivo de cancelacion...
-		mailParameters.add(mailParameter3);
-		
+
 		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_WS);
-		
+
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
+
+		String scheduleDateStr = sdf.format(cal.getTime());
+
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CANCELATIONDATE");
-		mailParameter4.setParamValue(sdf.format(cal.getTime()));
+		mailParameter4.setParamValue(scheduleDateStr);
 		mailParameters.add(mailParameter4);
-		
+
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("STOREURL");
 		mailParameter5.setParamValue("http://www.movistar.com.pe");
 		mailParameters.add(mailParameter5);
-		
-		return sendMail("177970", mailParameters.toArray(new MailParameter[0]));
+
+		MailParameter mailParameter6 = new MailParameter();
+		mailParameter6.setParamKey("PROVISIONNAME");
+		mailParameter6.setParamValue(provision.getProductName());
+		mailParameters.add(mailParameter6);
+
+		return sendMail("179829", mailParameters.toArray(new MailParameter[0]));
 	}
-	
+
 	private Boolean sendMail(String templateId, MailParameter[] mailParameters) {
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -366,7 +407,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		contactrPhoneIsMovistar = true;
 		smsRequest.setContactPhoneIsMovistar(contactrPhoneIsMovistar);
 		smsRequest.setMessage(message);
-		smsRequest.setWebURL("");
+		smsRequest.setWebURL(webURL);
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
@@ -388,6 +429,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
+		boolean updated = false;
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
@@ -398,14 +440,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 			boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
 
 			if (contactUpdated) {
-				sendContactInfoChangedMail(provision);
-				
 				Update update = new Update();
 				update.set("customer.contact_name", contactFullname);
 				update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
 				update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
-				boolean updated = provisionRepository.updateProvision(provision, update);
-				return updated ? provision : null;
+				updated = provisionRepository.updateProvision(provision, update);
+			}
+
+			if (updated) {
+				try {
+					sendContactInfoChangedMail(provision);
+				} catch (Exception e) {
+					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+				}
+				
+				sendSMS(provision.getCustomer(), provisionTexts.getContactUpdated(), provisionTexts.getWebUrl());
+				return provision;
 			} else {
 				return null;
 			}
@@ -435,6 +485,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_BO);
 		try {
 			dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_BO);
+			dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 			formattedDate = dateFormat.format(scheduledDate);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -485,13 +536,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionResponse<String> getStatus(String provisionId) {
-		Optional<String> optional = provisionRepository.getStatus(provisionId);
+		Optional<Provision> optional = provisionRepository.getStatus(provisionId);
 		ProvisionResponse<String> response = new ProvisionResponse<String>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 
 		if (optional.isPresent()) {
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(optional.get());
+			response.setHeader(header).setData(optional.get().getActiveStatus());
 		} else {
 			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
 			response.setHeader(header);

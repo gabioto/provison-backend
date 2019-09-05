@@ -1,12 +1,13 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,11 +27,13 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Repository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.JsonObject;
 import com.mongodb.client.result.UpdateResult;
 
+import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.request.MailRequest;
 import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
@@ -38,6 +41,8 @@ import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurity;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
+import pe.telefonica.provision.conf.SSLClientFactory;
+import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
@@ -94,10 +99,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<String> getStatus(String provisionId) {
+	public Optional<Provision> getStatus(String provisionId) {
 		Provision provision = this.mongoOperations
 				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), Provision.class);
-		Optional<String> optionalOrder = Optional.ofNullable(provision.getActiveStatus());
+		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
 
@@ -143,7 +148,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean updateCancelSchedule(Provision provision) {
+	public boolean updateCancelSchedule(CancelRequest cancelRequest) {
+		log.info("updateCancelSchedule");
 		RestTemplate restTemplate = new RestTemplate();
 		String urlProvisionUser = api.getScheduleUrl() + api.getUpdateSchedule();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -154,11 +160,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		headersMap.add("X-IBM-Client-Id", securitySchedule.getClientId());
 		headersMap.add("X-IBM-Client-Secret", securitySchedule.getClientSecret());
 
-		JsonObject jObject = new JsonObject();
-		jObject.addProperty("requestId", provision.getIdProvision());
-		jObject.addProperty("requestType", "provision");
-
-		HttpEntity<JsonObject> entityProvision = new HttpEntity<JsonObject>(jObject, headersMap);
+		HttpEntity<CancelRequest> entityProvision = new HttpEntity<CancelRequest>(cancelRequest, headersMap);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlProvisionUser, entityProvision,
@@ -173,7 +175,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	private Boolean updatePSIClient(Provision provision) {
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
@@ -183,6 +185,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getHeaderIn().setCountry("PE");
 		request.getHeaderIn().setLang("es");
 		request.getHeaderIn().setEntity("TDP");
+		
+		request.getHeaderIn().setSystem("SIVADAC");
+		request.getHeaderIn().setSubsystem("SIVADAC");
+		request.getHeaderIn().setOriginator("PE:TDP:SIVADAC:SIVADAC");
+		request.getHeaderIn().setSender("OracleServiceBus");
+		request.getHeaderIn().setUserId("USERSIVADAC");
+		request.getHeaderIn().setWsId("SistemSivadac");
+		request.getHeaderIn().setWsIp("10.10.10.10");
+		request.getHeaderIn().setOperation("updateClient");
+		request.getHeaderIn().setDestination("PE:SIVADAC:SIVADAC:SIVADAC");
+		request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
+		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
+		request.getHeaderIn().setMsgType("REQUEST");
+		
+		/*
 		request.getHeaderIn().setSystem("COL");
 		request.getHeaderIn().setSubsystem("TRA");
 		request.getHeaderIn().setOriginator("PE:TDP:COL:TRA");
@@ -195,7 +212,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
-
+		 */
+		
 		request.getBodyUpdateClient().getUser().setNow(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_USER));
 		request.getBodyUpdateClient().getUser().setLogin("appmovistar");
 		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
@@ -205,29 +223,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
 		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
 		
-		//Aqui se emplea un token diferente (estatico o dinamico) dependiendo del ambiente desplegado
-		String authString = "Bearer AAIkNjcxMjg5ZWItM2EyMC00ZTE4LWIzNTMtMjMxZGU5MmJiMDQ3SntvyuX56u439Ar0wfEzFRqGphAxBr7D6N7A5k_XjkEgCG-vUd-oM3iC1DlZonaoxBOM6Tk_LKcx9-dV0j-WsX1vCeQ5laESZouTkfl0lNA";
-		String clientId   = "671289eb-3a20-4e18-b353-231de92bb047";
-		
-		String[] profiles = environment.getActiveProfiles();
-		String activeProfile = null;
-
-		if(profiles.length > 0) {
-			activeProfile = profiles[0];
-			log.info("updatePSIClient - getActiveProfiles: " + activeProfile);
-		}
-		
-		if(activeProfile != null) {
-			if(activeProfile.equals(Constants.ENVIROMENT_PROD)){
-				authString = "Bearer " + getTokenFromPSI();
-				clientId = "f8ffe5b5-75ec-4d65-b0d6-869cf642b642";
-			}
-		}
+		log.info("updatePSIClient - request: " + request.toString());
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("Authorization", authString);
-		headers.set("X-IBM-Client-Id", clientId);
+		//headers.set("Authorization", "Bearer " + getTokenFromPSI());
+		headers.set("X-IBM-Client-Id", api.getOauth2Client());
+		
+		log.info("updatePSIClient - headers: " + headers.toString());
 
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
 
@@ -235,9 +238,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);
 
-			log.info("setSchedulePSI - Body: " + responseEntity.getBody());
+			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			log.info("HttpClientErrorException = " + e.getMessage());
+			log.info("getResponseBodyAsString = " + e.getResponseBodyAsString());
+			return false;
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());
 			return false;
@@ -260,7 +267,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			ResponseEntity<GetPSITokenResponse> responseEntity = restTemplate.postForEntity(urlToken, entityMail, GetPSITokenResponse.class);
 			log.info("responseEntity: " + responseEntity.getBody());
 
-			return responseEntity.getBody().getPSIToken().getOuath2Token();
+			return responseEntity.getBody().getAccessToken();
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());
 			return "";
@@ -303,17 +310,17 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean sendCancelledMail(Provision provision, String name, String idTemplate) {
+	public boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSendMail = api.getSecurityUrl() + api.getSendMail();
-		Calendar cancelationDate = Calendar.getInstance();
-		cancelationDate.setTime(new Date());
-		String month = cancelationDate.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-		month = month.substring(0, 1).toUpperCase() + month.substring(1);
-		int day = cancelationDate.get(Calendar.DAY_OF_MONTH);
-		int year = cancelationDate.get(Calendar.YEAR);
-		
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_EMAILING, new Locale("es", "ES"));
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
+		String scheduleDateStr = sdf.format(Calendar.getInstance().getTime());
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
+		
+		if (provision.getCustomer().getMail() == null || provision.getCustomer().getMail().isEmpty()) {
+			return false;
+		}
 		
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");
@@ -332,14 +339,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CANCELATIONDATE");
-		mailParameter4.setParamValue(day + " de " + month + " de " + year);
+		mailParameter4.setParamValue(scheduleDateStr);
 		mailParameters.add(mailParameter4);
 		
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("STOREURL");
-		mailParameter5.setParamValue(api.getSecurityUrl());
+		mailParameter5.setParamValue("http://www.movistar.com.pe");
 		mailParameters.add(mailParameter5);
-
 		
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

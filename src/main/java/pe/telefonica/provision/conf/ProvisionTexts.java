@@ -9,6 +9,7 @@ public class ProvisionTexts {
 
 	String webUrl;
 	String addressUpdated;
+	String contactUpdated;
 	String unreachable;
 	String cancelled;
 	String cancelledByCustomer;
@@ -49,6 +50,12 @@ public class ProvisionTexts {
 	}
 	public void setMainWeb(String mainWeb) {
 		this.mainWeb = mainWeb;
+	}
+	public String getContactUpdated() {
+		return contactUpdated;
+	}
+	public void setContactUpdated(String contactUpdated) {
+		this.contactUpdated = contactUpdated;
 	}
 	
 }

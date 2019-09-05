@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.core.query.Update;
 
+import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
@@ -15,7 +16,7 @@ public interface ProvisionRepository {
 
 	Optional<Provision> getOrder(ProvisionRequest provisionRequest);
 	
-	Optional<String> getStatus(String provisionId);
+	Optional<Provision> getStatus(String provisionId);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
 
@@ -25,9 +26,9 @@ public interface ProvisionRepository {
 
 	boolean updateProvision(Provision provision, Update update);
 	
-	boolean updateCancelSchedule(Provision provision);
+	boolean updateCancelSchedule(CancelRequest cancelRequest);
 	
 	Optional<Queue> isQueueAvailable();
 	
-	boolean sendCancelledMail(Provision provision, String name, String idTemplate);
+	boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason);
 }

@@ -1,8 +1,7 @@
 ---
 applications:
   - name: PROVISION-TRAZABILIDAD
-    routes:
-    - route: provision-trazabilidad-dev.mybluemix.net
+    random-route: true
     memory: 2GB
     path: target/tdp-provision-0.0.1-SNAPSHOT.jar
     buildpack: liberty-for-java

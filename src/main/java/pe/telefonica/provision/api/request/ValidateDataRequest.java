@@ -1,7 +1,6 @@
 package pe.telefonica.provision.api.request;
 
-
-public class CancelRequest extends LogDataFrontendRequest {
+public class ValidateDataRequest extends LogDataFrontendRequest {
 
 	private String provisionId;
 
@@ -12,4 +11,5 @@ public class CancelRequest extends LogDataFrontendRequest {
 	public void setProvisionId(String provisionId) {
 		this.provisionId = provisionId;
 	}
+
 }

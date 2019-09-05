@@ -19,6 +19,7 @@ public class ExternalApi {
 	String psiUpdateClient;
 	String updateSchedule;
 	String getPSIToken;
+	String securitySaveLogData;
 
 	public String getGetPSIToken() {
 		return getPSIToken;
@@ -107,4 +108,13 @@ public class ExternalApi {
 	public void setSendMail(String sendMail) {
 		this.sendMail = sendMail;
 	}
+
+	public String getSecuritySaveLogData() {
+		return securitySaveLogData;
+	}
+
+	public void setSecuritySaveLogData(String securitySaveLogData) {
+		this.securitySaveLogData = securitySaveLogData;
+	}
+
 }

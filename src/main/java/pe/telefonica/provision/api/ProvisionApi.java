@@ -17,9 +17,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
+
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.api.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.api.request.SetContactInfoUpdateRequest;
+import pe.telefonica.provision.api.request.ValidateDataRequest;
+import pe.telefonica.provision.api.request.AddressUpdateRequest;
+import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.response.ProvisionArrayResponse;
 import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.api.response.ProvisionResponse;
@@ -28,6 +33,8 @@ import pe.telefonica.provision.api.response.ResponseHeader;
 import pe.telefonica.provision.dto.Customer;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.service.ProvisionService;
+import pe.telefonica.provision.restclient.RestSecuritySaveLogData;
+import pe.telefonica.provision.util.ConstantsLogData;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -38,7 +45,10 @@ public class ProvisionApi {
 
 	@Autowired
 	ProvisionService contactService;
-
+	
+	@Autowired
+	RestSecuritySaveLogData restSecuritySaveLogData;
+	
 	private final ProvisionService provisionService;
 
 	@Autowired
@@ -93,8 +103,8 @@ public class ProvisionApi {
 	 * @param provisionId
 	 * @return
 	 */
-	@RequestMapping(value = "/setProvisionValidated", method = RequestMethod.POST)
-	public ResponseEntity<ProvisionArrayResponse<Provision>> setProvisionValidated(
+	@RequestMapping(value = "/setProvisionValidatedOLD", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionArrayResponse<Provision>> setProvisionValidatedOLD(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		log.info(this.getClass().getName() + " - " + "setProvisionValidated");
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
@@ -111,7 +121,46 @@ public class ProvisionApi {
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
+	
+	@RequestMapping(value = "/setProvisionValidated", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionArrayResponse<Provision>> setProvisionValidated(
+			@RequestBody ValidateDataRequest request) {
+		log.info(this.getClass().getName() + " - " + "setProvisionValidated");
+		
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		
+		try {
+			Provision result = provisionService.setProvisionIsValidated(request.getProvisionId());
 
+			if (result != null) {
+				List<Provision> provisions = new ArrayList<>();
+				provisions.add(result);
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+				response.setData(provisions);
+				
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_VALIDATE_DATA );
+				
+				
+				return ResponseEntity.ok(response);
+			} else {
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+				
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_VALIDATE_DATA );
+				
+				
+				return ResponseEntity.badRequest().body(response);
+			}
+		} catch (Exception ex) {
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+					request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_VALIDATE_DATA );
+			
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+			return ResponseEntity.badRequest().body(response);
+		}
+		
+	}
 	/**
 	 * 
 	 * @param request
@@ -121,20 +170,45 @@ public class ProvisionApi {
 	public ResponseEntity<ProvisionArrayResponse<Provision>> setContactInfoUpdate(
 			@RequestBody SetContactInfoUpdateRequest request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+		
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
-		Provision result = provisionService.setContactInfoUpdate(request.getProvisionId(), request.getContactFullname(),
-				request.getContactCellphone(), request.getContactCellphoneIsMovistar());
+		
+		try {
+			
+			Provision result = provisionService.setContactInfoUpdate(request.getProvisionId(), request.getContactFullname(),
+					request.getContactCellphone(), request.getContactCellphoneIsMovistar());
 
-		if (result != null) {
-			List<Provision> provisions = new ArrayList<>();
-			provisions.add(result);
-			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
-			response.setData(provisions);
-			return ResponseEntity.ok(response);
-		} else {
+			if (result != null) {
+				List<Provision> provisions = new ArrayList<>();
+				provisions.add(result);
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+				response.setData(provisions);
+				
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO );
+				
+				
+				return ResponseEntity.ok(response);
+			} else {
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+				
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO );
+				
+				return ResponseEntity.badRequest().body(response);
+			}
+		} catch (Exception ex) {
+			
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+					request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO );
+			
+			
 			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);
 		}
+		
+		
+		
 	}
 
 	/**
@@ -142,25 +216,96 @@ public class ProvisionApi {
 	 * @param provisionId
 	 * @return
 	 */
-	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
-	public ResponseEntity<ProvisionArrayResponse<Provision>> requestAddressUpdate(
+	@RequestMapping(value = "/requestAddressUpdateOLD", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionArrayResponse<Provision>> requestAddressUpdateOLD(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
-		Provision result = provisionService.requestAddressUpdate(provisionId);
-
-		if (result != null) {
-			List<Provision> provisions = new ArrayList<>();
-			provisions.add(result);
-			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
-			response.setData(provisions);
-			return ResponseEntity.ok(response);
-		} else {
+		
+		try {
+			
+			
+			Provision result = provisionService.requestAddressUpdate(provisionId);
+			
+			
+			
+			if (result != null) {
+				List<Provision> provisions = new ArrayList<>();
+				provisions.add(result);
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+				response.setData(provisions);
+				
+				restSecuritySaveLogData.saveLogData(result.getCustomer().getDocumentNumber(), result.getCustomer().getDocumentType(),
+						result.getOrderCode(), "bucket", "OK", provisionId.toString(), new Gson().toJson(response), ConstantsLogData.PROVISION_VALIDATE_DATA );
+				
+				
+				return ResponseEntity.ok(response);
+			} else {
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+				
+				restSecuritySaveLogData.saveLogData(result.getCustomer().getDocumentNumber(), result.getCustomer().getDocumentType(),
+						result.getOrderCode(), "bucket", "ERROR", provisionId.toString(), new Gson().toJson(response), ConstantsLogData.PROVISION_VALIDATE_DATA );
+				
+				return ResponseEntity.badRequest().body(response);
+			}
+			
+		} catch (Exception ex) {
+			
 			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+			
+			restSecuritySaveLogData.saveLogData("", "",
+					"", "bucket", "ERROR", provisionId.toString(), new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_VALIDATE_DATA );
+			
 			return ResponseEntity.badRequest().body(response);
 		}
+		
 	}
-
+	
+	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionArrayResponse<Provision>> requestAddressUpdate(
+			@RequestBody AddressUpdateRequest request) {
+		
+		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
+		
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		
+		try {
+			
+			
+			Provision result = provisionService.requestAddressUpdate(request.getProvisionId());
+			
+			
+			
+			if (result != null) {
+				List<Provision> provisions = new ArrayList<>();
+				provisions.add(result);
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+				response.setData(provisions);
+				
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_ADDRESS );
+				
+				return ResponseEntity.ok(response);
+			} else {
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+				
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_ADDRESS );
+				
+				return ResponseEntity.badRequest().body(response);
+			}
+			
+		} catch (Exception ex) {
+			
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+					request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_UPDATE_ADDRESS );
+			
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+			
+			return ResponseEntity.badRequest().body(response);
+		}
+		
+	}
 	/**
 	 * 
 	 * @param request
@@ -192,8 +337,8 @@ public class ProvisionApi {
 	 * @param provisionId
 	 * @return
 	 */
-	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
-	public ResponseEntity<ProvisionArrayResponse<Provision>> orderCancellation(
+	@RequestMapping(value = "/orderCancellationOLD", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionArrayResponse<Provision>> orderCancellationOLD(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		log.info(this.getClass().getName() + " - " + "orderCancellation");
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
@@ -209,6 +354,45 @@ public class ProvisionApi {
 			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);
 		}
+	}
+	
+	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
+	public ResponseEntity<ProvisionArrayResponse<Provision>> orderCancellation(
+			@RequestBody CancelRequest request) {
+		log.info(this.getClass().getName() + " - " + "orderCancellation");
+		
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		try {
+			Provision result = provisionService.orderCancellation(request.getProvisionId());
+			
+			if (result != null) {
+				List<Provision> provisions = new ArrayList<>();
+				provisions.add(result);
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+				response.setData(provisions);
+				
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_CANCEL );
+				
+				
+				return ResponseEntity.ok(response);
+			} else {
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+						request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(response), ConstantsLogData.PROVISION_CANCEL );
+				
+				return ResponseEntity.badRequest().body(response);
+			}
+			
+		} catch (Exception ex) {
+			
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+					request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_CANCEL );
+			
+			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
+			return ResponseEntity.badRequest().body(response);
+		}
+		
 	}
 	
 	@RequestMapping(value = "/validateContingency", method = RequestMethod.GET)

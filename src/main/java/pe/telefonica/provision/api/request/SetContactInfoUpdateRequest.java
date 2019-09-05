@@ -1,6 +1,7 @@
 package pe.telefonica.provision.api.request;
 
-public class SetContactInfoUpdateRequest {
+
+public class SetContactInfoUpdateRequest extends LogDataFrontendRequest{
 	
 	private String provisionId;
 	private String contactFullname;

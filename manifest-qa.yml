@@ -4,7 +4,7 @@ applications:
     routes:
     - route: provision-trazabilidad-test.mybluemix.net/
     memory: 2GB
-    path: target/tdp-provision-0.0.1-SNAPSHOT.jar
+    path: target/tdp-provision-1.0.1-SNAPSHOT.jar
     buildpack: liberty-for-java
     health-check-type: process
     disk_quota: 2GB

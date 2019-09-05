@@ -2,7 +2,7 @@
 applications:
   - name: PROVISION-TRAZABILIDAD
     routes:
-    - route: trazabilidad-backoffice-backend-dev.mybluemix.net
+    - route: provision-trazabilidad-test.mybluemix.net/
     memory: 2GB
     path: target/tdp-provision-0.0.1-SNAPSHOT.jar
     buildpack: liberty-for-java

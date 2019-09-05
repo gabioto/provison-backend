@@ -24,6 +24,7 @@ import pe.telefonica.provision.api.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.api.request.SetContactInfoUpdateRequest;
 import pe.telefonica.provision.api.request.ValidateDataRequest;
 import pe.telefonica.provision.api.request.AddressUpdateRequest;
+import pe.telefonica.provision.api.request.CancelOrderRequest;
 import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.response.ProvisionArrayResponse;
 import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
@@ -358,7 +359,7 @@ public class ProvisionApi {
 	
 	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
 	public ResponseEntity<ProvisionArrayResponse<Provision>> orderCancellation(
-			@RequestBody CancelRequest request) {
+			@RequestBody CancelOrderRequest request) {
 		log.info(this.getClass().getName() + " - " + "orderCancellation");
 		
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();

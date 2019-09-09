@@ -30,6 +30,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mongodb.client.result.UpdateResult;
 
@@ -225,11 +226,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		log.info("updatePSIClient - request: " + request.toString());
 		
+		System.out.println(new Gson().toJson(request));
+		
 		HttpHeaders headers = new HttpHeaders();
+		
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		//headers.set("Authorization", "Bearer " + getTokenFromPSI());
 		headers.set("X-IBM-Client-Id", api.getOauth2Client());
-		
+		System.out.println(api.getOauth2Client());
 		log.info("updatePSIClient - headers: " + headers.toString());
 
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);

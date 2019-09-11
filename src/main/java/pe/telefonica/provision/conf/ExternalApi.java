@@ -12,6 +12,7 @@ public class ExternalApi {
 	String provisionUrl;
 	String boUrl;
 	String psiUrl;
+	String oauthToken;
 	
 	String oauth2Client;
 	String oauth2RefreshToken;
@@ -137,4 +138,11 @@ public class ExternalApi {
 		this.securitySaveLogData = securitySaveLogData;
 	}
 
+	public String getOauthToken() {
+		return oauthToken;
+	}
+
+	public void setOauthToken(String oauthToken) {
+		this.oauthToken = oauthToken;
+	}
 }

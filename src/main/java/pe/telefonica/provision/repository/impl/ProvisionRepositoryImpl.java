@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -13,13 +14,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +32,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.JsonObject;
 import com.mongodb.client.result.UpdateResult;
 
+import pe.telefonica.provision.api.common.ApiRequest;
+import pe.telefonica.provision.api.common.ApiResponse;
 import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.request.MailRequest;
 import pe.telefonica.provision.api.request.MailRequest.MailParameter;
@@ -43,11 +46,11 @@ import pe.telefonica.provision.conf.IBMSecurity;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.conf.SSLClientFactory;
 import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
+import pe.telefonica.provision.dto.OAuthToken;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
-import pe.telefonica.provision.service.response.GetPSITokenResponse;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
 import pe.telefonica.provision.util.DateUtil;
 
@@ -59,15 +62,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private ExternalApi api;
-	@Autowired
-	private Environment environment;
+
 	@Autowired
 	private IBMSecurityAgendamiento securitySchedule;
-	
+
 	@Autowired
 	private IBMSecurity security;
-	@Autowired
-	private IBMSecurityAgendamiento securityAgendamiento;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -175,7 +175,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	private Boolean updatePSIClient(Provision provision) {
-		RestTemplate restTemplate = new RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		String oAuthToken;
+		RestTemplate restTemplate = new RestTemplate(
+				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
@@ -185,7 +187,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getHeaderIn().setCountry("PE");
 		request.getHeaderIn().setLang("es");
 		request.getHeaderIn().setEntity("TDP");
-		
+
 		request.getHeaderIn().setSystem("SIVADAC");
 		request.getHeaderIn().setSubsystem("SIVADAC");
 		request.getHeaderIn().setOriginator("PE:TDP:SIVADAC:SIVADAC");
@@ -198,22 +200,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
-		
+
 		/*
-		request.getHeaderIn().setSystem("COL");
-		request.getHeaderIn().setSubsystem("TRA");
-		request.getHeaderIn().setOriginator("PE:TDP:COL:TRA");
-		request.getHeaderIn().setSender("OracleServiceBus");
-		request.getHeaderIn().setUserId("USERTRA");
-		request.getHeaderIn().setWsId("SistemTRA");
-		request.getHeaderIn().setWsIp("192.168.100.1");
-		request.getHeaderIn().setOperation("updateClient");
-		request.getHeaderIn().setDestination("PE:TDP:COL:TRA");
-		request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
-		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
-		request.getHeaderIn().setMsgType("REQUEST");
+		 * request.getHeaderIn().setSystem("COL");
+		 * request.getHeaderIn().setSubsystem("TRA");
+		 * request.getHeaderIn().setOriginator("PE:TDP:COL:TRA");
+		 * request.getHeaderIn().setSender("OracleServiceBus");
+		 * request.getHeaderIn().setUserId("USERTRA");
+		 * request.getHeaderIn().setWsId("SistemTRA");
+		 * request.getHeaderIn().setWsIp("192.168.100.1");
+		 * request.getHeaderIn().setOperation("updateClient");
+		 * request.getHeaderIn().setDestination("PE:TDP:COL:TRA");
+		 * request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
+		 * request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.
+		 * TIMESTAMP_FORMAT_PSI)); request.getHeaderIn().setMsgType("REQUEST");
 		 */
-		
+
 		request.getBodyUpdateClient().getUser().setNow(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_USER));
 		request.getBodyUpdateClient().getUser().setLogin("appmovistar");
 		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
@@ -222,14 +224,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().getContactName());
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
 		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
-		
+
 		log.info("updatePSIClient - request: " + request.toString());
-		
+
+		oAuthToken = getAuthToken(provision.getCustomer().getName());
+		log.info("updatePSIClient - oAuthToken: " + oAuthToken);
+
+		if (oAuthToken.isEmpty()) {
+			return false;
+		}
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		//headers.set("Authorization", "Bearer " + getTokenFromPSI());
+		headers.set("Authorization", "Bearer " + oAuthToken);
 		headers.set("X-IBM-Client-Id", api.getOauth2Client());
-		
+
 		log.info("updatePSIClient - headers: " + headers.toString());
 
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
@@ -250,28 +259,109 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			return false;
 		}
 	}
-	
-	private String getTokenFromPSI() {
+
+	private String getAuthToken(String customerName) {
+		String psiTokenGenerated = "";
+		Optional<OAuthToken> optionalAuthToken = getTokenFromCollection();
+
+		if (optionalAuthToken.isPresent()) {
+			OAuthToken oAuthToken = optionalAuthToken.get();
+			Date now = new Date();
+			long timeDiff = now.getTime() - (Long.parseLong(oAuthToken.getConsentedOn()) * 1000);
+
+			if (timeDiff >= ((Integer.parseInt(oAuthToken.getExpiresIn()) - 5) * 1000)) {
+				psiTokenGenerated = getTokenFromPSI(customerName, false);
+			} else {
+				psiTokenGenerated = oAuthToken.getAccessToken();
+			}
+
+		} else {
+			psiTokenGenerated = getTokenFromPSI(customerName, true);
+		}
+
+		return psiTokenGenerated;
+	}
+
+	private String getTokenFromPSI(String customerName, boolean toInsert) {
 		RestTemplate restTemplate = new RestTemplate();
-		String urlToken = api.getScheduleUrl() + api.getGetPSIToken();
-		
+		boolean updated = true;
+		String urlToken = api.getSecurityUrl() + api.getOauthToken();
+
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization", securityAgendamiento.getAuth());
-		headersMap.add("X-IBM-Client-Id", securityAgendamiento.getClientId());
-		headersMap.add("X-IBM-Client-Secret", securityAgendamiento.getClientSecret());
+		headersMap.add("Authorization", security.getAuth());
+		headersMap.add("X-IBM-Client-Id", security.getClientId());
+		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
 
-		HttpEntity<String> entityMail = new HttpEntity<String>(null, headersMap);
+		ApiRequest<Object> request = new ApiRequest<Object>(Constants.APP_NAME_PROVISION, customerName,
+				Constants.OPER_GET_OAUTH_TOKEN, null);
+
+		HttpEntity<ApiRequest<Object>> entityToken = new HttpEntity<ApiRequest<Object>>(request, headersMap);
 
 		try {
-			ResponseEntity<GetPSITokenResponse> responseEntity = restTemplate.postForEntity(urlToken, entityMail, GetPSITokenResponse.class);
+			ParameterizedTypeReference<ApiResponse<OAuthToken>> parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<OAuthToken>>() {
+			};
+			ResponseEntity<ApiResponse<OAuthToken>> responseEntity = restTemplate.exchange(urlToken, HttpMethod.POST,
+					entityToken, parameterizedTypeReference);
+
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				if (toInsert) {
+					insertToken(responseEntity.getBody().getBody());
+				} else {
+					updated = updateTokenInCollection(responseEntity.getBody());
+				}
+			} else {
+				return "";
+			}
+
 			log.info("responseEntity: " + responseEntity.getBody());
 
-			return responseEntity.getBody().getAccessToken();
+			return updated ? ((OAuthToken) responseEntity.getBody().getBody()).getAccessToken() : "";
 		} catch (Exception e) {
 			log.info("Exception = " + e.getMessage());
 			return "";
 		}
+	}
+
+	private Optional<OAuthToken> getTokenFromCollection() {
+		OAuthToken oAuthToken = null;
+		try {
+			oAuthToken = this.mongoOperations.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_PSI_TOKEN")),
+					OAuthToken.class);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+		}
+
+		Optional<OAuthToken> optionalPsiToken = Optional.ofNullable(oAuthToken);
+
+		return optionalPsiToken;
+	}
+
+	private boolean updateTokenInCollection(ApiResponse<OAuthToken> apiResponse) {
+
+		if (apiResponse.getBody() != null) {
+			OAuthToken oAuthToken = apiResponse.getBody();
+			Update update = new Update();
+			update.set("token_type", oAuthToken.getTokenType());
+			update.set("access_token", oAuthToken.getAccessToken());
+			update.set("expires_in", oAuthToken.getExpiresIn());
+			update.set("consented_on", oAuthToken.getConsentedOn());
+			update.set("scope", oAuthToken.getScope());
+			update.set("refresh_token", oAuthToken.getRefreshToken());
+			update.set("refresh_token_expires_in", oAuthToken.getRefreshTokenExpiresIn());
+
+			UpdateResult result = this.mongoOperations.updateFirst(
+					new Query(Criteria.where("token_key").is("PARAM_KEY_PSI_TOKEN")), update, OAuthToken.class);
+
+			return result.getMatchedCount() > 0;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean insertToken(OAuthToken oAuthToken) {
+		this.mongoOperations.insert(oAuthToken);
+		return true;
 	}
 
 	private String stringToMD5(String string) {
@@ -317,36 +407,36 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 		String scheduleDateStr = sdf.format(Calendar.getInstance().getTime());
 		ArrayList<MailParameter> mailParameters = new ArrayList<>();
-		
+
 		if (provision.getCustomer().getMail() == null || provision.getCustomer().getMail().isEmpty()) {
 			return false;
 		}
-		
+
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");
 		mailParameter1.setParamValue(name);
 		mailParameters.add(mailParameter1);
-		
+
 		MailParameter mailParameter2 = new MailParameter();
 		mailParameter2.setParamKey("EMAIL");
 		mailParameter2.setParamValue(provision.getCustomer().getMail());
 		mailParameters.add(mailParameter2);
-		
+
 		MailParameter mailParameter3 = new MailParameter();
 		mailParameter3.setParamKey("PROVISIONNAME");
 		mailParameter3.setParamValue(provision.getProductName());
 		mailParameters.add(mailParameter3);
-		
+
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CANCELATIONDATE");
 		mailParameter4.setParamValue(scheduleDateStr);
 		mailParameters.add(mailParameter4);
-		
+
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("STOREURL");
 		mailParameter5.setParamValue("http://www.movistar.com.pe");
 		mailParameters.add(mailParameter5);
-		
+
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
@@ -362,8 +452,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		HttpEntity<MailRequest> entityMail = new HttpEntity<MailRequest>(mailRequest, headersMap);
 
 		try {
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSendMail, entityMail,
-					String.class);
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSendMail, entityMail, String.class);
 			log.info("responseEntity: " + responseEntity.getBody());
 
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);

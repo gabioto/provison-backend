@@ -223,5 +223,10 @@
     "name": "external.api.getPSIToken",
     "type": "java.lang.String",
     "description": "A description for 'external.api.getPSIToken'"
+  },
+  {
+    "name": "external.api.oauthToken",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.oauthToken'"
   }
 ]}

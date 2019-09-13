@@ -49,6 +49,7 @@ import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.dto.OAuthToken;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
+import pe.telefonica.provision.exception.ServerNotFoundException;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
@@ -250,13 +251,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
-		} catch (HttpClientErrorException e) {
-			log.info("HttpClientErrorException = " + e.getMessage());
-			log.info("getResponseBodyAsString = " + e.getResponseBodyAsString());
-			return false;
-		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
-			return false;
+		} catch (HttpClientErrorException ex) {
+			log.info("HttpClientErrorException = " + ex.getMessage());
+			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
+			throw new ServerNotFoundException(ex.getResponseBodyAsString());
+			//return false;
+		} catch (Exception ex) {
+			log.info("Exception = " + ex.getMessage());
+			throw new ServerNotFoundException(ex.getMessage());
+			//return false;
 		}
 	}
 
@@ -326,7 +329,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private Optional<OAuthToken> getTokenFromCollection() {
 		OAuthToken oAuthToken = null;
 		try {
-			oAuthToken = this.mongoOperations.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_PSI_TOKEN")),
+			oAuthToken = this.mongoOperations.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")),
 					OAuthToken.class);
 		} catch (Exception e) {
 			log.info(e.getMessage());
@@ -351,7 +354,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			update.set("refresh_token_expires_in", oAuthToken.getRefreshTokenExpiresIn());
 
 			UpdateResult result = this.mongoOperations.updateFirst(
-					new Query(Criteria.where("token_key").is("PARAM_KEY_PSI_TOKEN")), update, OAuthToken.class);
+					new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")), update, OAuthToken.class);
 
 			return result.getMatchedCount() > 0;
 		} else {

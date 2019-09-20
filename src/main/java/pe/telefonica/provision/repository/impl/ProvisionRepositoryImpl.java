@@ -76,9 +76,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest) {
+	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType) {
 		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(provisionRequest.getDocumentType())
+				new Query(Criteria.where("customer.document_type").is(documentType)
 						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
@@ -88,9 +88,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<Provision> getOrder(ProvisionRequest provisionRequest) {
+	public Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType) {
 		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("customer.document_type").is(provisionRequest.getDocumentType())
+				new Query(Criteria.where("customer.document_type").is(documentType)
 						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),

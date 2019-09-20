@@ -64,9 +64,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest) {
-		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest);
+		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest, provisionRequest.getDocumentType());
 		ProvisionResponse<Customer> response = new ProvisionResponse<Customer>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+		
+		if (!provision.isPresent() && provisionRequest.getDocumentType().equals("CE")) {
+			provision = provisionRepository.getOrder(provisionRequest, "CEX");
+		}
 
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
 			Provision prov = provision.get();
@@ -83,10 +87,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionArrayResponse<Provision> getAll(ProvisionRequest provisionRequest) {
-		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest);
+		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest, provisionRequest.getDocumentType());
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
-		if (!provisions.get().isEmpty()) {
+		
+		if (!provisions.isPresent() && provisionRequest.getDocumentType().equals("CE")) {
+			provisions = provisionRepository.findAll(provisionRequest, "CEX");
+		}
+		
+		if (provisions.isPresent() && !provisions.get().isEmpty()) {
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
 			response.setHeader(header).setData(provisions.get());
 		} else {

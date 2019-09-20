@@ -49,6 +49,7 @@ import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.dto.OAuthToken;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.dto.Queue;
+import pe.telefonica.provision.exception.ServerNotFoundException;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
@@ -75,9 +76,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest) {
+	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType) {
 		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(provisionRequest.getDocumentType())
+				new Query(Criteria.where("customer.document_type").is(documentType)
 						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
@@ -87,9 +88,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<Provision> getOrder(ProvisionRequest provisionRequest) {
+	public Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType) {
 		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("customer.document_type").is(provisionRequest.getDocumentType())
+				new Query(Criteria.where("customer.document_type").is(documentType)
 						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
@@ -250,13 +251,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
-		} catch (HttpClientErrorException e) {
-			log.info("HttpClientErrorException = " + e.getMessage());
-			log.info("getResponseBodyAsString = " + e.getResponseBodyAsString());
-			return false;
-		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
-			return false;
+		} catch (HttpClientErrorException ex) {
+			log.info("HttpClientErrorException = " + ex.getMessage());
+			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
+			throw new ServerNotFoundException(ex.getResponseBodyAsString());
+			//return false;
+		} catch (Exception ex) {
+			log.info("Exception = " + ex.getMessage());
+			throw new ServerNotFoundException(ex.getMessage());
+			//return false;
 		}
 	}
 

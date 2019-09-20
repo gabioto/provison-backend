@@ -12,9 +12,9 @@ import pe.telefonica.provision.dto.Queue;
 
 public interface ProvisionRepository {
 
-	Optional<List<Provision>> findAll(ProvisionRequest provisionRequest);
+	Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType);
 
-	Optional<Provision> getOrder(ProvisionRequest provisionRequest);
+	Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType);
 	
 	Optional<Provision> getStatus(String provisionId);
 

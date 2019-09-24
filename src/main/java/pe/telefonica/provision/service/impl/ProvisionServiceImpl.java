@@ -71,6 +71,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (!provision.isPresent() && provisionRequest.getDocumentType().equals("CE")) {
 			provision = provisionRepository.getOrder(provisionRequest, "CEX");
 		}
+		
+		if (!provision.isPresent() && provisionRequest.getDocumentType().equals("PASAPORTE")) {
+			provision = provisionRepository.getOrder(provisionRequest, "PAS");
+		}
 
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
 			Provision prov = provision.get();

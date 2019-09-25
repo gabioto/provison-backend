@@ -95,8 +95,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 		
-		if (!provisions.isPresent() && provisionRequest.getDocumentType().equals("CE")) {
+		if (provisions.get().size() == 0 && provisionRequest.getDocumentType().equals("CE")) {
 			provisions = provisionRepository.findAll(provisionRequest, "CEX");
+		}
+		
+		if (provisions.get().size() == 0 && provisionRequest.getDocumentType().equals("PASAPORTE")) {
+			provisions = provisionRepository.findAll(provisionRequest, "PAS");
 		}
 		
 		if (provisions.isPresent() && !provisions.get().isEmpty()) {

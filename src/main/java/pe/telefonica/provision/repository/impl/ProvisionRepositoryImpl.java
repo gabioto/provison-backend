@@ -78,8 +78,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType) {
 		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType)
-						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
@@ -90,8 +90,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType) {
 		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("customer.document_type").is(documentType)
-						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
@@ -255,11 +255,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 			throw new ServerNotFoundException(ex.getResponseBodyAsString());
-			//return false;
+			// return false;
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			throw new ServerNotFoundException(ex.getMessage());
-			//return false;
+			// return false;
 		}
 	}
 
@@ -329,8 +329,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private Optional<OAuthToken> getTokenFromCollection() {
 		OAuthToken oAuthToken = null;
 		try {
-			oAuthToken = this.mongoOperations.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")),
-					OAuthToken.class);
+			oAuthToken = this.mongoOperations
+					.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")), OAuthToken.class);
 		} catch (Exception e) {
 			log.info(e.getMessage());
 		}

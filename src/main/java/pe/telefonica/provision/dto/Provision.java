@@ -1,7 +1,8 @@
 package pe.telefonica.provision.dto;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import javax.persistence.Id;
 
@@ -81,7 +82,7 @@ public class Provision implements Serializable {
 	private String validatedAddress;
 	
 	@Field("register_date")
-	private Date registerDate = new Date();
+	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 	
 	@Field("has_schedule")
 	private Boolean hasSchedule = false;
@@ -277,11 +278,11 @@ public class Provision implements Serializable {
 		this.validatedAddress = validatedAddress;
 	}
 
-	public Date getRegisterDate() {
+	public LocalDateTime getRegisterDate() {
 		return registerDate;
 	}
 
-	public void setRegisterDate(Date registerDate) {
+	public void setRegisterDate(LocalDateTime registerDate) {
 		this.registerDate = registerDate;
 	}
 

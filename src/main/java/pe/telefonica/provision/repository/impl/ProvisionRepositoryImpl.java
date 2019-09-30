@@ -42,7 +42,7 @@ import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
-import pe.telefonica.provision.conf.IBMSecurity;
+import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.conf.SSLClientFactory;
 import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
@@ -68,7 +68,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private IBMSecurityAgendamiento securitySchedule;
 
 	@Autowired
-	private IBMSecurity security;
+	private IBMSecuritySeguridad security;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {

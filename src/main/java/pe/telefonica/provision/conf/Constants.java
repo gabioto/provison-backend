@@ -38,8 +38,8 @@ public final class Constants {
 	public static final String USER_SEGURIDAD 	 = "USER_SEGURIDAD";
 	public static final String USER_AVERIA 		 = "USER_AVERIA";
 	
-	public static final String TEXT_NAME_REPLACE 	= "TEXT_NAME_REPLACE";
-	public static final String TEXT_PRODUCT_REPLACE = "TEXT_PRODUCT_REPLACE";
+	public static final String TEXT_NAME_REPLACE 	= "[$name]";
+	public static final String TEXT_PRODUCT_REPLACE = "[$product]";
 	
 	public static final String MSG_CONTACT_UPDATED_KEY 		= "MSG_CONTACT_UPDATED_KEY";
 	public static final String MSG_ADDRESS_UPDATED_KEY 		= "MSG_ADDRESS_UPDATED_KEY";

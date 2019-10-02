@@ -2,6 +2,7 @@ package pe.telefonica.provision.repository.impl;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -463,5 +464,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("Exception = " + e.getMessage());
 			return false;
 		}
+	}
+
+	@Override
+	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
+		Query query = new Query(new Criteria().andOperator(Criteria.where("registerDate").gte(startDate), Criteria.where("registerDate").lte(endDate))); 
+		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+		
+		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
 	}
 }

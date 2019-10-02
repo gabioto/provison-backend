@@ -42,7 +42,7 @@ import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
-import pe.telefonica.provision.conf.IBMSecurity;
+import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.conf.SSLClientFactory;
 import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
@@ -68,7 +68,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private IBMSecurityAgendamiento securitySchedule;
 
 	@Autowired
-	private IBMSecurity security;
+	private IBMSecuritySeguridad security;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -78,8 +78,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType) {
 		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType)
-						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
@@ -90,8 +90,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType) {
 		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("customer.document_type").is(documentType)
-						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
@@ -255,11 +255,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 			throw new ServerNotFoundException(ex.getResponseBodyAsString());
-			//return false;
+			// return false;
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			throw new ServerNotFoundException(ex.getMessage());
-			//return false;
+			// return false;
 		}
 	}
 
@@ -329,8 +329,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private Optional<OAuthToken> getTokenFromCollection() {
 		OAuthToken oAuthToken = null;
 		try {
-			oAuthToken = this.mongoOperations.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")),
-					OAuthToken.class);
+			oAuthToken = this.mongoOperations
+					.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")), OAuthToken.class);
 		} catch (Exception e) {
 			log.info(e.getMessage());
 		}

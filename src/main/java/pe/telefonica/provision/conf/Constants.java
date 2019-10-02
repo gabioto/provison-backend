@@ -37,4 +37,19 @@ public final class Constants {
 	public static final String USER_AGENDAMIENTO = "USER_AGENDAMIENTO";
 	public static final String USER_SEGURIDAD 	 = "USER_SEGURIDAD";
 	public static final String USER_AVERIA 		 = "USER_AVERIA";
+	
+	public static final String TEXT_NAME_REPLACE 	= "[$name]";
+	public static final String TEXT_PRODUCT_REPLACE = "[$product]";
+	
+	public static final String MSG_CONTACT_UPDATED_KEY 		= "MSG_CONTACT_UPDATED_KEY";
+	public static final String MSG_ADDRESS_UPDATED_KEY 		= "MSG_ADDRESS_UPDATED_KEY";
+	
+	//Cuando el BO no se logra contactar con el cliente 
+	public static final String MSG_PRO_CUSTOMER_UNREACHABLE_KEY  = "MSG_PRO_CUSTOMER_UNREACHABLE_KEY";
+	//Cuando el BO cancela la orden
+	public static final String MSG_PRO_CANCELLED_BY_BO_KEY 		 = "MSG_PRO_CANCELLED_BY_BO_KEY";
+	//Cuando el cliente cancela desde la web
+	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
+	
+	public static final String OPER_SEND_SMS_BY_ID	 = "OPER_SEND_SMS_BY_ID";
 }

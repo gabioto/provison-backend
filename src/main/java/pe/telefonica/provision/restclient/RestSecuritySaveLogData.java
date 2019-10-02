@@ -9,14 +9,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import pe.telefonica.provision.conf.ExternalApi;
-import pe.telefonica.provision.conf.IBMSecurity;
+import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.restclient.request.LogDataRequest;
 import pe.telefonica.provision.service.request.SMSRequest;
 
 @Service()
 public class RestSecuritySaveLogData {
 	@Autowired
-	private IBMSecurity security;
+	private IBMSecuritySeguridad security;
 	
 
 	@Autowired

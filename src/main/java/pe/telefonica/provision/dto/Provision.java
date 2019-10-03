@@ -101,6 +101,17 @@ public class Provision implements Serializable {
 	
 	@Field("work_zone")
 	private String workZone;
+	
+	@Field("registro_actualizado")
+	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+
+	public LocalDateTime getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(LocalDateTime updatedDate) {
+		this.updatedDate = updatedDate;
+	}
 
 	public String getWorkZone() {
 		return workZone;

@@ -1,6 +1,7 @@
 package pe.telefonica.provision.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -664,5 +665,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		return response;
+	}
+
+	@Override
+	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
+		Optional<List<Provision>> optional = provisionRepository.getAllInTimeRange(startDate, endDate);
+		
+		if(optional.isPresent()) {
+			return optional.get();
+		}
+
+		return null;
 	}
 }

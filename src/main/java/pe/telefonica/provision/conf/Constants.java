@@ -26,6 +26,7 @@ public final class Constants {
 	public static final String PARAM_KEY_OAUTH_TOKEN = "PARAM_KEY_OAUTH_TOKEN";
 	
 	public static final String OPER_GET_OAUTH_TOKEN	 = "OPER_GET_OAUTH_TOKEN";
+	public static final String OPER_GET_ALL_IN_TIME_RANGE = "OPER_GET_ALL_IN_TIME_RANGE";
 	
 	public static final String APP_NAME_FRONT_END	 = "APP_FRONT_END";
 	public static final String APP_NAME_PROVISION 	 = "APP_PROVISION";

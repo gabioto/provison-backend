@@ -1,5 +1,6 @@
 package pe.telefonica.provision.api;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,17 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 
+import pe.telefonica.provision.api.common.ApiRequest;
+import pe.telefonica.provision.api.common.ApiResponse;
 import pe.telefonica.provision.api.request.AddressUpdateRequest;
 import pe.telefonica.provision.api.request.CancelOrderRequest;
+import pe.telefonica.provision.api.request.GetAllInTimeRangeRequest;
 import pe.telefonica.provision.api.request.ProvisionRequest;
 import pe.telefonica.provision.api.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.api.request.SetContactInfoUpdateRequest;
 import pe.telefonica.provision.api.request.ValidateDataRequest;
+import pe.telefonica.provision.api.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.api.response.ProvisionArrayResponse;
 import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.api.response.ProvisionResponse;
 import pe.telefonica.provision.api.response.ReceiveAddressUpdateBOResponse;
 import pe.telefonica.provision.api.response.ResponseHeader;
+import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.dto.Customer;
 import pe.telefonica.provision.dto.Provision;
 import pe.telefonica.provision.restclient.RestSecuritySaveLogData;
@@ -426,5 +432,33 @@ public class ProvisionApi {
 	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		return ResponseEntity.ok(provisionService.updateOrderSchedule(provisionId));
+	}
+	
+	
+	@RequestMapping(value = "/getAllInTimeRange", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<GetAllInTimeRangeResponse>> getAllInTimeRange(@RequestBody ApiRequest<GetAllInTimeRangeRequest> request) {
+		
+		ApiResponse<GetAllInTimeRangeResponse> apiResponse;
+		HttpStatus status;
+		
+		try {
+			String[] startDateStrArr = request.getBody().getStartDateStr().split("-");
+			String[] endDateStrArr = request.getBody().getEndDateStr().split("-");
+			//year, month, day, hour, minutes, seconds
+			LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(startDateStrArr[0]), Integer.parseInt(startDateStrArr[1]), Integer.parseInt(startDateStrArr[2]), 0, 0, 0);
+			LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(endDateStrArr[0]), Integer.parseInt(endDateStrArr[1]), Integer.parseInt(endDateStrArr[2]), 23, 59, 59);
+					
+			List<Provision> provisions = provisionService.getAllInTimeRange(startDate, endDate);
+			GetAllInTimeRangeResponse response = new GetAllInTimeRangeResponse();
+			response.setProvisions(provisions);
+			
+			status = HttpStatus.OK;
+			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), status.getReasonPhrase(), response);
+		}catch(Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), e.getMessage(), null);
+		}
+		
+		return ResponseEntity.status(status).body(apiResponse);
 	}
 }

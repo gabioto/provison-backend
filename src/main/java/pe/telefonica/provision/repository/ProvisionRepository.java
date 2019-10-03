@@ -1,5 +1,6 @@
 package pe.telefonica.provision.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,4 +32,6 @@ public interface ProvisionRepository {
 	Optional<Queue> isQueueAvailable();
 	
 	boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason);
+	
+	Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 }

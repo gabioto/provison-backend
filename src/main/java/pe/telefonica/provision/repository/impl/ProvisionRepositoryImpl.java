@@ -468,7 +468,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-		Query query = new Query(Criteria.where("productName").ne(null).andOperator(Criteria.where("updatedDate").gte(startDate), Criteria.where("updatedDate").lte(endDate))); 
+		Query query = new Query(Criteria.where("productName").ne(null).andOperator(Criteria.where("updatedDate").gte(startDate), Criteria.where("updatedDate").lt(endDate))); 
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 		
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);

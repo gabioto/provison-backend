@@ -1,7 +1,5 @@
 package pe.telefonica.provision.api.response;
 
-import pe.telefonica.provision.api.ProvisionHeaderResponse;
-
 public class RequestAddressUpdateResponse {
 
 	private ResponseHeader header;

@@ -9,8 +9,11 @@ public class ProvisionTexts {
 
 	String webUrl;
 	String addressUpdated;
+	String contactUpdated;
 	String unreachable;
 	String cancelled;
+	String cancelledByCustomer;
+	String mainWeb;
 	
 	public String getCancelled() {
 		return cancelled;
@@ -36,4 +39,23 @@ public class ProvisionTexts {
 	public void setUnreachable(String unreachable) {
 		this.unreachable = unreachable;
 	}
+	public String getCancelledByCustomer() {
+		return cancelledByCustomer;
+	}
+	public void setCancelledByCustomer(String cancelledByCustomer) {
+		this.cancelledByCustomer = cancelledByCustomer;
+	}
+	public String getMainWeb() {
+		return mainWeb;
+	}
+	public void setMainWeb(String mainWeb) {
+		this.mainWeb = mainWeb;
+	}
+	public String getContactUpdated() {
+		return contactUpdated;
+	}
+	public void setContactUpdated(String contactUpdated) {
+		this.contactUpdated = contactUpdated;
+	}
+	
 }

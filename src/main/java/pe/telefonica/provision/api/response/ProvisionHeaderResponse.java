@@ -1,4 +1,4 @@
-package pe.telefonica.provision.api;
+package pe.telefonica.provision.api.response;
 
 import java.util.Date;
 
@@ -32,6 +32,16 @@ public class ProvisionHeaderResponse {
 	public ProvisionHeaderResponse() {
 		super();
 		this.datetime = new Date().toString();
+	}
+	
+	public ProvisionHeaderResponse generateHeader(int code, String message) {
+		ProvisionHeaderResponse result = new ProvisionHeaderResponse();
+		
+		result.setDatetime(new Date().toString());
+		result.setCode(code);
+		result.setMessage(message);
+		
+		return result;
 	}
 	
 }

@@ -98,5 +98,135 @@
     "name": "external.api.boUrl",
     "type": "java.lang.String",
     "description": "A description for 'external.api.boUrl'"
+  },
+  {
+    "name": "external.api.sendRequestToBO",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendRequestToBO'"
+  },
+  {
+    "name": "external.api.sendRequestToBO",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendRequestToBO'"
+  },
+  {
+    "name": "external.api.sendRequestToBO",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendRequestToBO'"
+  },
+  {
+    "name": "external.api.psiUrl",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.psiUrl'"
+  },
+  {
+    "name": "external.api.psiUpdateClient",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.psiUpdateClient'"
+  },
+  {
+    "name": "external.api.updateSchedule",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.updateSchedule'"
+  },
+  {
+    "name": "security.ibm.seguridad.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.seguridad.clientId'"
+  },
+  {
+    "name": "security.ibm.seguridad.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.seguridad.clientSecret'"
+  },
+  {
+    "name": "security.ibm.seguridad.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.seguridad.auth'"
+  },
+  {
+    "name": "security.ibm.agendamiento.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.agendamiento.clientId'"
+  },
+  {
+    "name": "security.ibm.agendamiento.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.agendamiento.clientSecret'"
+  },
+  {
+    "name": "security.ibm.agendamiento.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.agendamiento.auth'"
+  },
+  {
+    "name": "security.ibm.provision.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.provision.clientId'"
+  },
+  {
+    "name": "security.ibm.provision.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.provision.clientSecret'"
+  },
+  {
+    "name": "security.ibm.provision.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.provision.auth'"
+  },
+  {
+    "name": "security.ibm.averia.clientId",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.averia.clientId'"
+  },
+  {
+    "name": "security.ibm.averia.clientSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.averia.clientSecret'"
+  },
+  {
+    "name": "security.ibm.averia.auth",
+    "type": "java.lang.String",
+    "description": "A description for 'security.ibm.averia.auth'"
+  },
+  {
+    "name": "sms.text.provision.cancelledByCustomer",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.cancelledByCustomer'"
+  },
+  {
+    "name": "sms.text.provision.mainWeb",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.mainWeb'"
+  },
+  {
+    "name": "sms.text.provision.mainWeb",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.mainWeb'"
+  },
+  {
+    "name": "sms.text.provision.mainWeb",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.mainWeb'"
+  },
+  {
+    "name": "external.api.sendMail",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.sendMail'"
+  },
+  {
+    "name": "sms.text.provision.contactUpdated",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.text.provision.contactUpdated'"
+  },
+  {
+    "name": "external.api.getPSIToken",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.getPSIToken'"
+  },
+  {
+    "name": "external.api.oauthToken",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.oauthToken'"
   }
 ]}

@@ -106,7 +106,7 @@ public class ProvisionApi {
 	@RequestMapping(value = "/setProvisionValidatedOLD", method = RequestMethod.POST)
 	public ResponseEntity<ProvisionArrayResponse<Provision>> setProvisionValidatedOLD(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
-		log.info(this.getClass().getName() + " - " + "setProvisionValidated");
+		log.info(this.getClass().getName() + " - " + "setProvisionValidated devops");
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
 		Provision result = provisionService.setProvisionIsValidated(provisionId);
 

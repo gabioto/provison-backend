@@ -24,8 +24,16 @@ public class ExternalApi {
 	String updateSchedule;
 	String getPSIToken;
 	String securitySaveLogData;
+	String sendSMSById;
 
-	
+	public String getSendSMSById() {
+		return sendSMSById;
+	}
+
+	public void setSendSMSById(String sendSMSById) {
+		this.sendSMSById = sendSMSById;
+	}
+
 	public String getOauth2Client() {
 		return oauth2Client;
 	}

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "security.ibm.seguridad")
-public class IBMSecurity {
+public class IBMSecuritySeguridad {
 
 	String clientId;
 	String clientSecret;

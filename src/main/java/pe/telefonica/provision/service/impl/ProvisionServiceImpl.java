@@ -1,6 +1,7 @@
 package pe.telefonica.provision.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -12,8 +13,10 @@ import java.util.TimeZone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -23,16 +26,23 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import pe.telefonica.provision.api.common.ApiRequest;
+import pe.telefonica.provision.api.common.ApiResponse;
 import pe.telefonica.provision.api.request.CancelRequest;
 import pe.telefonica.provision.api.request.MailRequest;
 import pe.telefonica.provision.api.request.MailRequest.MailParameter;
 import pe.telefonica.provision.api.request.ProvisionRequest;
+import pe.telefonica.provision.api.request.SMSByIdRequest;
+import pe.telefonica.provision.api.request.SMSByIdRequest.Contact;
+import pe.telefonica.provision.api.request.SMSByIdRequest.Message;
+import pe.telefonica.provision.api.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.api.response.ProvisionArrayResponse;
 import pe.telefonica.provision.api.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.api.response.ProvisionResponse;
+import pe.telefonica.provision.api.response.SMSByIdResponse;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
-import pe.telefonica.provision.conf.IBMSecurity;
+import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.dto.Customer;
 import pe.telefonica.provision.dto.Provision;
@@ -55,7 +65,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private ProvisionTexts provisionTexts;
 
 	@Autowired
-	private IBMSecurity security;
+	private IBMSecuritySeguridad ibmSecuritySeguridad;
 
 	@Autowired
 	public ProvisionServiceImpl(ProvisionRepository provisionRepository) {
@@ -187,9 +197,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 				boolean updated = provisionRepository.updateProvision(provision, update);
 
 				if (isSMSRequired) {
-					String messageSMS = provisionTexts.getCancelledByCustomer().replace("[$name]", name);
-					messageSMS = messageSMS.replace("[$product]", provision.getProductName());
-					sendSMS(provision.getCustomer(), messageSMS, "");
+					List<MsgParameter> msgParameters = new ArrayList<>();
+					MsgParameter paramName = new MsgParameter();
+					paramName.setKey(Constants.TEXT_NAME_REPLACE);
+					paramName.setValue(name);
+					
+					MsgParameter paramProduct = new MsgParameter();
+					paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
+					paramProduct.setValue(provision.getProductName());
+
+					msgParameters.add(paramName);
+					msgParameters.add(paramProduct);
+					
+					ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]), "");
 
 					try {
 						provisionRepository.sendCancelledMail(provision, name, "179829",
@@ -205,9 +225,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 				boolean updated = provisionRepository.updateProvision(provision, update);
+				
+				List<MsgParameter> msgParameters = new ArrayList<>();
+				MsgParameter paramProduct = new MsgParameter();
+				paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
+				paramProduct.setValue(provision.getProductName());
 
-				String messageSMS = provisionTexts.getUnreachable().replace("[$product]", provision.getProductName());
-				sendSMS(provision.getCustomer(), messageSMS, "http://www.movistar.com.pe");
+				msgParameters.add(paramProduct);
+				
+				//TODO: url como parametro?
+				ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new MsgParameter[0]), "http://www.movistar.com.pe");
 
 				try {
 					provisionRepository.sendCancelledMail(provision, name, "179824", Constants.ADDRESS_UNREACHABLE);
@@ -228,7 +255,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				boolean updated = provisionRepository.updateProvision(provision, update);
 
 				if (updated) {
-					sendSMS(provision.getCustomer(), provisionTexts.getAddressUpdated(), provisionTexts.getWebUrl());
+					List<MsgParameter> msgParameters = new ArrayList<>();
+					
+					ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_ADDRESS_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
 					return true;
 				} else {
 					return false;
@@ -261,10 +290,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provision.getHasSchedule()) {
-				// scheduleUpdated = faultRepository.cancelSchedule(new
-				// CancelRequest(fault.getIdFault(), "fault"));
-				scheduleUpdated = provisionRepository
-						.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision"));
+				scheduleUpdated = provisionRepository.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision"));
 
 				if (!scheduleUpdated) {
 					return null;
@@ -284,11 +310,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			String name = provision.getCustomer().getName().split(" ")[0];
-			String messageSMS = provisionTexts.getCancelled().replace("[$name]", name);
-			messageSMS = messageSMS.replace("[$product]", provision.getProductName());
 
-			messageSent = sendSMS(provision.getCustomer(), messageSMS, "");
-
+			List<MsgParameter> msgParameters = new ArrayList<>();
+			MsgParameter paramName = new MsgParameter();
+			paramName.setKey(Constants.TEXT_NAME_REPLACE);
+			paramName.setValue(name);
+			
+			MsgParameter paramProduct = new MsgParameter();
+			paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
+			paramProduct.setValue(provision.getProductName());
+			
+			msgParameters.add(paramName);
+			msgParameters.add(paramProduct);
+			
+			ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]), "");
+			if(apiResponse.getHeader().getResultCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+				messageSent = true;
+			}else {
+				messageSent = false;
+			}
 			return messageSent ? provision : null;
 		} else {
 			return null;
@@ -394,9 +434,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization", security.getAuth());
-		headersMap.add("X-IBM-Client-Id", security.getClientId());
-		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
+		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
+		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
 
 		HttpEntity<MailRequest> entity = new HttpEntity<MailRequest>(mailRequest, headersMap);
 
@@ -408,38 +448,50 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 	}
 
-	private Boolean sendSMS(Customer customer, String message, String webURL) {
-		RestTemplate restTemplate = new RestTemplate();
-
-		String sendSMSUrl = api.getSecurityUrl() + api.getSendSMS();
-		SMSRequest smsRequest = new SMSRequest();
-		smsRequest.setCustomerPhone(String.valueOf(customer.getPhoneNumber()));
-		Boolean customerPhoneIsMovistar = false;
-		if (customer.getCarrier().equals("true")) {
-			customerPhoneIsMovistar = true;
-		}
-		smsRequest.setCustomerPhoneIsMovistar(customerPhoneIsMovistar);
-		smsRequest.setContactPhone(String.valueOf(customer.getContactPhoneNumber()));
-		Boolean contactrPhoneIsMovistar = false;
-		contactrPhoneIsMovistar = true;
-		smsRequest.setContactPhoneIsMovistar(contactrPhoneIsMovistar);
-		smsRequest.setMessage(message);
-		smsRequest.setWebURL(webURL);
-
+	private ApiResponse<SMSByIdResponse> sendSMS(Customer customer, String msgKey, MsgParameter[] msgParameters, String webURL) {
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
+		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
 		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization", security.getAuth());
-		headersMap.add("X-IBM-Client-Id", security.getClientId());
-		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
+		
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		HttpEntity<SMSRequest> entitySMS = new HttpEntity<SMSRequest>(smsRequest, headersMap);
+		String url = api.getSecurityUrl() + api.getSendSMSById();
+		
+		SMSByIdRequest smsByIdRequest = new SMSByIdRequest();
+		
+		Message message = new Message();
+		message.setMsgKey(msgKey);
+		message.setMsgParameters(msgParameters);
+		message.setWebURL(webURL);
+		
+		List<Contact> contacts = new ArrayList<>();
+		
+		Contact contactCustomer = new Contact();
+		contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); //TODO: Cambiar integer a string
+		contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
+		
+		Contact contactContact = new Contact();
+		contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString()); //TODO: Cambiar integer a string
+		contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
+		
+		contacts.add(contactCustomer);
+		contacts.add(contactContact);
+		
+		smsByIdRequest.setContacts(contacts.toArray(new Contact[0]));
+		smsByIdRequest.setMessage(message);
+		
 
-		ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendSMSUrl, entitySMS, String.class);
-		if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-			return true;
-		} else {
-			return false;
-		}
+		ApiRequest<SMSByIdRequest> apiRequest = new ApiRequest<SMSByIdRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_SEND_SMS_BY_ID, smsByIdRequest);
+		HttpEntity<ApiRequest<SMSByIdRequest>> entity = new HttpEntity<ApiRequest<SMSByIdRequest>>(apiRequest, headersMap);
+		
+		ParameterizedTypeReference<ApiResponse<SMSByIdResponse>>  parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<SMSByIdResponse>>(){};
+
+		ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity, parameterizedTypeReference);
+		
+		return responseEntity.getBody();
 	}
 
 	@Override
@@ -469,9 +521,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					sendContactInfoChangedMail(provision);
 				} catch (Exception e) {
 					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+					return provision;
 				}
 				
-				sendSMS(provision.getCustomer(), provisionTexts.getContactUpdated(), provisionTexts.getWebUrl());
+				List<MsgParameter> msgParameters = new ArrayList<>();
+				//Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no se valida la respuesta
+				ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
 				return provision;
 			} else {
 				return null;
@@ -610,5 +665,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		return response;
+	}
+
+	@Override
+	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
+		Optional<List<Provision>> optional = provisionRepository.getAllInTimeRange(startDate, endDate.plusDays(1));
+		
+		if(optional.isPresent()) {
+			return optional.get();
+		}
+
+		return null;
 	}
 }

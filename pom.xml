@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>pe.telefonica</groupId>
 	<artifactId>tdp-provision</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>tdp-provision</name>
 	<description>Servicio web REST Provision</description>
 

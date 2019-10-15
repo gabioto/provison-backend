@@ -1,12 +1,13 @@
 package pe.telefonica.provision.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import pe.telefonica.provision.api.request.ProvisionRequest;
-import pe.telefonica.provision.api.response.ProvisionArrayResponse;
-import pe.telefonica.provision.api.response.ProvisionResponse;
-import pe.telefonica.provision.dto.Customer;
-import pe.telefonica.provision.dto.Provision;
+import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.response.ProvisionArrayResponse;
+import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.model.Customer;
+import pe.telefonica.provision.model.Provision;
 
 public interface ProvisionService {
 
@@ -33,4 +34,6 @@ public interface ProvisionService {
 	ProvisionResponse<Boolean> validateQueue();
 	
 	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId);
+	
+	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 }

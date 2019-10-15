@@ -2,6 +2,7 @@ package pe.telefonica.provision.repository.impl;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,22 +35,22 @@ import org.springframework.web.client.RestTemplate;
 
 import com.mongodb.client.result.UpdateResult;
 
-import pe.telefonica.provision.api.common.ApiRequest;
-import pe.telefonica.provision.api.common.ApiResponse;
-import pe.telefonica.provision.api.request.CancelRequest;
-import pe.telefonica.provision.api.request.MailRequest;
-import pe.telefonica.provision.api.request.MailRequest.MailParameter;
-import pe.telefonica.provision.api.request.ProvisionRequest;
+import pe.telefonica.provision.controller.common.ApiRequest;
+import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.controller.request.CancelRequest;
+import pe.telefonica.provision.controller.request.MailRequest;
+import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
+import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
-import pe.telefonica.provision.conf.IBMSecurity;
+import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.conf.SSLClientFactory;
 import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
-import pe.telefonica.provision.dto.OAuthToken;
-import pe.telefonica.provision.dto.Provision;
-import pe.telefonica.provision.dto.Queue;
-import pe.telefonica.provision.exception.ServerNotFoundException;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
+import pe.telefonica.provision.model.OAuthToken;
+import pe.telefonica.provision.model.Provision;
+import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
@@ -68,7 +69,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private IBMSecurityAgendamiento securitySchedule;
 
 	@Autowired
-	private IBMSecurity security;
+	private IBMSecuritySeguridad security;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -76,10 +77,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest) {
+	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType) {
 		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(provisionRequest.getDocumentType())
-						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
@@ -88,10 +89,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<Provision> getOrder(ProvisionRequest provisionRequest) {
+	public Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType) {
 		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("customer.document_type").is(provisionRequest.getDocumentType())
-						.and("customer.document_number").is(provisionRequest.getDocumentNumber())
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(provisionRequest.getDocumentNumber())
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
@@ -141,14 +142,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		return result.getMatchedCount() > 0;
 	}
 
-	@Override
+	/*@Override
 	public boolean updateContactInfoPsi(Provision provision) {
 		log.info(this.getClass().getName() + " - " + "updateContactInfoPsi");
 		boolean contactUpdated = updatePSIClient(provision);
 		return contactUpdated;
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public boolean updateCancelSchedule(CancelRequest cancelRequest) {
 		log.info("updateCancelSchedule");
 		RestTemplate restTemplate = new RestTemplate();
@@ -173,9 +174,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("Exception = " + e.getMessage());
 			return false;
 		}
-	}
+	}*/
 
-	private Boolean updatePSIClient(Provision provision) {
+	/*private Boolean updatePSIClient(Provision provision) {
 		String oAuthToken;
 		RestTemplate restTemplate = new RestTemplate(
 				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
@@ -202,20 +203,20 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
 
-		/*
-		 * request.getHeaderIn().setSystem("COL");
-		 * request.getHeaderIn().setSubsystem("TRA");
-		 * request.getHeaderIn().setOriginator("PE:TDP:COL:TRA");
-		 * request.getHeaderIn().setSender("OracleServiceBus");
-		 * request.getHeaderIn().setUserId("USERTRA");
-		 * request.getHeaderIn().setWsId("SistemTRA");
-		 * request.getHeaderIn().setWsIp("192.168.100.1");
-		 * request.getHeaderIn().setOperation("updateClient");
-		 * request.getHeaderIn().setDestination("PE:TDP:COL:TRA");
-		 * request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
-		 * request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.
-		 * TIMESTAMP_FORMAT_PSI)); request.getHeaderIn().setMsgType("REQUEST");
-		 */
+		
+		 request.getHeaderIn().setSystem("COL");
+		 request.getHeaderIn().setSubsystem("TRA");
+		 request.getHeaderIn().setOriginator("PE:TDP:COL:TRA");
+		 request.getHeaderIn().setSender("OracleServiceBus");
+		 request.getHeaderIn().setUserId("USERTRA");
+		 request.getHeaderIn().setWsId("SistemTRA");
+		 request.getHeaderIn().setWsIp("192.168.100.1");
+		 request.getHeaderIn().setOperation("updateClient");
+		 request.getHeaderIn().setDestination("PE:TDP:COL:TRA");
+		 request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
+		 request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.
+		 TIMESTAMP_FORMAT_PSI)); request.getHeaderIn().setMsgType("REQUEST");
+		 
 
 		request.getBodyUpdateClient().getUser().setNow(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_USER));
 		request.getBodyUpdateClient().getUser().setLogin("appmovistar");
@@ -255,15 +256,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 			throw new ServerNotFoundException(ex.getResponseBodyAsString());
-			//return false;
+			// return false;
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			throw new ServerNotFoundException(ex.getMessage());
-			//return false;
+			// return false;
 		}
-	}
+	}*/
 
-	private String getAuthToken(String customerName) {
+	/*private String getAuthToken(String customerName) {
 		String psiTokenGenerated = "";
 		Optional<OAuthToken> optionalAuthToken = getTokenFromCollection();
 
@@ -283,9 +284,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		}
 
 		return psiTokenGenerated;
-	}
+	}*/
 
-	private String getTokenFromPSI(String customerName, boolean toInsert) {
+	/*private String getTokenFromPSI(String customerName, boolean toInsert) {
 		RestTemplate restTemplate = new RestTemplate();
 		boolean updated = true;
 		String urlToken = api.getSecurityUrl() + api.getOauthToken();
@@ -324,13 +325,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("Exception = " + e.getMessage());
 			return "";
 		}
-	}
+	}*/
 
-	private Optional<OAuthToken> getTokenFromCollection() {
+	/*private Optional<OAuthToken> getTokenFromCollection() {
 		OAuthToken oAuthToken = null;
 		try {
-			oAuthToken = this.mongoOperations.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")),
-					OAuthToken.class);
+			oAuthToken = this.mongoOperations
+					.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")), OAuthToken.class);
 		} catch (Exception e) {
 			log.info(e.getMessage());
 		}
@@ -338,9 +339,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<OAuthToken> optionalPsiToken = Optional.ofNullable(oAuthToken);
 
 		return optionalPsiToken;
-	}
+	}*/
 
-	private boolean updateTokenInCollection(ApiResponse<OAuthToken> apiResponse) {
+	/*private boolean updateTokenInCollection(ApiResponse<OAuthToken> apiResponse) {
 
 		if (apiResponse.getBody() != null) {
 			OAuthToken oAuthToken = apiResponse.getBody();
@@ -360,12 +361,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		} else {
 			return false;
 		}
-	}
+	}*/
 
-	private boolean insertToken(OAuthToken oAuthToken) {
+	/*private boolean insertToken(OAuthToken oAuthToken) {
 		this.mongoOperations.insert(oAuthToken);
 		return true;
-	}
+	}*/
 
 	private String stringToMD5(String string) {
 		try {
@@ -402,7 +403,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		return optionalQueue;
 	}
 
-	@Override
+	/*@Override
 	public boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSendMail = api.getSecurityUrl() + api.getSendMail();
@@ -463,5 +464,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			log.info("Exception = " + e.getMessage());
 			return false;
 		}
+	}*/
+
+	@Override
+	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
+		Query query = new Query(Criteria.where("productName").ne(null).andOperator(Criteria.where("updatedDate").gte(startDate), Criteria.where("updatedDate").lt(endDate))); 
+		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+		
+		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
 	}
 }

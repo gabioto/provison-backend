@@ -1,6 +1,6 @@
 package pe.telefonica.provision.service.response;
 
-import pe.telefonica.provision.api.response.ResponseHeader;
+import pe.telefonica.provision.controller.response.ResponseHeader;
 
 public class GetPSITokenResponse {
 	

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.response.ProvisionArrayResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.model.Customer;
@@ -21,10 +22,13 @@ public interface ProvisionService {
 
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
+	
+	public ProvisionArrayResponse<Provision> setContactInfoUpdateNew(SetContactInfoUpdateRequest request);
 
 	public Provision setProvisionIsValidated(String provisionId);
 
 	public Provision requestAddressUpdate(String provisionId);
+	
 
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);

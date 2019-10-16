@@ -14,12 +14,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
@@ -29,6 +34,7 @@ import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
+import pe.telefonica.provision.util.exception.FunctionalErrorException;
 import pe.telefonica.provision.model.OAuthToken;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.repository.OAuthTokenRepository;
@@ -38,7 +44,7 @@ import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
 import pe.telefonica.provision.util.DateUtil;
 
 @Component
-public class PSIApi {
+public class PSIApi extends ConfigRestTemplate {
 	private static final Log log = LogFactory.getLog(PSIApi.class);
 	
 	@Autowired
@@ -52,10 +58,14 @@ public class PSIApi {
 	
 	public Boolean updatePSIClient(Provision provision) {
 		String oAuthToken;
+		
+    	
 		RestTemplate restTemplate = new RestTemplate(
-				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
+			SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());	
+		
+		//RestTemplate test = new RestTemplate(this.getClientHttpRequestFactory());
+    	
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
 		log.info("updatePSIClient - URL: " + requestUrl);
 
@@ -120,17 +130,32 @@ public class PSIApi {
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
 
 		try {
+			
 			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);
-
+			
+			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = test.postForEntity(requestUrl, entity,
+					PSIUpdateClientResponse.class);*/
+			
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
+			
+			
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
-			System.out.println(ex.getResponseBodyAsString());
-			throw new ServerNotFoundException(ex.getResponseBodyAsString());
+			
+			//JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
+			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+			System.out.println(jsonDecode);
+			
+			JsonObject appDetail = 	jsonDecode.getAsJsonObject("BodyOut").getAsJsonObject("ClientException").getAsJsonObject("appDetail");
+			String message = appDetail.get("exceptionAppMessage").toString();
+			String codeError = appDetail.get("exceptionAppCode").toString();
+			
+			throw new FunctionalErrorException(message, ex, codeError);
+			//throw new ServerNotFoundException(ex.getResponseBodyAsString());
 			// return false;
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
@@ -139,6 +164,18 @@ public class PSIApi {
 		}
 	}
 	
+	private ClientHttpRequestFactory getClientHttpRequestFactory() {
+		
+		SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient);
+		
+		int connection_timeout = 50;
+		int read_timeout = 50;
+		System.out.println("test tiemout");
+	    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+	    clientHttpRequestFactory.setConnectTimeout(connection_timeout);
+	    clientHttpRequestFactory.setReadTimeout(read_timeout);
+	    return clientHttpRequestFactory;
+	} 
 	private String getTokenFromPSI(String customerName, boolean toInsert) {
 		RestTemplate restTemplate = new RestTemplate();
 		boolean updated = true;

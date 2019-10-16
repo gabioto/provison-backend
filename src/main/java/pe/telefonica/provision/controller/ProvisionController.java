@@ -41,6 +41,7 @@ import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.util.ConstantsLogData;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -167,8 +168,16 @@ public class ProvisionController {
 		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
 
 		try {
-
-			Provision result = provisionService.setContactInfoUpdate(request.getProvisionId(),
+			
+			response = provisionService.setContactInfoUpdateNew(request);
+			
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+					request.getOrderCode(), request.getBucket(), response.getHeader().getCode() == 200 ? "OK": "ERROR", new Gson().toJson(request),
+					new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+			
+			return ResponseEntity.ok(response);
+			
+			/*Provision result = provisionService.setContactInfoUpdate(request.getProvisionId(),
 					request.getContactFullname(), request.getContactCellphone(),
 					request.getContactCellphoneIsMovistar());
 
@@ -193,13 +202,17 @@ public class ProvisionController {
 						new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
 
 				return ResponseEntity.badRequest().body(response);
-			}
+			}*/
 		} catch (Exception ex) {
-
+			
 			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
 					request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request),
 					new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
-
+			
+			if(ex instanceof ServerNotFoundException) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			}
+			
 			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(),
 					HttpStatus.BAD_REQUEST.name()));
 			return ResponseEntity.badRequest().body(response);

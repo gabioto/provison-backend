@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
@@ -36,6 +37,7 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
+import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.response.ProvisionArrayResponse;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -55,6 +57,9 @@ import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
+import pe.telefonica.provision.util.exception.FunctionalErrorException;
+import pe.telefonica.provision.util.exception.DataNotFoundException;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @Service("provisionService")
 @Transactional
@@ -565,48 +570,138 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar) {
-		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
-		boolean updated = false;
+		
+		try {
+		
+			Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
+			boolean updated = false;
 
-		if (optional.isPresent()) {
-			Provision provision = optional.get();
-			provision.getCustomer().setContactName(contactFullname);
-			provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
-			provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());
+			if (optional.isPresent()) {
+				Provision provision = optional.get();
+				provision.getCustomer().setContactName(contactFullname);
+				provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
+				provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());
+				
 
-			//boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-			boolean contactUpdated = restPSI.updatePSIClient(provision);
+				//boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
+				boolean contactUpdated = restPSI.updatePSIClient(provision);
 
-			if (contactUpdated) {
-				Update update = new Update();
-				update.set("customer.contact_name", contactFullname);
-				update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
-				update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
-				updated = provisionRepository.updateProvision(provision, update);
-			}
-
-			if (updated) {
-				try {
-					sendContactInfoChangedMail(provision);
-				} catch (Exception e) {
-					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
-					return provision;
+				if (contactUpdated) {
+					Update update = new Update();
+					update.set("customer.contact_name", contactFullname);
+					update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
+					update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
+					updated = provisionRepository.updateProvision(provision, update);
 				}
-				
-				List<MsgParameter> msgParameters = new ArrayList<>();
-				//Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no se valida la respuesta
-				//ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
-				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
-				
-				return provision;
+
+				if (updated) {
+					try {
+						sendContactInfoChangedMail(provision);
+					} catch (Exception e) {
+						log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+						return provision;
+					}
+					
+					List<MsgParameter> msgParameters = new ArrayList<>();
+					//Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no se valida la respuesta
+					//ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
+					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
+					
+					return provision;
+				} else {
+					return null;
+				}
 			} else {
 				return null;
 			}
-		} else {
-			return null;
+		} catch (Exception e) {
+			
 		}
+		return null;
+		
+		
 	}
+	
+	@Override
+	public ProvisionArrayResponse<Provision> setContactInfoUpdateNew(SetContactInfoUpdateRequest request) {
+		
+		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		List<Provision> provisions = new ArrayList<>();
+		try {
+		
+			
+			
+			Optional<Provision> optional = provisionRepository.getProvisionById(request.getProvisionId());
+			boolean updated = false;
 
+			if (optional.isPresent()) {
+				Provision provision = optional.get();
+				provision.getCustomer().setContactName(request.getContactFullname());
+				provision.getCustomer().setContactPhoneNumber(Integer.valueOf(request.getContactCellphone()));
+				provision.getCustomer().setContactCarrier(request.getContactCellphoneIsMovistar().toString());
+				
+
+				//boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
+				boolean contactUpdated = restPSI.updatePSIClient(provision);
+
+				if (contactUpdated) {
+					Update update = new Update();
+					update.set("customer.contact_name", request.getContactFullname());
+					update.set("customer.contact_phone_number", Integer.valueOf(request.getContactCellphone()));
+					update.set("customer.contact_carrier", request.getContactCellphoneIsMovistar().toString());
+					
+					updated = provisionRepository.updateProvision(provision, update);
+					
+						
+				}
+
+				if (updated) {
+					try {
+						sendContactInfoChangedMail(provision);
+					} catch (Exception e) {
+						log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
+						//return provision;
+					}
+					
+					List<MsgParameter> msgParameters = new ArrayList<>();
+					//Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no se valida la respuesta
+					//ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
+					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
+					
+					response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
+					provisions.add(provision);
+					response.setData(provisions);
+					return response;
+				} else {
+					throw new DataNotFoundException();
+				}
+			} else {
+				throw new DataNotFoundException();
+			}
+		} catch (Exception ex) {
+			if(ex instanceof FunctionalErrorException) {
+				
+				String messageCustome = ((FunctionalErrorException) ex).getErrorCode().toString().equals("ERR19")? "Usuario cancelo solicitud": ((FunctionalErrorException) ex).getMessage().toString(); 
+				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.NO_CONTENT.value(), messageCustome));
+				response.setData(null);
+				//System.out.println(FunctionalErrorException);
+				
+				
+				System.out.println(((FunctionalErrorException) ex).getMessage());
+				System.out.println(((FunctionalErrorException) ex).getErrorCode());
+				return response;
+				
+			} else if(ex instanceof ServerNotFoundException) {
+				throw new ServerNotFoundException(ex.getMessage());
+			} 
+			
+			throw new DataNotFoundException();
+			
+			
+			
+		}
+		
+	}
 	/*private Boolean sendAddressChangeRequest(Provision provision) {
 		return sendRequestToBO(provision, "3");
 	}*/
@@ -748,4 +843,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return null;
 	}
+
+	
 }

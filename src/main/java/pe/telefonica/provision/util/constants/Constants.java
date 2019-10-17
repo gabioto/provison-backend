@@ -1,4 +1,4 @@
-package pe.telefonica.provision.conf;
+package pe.telefonica.provision.util.constants;
 
 public final class Constants {
 
@@ -53,4 +53,18 @@ public final class Constants {
 	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
 	
 	public static final String OPER_SEND_SMS_BY_ID	 = "OPER_SEND_SMS_BY_ID";
+	public static final String OPER_SEND_MAIL_BY_ID	 = "OPER_SEND_MAIL_BY_ID";
+	
+	
+	public static final String OPER_CONTACT_INFO_UPDATE 	= "OPER_CONTACT_INFO_UPDATE";
+	public static final String OPER_UPDATE_ADDRESS 	= "OPER_UPDATE_ADDRESS";
+	public static final String OPER_UPDATE_ADDRESSBO 	= "OPER_UPDATE_ADDRESSBO";
+	public static final String OPER_VALIDATE_DATA 	= "OPER_VALIDATE_DATA";
+	public static final String OPER_VALIDATE_USER 	= "OPER_VALIDATE_USER";
+	public static final String OPER_GET_PROVISION_ALL 	= "OPER_GET_PROVISION_ALL";
+	public static final String OPER_INSERT_PROVISION 	= "OPER_INSERT_PROVISION";
+	public static final String OPER_ORDER_CANCELLATION 	= "OPER_ORDER_CANCELLATION";
+	
+	
+	
 }

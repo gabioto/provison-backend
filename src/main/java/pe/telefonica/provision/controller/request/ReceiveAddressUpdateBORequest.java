@@ -1,6 +1,6 @@
 package pe.telefonica.provision.controller.request;
 
-public class ReceiveAddressUpdateBORequest {
+public class ReceiveAddressUpdateBORequest extends LogDataFrontendRequest {
 
 	private String action;
 	private Boolean isSMSRequired;

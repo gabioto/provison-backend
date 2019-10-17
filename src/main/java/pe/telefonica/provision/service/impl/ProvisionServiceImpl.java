@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.controller.common.ResponseHeader;
 import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.controller.request.MailRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
@@ -42,7 +43,6 @@ import pe.telefonica.provision.controller.response.ProvisionArrayResponse;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.controller.response.SMSByIdResponse;
-import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.ProvisionTexts;
@@ -58,6 +58,7 @@ import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
+import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.exception.DataNotFoundException;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
@@ -95,68 +96,84 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest) {
-		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest, provisionRequest.getDocumentType());
+	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
+		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(), provisionRequest.getBody().getDocumentNumber());
 		ProvisionResponse<Customer> response = new ProvisionResponse<Customer>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 		
-		if (!provision.isPresent() && provisionRequest.getDocumentType().equals("CE")) {
-			provision = provisionRepository.getOrder(provisionRequest, "CEX");
+		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equals("CE")) {
+			provision = provisionRepository.getOrder("CEX", provisionRequest.getBody().getDocumentNumber());
 		}
 		
-		if (!provision.isPresent() && provisionRequest.getDocumentType().equals("PASAPORTE")) {
-			provision = provisionRepository.getOrder(provisionRequest, "PAS");
+		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
+			provision = provisionRepository.getOrder( "PAS", provisionRequest.getBody().getDocumentNumber());
 		}
 
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
+			
 			Provision prov = provision.get();
-			prov.getCustomer().setProductName(prov.getProductName());
+			return prov.getCustomer();
+			
+			/*prov.getCustomer().setProductName(prov.getProductName());
 			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(prov.getCustomer());
+			response.setHeader(header).setData(prov.getCustomer());*/
+			
 		} else {
-			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron datos del cliente");
-			response.setHeader(header);
+			return null;
+			
+			/*header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron datos del cliente");
+			response.setHeader(header);*/
 		}
 
-		return response;
+		//return response;
 	}
 
 	@Override
-	public ProvisionArrayResponse<Provision> getAll(ProvisionRequest provisionRequest) {
-		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest, provisionRequest.getDocumentType());
-		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
-		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
 		
-		if (provisions.get().size() == 0 && provisionRequest.getDocumentType().equals("CE")) {
-			provisions = provisionRepository.findAll(provisionRequest, "CEX");
+		
+		
+		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(), provisionRequest.getBody().getDocumentNumber());
+		/*ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();*/
+		
+		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("CE")) {
+			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentType());
 		}
 		
-		if (provisions.get().size() == 0 && provisionRequest.getDocumentType().equals("PASAPORTE")) {
-			provisions = provisionRepository.findAll(provisionRequest, "PAS");
+		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
+			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentType());
 		}
 		
 		if (provisions.isPresent() && !provisions.get().isEmpty()) {
-			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(provisions.get());
+			return provisions.get();
+			/*header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+			response.setHeader(header).setData(provisions.get());*/
 		} else {
-			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
-			response.setHeader(header);
+			return null;
+			
+			/*header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+			response.setHeader(header);*/
 		}
-		return response;
+		
 	}
 
 	@Override
-	public ProvisionArrayResponse<Provision> insertProvisionList(List<Provision> provisionList) {
+	public List<Provision> insertProvisionList(List<Provision> provisionList) {
+		
 		Optional<List<Provision>> provisions = provisionRepository.insertProvisionList(provisionList);
-		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<Provision>();
-		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+		
 		if (provisions.get().size() == provisionList.size()) {
-			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+			
+			return provisions.get();
+			
+			//header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
 		} else {
-			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+			return null;
+			//header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
 		}
-		response.setHeader(header);
-		return response;
+		//response.setHeader(header);
+		//return response;
 	}
 
 	@Override
@@ -344,6 +361,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
+			
 			Provision provision = optional.get();
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
@@ -571,7 +589,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar) {
 		
-		try {
 		
 			Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 			boolean updated = false;
@@ -614,94 +631,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 			} else {
 				return null;
 			}
-		} catch (Exception e) {
-			
-		}
-		return null;
+		
 		
 		
 	}
 	
-	@Override
-	public ProvisionArrayResponse<Provision> setContactInfoUpdateNew(SetContactInfoUpdateRequest request) {
-		
-		ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
-		List<Provision> provisions = new ArrayList<>();
-		try {
-		
-			
-			
-			Optional<Provision> optional = provisionRepository.getProvisionById(request.getProvisionId());
-			boolean updated = false;
-
-			if (optional.isPresent()) {
-				Provision provision = optional.get();
-				provision.getCustomer().setContactName(request.getContactFullname());
-				provision.getCustomer().setContactPhoneNumber(Integer.valueOf(request.getContactCellphone()));
-				provision.getCustomer().setContactCarrier(request.getContactCellphoneIsMovistar().toString());
-				
-
-				//boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-				boolean contactUpdated = restPSI.updatePSIClient(provision);
-
-				if (contactUpdated) {
-					Update update = new Update();
-					update.set("customer.contact_name", request.getContactFullname());
-					update.set("customer.contact_phone_number", Integer.valueOf(request.getContactCellphone()));
-					update.set("customer.contact_carrier", request.getContactCellphoneIsMovistar().toString());
-					
-					updated = provisionRepository.updateProvision(provision, update);
-					
-						
-				}
-
-				if (updated) {
-					try {
-						sendContactInfoChangedMail(provision);
-					} catch (Exception e) {
-						log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
-						//return provision;
-					}
-					
-					List<MsgParameter> msgParameters = new ArrayList<>();
-					//Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no se valida la respuesta
-					//ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
-					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(), Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
-					
-					response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
-					provisions.add(provision);
-					response.setData(provisions);
-					return response;
-				} else {
-					throw new DataNotFoundException();
-				}
-			} else {
-				throw new DataNotFoundException();
-			}
-		} catch (Exception ex) {
-			if(ex instanceof FunctionalErrorException) {
-				
-				String messageCustome = ((FunctionalErrorException) ex).getErrorCode().toString().equals("ERR19")? "Usuario cancelo solicitud": ((FunctionalErrorException) ex).getMessage().toString(); 
-				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.NO_CONTENT.value(), messageCustome));
-				response.setData(null);
-				//System.out.println(FunctionalErrorException);
-				
-				
-				System.out.println(((FunctionalErrorException) ex).getMessage());
-				System.out.println(((FunctionalErrorException) ex).getErrorCode());
-				return response;
-				
-			} else if(ex instanceof ServerNotFoundException) {
-				throw new ServerNotFoundException(ex.getMessage());
-			} 
-			
-			throw new DataNotFoundException();
-			
-			
-			
-		}
-		
-	}
+	
 	/*private Boolean sendAddressChangeRequest(Provision provision) {
 		return sendRequestToBO(provision, "3");
 	}*/

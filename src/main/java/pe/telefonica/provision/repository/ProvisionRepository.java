@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.core.query.Update;
 
+import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.model.Provision;
@@ -13,9 +14,9 @@ import pe.telefonica.provision.model.Queue;
 
 public interface ProvisionRepository {
 
-	Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType);
+	Optional<List<Provision>> findAll(String documentType, String documentNumber);
 
-	Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType);
+	Optional<Provision> getOrder(String documentType, String documentNumber);
 	
 	Optional<Provision> getStatus(String provisionId);
 

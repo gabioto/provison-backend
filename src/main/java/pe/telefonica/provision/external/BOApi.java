@@ -16,10 +16,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.service.request.BORequest;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Component
 public class BOApi {

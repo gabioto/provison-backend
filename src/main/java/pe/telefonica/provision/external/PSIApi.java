@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.SSLClientFactory;
@@ -42,6 +41,7 @@ import pe.telefonica.provision.repository.impl.ProvisionRepositoryImpl;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
 import pe.telefonica.provision.util.DateUtil;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Component
 public class PSIApi extends ConfigRestTemplate {

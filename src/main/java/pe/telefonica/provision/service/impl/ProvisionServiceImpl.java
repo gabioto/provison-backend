@@ -112,6 +112,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
 			
 			Provision prov = provision.get();
+			prov.getCustomer().setProductName(prov.getProductName());
 			return prov.getCustomer();
 			
 			/*prov.getCustomer().setProductName(prov.getProductName());

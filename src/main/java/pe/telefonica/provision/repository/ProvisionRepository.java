@@ -18,9 +18,15 @@ public interface ProvisionRepository {
 
 	Optional<Provision> getOrder(String documentType, String documentNumber);
 	
+	Optional<Provision> getProvisionByXaRequest(String xaRequest);
+	
 	Optional<Provision> getStatus(String provisionId);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
+	
+	Optional<Provision> insertProvision(Provision provisionRequest);
+	
+	Boolean resetProvision(Provision provisionRequest);
 
 	Optional<Provision> getProvisionById(String provisionId);
 	

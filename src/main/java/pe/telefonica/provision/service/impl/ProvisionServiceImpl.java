@@ -59,6 +59,7 @@ import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.exception.DataNotFoundException;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
@@ -161,20 +162,36 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public List<Provision> insertProvisionList(List<Provision> provisionList) {
-		
-		Optional<List<Provision>> provisions = provisionRepository.insertProvisionList(provisionList);
-		
-		if (provisions.get().size() == provisionList.size()) {
-			
-			return provisions.get();
-			
-			//header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-		} else {
+		//EAPR: agregada validacion de registros previos (por cod de peticion) para actualizarlos en caso de nuevos ST
+		if(provisionList.isEmpty()) {
 			return null;
-			//header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
 		}
-		//response.setHeader(header);
-		//return response;
+		
+		List<Provision> resultList = new ArrayList<Provision>();
+		
+		for(Provision newProvision:provisionList) {
+			Optional<Provision> optional = provisionRepository.getProvisionByXaRequest(newProvision.getXaRequest());
+			
+			if(!optional.isPresent()) {
+				continue;
+			} else {
+				Provision oldProvision = optional.get();
+				if (newProvision.getXaIdSt().equals(oldProvision.getXaIdSt())) {
+					continue;
+				} else {
+					String oldSt = oldProvision.getXaIdSt();
+					oldProvision.setXaIdSt(newProvision.getXaIdSt());
+					
+					if(provisionRepository.resetProvision(oldProvision)) {
+						//Enviar al log el cambio
+						trazabilidadSecurityApi.saveLogData("", "", "", "", "UPDATE", "oldST = " + oldSt, "newST = " + newProvision.getXaIdSt(), ConstantsLogData.PROVISION_UPDATE_ST);
+					}
+				}
+				resultList.add(oldProvision);
+			}
+		}
+		
+		return resultList;
 	}
 
 	@Override

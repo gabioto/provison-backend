@@ -1,5 +1,6 @@
 package pe.telefonica.provision.conf;
 
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -8,16 +9,21 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class RestTemplateConfig {
+	
+		
 	 	@Bean
-	    public RestTemplate restTemplateOld() {
-	 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory
-            = new HttpComponentsClientHttpRequestFactory();
+	    public RestTemplate restTemplate() {
+	 		
+	 		/*HttpComponentsClientHttpRequestFactory clientHttpRequestFactory
+            = new HttpComponentsClientHttpRequestFactory();*/
+	 		
+	 		SimpleClientHttpRequestFactory test = new SimpleClientHttpRequestFactory();
+	       
 
-	         //factory = new SimpleClientHttpRequestFactory();
+	 		test.setConnectTimeout(20000);
+	 		test.setReadTimeout(20000);
 
-	 		clientHttpRequestFactory.setConnectTimeout(1000);
-	 		clientHttpRequestFactory.setReadTimeout(1000);
-
-	        return new RestTemplate(clientHttpRequestFactory);
+	        return new RestTemplate(test);
+	        
 	    }
 }

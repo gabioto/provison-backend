@@ -52,6 +52,12 @@ public final class Constants {
 	//Cuando el cliente cancela desde la web
 	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
 	
+	//Codigos de los endpoints de PSI
+	public static final String PSI_CODE_CAPACITY = "201";
+	public static final String PSI_CODE_SCHEDULE = "202";
+	public static final String PSI_CODE_CANCEL   = "203";
+	public static final String PSI_CODE_UPDATE_CONTACT = "204";
+		
 	public static final String OPER_SEND_SMS_BY_ID	 = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID	 = "OPER_SEND_MAIL_BY_ID";
 	

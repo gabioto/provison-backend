@@ -41,6 +41,7 @@ import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
+import pe.telefonica.provision.util.constants.ErrorCode;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
@@ -91,7 +92,7 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 				
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
-						request.getBody().getOrderCode(), request.getBody().getBucket(),  "OK", new Gson().toJson(request),
+						request.getBody().getOrderCode(), request.getBody().getBucket(),  "NOT_MATCH", new Gson().toJson(request),
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER);
 				
 			}
@@ -139,7 +140,7 @@ public class ProvisionController {
 							new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_PROVISION_ALL);
 					
 				} else {
-					status = HttpStatus.INTERNAL_SERVER_ERROR;
+					status = HttpStatus.NOT_FOUND;
 					apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), "No se encontraron provisiones", null);
 					apiResponse.setBody(provisions);
 					
@@ -351,10 +352,23 @@ public class ProvisionController {
 			
 			
 			if(ex instanceof FunctionalErrorException ) {
-				status = HttpStatus.OK;
-				String messageCustome = ((FunctionalErrorException) ex).getErrorCode().toString().equals("ERR19")? "Usuario cancelo solicitud": ((FunctionalErrorException) ex).getMessage().toString(); 
 				
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(HttpStatus.NO_CONTENT.value()), messageCustome, null);
+				status = HttpStatus.BAD_REQUEST;
+				
+				String errorCode = ((FunctionalErrorException) ex).getErrorCode().replace("\"", "");
+				if(errorCode.equals("ERR10") || errorCode.equals("ERR11") || errorCode.equals("ERR02") ) {
+					status = HttpStatus.BAD_REQUEST;
+				} else if(errorCode.equals("ERR15") ) {
+					status = HttpStatus.UNAUTHORIZED;
+				}else if(errorCode.equals("ERR03") ) {
+					status = HttpStatus.NOT_FOUND;
+				}else if(errorCode.equals("ERR19") ) {
+					status = HttpStatus.CONFLICT;
+				} 
+				
+				errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
+			
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
 				
 				
 			} else {

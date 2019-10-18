@@ -14,10 +14,10 @@ public class ConfigRestTemplate {
 	
 	
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
+    	SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient);
     	
-    	
-        int timeout = 5000;
-        int readtimeout = 10000;
+        int timeout = 20000;
+        int readtimeout = 20000;
         HttpComponentsClientHttpRequestFactory clientHttpRequestFactory
                 = new HttpComponentsClientHttpRequestFactory();
         clientHttpRequestFactory.setConnectTimeout(timeout);

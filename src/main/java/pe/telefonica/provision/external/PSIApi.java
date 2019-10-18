@@ -134,7 +134,7 @@ public class PSIApi extends ConfigRestTemplate {
 			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);
 			
-			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = test.postForEntity(requestUrl, entity,
+			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = getRestTemplate().postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);*/
 			
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
@@ -163,19 +163,7 @@ public class PSIApi extends ConfigRestTemplate {
 			// return false;
 		}
 	}
-	
-	private ClientHttpRequestFactory getClientHttpRequestFactory() {
-		
-		SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient);
-		
-		int connection_timeout = 50;
-		int read_timeout = 50;
-		System.out.println("test tiemout");
-	    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-	    clientHttpRequestFactory.setConnectTimeout(connection_timeout);
-	    clientHttpRequestFactory.setReadTimeout(read_timeout);
-	    return clientHttpRequestFactory;
-	} 
+	 
 	private String getTokenFromPSI(String customerName, boolean toInsert) {
 		RestTemplate restTemplate = new RestTemplate();
 		boolean updated = true;

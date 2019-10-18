@@ -34,8 +34,8 @@ public class TrazabilidadScheduleApi {
 	public boolean updateCancelSchedule(CancelRequest cancelRequest) {
 		log.info("updateCancelSchedule");
 		RestTemplate restTemplate = new RestTemplate();
-		String urlProvisionUser = api.getScheduleUrl() + api.getUpdateSchedule();
-		String urlSchedule = "https://agendamiento-trazabilidad-dev.mybluemix.net/schedule/cancelSchedule";
+		String urlSchedule = api.getScheduleUrl() + api.getUpdateSchedule();
+		//String urlSchedule = "https://agendamiento-trazabilidad-dev.mybluemix.net/schedule/cancelSchedule";
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();

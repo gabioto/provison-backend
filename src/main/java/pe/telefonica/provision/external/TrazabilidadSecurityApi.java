@@ -18,7 +18,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.controller.common.ApiRequest;
@@ -34,6 +33,7 @@ import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.external.request.LogDataRequest;
 import pe.telefonica.provision.service.request.SMSRequest;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Component
 public class TrazabilidadSecurityApi {
@@ -97,23 +97,34 @@ public class TrazabilidadSecurityApi {
 
 		String sendMailUrl = api.getSecurityUrl() + api.getSendMail();
 		MailRequest mailRequest = new MailRequest();
+		
 		mailRequest.setMailTemplateId(templateId);
 		mailRequest.setMailParameters(mailParameters);
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		
 		headersMap.add("Content-Type", "application/json");
 		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
 		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
-
-		HttpEntity<MailRequest> entity = new HttpEntity<MailRequest>(mailRequest, headersMap);
-
-		ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendMailUrl, entity, String.class);
-		if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-			return true;
-		} else {
-			return false;
+		
+		ApiRequest<MailRequest> apiRequest = new ApiRequest<MailRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_SEND_MAIL_BY_ID, mailRequest);
+		
+		HttpEntity<ApiRequest<MailRequest>> entity = new HttpEntity<ApiRequest<MailRequest>>(apiRequest, headersMap);
+		
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendMailUrl, entity, String.class);
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception ex) {
+			
+			System.out.println(ex);
 		}
+		return false;
+		
 	}
 	
 	public ApiResponse<SMSByIdResponse> sendSMS(Customer customer, String msgKey, MsgParameter[] msgParameters, String webURL) {

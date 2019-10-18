@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.SSLClientFactory;
@@ -42,6 +41,7 @@ import pe.telefonica.provision.repository.impl.ProvisionRepositoryImpl;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
 import pe.telefonica.provision.util.DateUtil;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Component
 public class PSIApi extends ConfigRestTemplate {
@@ -131,11 +131,11 @@ public class PSIApi extends ConfigRestTemplate {
 
 		try {
 			
-			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
-					PSIUpdateClientResponse.class);
-			
-			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = test.postForEntity(requestUrl, entity,
+			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);*/
+			
+			ResponseEntity<PSIUpdateClientResponse> responseEntity = getRestTemplate().postForEntity(requestUrl, entity,
+					PSIUpdateClientResponse.class);
 			
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
@@ -163,19 +163,7 @@ public class PSIApi extends ConfigRestTemplate {
 			// return false;
 		}
 	}
-	
-	private ClientHttpRequestFactory getClientHttpRequestFactory() {
-		
-		SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient);
-		
-		int connection_timeout = 50;
-		int read_timeout = 50;
-		System.out.println("test tiemout");
-	    HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-	    clientHttpRequestFactory.setConnectTimeout(connection_timeout);
-	    clientHttpRequestFactory.setReadTimeout(read_timeout);
-	    return clientHttpRequestFactory;
-	} 
+	 
 	private String getTokenFromPSI(String customerName, boolean toInsert) {
 		RestTemplate restTemplate = new RestTemplate();
 		boolean updated = true;

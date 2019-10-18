@@ -41,7 +41,6 @@ import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.controller.request.MailRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
-import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
@@ -55,6 +54,7 @@ import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
 import pe.telefonica.provision.util.DateUtil;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Repository
 public class ProvisionRepositoryImpl implements ProvisionRepository {
@@ -77,10 +77,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<List<Provision>> findAll(ProvisionRequest provisionRequest, String documentType) {
+	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(provisionRequest.getDocumentNumber())
+						.is(documentNumber)
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);
@@ -89,10 +89,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<Provision> getOrder(ProvisionRequest provisionRequest, String documentType) {
+	public Optional<Provision> getOrder(String documentType, String documentNumber) {
 		Provision provision = this.mongoOperations.findOne(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(provisionRequest.getDocumentNumber())
+						.is(documentNumber)
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);

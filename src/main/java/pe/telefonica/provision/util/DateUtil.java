@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import pe.telefonica.provision.conf.Constants;
+import pe.telefonica.provision.util.constants.Constants;
 
 public class DateUtil {
 

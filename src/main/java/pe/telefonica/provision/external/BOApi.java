@@ -16,19 +16,21 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import pe.telefonica.provision.conf.Constants;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.service.request.BORequest;
+import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @Component
-public class BOApi {
+public class BOApi /*extends ConfigRestTemplate*/ {
 	private static final Log log = LogFactory.getLog(BOApi.class);
 	
 	@Autowired
 	private ExternalApi api;
 	
-	public Boolean sendRequestToBO(Provision provision, String action) {
+	public Boolean sendRequestToBO(Provision provision, String action)  {
+		
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -75,8 +77,11 @@ public class BOApi {
 		HttpEntity<BORequest> entityBO = new HttpEntity<BORequest>(boRequest, headersMap);
 
 		try {
+			
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendRequestBO, entityBO, String.class);
-
+			
+			//ResponseEntity<String> responseEntity = getRestTemplate().postForEntity(sendRequestBO, entityBO, String.class);
+			
 			log.info("sendRequestToBO - BO - Response: " + responseEntity.getBody());
 
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
@@ -84,9 +89,9 @@ public class BOApi {
 			} else {
 				return false;
 			}
-		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
-			return false;
+		} catch (Exception ex) {
+			log.info("Exception = " + ex.getMessage());
+			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
 }

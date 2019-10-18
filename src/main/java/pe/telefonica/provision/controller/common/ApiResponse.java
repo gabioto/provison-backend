@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import pe.telefonica.provision.conf.Constants;
+import pe.telefonica.provision.util.constants.Constants;
 
 public class ApiResponse<T> {
 
@@ -18,6 +18,7 @@ public class ApiResponse<T> {
 		ResponseHeader header = new ResponseHeader();
 		header.setAppName(appName);
 		header.setDateTime(sdf.format(Calendar.getInstance().getTime()));
+		header.setOperation(operation);
 		header.setResultCode(resultCode);
 		header.setMessage(message);
 

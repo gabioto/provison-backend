@@ -580,6 +580,8 @@ public class ProvisionController {
 
 				return ResponseEntity.ok(response);*/
 			} else {
+				
+				
 				status = HttpStatus.BAD_REQUEST;
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(), null);
 				
@@ -599,22 +601,38 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(), null);
+			if(ex instanceof FunctionalErrorException ) {
+				
+				status = HttpStatus.BAD_REQUEST;
+				
+				
+				String errorCode = ((FunctionalErrorException) ex).getErrorCode();
+				if(errorCode.equals("400")) {
+					status = HttpStatus.BAD_REQUEST;
+				} else if(errorCode.equals("401") ) {
+					status = HttpStatus.UNAUTHORIZED;
+				}else if(errorCode.equals("404") ) {
+					status = HttpStatus.NOT_FOUND;
+				}else if(errorCode.equals("409") ) {
+					status = HttpStatus.CONFLICT;
+				} 
+				
+				//errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 			
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException) ex).getMessage(), null);
+				
+				
+			} else {
+						
+				status = HttpStatus.INTERNAL_SERVER_ERROR;
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(), null);
+				
+				
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
 			
-			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
-					request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
-					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
-			
-			
-			/*restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
-					request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request),
-					new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_CANCEL);
-
-			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(),
-					HttpStatus.BAD_REQUEST.name()));
-			return ResponseEntity.badRequest().body(response);*/
+			}
 		}
 		
 		return ResponseEntity.status(status).body(apiResponse);

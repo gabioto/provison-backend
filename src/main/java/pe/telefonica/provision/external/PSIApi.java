@@ -63,6 +63,8 @@ public class PSIApi extends ConfigRestTemplate {
 		RestTemplate restTemplate = new RestTemplate(
 			SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());	
+		/*RestTemplate restTemplate = new RestTemplate();*/
+	restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());	
 		
 		//RestTemplate test = new RestTemplate(this.getClientHttpRequestFactory());
     	
@@ -131,11 +133,11 @@ public class PSIApi extends ConfigRestTemplate {
 
 		try {
 			
-			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
-					PSIUpdateClientResponse.class);*/
-			
-			ResponseEntity<PSIUpdateClientResponse> responseEntity = getRestTemplate().postForEntity(requestUrl, entity,
+			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);
+			
+			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = getRestTemplate().postForEntity(requestUrl, entity,
+					PSIUpdateClientResponse.class);*/
 			
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 

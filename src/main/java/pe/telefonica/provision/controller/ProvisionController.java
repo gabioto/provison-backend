@@ -592,7 +592,7 @@ public class ProvisionController {
 				
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
 						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 			
 			}
 		}

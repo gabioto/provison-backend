@@ -106,7 +106,8 @@ public class PSIApi extends ConfigRestTemplate {
 
 		request.getBodyUpdateClient().getUser().setNow(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_USER));
 		request.getBodyUpdateClient().getUser().setLogin("appmovistar");
-		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
+		//request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
+		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe1");
 		request.getBodyUpdateClient().getUser().setAuth_string(generateAuthString());
 		request.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 		request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().getContactName());

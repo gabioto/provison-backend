@@ -144,7 +144,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		update.set("active_status", Constants.PROVISION_STATUS_INCOMPLETE);
 		update.set("status_toa", "IN_TOA");
 
-		UpdateResult result = this.mongoOperations.updateFirst(new Query(Criteria.where("idProvision").is(provisionRequest.getIdProvision())),
+		UpdateResult result = this.mongoOperations.updateFirst(new Query(Criteria.where("idProvision").is(new ObjectId(provisionRequest.getIdProvision()))),
 				update, Provision.class);
 
 		return result.getMatchedCount() > 0;

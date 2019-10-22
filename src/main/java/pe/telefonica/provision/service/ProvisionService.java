@@ -3,28 +3,33 @@ package pe.telefonica.provision.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import pe.telefonica.provision.api.request.ProvisionRequest;
-import pe.telefonica.provision.api.response.ProvisionArrayResponse;
-import pe.telefonica.provision.api.response.ProvisionResponse;
-import pe.telefonica.provision.dto.Customer;
-import pe.telefonica.provision.dto.Provision;
+import pe.telefonica.provision.controller.common.ApiRequest;
+import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
+import pe.telefonica.provision.controller.response.ProvisionArrayResponse;
+import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.model.Customer;
+import pe.telefonica.provision.model.Provision;
 
 public interface ProvisionService {
 
-	ProvisionResponse<Customer> validateUser(ProvisionRequest provisionRequest);
+	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
 
-	ProvisionArrayResponse<Provision> getAll(ProvisionRequest provisionRequest);
+	List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 	
 	ProvisionResponse<String> getStatus(String provisionId);
 
-	ProvisionArrayResponse<Provision> insertProvisionList(List<Provision> provisionList);
+	List<Provision> insertProvisionList(List<Provision> provisionList);
 
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
-
+	
+	
 	public Provision setProvisionIsValidated(String provisionId);
 
 	public Provision requestAddressUpdate(String provisionId);
+	
 
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);

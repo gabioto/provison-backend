@@ -190,6 +190,7 @@ public class ProvisionController {
 			@RequestBody @Valid ApiRequest<List<Provision>> provisionListReq) {
 		log.info(this.getClass().getName() + " - " + "insertOrders: " + provisionListReq.toString());
 		
+		log.info(this.getClass().getName() + " - " + "provisionListReq: " + provisionListReq.toString());
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 		

@@ -1,0 +1,9 @@
+---
+applications:
+  - name: PruebaUK
+    random-route: true
+    memory: 2GB
+    path: target/tdp-provision-1.0.2-SNAPSHOT.jar
+    buildpack: liberty-for-java
+    disk_quota: 2GB
+    instances: 1

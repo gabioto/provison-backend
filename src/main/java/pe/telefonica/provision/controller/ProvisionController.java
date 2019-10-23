@@ -372,6 +372,10 @@ public class ProvisionController {
 			
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
 				
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+				
 				
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;

@@ -146,18 +146,24 @@ public class TrazabilidadSecurityApi {
 		message.setMsgParameters(msgParameters);
 		message.setWebURL(webURL);
 		
+		System.out.println(webURL);
+		
 		List<Contact> contacts = new ArrayList<>();
 		
 		Contact contactCustomer = new Contact();
 		contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); //TODO: Cambiar integer a string
 		contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
 		
-		Contact contactContact = new Contact();
-		contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString()); //TODO: Cambiar integer a string
-		contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
+		if(customer.getContactPhoneNumber() != null) {
+			Contact contactContact = new Contact();
+			contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString()); //TODO: Cambiar integer a string
+			contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
+			contacts.add(contactContact);
+		}
+		
 		
 		contacts.add(contactCustomer);
-		contacts.add(contactContact);
+		
 		
 		smsByIdRequest.setContacts(contacts.toArray(new Contact[0]));
 		smsByIdRequest.setMessage(message);

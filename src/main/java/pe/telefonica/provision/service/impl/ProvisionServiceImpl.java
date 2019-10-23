@@ -413,8 +413,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (provision.getHasSchedule()) {
 				// scheduleUpdated = provisionRepository.updateCancelSchedule(new
 				// CancelRequest(provision.getIdProvision(), "provision"));
-				scheduleUpdated = trazabilidadScheduleApi
-						.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision"));
+				scheduleUpdated = trazabilidadScheduleApi.updateCancelSchedule(
+						new CancelRequest(provision.getIdProvision(), "provision", provision.getXaIdSt()));
 				if (!scheduleUpdated) {
 					return null;
 				}

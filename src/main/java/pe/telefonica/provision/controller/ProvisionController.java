@@ -567,22 +567,24 @@ public class ProvisionController {
 			if(ex instanceof FunctionalErrorException ) {
 				
 				status = HttpStatus.BAD_REQUEST;
+				System.out.println(ex.getMessage());
 				
+				String errorCode[] = ((FunctionalErrorException) ex).getErrorCode().split("_");
+				Integer htttCode = Integer.parseInt(errorCode[0]);
 				
-				String errorCode = ((FunctionalErrorException) ex).getErrorCode();
-				if(errorCode.equals("400")) {
+				if(htttCode.equals(400)) {
 					status = HttpStatus.BAD_REQUEST;
-				} else if(errorCode.equals("401") ) {
+				} else if(htttCode.equals(401) ) {
 					status = HttpStatus.UNAUTHORIZED;
-				}else if(errorCode.equals("404") ) {
+				}else if(htttCode.equals(404) ) {
 					status = HttpStatus.NOT_FOUND;
-				}else if(errorCode.equals("409") ) {
+				}else if(htttCode.equals(409) ) {
 					status = HttpStatus.CONFLICT;
 				} 
 				
 				//errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 			
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException) ex).getMessage(), null);
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode[1], ((FunctionalErrorException) ex).getMessage(), null);
 				
 				
 			} else {

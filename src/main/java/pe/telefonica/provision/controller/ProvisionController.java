@@ -466,7 +466,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Object>> receiveAddressUpdateBO(
 			@RequestBody ApiRequest<ReceiveAddressUpdateBORequest> request) {
-		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO");
+		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO error 405  ");
 		log.info(this.getClass().getName() + " - " + request.toString());
 		
 		

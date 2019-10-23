@@ -14,6 +14,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.controller.request.CancelRequest;
@@ -61,7 +64,14 @@ public class TrazabilidadScheduleApi {
 		} catch (HttpClientErrorException ex) {
 			log.info("Exception = " + ex.getMessage());
 			log.info("Exception = " + ex.getResponseBodyAsString());
-			throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode()));
+			
+			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+			
+			String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
+			String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
+			
+			throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
+			
 			
 			
 		//hrow ew FunctionalErrrException(ex.getMessage(), ex, String.valueOf}<>)ex.getStatusCode());

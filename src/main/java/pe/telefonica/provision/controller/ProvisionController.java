@@ -86,7 +86,7 @@ public class ProvisionController {
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER);
 			} else {
 				
-				status = HttpStatus.NOT_FOUND;
+				status = HttpStatus.OK;
 				
 				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER, String.valueOf(status.value()), "No se encontraron datos del cliente", null);
 				apiResponse.setBody(null);
@@ -372,6 +372,10 @@ public class ProvisionController {
 			
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
 				
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+				
 				
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -422,35 +426,19 @@ public class ProvisionController {
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
 
 				
-				/*List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-				response.setHeader(
-						new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
-				response.setData(provisions);
-
-				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
-						request.getOrderCode(), request.getBucket(), "OK", new Gson().toJson(request),
-						new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
-
-				return ResponseEntity.ok(response);*/
-			} else {
-				status = HttpStatus.BAD_REQUEST;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
 				
+			} else {
+				
+				status = HttpStatus.OK;
+				
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody(null);
 				
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
-						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+						request.getBody().getOrderCode(), request.getBody().getBucket(),  "NOT_MATCH", new Gson().toJson(request),
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
 				
-				/*
-				response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(),
-						HttpStatus.BAD_REQUEST.name()));
-
-				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
-						request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(response), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
-
-				return ResponseEntity.badRequest().body(response);*/
+				
 			}
 
 		} catch (Exception ex) {
@@ -464,14 +452,7 @@ public class ProvisionController {
 					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
 			
 			
-			/*restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
-					request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request),
-					new Gson().toJson(ex.getMessage()), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
-
-			response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(),
-					HttpStatus.BAD_REQUEST.name()));
-
-			return ResponseEntity.badRequest().body(response);*/
+			
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
@@ -482,10 +463,10 @@ public class ProvisionController {
 	 * @return
 	 */
 		
-	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.PUT)
+	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Object>> receiveAddressUpdateBO(
 			@RequestBody ApiRequest<ReceiveAddressUpdateBORequest> request) {
-		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO");
+		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO error 405  ");
 		log.info(this.getClass().getName() + " - " + request.toString());
 		
 		
@@ -570,17 +551,7 @@ public class ProvisionController {
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 				
 				
-				/*List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-				response.setHeader(
-						new ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(), HttpStatus.OK.name()));
-				response.setData(provisions);
-
-				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
-						request.getOrderCode(), request.getBucket(), "OK", new Gson().toJson(request),
-						new Gson().toJson(response), ConstantsLogData.PROVISION_CANCEL);
-
-				return ResponseEntity.ok(response);*/
+				
 			} else {
 				
 				
@@ -591,13 +562,7 @@ public class ProvisionController {
 						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 				
-				/*response.setHeader(new ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(),
-						HttpStatus.BAD_REQUEST.name()));
-				restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
-						request.getOrderCode(), request.getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(response), ConstantsLogData.PROVISION_CANCEL);
-
-				return ResponseEntity.badRequest().body(response);*/
+				
 				
 			}
 
@@ -606,23 +571,28 @@ public class ProvisionController {
 			if(ex instanceof FunctionalErrorException ) {
 				
 				status = HttpStatus.BAD_REQUEST;
+				System.out.println(ex.getMessage());
 				
+				String errorCode[] = ((FunctionalErrorException) ex).getErrorCode().split("_");
+				Integer htttCode = Integer.parseInt(errorCode[0]);
 				
-				String errorCode = ((FunctionalErrorException) ex).getErrorCode();
-				if(errorCode.equals("400")) {
+				if(htttCode.equals(400)) {
 					status = HttpStatus.BAD_REQUEST;
-				} else if(errorCode.equals("401") ) {
+				} else if(htttCode.equals(401) ) {
 					status = HttpStatus.UNAUTHORIZED;
-				}else if(errorCode.equals("404") ) {
+				}else if(htttCode.equals(404) ) {
 					status = HttpStatus.NOT_FOUND;
-				}else if(errorCode.equals("409") ) {
+				}else if(htttCode.equals(409) ) {
 					status = HttpStatus.CONFLICT;
 				} 
 				
 				//errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 			
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException) ex).getMessage(), null);
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode[1], ((FunctionalErrorException) ex).getMessage(), null);
 				
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 				
 			} else {
 						
@@ -632,7 +602,7 @@ public class ProvisionController {
 				
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
 						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS);
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 			
 			}
 		}

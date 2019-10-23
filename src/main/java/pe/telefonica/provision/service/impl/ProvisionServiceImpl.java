@@ -93,7 +93,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision = provisionRepository.getOrder("CEX", provisionRequest.getBody().getDocumentNumber());
 		}
 
-		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
+		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equalsIgnoreCase("PASAPORTE")) {
 			provision = provisionRepository.getOrder("PAS", provisionRequest.getBody().getDocumentNumber());
 		}
 

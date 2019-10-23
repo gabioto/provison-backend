@@ -463,7 +463,7 @@ public class ProvisionController {
 	 * @return
 	 */
 		
-	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.PUT)
+	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Object>> receiveAddressUpdateBO(
 			@RequestBody ApiRequest<ReceiveAddressUpdateBORequest> request) {
 		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO");
@@ -590,6 +590,9 @@ public class ProvisionController {
 			
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE, errorCode[1], ((FunctionalErrorException) ex).getMessage(), null);
 				
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+						request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 				
 			} else {
 						

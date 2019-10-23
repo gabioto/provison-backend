@@ -86,7 +86,7 @@ public class ProvisionController {
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER);
 			} else {
 				
-				status = HttpStatus.NOT_FOUND;
+				status = HttpStatus.OK;
 				
 				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER, String.valueOf(status.value()), "No se encontraron datos del cliente", null);
 				apiResponse.setBody(null);

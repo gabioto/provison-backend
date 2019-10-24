@@ -7,8 +7,7 @@ import java.util.Optional;
 import org.springframework.data.mongodb.core.query.Update;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
-import pe.telefonica.provision.controller.request.CancelRequest;
-import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Queue;
 
@@ -41,4 +40,6 @@ public interface ProvisionRepository {
 	//boolean sendCancelledMail(Provision provision, String name, String idTemplate, String cancellationReason);
 	
 	Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
+	
+	Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 }

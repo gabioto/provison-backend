@@ -665,9 +665,18 @@ public class ProvisionController {
 			
 			status = HttpStatus.OK;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), status.getReasonPhrase(), provision);
+			
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+					request.getBody().getOrderCode(), request.getBody().getBucket(),  "OK", new Gson().toJson(request),
+					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
+			
 		}catch(Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), e.getMessage(), null);
+		
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+					request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
 		}
 		
 		return ResponseEntity.status(status).body(apiResponse);

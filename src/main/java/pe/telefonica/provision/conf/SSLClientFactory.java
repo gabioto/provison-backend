@@ -22,7 +22,7 @@ import okhttp3.OkHttpClient;
 public class SSLClientFactory {
 
 	private static boolean allowUntrusted = false;
-    private static final long LOGIN_TIMEOUT_SEC = 100;
+    private static final long LOGIN_TIMEOUT_SEC = 20;
     private static HttpClientBuilder closeableClientBuilder = null;
     private static OkHttpClient.Builder okHttpClientBuilder = null;
 
@@ -49,7 +49,7 @@ public class SSLClientFactory {
             requestFactory = new HttpComponentsClientHttpRequestFactory(closeableClientBuilder.build());
             break;
         case OkHttpClient:
-            okHttpClientBuilder = new OkHttpClient().newBuilder().readTimeout(LOGIN_TIMEOUT_SEC, TimeUnit.MILLISECONDS);
+            okHttpClientBuilder = new OkHttpClient().newBuilder().readTimeout(LOGIN_TIMEOUT_SEC, TimeUnit.SECONDS);
             //Add the SSLContext and trustmanager
             okHttpClientBuilder.sslSocketFactory(getSSlContext().getSocketFactory(), getTrustManager());
             //add the hostname verifier

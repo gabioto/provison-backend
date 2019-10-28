@@ -157,7 +157,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
-		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode()));
+		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode()).andOperator(Criteria.where("status_toa").is("done")));
 		
 		query.with(new Sort(new Order(Direction.DESC, "register_date")));
 		

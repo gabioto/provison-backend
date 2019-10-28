@@ -664,7 +664,7 @@ public class ProvisionController {
 			
 			
 			status = HttpStatus.OK;
-			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), status.getReasonPhrase(), provision);
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), status.getReasonPhrase(), provision);
 			
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
 					request.getBody().getOrderCode(), request.getBody().getBucket(),  "OK", new Gson().toJson(request),
@@ -672,7 +672,7 @@ public class ProvisionController {
 			
 		}catch(Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), e.getMessage(), null);
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), e.getMessage(), null);
 		
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
 					request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),

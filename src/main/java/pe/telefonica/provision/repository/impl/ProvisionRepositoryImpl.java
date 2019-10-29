@@ -13,9 +13,14 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 
 import com.mongodb.client.result.UpdateResult;
 
+import pe.telefonica.provision.controller.common.ApiRequest;
+import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Provision.StatusLog;
@@ -168,5 +173,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Provision.class);
 
 		return result.getMatchedCount() > 0;
+	}
+
+	@Override
+	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
+		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode()).andOperator(Criteria.where("status_toa").is("done")));
+		
+		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		
+		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+		
+		if(provisions.size() > 0) {
+		 Provision provision = provisions.get(0);
+		 return provision;
+		}
+		//Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(request.getOrdercode()).with( new Sort.Direction.DESC, "sortField"))), Provision.class);
+		
+		return null ;
 	}
 }

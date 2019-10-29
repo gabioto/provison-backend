@@ -25,6 +25,7 @@ import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.request.AddressUpdateRequest;
 import pe.telefonica.provision.controller.request.CancelOrderRequest;
 import pe.telefonica.provision.controller.request.GetAllInTimeRangeRequest;
+import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
@@ -755,6 +756,38 @@ public class ProvisionController {
 					String.valueOf(status.value()), e.getMessage(), null);
 		}
 
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+	
+	@RequestMapping(value = "/getProvisionByOrderCode", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<Provision>> getProvisionByOrderCode(@RequestBody ApiRequest<GetProvisionByOrderCodeRequest> request) {
+		
+		ApiResponse<Provision> apiResponse;
+		Provision provision = null;
+		HttpStatus status;
+		
+		try {
+			
+			 provision = provisionService.getProvisionByOrderCode(request);
+			//apiResponse.setBody(provision);
+			
+			
+			status = HttpStatus.OK;
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), status.getReasonPhrase(), provision);
+			
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+					request.getBody().getOrderCode(), request.getBody().getBucket(),  "OK", new Gson().toJson(request),
+					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
+			
+		}catch(Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), e.getMessage(), null);
+		
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
+					request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
+					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
+		}
+		
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 }

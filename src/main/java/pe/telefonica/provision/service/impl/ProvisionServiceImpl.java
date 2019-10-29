@@ -29,6 +29,7 @@ import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.request.CancelRequest;
+import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
@@ -852,6 +853,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		return updated;
+	}
+
+	@Override
+	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
+		return provisionRepository.getProvisionByOrderCode(request);
 	}
 
 }

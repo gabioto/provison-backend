@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
+import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.model.Customer;
@@ -40,4 +41,6 @@ public interface ProvisionService {
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 	
 	Boolean updateTrackingStatus(String xaRequest, String xaIdSt,  String status);
+	
+	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 }

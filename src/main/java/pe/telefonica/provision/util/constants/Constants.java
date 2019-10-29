@@ -71,5 +71,5 @@ public final class Constants {
 	public static final String OPER_ORDER_CANCELLATION = "OPER_ORDER_CANCELLATION";
 	public static final String OPER_CANCEL_SCHEDULE = "OPER_CANCEL_SCHEDULE";
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
-
+	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
 }

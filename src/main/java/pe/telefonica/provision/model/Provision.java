@@ -3,6 +3,8 @@ package pe.telefonica.provision.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Id;
 
@@ -12,98 +14,104 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @Document(collection = "collProvision")
-@JsonPropertyOrder({"idProvision"})
+@JsonPropertyOrder({ "idProvision" })
 public class Provision implements Serializable {
-	
+
 	private static final long serialVersionUID = 4894729030347835498L;
-	
+
 	@Id
 	@Field("_id")
 	private String idProvision;
-	
+
 	@Field("external_id")
 	private String externalId;
-	
+
 	@Field("xa_request")
 	private String xaRequest;
-	
+
 	@Field("xa_creation_date")
 	private String xaCreationDate;
-	
+
 	@Field("xa_id_st")
 	private String xaIdSt;
-	
+
 	@Field("xa_requirement_number")
 	private String xaRequirementNumber;
-	
+
 	@Field("appt_number")
 	private String apptNumber;
-	
+
 	@Field("purchase_date")
 	private String purchaseDate;
-	
+
 	@Field("purchase_hour")
 	private String purchaseHour;
-	
+
 	@Field("order_code")
 	private String orderCode;
-	
+
 	@Field("product_name")
 	private String productName;
-	
+
 	@Field("commercial_op")
 	private String commercialOp;
-	
+
 	@Field("payment_method")
 	private String paymentMethod;
-	
+
 	@Field("regular_price")
 	private Double regularPrice;
-	
+
 	@Field("promo_price")
 	private Double promoPrice;
-	
+
 	@Field("time_promo_price")
 	private Integer timePromoPrice;
-	
+
 	@Field("currency")
 	private String currency;
-	
+
 	@Field("install_price")
 	private String installPrice;
-	
+
 	@Field("active_status")
 	private String activeStatus;
-	
+
 	@Field("status_toa")
 	private String statusToa;
-	
+
 	@Field("validated_address")
 	private String validatedAddress;
-	
+
 	@Field("register_date")
 	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-	
+
 	@Field("has_schedule")
 	private Boolean hasSchedule = false;
-	
+
 	@Field("internet_detail")
 	private Internet internetDetail;
-	
+
 	@Field("television_detail")
 	private Television tvDetail;
-	
+
 	@Field("home_phone_detail")
 	private HomePhone homePhoneDetail;
-	
+
 	@Field("customer")
 	private Customer customer;
-	
+
 	@Field("work_zone")
 	private String workZone;
-	
+
 	@Field("registro_actualizado")
 	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+
+	@Field("last_tracking_status")
+	private String lastTrackingStatus;
+
+	@Field("log_status")
+	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
 
 	public LocalDateTime getUpdatedDate() {
 		return updatedDate;
@@ -337,8 +345,24 @@ public class Provision implements Serializable {
 		this.customer = customer;
 	}
 
-	public Provision(){
-		
+	public String getLastTrackingStatus() {
+		return lastTrackingStatus;
+	}
+
+	public void setLastTrackingStatus(String lastTrackingStatus) {
+		this.lastTrackingStatus = lastTrackingStatus;
+	}
+
+	public List<StatusLog> getLogStatus() {
+		return logStatus;
+	}
+
+	public void setLogStatus(List<StatusLog> logStatus) {
+		this.logStatus = logStatus;
+	}
+
+	public Provision() {
+
 	}
 
 	@Override
@@ -353,6 +377,31 @@ public class Provision implements Serializable {
 				+ statusToa + ", validatedAddress=" + validatedAddress + ", registerDate=" + registerDate
 				+ ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail
 				+ ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", workZone=" + workZone + "]";
+	}
+
+	public static class StatusLog {
+
+		@Field("status")
+		private String status;
+
+		@Field("inserted_date")
+		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+
+		public String getStatus() {
+			return status;
+		}
+
+		public void setStatus(String status) {
+			this.status = status;
+		}
+
+		public LocalDateTime getInsertedDate() {
+			return insertedDate;
+		}
+
+		public void setInsertedDate(LocalDateTime insertedDate) {
+			this.insertedDate = insertedDate;
+		}
 	}
 
 }

@@ -6,11 +6,9 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.core.query.Update;
 
-import pe.telefonica.provision.controller.common.ApiRequest;
-import pe.telefonica.provision.controller.request.CancelRequest;
-import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Queue;
+import pe.telefonica.provision.model.Provision.StatusLog;
 
 public interface ProvisionRepository {
 
@@ -18,9 +16,11 @@ public interface ProvisionRepository {
 
 	Optional<Provision> getOrder(String documentType, String documentNumber);
 	
-	Optional<Provision> getProvisionByXaRequest(String xaRequest);
+	Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt);
 	
 	Optional<Provision> getStatus(String provisionId);
+	
+	boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
 	

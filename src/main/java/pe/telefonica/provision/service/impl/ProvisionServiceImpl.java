@@ -25,7 +25,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import pe.telefonica.provision.conf.ExternalApi;
-import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
@@ -42,6 +41,7 @@ import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
+import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
@@ -61,9 +61,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private ProvisionTexts provisionTexts;
-
-	@Autowired
-	private IBMSecuritySeguridad ibmSecuritySeguridad;
 
 	@Autowired
 	private BOApi bOApi;
@@ -171,7 +168,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		List<Provision> resultList = new ArrayList<Provision>();
 
 		for (Provision newProvision : provisionList) {
-			Optional<Provision> optional = provisionRepository.getProvisionByXaRequest(newProvision.getXaRequest());
+			Optional<Provision> optional = provisionRepository.getProvisionByXaRequestAndSt(newProvision.getXaRequest(),
+					newProvision.getXaIdSt());
 
 			if (!optional.isPresent()) {
 				provisionRepository.insertProvision(newProvision);
@@ -830,6 +828,30 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status) {
+		boolean updated = false;
+		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
+		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
+				+ ", xaIdSt =" + xaIdSt + ", status = " + status);
+
+		if (optionalProvision.isPresent()) {
+			Provision provision = optionalProvision.get();
+			List<StatusLog> logStatus = provision.getLogStatus() == null ? new ArrayList<>() : provision.getLogStatus();
+
+			StatusLog statusLog = new StatusLog();
+			statusLog.setStatus(status);
+			logStatus.add(statusLog);
+
+			provision.setLastTrackingStatus(status);
+
+			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus);
+			log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
+		}
+
+		return updated;
 	}
 
 }

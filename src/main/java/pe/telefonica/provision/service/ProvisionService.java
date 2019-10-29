@@ -4,10 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
-import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
-import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
-import pe.telefonica.provision.controller.response.ProvisionArrayResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
@@ -41,4 +38,6 @@ public interface ProvisionService {
 	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId);
 	
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
+	
+	Boolean updateTrackingStatus(String xaRequest, String xaIdSt,  String status);
 }

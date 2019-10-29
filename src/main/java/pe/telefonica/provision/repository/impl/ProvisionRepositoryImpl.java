@@ -18,6 +18,7 @@ import com.mongodb.client.result.UpdateResult;
 
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Queue;
+import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
 
@@ -46,12 +47,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
-		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber)
-						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
-				Provision.class);
+		Provision provision = this.mongoOperations
+				.findOne(
+						new Query(
+								Criteria.where("customer.document_type").is(documentType)
+										.and("customer.document_number").is(documentNumber).orOperator(
+												Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
+												Criteria.where("active_status")
+														.is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
+						Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
@@ -114,16 +118,18 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-		Query query = new Query(Criteria.where("productName").ne(null).andOperator(Criteria.where("updatedDate").gte(startDate), Criteria.where("updatedDate").lt(endDate))); 
+		Query query = new Query(Criteria.where("productName").ne(null)
+				.andOperator(Criteria.where("updatedDate").gte(startDate), Criteria.where("updatedDate").lt(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
-		
+
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
 
 	@Override
-	public Optional<Provision> getProvisionByXaRequest(String xaRequest) {
-		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(xaRequest)), Provision.class);
+	public Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt) {
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(xaRequest)),
+				Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
@@ -131,7 +137,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<Provision> insertProvision(Provision provisionRequest) {
 		Provision provision = this.mongoOperations.insert(provisionRequest);
-		
+
 		Optional<Provision> optionalProvision = Optional.ofNullable(provision);
 		return optionalProvision;
 	}
@@ -144,8 +150,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		update.set("active_status", Constants.PROVISION_STATUS_INCOMPLETE);
 		update.set("status_toa", "IN_TOA");
 
-		UpdateResult result = this.mongoOperations.updateFirst(new Query(Criteria.where("idProvision").is(new ObjectId(provisionRequest.getIdProvision()))),
-				update, Provision.class);
+		UpdateResult result = this.mongoOperations.updateFirst(
+				new Query(Criteria.where("idProvision").is(new ObjectId(provisionRequest.getIdProvision()))), update,
+				Provision.class);
+
+		return result.getMatchedCount() > 0;
+	}
+
+	@Override
+	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus) {
+		Update update = new Update();
+		update.set("last_tracking_status", provision.getLastTrackingStatus());
+		update.set("log_status", logStatus);
+
+		UpdateResult result = this.mongoOperations.updateFirst(
+				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
+				Provision.class);
 
 		return result.getMatchedCount() > 0;
 	}

@@ -40,7 +40,7 @@ public interface ProvisionService {
 	
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 	
-	Boolean updateTrackingStatus(String xaRequest, String xaIdSt,  String status);
+	Boolean updateTrackingStatus(String xaRequest, String xaIdSt,  String status, boolean comesFromSchedule);
 	
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 }

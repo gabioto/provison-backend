@@ -1,6 +1,7 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.constants.Status;
 
 @Repository
 public class ProvisionRepositoryImpl implements ProvisionRepository {
@@ -133,8 +135,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt) {
-		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(xaRequest)),
-				Provision.class);
+		Provision provision = this.mongoOperations.findOne(
+				new Query(Criteria.where("xaRequest").is(xaRequest).and("xaIdSt").is(xaIdSt)), Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
@@ -150,10 +152,17 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Boolean resetProvision(Provision provisionRequest) {
 		Update update = new Update();
+		StatusLog statusLog = new StatusLog();
+		statusLog.setStatus(Status.IN_TOA.getStatusName());
+		List<StatusLog> listStatusLogs = new ArrayList<>();
+		listStatusLogs.add(statusLog);
+
 		update.set("xa_id_st", provisionRequest.getXaIdSt());
 		update.set("has_schedule", false);
 		update.set("active_status", Constants.PROVISION_STATUS_INCOMPLETE);
 		update.set("status_toa", "IN_TOA");
+		update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+		update.set("log_status", listStatusLogs);
 
 		UpdateResult result = this.mongoOperations.updateFirst(
 				new Query(Criteria.where("idProvision").is(new ObjectId(provisionRequest.getIdProvision()))), update,
@@ -163,10 +172,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus) {
+	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, boolean comesFromSchedule) {
 		Update update = new Update();
 		update.set("last_tracking_status", provision.getLastTrackingStatus());
 		update.set("log_status", logStatus);
+
+		if (comesFromSchedule) {
+			update.set("has_schedule", true);
+		}
 
 		UpdateResult result = this.mongoOperations.updateFirst(
 				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
@@ -177,18 +190,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
-		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode()).andOperator(Criteria.where("status_toa").is("done")));
-		
+		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode())
+				.andOperator(Criteria.where("status_toa").is("done")));
+
 		query.with(new Sort(new Order(Direction.DESC, "register_date")));
-		
+
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
-		
-		if(provisions.size() > 0) {
-		 Provision provision = provisions.get(0);
-		 return provision;
+
+		if (provisions.size() > 0) {
+			Provision provision = provisions.get(0);
+			return provision;
 		}
-		//Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(request.getOrdercode()).with( new Sort.Direction.DESC, "sortField"))), Provision.class);
-		
-		return null ;
+		// Provision provision = this.mongoOperations.findOne(new
+		// Query(Criteria.where("xaRequest").is(request.getOrdercode()).with( new
+		// Sort.Direction.DESC, "sortField"))), Provision.class);
+
+		return null;
 	}
 }

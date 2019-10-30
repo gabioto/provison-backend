@@ -22,7 +22,7 @@ public interface ProvisionRepository {
 	
 	Optional<Provision> getStatus(String provisionId);
 	
-	boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus);
+	boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, boolean comesFromSchedule);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
 	

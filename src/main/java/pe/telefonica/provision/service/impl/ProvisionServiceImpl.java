@@ -49,6 +49,7 @@ import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.BORequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
+import pe.telefonica.provision.util.constants.Status;
 
 @Service("provisionService")
 @Transactional
@@ -799,22 +800,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 		ProvisionResponse<Boolean> response = new ProvisionResponse<Boolean>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 
-		if (optional.isPresent()) {
-			Provision provision = optional.get();
-			Update update = new Update();
-			update.set("has_schedule", true);
-			boolean updated = provisionRepository.updateProvision(provision, update);
+		try {
+			if (optional.isPresent()) {
+				Provision provision = optional.get();
+				boolean updated = updateTrackingStatus(provision.getXaRequest(), provision.getXaIdSt(),
+						Status.AGENDADO.getStatusName(), true);
 
-			if (updated) {
-				header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-				response.setHeader(header).setData(true);
+				if (updated) {
+					header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+					response.setHeader(header).setData(true);
+				} else {
+					header.setCode(HttpStatus.BAD_REQUEST.value()).setMessage("No se pudo actualizar");
+					response.setHeader(header).setData(false);
+				}
 			} else {
-				header.setCode(HttpStatus.BAD_REQUEST.value()).setMessage("No se pudo actualizar");
+				header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron provisiones");
 				response.setHeader(header).setData(false);
 			}
-		} else {
-			header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron provisiones");
-			response.setHeader(header).setData(false);
+		} catch (Exception exception) {
+			throw exception;
 		}
 
 		return response;
@@ -832,7 +836,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status) {
+	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule) {
 		boolean updated = false;
 		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
 		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
@@ -848,7 +852,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provision.setLastTrackingStatus(status);
 
-			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus);
+			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, comesFromSchedule);
 			log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
 		}
 

@@ -741,7 +741,7 @@ public class ProvisionController {
 
 			if (statusProvision != null) {
 				updated = provisionService.updateTrackingStatus(statusProvision.getXaRequest(),
-						statusProvision.getXaIdSt(), request.getBody().getStatus());
+						statusProvision.getXaIdSt(), request.getBody().getStatus(), false);
 
 				status = updated ? HttpStatus.OK : HttpStatus.NOT_FOUND;
 			} else {

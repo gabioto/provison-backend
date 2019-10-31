@@ -641,12 +641,16 @@ public class ProvisionController {
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 
 			} else {
-
+				
+				System.out.println(ex.getMessage());
+				
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
-
+				
+				System.out.println(apiResponse);
+				
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),

@@ -64,13 +64,18 @@ public class TrazabilidadScheduleApi {
 		} catch (HttpClientErrorException ex) {
 			log.info("Exception = " + ex.getMessage());
 			log.info("Exception = " + ex.getResponseBodyAsString());
-			
-			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
-			
-			String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
-			String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
-			
-			throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
+			if(ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+				throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode().value() +"_"+ "401" ));
+			} else {
+				
+				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+				
+				String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
+				String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
+				
+				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
+				
+			}
 			
 			
 			

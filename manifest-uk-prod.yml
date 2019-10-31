@@ -1,0 +1,11 @@
+---
+applications:
+  - name: UK-PROVISION-TRAZABILIDAD
+    routes:
+    - route: uk-provision-trazabilidad.eu-gb.mybluemix.net
+    memory: 1GB
+    path: target/tdp-provision-1.0.2-SNAPSHOT.jar
+    buildpack: liberty-for-java
+    health-check-type: process
+    disk_quota: 2GB
+    instances: 1

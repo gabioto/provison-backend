@@ -170,8 +170,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		List<Provision> resultList = new ArrayList<Provision>();
 
 		for (Provision newProvision : provisionList) {
-			Optional<Provision> optional = provisionRepository.getProvisionByXaRequestAndSt(newProvision.getXaRequest(),
-					newProvision.getXaIdSt());
+			Optional<Provision> optional = provisionRepository.getProvisionByXaRequest(newProvision.getXaRequest());
 
 			if (!optional.isPresent()) {
 				provisionRepository.insertProvision(newProvision);

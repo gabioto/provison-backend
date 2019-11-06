@@ -28,7 +28,9 @@ import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.CancelRequest;
+import pe.telefonica.provision.controller.request.ContactRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
@@ -40,6 +42,7 @@ import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
+import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
@@ -555,86 +558,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return trazabilidadSecurityApi.sendMail("179829", mailParameters.toArray(new MailParameter[0]));
 	}
 
-	/*
-	 * private Boolean sendMail(String templateId, MailParameter[] mailParameters) {
-	 * RestTemplate restTemplate = new RestTemplate();
-	 * 
-	 * String sendMailUrl = api.getSecurityUrl() + api.getSendMail(); MailRequest
-	 * mailRequest = new MailRequest(); mailRequest.setMailTemplateId(templateId);
-	 * mailRequest.setMailParameters(mailParameters);
-	 * 
-	 * MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String,
-	 * String>(); headersMap.add("Content-Type", "application/json");
-	 * headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
-	 * headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
-	 * headersMap.add("X-IBM-Client-Secret",
-	 * ibmSecuritySeguridad.getClientSecret());
-	 * 
-	 * HttpEntity<MailRequest> entity = new HttpEntity<MailRequest>(mailRequest,
-	 * headersMap);
-	 * 
-	 * ResponseEntity<String> responseEntity =
-	 * restTemplate.postForEntity(sendMailUrl, entity, String.class); if
-	 * (responseEntity.getStatusCode().equals(HttpStatus.OK)) { return true; } else
-	 * { return false; } }
-	 */
-
-	/*
-	 * private ApiResponse<SMSByIdResponse> sendSMS(Customer customer, String
-	 * msgKey, MsgParameter[] msgParameters, String webURL) { MultiValueMap<String,
-	 * String> headersMap = new LinkedMultiValueMap<String, String>();
-	 * headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
-	 * headersMap.add("X-IBM-Client-Secret",
-	 * ibmSecuritySeguridad.getClientSecret()); headersMap.add("Authorization",
-	 * ibmSecuritySeguridad.getAuth()); headersMap.add("Content-Type",
-	 * "application/json");
-	 * 
-	 * RestTemplate restTemplate = new RestTemplate();
-	 * restTemplate.getMessageConverters().add(new
-	 * MappingJackson2HttpMessageConverter());
-	 * 
-	 * String url = api.getSecurityUrl() + api.getSendSMSById();
-	 * 
-	 * SMSByIdRequest smsByIdRequest = new SMSByIdRequest();
-	 * 
-	 * Message message = new Message(); message.setMsgKey(msgKey);
-	 * message.setMsgParameters(msgParameters); message.setWebURL(webURL);
-	 * 
-	 * List<Contact> contacts = new ArrayList<>();
-	 * 
-	 * Contact contactCustomer = new Contact();
-	 * contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); //TODO:
-	 * Cambiar integer a string
-	 * contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
-	 * 
-	 * Contact contactContact = new Contact();
-	 * contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString());
-	 * //TODO: Cambiar integer a string
-	 * contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
-	 * 
-	 * contacts.add(contactCustomer); contacts.add(contactContact);
-	 * 
-	 * smsByIdRequest.setContacts(contacts.toArray(new Contact[0]));
-	 * smsByIdRequest.setMessage(message);
-	 * 
-	 * 
-	 * ApiRequest<SMSByIdRequest> apiRequest = new
-	 * ApiRequest<SMSByIdRequest>(Constants.APP_NAME_PROVISION,
-	 * Constants.USER_PROVISION, Constants.OPER_SEND_SMS_BY_ID, smsByIdRequest);
-	 * HttpEntity<ApiRequest<SMSByIdRequest>> entity = new
-	 * HttpEntity<ApiRequest<SMSByIdRequest>>(apiRequest, headersMap);
-	 * 
-	 * ParameterizedTypeReference<ApiResponse<SMSByIdResponse>>
-	 * parameterizedTypeReference = new
-	 * ParameterizedTypeReference<ApiResponse<SMSByIdResponse>>(){};
-	 * 
-	 * ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity =
-	 * restTemplate.exchange(url, HttpMethod.POST, entity,
-	 * parameterizedTypeReference);
-	 * 
-	 * return responseEntity.getBody(); }
-	 */
-
 	@Override
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar) {
@@ -686,16 +609,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 	}
-
-	/*
-	 * private Boolean sendAddressChangeRequest(Provision provision) { return
-	 * sendRequestToBO(provision, "3"); }
-	 */
-
-	/*
-	 * private Boolean sendCancellation(Provision provision) { return
-	 * sendRequestToBO(provision, "4"); }
-	 */
 
 	private Boolean sendRequestToBO(Provision provision, String action) {
 		RestTemplate restTemplate = new RestTemplate();
@@ -861,6 +774,119 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
 		return provisionRepository.getProvisionByOrderCode(request);
+	}
+
+	@Override
+	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) {
+
+		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
+
+		if (provision != null) {
+
+			// Provision provision = optional.get();
+			List<ContactRequest> listContact = request.getContacts();
+			List<Contacts> contactsList = new ArrayList<>();
+			
+			String contactName1 = "";
+			String contactName2 = "";
+			String contactName3 = "";
+			String contactName4 = "";
+			
+			Integer contactPhone1 = 0;
+			Integer contactPhone2 = 0;
+			Integer contactPhone3 = 0;
+			Integer contactPhone4 = 0;
+			
+			for (int a = 0; a < 4; a++) {
+				
+				int quanty_contact = request.getContacts().size();
+				
+				if(a < quanty_contact) {
+					
+					Contacts contacts = new Contacts();
+					contacts.setFullName(listContact.get(a).getFullName());
+					contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
+					
+					contactsList.add(contacts);
+				}
+				
+				
+				
+
+				if (a == 0) {
+					contactName1 = a < quanty_contact ? listContact.get(a).getFullName(): null;
+					contactPhone1 = a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0;
+							
+					provision.getCustomer().setContactName(a < quanty_contact ? listContact.get(a).getFullName(): null);
+					provision.getCustomer().setContactPhoneNumber(a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0);
+				}
+				if (a == 1) {
+					
+					contactName2 = a < quanty_contact ? listContact.get(a).getFullName(): null;
+					contactPhone2 = a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0;
+					
+					provision.getCustomer().setContactName1(a < quanty_contact ? listContact.get(a).getFullName(): null);
+					provision.getCustomer().setContactPhoneNumber1(a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0);
+				}
+				if (a == 2) {
+					
+					contactName3 = a < quanty_contact ? listContact.get(a).getFullName(): null;
+					contactPhone3 = a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0;
+					
+					provision.getCustomer().setContactName2(a < quanty_contact ? listContact.get(a).getFullName(): null);
+					provision.getCustomer().setContactPhoneNumber2(a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0);
+				}
+				if (a == 3) {
+					
+					contactName4 = a < quanty_contact ? listContact.get(a).getFullName(): null;
+					contactPhone4 = a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0;
+					
+					provision.getCustomer().setContactName3(a < quanty_contact ? listContact.get(a).getFullName(): null);
+					provision.getCustomer().setContactPhoneNumber3(a < quanty_contact ? listContact.get(a).getPhoneNumber(): 0);
+				}
+
+			}
+			provision.getCustomer().setMail(request.getEmail());
+			
+			
+			provision.setContacts(contactsList);
+		
+			
+			/*provision.getCustomer().setContactName(contactFullname);
+			provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
+			provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());*/
+
+			// boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
+			
+				//restPSI.updatePSIClient(provision);
+
+			
+				Update update = new Update();
+				
+				update.set("customer.contact_name", contactName1);
+				update.set("customer.contact_name1", contactName2);
+				update.set("customer.contact_name2", contactName3);
+				update.set("customer.contact_name3", contactName4);
+				
+				update.set("customer.mail", request.getEmail());
+				
+				update.set("customer.contact_phone_number", Integer.valueOf(contactPhone1));
+				update.set("customer.contact_phone_number1", Integer.valueOf(contactPhone2));
+				update.set("customer.contact_phone_number2", Integer.valueOf(contactPhone3));
+				update.set("customer.contact_phone_number3", Integer.valueOf(contactPhone4));
+				
+				update.set("contacts", contactsList);
+				//update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
+				
+				provisionRepository.updateProvision(provision, update);
+				
+				return true;
+			
+		} else {
+
+			return false;
+		}
+
 	}
 
 }

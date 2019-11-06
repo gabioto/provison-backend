@@ -109,9 +109,18 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
 		request.getBodyUpdateClient().getUser().setAuth_string(generateAuthString());
 		request.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
-		request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().getContactName());
+		
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
+		
+		request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().getContactName());
+		request.getBodyUpdateClient().setNombre_completo2(provision.getCustomer().getContactName1());
+		request.getBodyUpdateClient().setNombre_completo3(provision.getCustomer().getContactName2());
+		request.getBodyUpdateClient().setNombre_completo4(provision.getCustomer().getContactName3());
+		
 		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
+		request.getBodyUpdateClient().setTelefono2(String.valueOf(provision.getCustomer().getContactPhoneNumber1()));
+		request.getBodyUpdateClient().setTelefono3(String.valueOf(provision.getCustomer().getContactPhoneNumber2()));
+		request.getBodyUpdateClient().setTelefono4(String.valueOf(provision.getCustomer().getContactPhoneNumber3()));
 
 		log.info("updatePSIClient - request: " + request.toString());
 

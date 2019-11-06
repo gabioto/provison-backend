@@ -858,7 +858,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			// boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
 			
-				//restPSI.updatePSIClient(provision);
+				restPSI.updatePSIClient(provision);
 
 			
 				Update update = new Update();

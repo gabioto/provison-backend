@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
+import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -23,6 +24,7 @@ public interface ProvisionService {
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
 	
+	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);
 	
 	public Provision setProvisionIsValidated(String provisionId);
 

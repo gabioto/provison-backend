@@ -101,6 +101,9 @@ public class Provision implements Serializable {
 	@Field("customer")
 	private Customer customer;
 
+	@Field("contacts")
+	private List<Contacts> contacts;
+
 	@Field("work_zone")
 	private String workZone;
 
@@ -343,6 +346,14 @@ public class Provision implements Serializable {
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
+	}
+
+	public List<Contacts> getContacts() {
+		return contacts;
+	}
+
+	public void setContacts(List<Contacts> contacts) {
+		this.contacts = contacts;
 	}
 
 	public String getLastTrackingStatus() {

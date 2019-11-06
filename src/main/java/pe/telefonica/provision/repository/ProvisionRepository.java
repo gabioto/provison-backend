@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
+import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 
 public interface ProvisionRepository {
@@ -17,9 +18,11 @@ public interface ProvisionRepository {
 
 	Optional<Provision> getOrder(String documentType, String documentNumber);
 	
-	Optional<Provision> getProvisionByXaRequest(String xaRequest);
+	Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt);
 	
 	Optional<Provision> getStatus(String provisionId);
+	
+	boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, boolean comesFromSchedule);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
 	

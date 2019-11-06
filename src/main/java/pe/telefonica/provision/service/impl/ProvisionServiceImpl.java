@@ -25,7 +25,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import pe.telefonica.provision.conf.ExternalApi;
-import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
@@ -43,12 +42,14 @@ import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
+import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.BORequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
+import pe.telefonica.provision.util.constants.Status;
 
 @Service("provisionService")
 @Transactional
@@ -62,9 +63,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private ProvisionTexts provisionTexts;
-
-	@Autowired
-	private IBMSecuritySeguridad ibmSecuritySeguridad;
 
 	@Autowired
 	private BOApi bOApi;
@@ -172,7 +170,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		List<Provision> resultList = new ArrayList<Provision>();
 
 		for (Provision newProvision : provisionList) {
-			Optional<Provision> optional = provisionRepository.getProvisionByXaRequest(newProvision.getXaRequest());
+			Optional<Provision> optional = provisionRepository.getProvisionByXaRequestAndSt(newProvision.getXaRequest(),
+					newProvision.getXaIdSt());
 
 			if (!optional.isPresent()) {
 				provisionRepository.insertProvision(newProvision);
@@ -801,22 +800,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 		ProvisionResponse<Boolean> response = new ProvisionResponse<Boolean>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 
-		if (optional.isPresent()) {
-			Provision provision = optional.get();
-			Update update = new Update();
-			update.set("has_schedule", true);
-			boolean updated = provisionRepository.updateProvision(provision, update);
+		try {
+			if (optional.isPresent()) {
+				Provision provision = optional.get();
+				boolean updated = updateTrackingStatus(provision.getXaRequest(), provision.getXaIdSt(),
+						Status.AGENDADO.getStatusName(), true);
 
-			if (updated) {
-				header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-				response.setHeader(header).setData(true);
+				if (updated) {
+					header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+					response.setHeader(header).setData(true);
+				} else {
+					header.setCode(HttpStatus.BAD_REQUEST.value()).setMessage("No se pudo actualizar");
+					response.setHeader(header).setData(false);
+				}
 			} else {
-				header.setCode(HttpStatus.BAD_REQUEST.value()).setMessage("No se pudo actualizar");
+				header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron provisiones");
 				response.setHeader(header).setData(false);
 			}
-		} else {
-			header.setCode(HttpStatus.NO_CONTENT.value()).setMessage("No se encontraron provisiones");
-			response.setHeader(header).setData(false);
+		} catch (Exception exception) {
+			throw exception;
 		}
 
 		return response;
@@ -834,8 +836,31 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
+	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule) {
+		boolean updated = false;
+		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
+		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
+				+ ", xaIdSt =" + xaIdSt + ", status = " + status);
+
+		if (optionalProvision.isPresent()) {
+			Provision provision = optionalProvision.get();
+			List<StatusLog> logStatus = provision.getLogStatus() == null ? new ArrayList<>() : provision.getLogStatus();
+
+			StatusLog statusLog = new StatusLog();
+			statusLog.setStatus(status);
+			logStatus.add(statusLog);
+
+			provision.setLastTrackingStatus(status);
+
+			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, comesFromSchedule);
+			log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
+		}
+
+		return updated;
+	}
+
+	@Override
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
-		
 		return provisionRepository.getProvisionByOrderCode(request);
 	}
 

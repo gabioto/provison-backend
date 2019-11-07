@@ -215,4 +215,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		return null;
 	}
+
+	@Override
+	public Provision getProvisionByXaIdSt(String xaIdSt) {
+		
+		Provision provision = this.mongoOperations.findOne(
+				new Query(Criteria.where("xaIdSt").is(xaIdSt)), Provision.class);
+		
+		return provision;
+	}
 }

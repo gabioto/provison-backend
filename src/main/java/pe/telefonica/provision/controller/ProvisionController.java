@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -868,18 +869,18 @@ public class ProvisionController {
 		return ResponseEntity.ok(provisionService.validateQueue());
 	}
 
-	@RequestMapping(value = "/updateOrderSchedule", method = RequestMethod.POST)
+	@PostMapping(value = "/updateOrderSchedule")
 	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(
-			@RequestBody ApiRequest<ProvisionScheduler> request) {
+			@RequestBody ProvisionScheduler request) {
 		
 		ProvisionResponse<Boolean> apiResponse;
 		HttpStatus status = null;
 		try {
 			status = HttpStatus.OK;
-			String[] scheduledDateStrArr = request.getBody().getScheduleDate().split("-");
+			String[] scheduledDateStrArr = request.getScheduleDate().split("-");
 			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[0]),
 					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[2]));
-			apiResponse = provisionService.updateOrderSchedule(request.getBody().getIdProvision(), scheduledDate, request.getBody().getScheduleRange());
+			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), scheduledDate, request.getScheduleRange());
 		}
 		catch(Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;

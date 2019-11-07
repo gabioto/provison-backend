@@ -885,6 +885,8 @@ public class ProvisionController {
 			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), scheduledDate, request.getScheduleRange());
 		}
 		catch(Exception e) {
+			log.info("Date Schedule:" + request.getScheduleDate());
+			log.info("Error:" + e.getMessage());
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ProvisionResponse<Boolean>().setData(null);
 		}

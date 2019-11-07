@@ -878,6 +878,7 @@ public class ProvisionController {
 		HttpStatus status = null;
 		try {
 			status = HttpStatus.OK;
+			log.info("Date Schedule:" + request.getScheduleDate());
 			String[] scheduledDateStrArr = request.getScheduleDate().split("/");
 			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[0]),
 					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[2]));

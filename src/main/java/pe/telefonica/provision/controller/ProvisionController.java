@@ -1,5 +1,6 @@
 package pe.telefonica.provision.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
+import pe.telefonica.provision.model.ProvisionScheduler;
 import pe.telefonica.provision.model.StatusProvision;
 import pe.telefonica.provision.model.WoCompletedProvision;
 import pe.telefonica.provision.model.WoInitProvision;
@@ -667,10 +669,26 @@ public class ProvisionController {
 		return ResponseEntity.ok(provisionService.validateQueue());
 	}
 
-	@RequestMapping(value = "/updateOrderSchedule", method = RequestMethod.PUT)
+	@RequestMapping(value = "/updateOrderSchedule", method = RequestMethod.POST)
 	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(
-			@RequestParam(value = "provisionId", required = true) String provisionId) {
-		return ResponseEntity.ok(provisionService.updateOrderSchedule(provisionId));
+			@RequestBody ApiRequest<ProvisionScheduler> request) {
+		
+		ProvisionResponse<Boolean> apiResponse;
+		HttpStatus status = null;
+		try {
+			status = HttpStatus.OK;
+			String[] scheduledDateStrArr = request.getBody().getScheduleDate().split("-");
+			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[0]),
+					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[2]));
+			apiResponse = provisionService.updateOrderSchedule(request.getBody().getIdProvision(), scheduledDate, request.getBody().getScheduleRange());
+		}
+		catch(Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ProvisionResponse<Boolean>().setData(null);
+		}
+		
+		return ResponseEntity.status(status).body(apiResponse);
+				
 	}
 
 	@RequestMapping(value = "/getAllInTimeRange", method = RequestMethod.POST)
@@ -745,7 +763,7 @@ public class ProvisionController {
 
 			if (statusProvision != null) {
 				updated = provisionService.updateTrackingStatus(statusProvision.getXaRequest(),
-						statusProvision.getXaIdSt(), request.getBody().getStatus(), false);
+						statusProvision.getXaIdSt(), request.getBody().getStatus(), false,null,null);
 
 				status = updated ? HttpStatus.OK : HttpStatus.NOT_FOUND;
 			} else {

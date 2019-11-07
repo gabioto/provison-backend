@@ -2,7 +2,7 @@ package pe.telefonica.provision.util.constants;
 
 public enum Status {
 
-	IN_TOA("IN_TOA", 1), AGENDADO("AGENDADO", 2), WO_PRESTART("WO_PRESTART", 3), WO_INIT("WO_INIT", 4),
+	IN_TOA("IN_TOA", 1), SCHEDULED("SCHEDULED", 2), WO_PRESTART("WO_PRESTART", 3), WO_INIT("WO_INIT", 4),
 	WO_COMPLETED("WO_COMPLETED", 5), WO_CANCEL("WO_CANCEL", 6);
 
 	private String statusName;

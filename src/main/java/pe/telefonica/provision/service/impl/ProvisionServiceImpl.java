@@ -1,6 +1,7 @@
 package pe.telefonica.provision.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -794,7 +795,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId) {
+	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId,
+			                                              LocalDate scheduledDate,
+            											  String scheduledRange) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 		ProvisionResponse<Boolean> response = new ProvisionResponse<Boolean>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
@@ -803,7 +806,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (optional.isPresent()) {
 				Provision provision = optional.get();
 				boolean updated = updateTrackingStatus(provision.getXaRequest(), provision.getXaIdSt(),
-						Status.AGENDADO.getStatusName(), true);
+						Status.SCHEDULED.getStatusName(), true, scheduledDate, scheduledRange);
 
 				if (updated) {
 					header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
@@ -835,7 +838,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule) {
+	public Boolean updateTrackingStatus(String xaRequest, 
+			                            String xaIdSt, 
+			                            String status, 
+			                            boolean comesFromSchedule,
+			                            LocalDate scheduledDate,
+			                            String scheduledRange) {
 		boolean updated = false;
 		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
 		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
@@ -847,6 +855,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(status);
+			
+			if(scheduledDate != null)
+				statusLog.setScheduledDate(scheduledDate);
+			
+			if(scheduledRange != null && !scheduledRange.equals(""))
+				statusLog.setScheduledRange(scheduledRange);
+			
 			logStatus.add(statusLog);
 
 			provision.setLastTrackingStatus(status);

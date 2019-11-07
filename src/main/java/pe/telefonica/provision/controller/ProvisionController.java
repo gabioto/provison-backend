@@ -874,7 +874,7 @@ public class ProvisionController {
 	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule (
 			@RequestBody ProvisionScheduler request) throws ParseException {
 		
-		System.out.println("idProvision:" + request.getIdProvision());
+		log.info("idProvision:" + request.getIdProvision());
 		ProvisionResponse<Boolean> apiResponse;
 		HttpStatus status = null;
 		try {

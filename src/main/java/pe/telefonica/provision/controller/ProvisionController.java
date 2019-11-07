@@ -880,8 +880,8 @@ public class ProvisionController {
 			status = HttpStatus.OK;
 			log.info("Date Schedule:" + request.getScheduleDate());
 			String[] scheduledDateStrArr = request.getScheduleDate().split("/");
-			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[0]),
-					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[2]));
+			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[2]),
+					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[0]));
 			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), scheduledDate, request.getScheduleRange());
 		}
 		catch(Exception e) {

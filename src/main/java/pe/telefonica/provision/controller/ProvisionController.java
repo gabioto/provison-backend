@@ -1,5 +1,6 @@
 package pe.telefonica.provision.controller;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -870,8 +871,8 @@ public class ProvisionController {
 	}
 
 	@PostMapping(value = "/updateOrderSchedule")
-	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(
-			@RequestBody ProvisionScheduler request) {
+	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule (
+			@RequestBody ProvisionScheduler request) throws ParseException {
 		
 		ProvisionResponse<Boolean> apiResponse;
 		HttpStatus status = null;

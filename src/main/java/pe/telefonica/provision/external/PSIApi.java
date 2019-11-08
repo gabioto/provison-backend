@@ -46,28 +46,27 @@ import pe.telefonica.provision.util.constants.Constants;
 @Component
 public class PSIApi extends ConfigRestTemplate {
 	private static final Log log = LogFactory.getLog(PSIApi.class);
-	
+
 	@Autowired
 	private OAuthTokenRepository oAuthTokenRepository;
-	
+
 	@Autowired
 	private ExternalApi api;
-	
+
 	@Autowired
 	private IBMSecuritySeguridad security;
-	
+
 	public Boolean updatePSIClient(Provision provision) {
 		String oAuthToken;
-		
-    	
+
 		RestTemplate restTemplate = new RestTemplate(
-			SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());	
-		/*RestTemplate restTemplate = new RestTemplate();*/
-	restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());	
-		
-		//RestTemplate test = new RestTemplate(this.getClientHttpRequestFactory());
-    	
+				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		/* RestTemplate restTemplate = new RestTemplate(); */
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		// RestTemplate test = new RestTemplate(this.getClientHttpRequestFactory());
+
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
 		log.info("updatePSIClient - URL: " + requestUrl);
 
@@ -132,32 +131,35 @@ public class PSIApi extends ConfigRestTemplate {
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
 
 		try {
-			
+
 			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);
-			
-			/*ResponseEntity<PSIUpdateClientResponse> responseEntity = getRestTemplate().postForEntity(requestUrl, entity,
-					PSIUpdateClientResponse.class);*/
-			
+
+			/*
+			 * ResponseEntity<PSIUpdateClientResponse> responseEntity =
+			 * getRestTemplate().postForEntity(requestUrl, entity,
+			 * PSIUpdateClientResponse.class);
+			 */
+
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
-			
-			
+
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
-			
-			//JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
+
+			// JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 			System.out.println(jsonDecode);
-			
-			JsonObject appDetail = 	jsonDecode.getAsJsonObject("BodyOut").getAsJsonObject("ClientException").getAsJsonObject("appDetail");
+
+			JsonObject appDetail = jsonDecode.getAsJsonObject("BodyOut").getAsJsonObject("ClientException")
+					.getAsJsonObject("appDetail");
 			String message = appDetail.get("exceptionAppMessage").toString();
 			String codeError = appDetail.get("exceptionAppCode").toString();
-			
+
 			throw new FunctionalErrorException(message, ex, codeError);
-			//throw new ServerNotFoundException(ex.getResponseBodyAsString());
+			// throw new ServerNotFoundException(ex.getResponseBodyAsString());
 			// return false;
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
@@ -165,7 +167,7 @@ public class PSIApi extends ConfigRestTemplate {
 			// return false;
 		}
 	}
-	 
+
 	private String getTokenFromPSI(String customerName, boolean toInsert) {
 		RestTemplate restTemplate = new RestTemplate();
 		boolean updated = true;
@@ -190,12 +192,12 @@ public class PSIApi extends ConfigRestTemplate {
 
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				if (toInsert) {
-					//insertToken(responseEntity.getBody().getBody());
+					// insertToken(responseEntity.getBody().getBody());
 					oAuthTokenRepository.insertToken(responseEntity.getBody().getBody());
 				} else {
 					updated = oAuthTokenRepository.updateToken(responseEntity.getBody());
-					
-					//updated = updateTokenInCollection(responseEntity.getBody());
+
+					// updated = updateTokenInCollection(responseEntity.getBody());
 				}
 			} else {
 				return "";
@@ -209,14 +211,14 @@ public class PSIApi extends ConfigRestTemplate {
 			return "";
 		}
 	}
-	
-	//Util
+
+	// Util
 	private String generateAuthString() {
 		String passMD5 = stringToMD5("aPpM0v1S7@R");
 		String authString = stringToMD5(DateUtil.getNowPsi(Constants.DATE_FORMAT_PSI_AUTH) + passMD5);
 		return authString;
 	}
-	
+
 	private String getAuthToken(String customerName) {
 		String psiTokenGenerated = "";
 		Optional<OAuthToken> optionalAuthToken = oAuthTokenRepository.getOAuthToke();
@@ -238,6 +240,7 @@ public class PSIApi extends ConfigRestTemplate {
 
 		return psiTokenGenerated;
 	}
+
 	private String stringToMD5(String string) {
 		try {
 			java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");

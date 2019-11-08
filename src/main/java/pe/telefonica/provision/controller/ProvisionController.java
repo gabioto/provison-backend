@@ -566,7 +566,7 @@ public class ProvisionController {
 				 */
 
 			} else {
-				status = HttpStatus.BAD_REQUEST;
+				status = HttpStatus.NOT_FOUND;
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
 						String.valueOf(status.value()), "No existe registro", null);
 
@@ -606,7 +606,7 @@ public class ProvisionController {
 				errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-						errorCode, ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
+						String.valueOf(status.value()), ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
 
 				/*
 				 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),

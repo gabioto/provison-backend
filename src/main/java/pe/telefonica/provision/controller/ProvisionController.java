@@ -1,29 +1,39 @@
 package pe.telefonica.provision.controller;
 
+import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.validation.Valid;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
 import com.google.gson.Gson;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.request.AddressUpdateRequest;
+import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.CancelOrderRequest;
+import pe.telefonica.provision.controller.request.ContactRequest;
 import pe.telefonica.provision.controller.request.GetAllInTimeRangeRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
@@ -36,6 +46,7 @@ import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
+import pe.telefonica.provision.model.ProvisionScheduler;
 import pe.telefonica.provision.model.StatusProvision;
 import pe.telefonica.provision.model.WoCompletedProvision;
 import pe.telefonica.provision.model.WoInitProvision;
@@ -341,19 +352,6 @@ public class ProvisionController {
 		HttpStatus status;
 		try {
 
-			/*
-			 * Provision provision = provisionService.setContactInfoUpdateNew(request);
-			 * 
-			 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-			 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-			 * request.getBody().getBucket(),
-			 * response.getHeader().getResultCode().equals("200") ? "OK": "ERROR", new
-			 * Gson().toJson(request), new Gson().toJson(response),
-			 * ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
-			 * 
-			 * return ResponseEntity.ok(response);
-			 */
-
 			Provision result = provisionService.setContactInfoUpdate(request.getBody().getProvisionId(),
 					request.getBody().getContactFullname(), request.getBody().getContactCellphone(),
 					request.getBody().getContactCellphoneIsMovistar());
@@ -423,6 +421,211 @@ public class ProvisionController {
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+			}
+		}
+
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+
+	@RequestMapping(value = "/apiTrazaSetContactInfoUpdate", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<String>> apiTrazaSetContactInfoUpdate(
+			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
+		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+
+		ApiResponse<String> apiResponse;
+		HttpStatus status;
+		try {
+
+			ApiTrazaSetContactInfoUpdateRequest requestBody = request.getBody();
+			
+			//Validate PSICode
+			if (requestBody.getPsiCode() == null) {
+
+				status = HttpStatus.BAD_REQUEST;
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						String.valueOf(status.value()), "PSICode obligatorio", null);
+				return ResponseEntity.status(status).body(apiResponse);
+			}
+
+			if (requestBody.getPsiCode() != null) {
+				status = HttpStatus.BAD_REQUEST;
+				if(requestBody.getPsiCode().length() > 11) {
+					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+							String.valueOf(status.value()), "PSICode maximo 11 caracteres", null);
+					return ResponseEntity.status(status).body(apiResponse);
+				}
+				Boolean typedata = requestBody.getPsiCode() instanceof String;
+				if(!typedata) {
+					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+							String.valueOf(status.value()), "PSICode debe ser una cadena", null);
+					return ResponseEntity.status(status).body(apiResponse);
+				}
+					
+			}
+			
+			//Validate email
+
+			if (requestBody.getEmail() != null && requestBody.getEmail().trim().length() > 0 ) {
+				status = HttpStatus.BAD_REQUEST;
+				if(requestBody.getEmail().length() > 100) {
+					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+							String.valueOf(status.value()), "email maximo 100 caracteres", null);
+					return ResponseEntity.status(status).body(apiResponse);
+				}
+				
+				String regex = "^(.+)@(.+)$";
+				Pattern pattern = Pattern.compile(regex);
+				Matcher matcher = pattern.matcher(requestBody.getEmail());
+				if(!matcher.matches()) {
+					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+							String.valueOf(status.value()), "email formato invalido ", null);
+					return ResponseEntity.status(status).body(apiResponse);
+				}
+					
+			}
+			//Validate contact
+			
+			
+			List<ContactRequest> contact = requestBody.getContacts();
+			
+			if(requestBody.getContacts().size() > 0) {
+				status = HttpStatus.BAD_REQUEST;
+				
+				for(ContactRequest list: contact) {
+					if(list.getFullName() == null) {
+						//contactFullname;
+						//contactCellphone;
+						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+								String.valueOf(status.value()), "fullName obligatorio", null);
+
+						 return ResponseEntity.status(status).body(apiResponse);
+					}
+					if(list.getPhoneNumber() == null) {
+						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+								String.valueOf(status.value()), "phoneNumber obligatorio", null);
+
+						 return ResponseEntity.status(status).body(apiResponse);
+					}
+					
+					boolean typePhone = list.getPhoneNumber() instanceof Integer;
+					if(!typePhone) {
+						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+								String.valueOf(status.value()), "phoneNumber debe ser numerico", null);
+
+						 return ResponseEntity.status(status).body(apiResponse);
+					}
+					
+					String countPhone = list.getPhoneNumber().toString();
+					if(countPhone.length() > 9) {
+						
+						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+								String.valueOf(status.value()), "phoneNumber maximo 9 caracteres", null);
+
+						 return ResponseEntity.status(status).body(apiResponse);
+					}
+					
+					
+				}
+			}
+			if (requestBody.getContacts().size() == 0 || requestBody.getContacts().size() > 4) {
+				
+				status = HttpStatus.BAD_REQUEST;
+				
+				
+				
+				status = HttpStatus.BAD_REQUEST;
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						String.valueOf(status.value()), "Minimo 1 y maximo 4 datos datos de contacto", null);
+
+				 return ResponseEntity.status(status).body(apiResponse);
+			}
+
+			/*
+			 * if(request.getBody().getContacts() instanceof List) {
+			 * 
+			 * status = HttpStatus.BAD_REQUEST; apiResponse = new
+			 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			 * Constants.OPER_CONTACT_INFO_UPDATE,
+			 * String.valueOf(status.value()),"Array de contactos", null); }
+			 */
+
+			Boolean result = provisionService.apiContactInfoUpdate(request.getBody());
+
+			if (result) {
+
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody("OK");
+
+				/*
+				 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+				 * request.getBody().getBucket(), "OK", new Gson().toJson(request), new
+				 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+				 */
+
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						String.valueOf(status.value()), "No existe registro", null);
+
+				/*
+				 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+				 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
+				 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+				 */
+
+			}
+		
+		} catch(BadRequest ex) {
+			System.out.println(ex.getMessage());
+			status = HttpStatus.BAD_REQUEST;
+			
+			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+					String.valueOf(status.value()), ex.getMessage().toString(), null);
+		}
+		
+		catch (Exception ex) {
+			if (ex instanceof FunctionalErrorException) {
+
+				status = HttpStatus.BAD_REQUEST;
+
+				String errorCode = ((FunctionalErrorException) ex).getErrorCode().replace("\"", "");
+				if (errorCode.equals("ERR10") || errorCode.equals("ERR11") || errorCode.equals("ERR02")) {
+					status = HttpStatus.BAD_REQUEST;
+				} else if (errorCode.equals("ERR15")) {
+					status = HttpStatus.UNAUTHORIZED;
+				} else if (errorCode.equals("ERR03")) {
+					status = HttpStatus.NOT_FOUND;
+				} else if (errorCode.equals("ERR19")) {
+					status = HttpStatus.CONFLICT;
+				}
+
+				errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
+
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						errorCode, ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
+
+				/*
+				 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+				 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
+				 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+				 */
+
+			} else {
+				status = HttpStatus.INTERNAL_SERVER_ERROR;
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+				/*
+				 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+				 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
+				 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO);
+				 */
 			}
 		}
 
@@ -641,16 +844,16 @@ public class ProvisionController {
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL);
 
 			} else {
-				
+
 				System.out.println(ex.getMessage());
-				
+
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
-				
+
 				System.out.println(apiResponse);
-				
+
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
@@ -667,10 +870,33 @@ public class ProvisionController {
 		return ResponseEntity.ok(provisionService.validateQueue());
 	}
 
-	@RequestMapping(value = "/updateOrderSchedule", method = RequestMethod.PUT)
-	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(
-			@RequestParam(value = "provisionId", required = true) String provisionId) {
-		return ResponseEntity.ok(provisionService.updateOrderSchedule(provisionId));
+	@PostMapping(value = "/updateOrderSchedule")
+	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule (
+			@RequestBody ProvisionScheduler request) throws ParseException {
+		
+		//log.info("idProvision:" + request.getIdProvision());
+		ProvisionResponse<Boolean> apiResponse;
+		HttpStatus status = null;
+		try {
+			status = HttpStatus.OK;
+			//log.info("Date Schedule:" + request.getScheduleDate());
+			String[] scheduledDateStrArr = request.getScheduleDate().split("/");
+			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[2]),
+					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[0]));
+			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), 
+					                                           scheduledDate, 
+					                                           request.getScheduleRange(),
+					                                           request.getScheduleType());
+		}
+		catch(Exception e) {
+			log.info("Date Schedule:" + request.getScheduleDate());
+			log.info("Error:" + e.getMessage());
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ProvisionResponse<Boolean>().setData(null);
+		}
+		
+		return ResponseEntity.status(status).body(apiResponse);
+				
 	}
 
 	@RequestMapping(value = "/getAllInTimeRange", method = RequestMethod.POST)
@@ -745,7 +971,7 @@ public class ProvisionController {
 
 			if (statusProvision != null) {
 				updated = provisionService.updateTrackingStatus(statusProvision.getXaRequest(),
-						statusProvision.getXaIdSt(), request.getBody().getStatus(), false);
+						statusProvision.getXaIdSt(), request.getBody().getStatus(), false,null,null,null);
 
 				status = updated ? HttpStatus.OK : HttpStatus.NOT_FOUND;
 			} else {
@@ -762,36 +988,41 @@ public class ProvisionController {
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
-	
+
 	@RequestMapping(value = "/getProvisionByOrderCode", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<Provision>> getProvisionByOrderCode(@RequestBody ApiRequest<GetProvisionByOrderCodeRequest> request) {
-		
+	public ResponseEntity<ApiResponse<Provision>> getProvisionByOrderCode(
+			@RequestBody ApiRequest<GetProvisionByOrderCodeRequest> request) {
+
 		ApiResponse<Provision> apiResponse;
 		Provision provision = null;
 		HttpStatus status;
-		
+
 		try {
-			
-			 provision = provisionService.getProvisionByOrderCode(request);
-			//apiResponse.setBody(provision);
-			
-			
+
+			provision = provisionService.getProvisionByOrderCode(request);
+			// apiResponse.setBody(provision);
+
 			status = HttpStatus.OK;
-			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), status.getReasonPhrase(), provision);
-			
-			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
-					request.getBody().getOrderCode(), request.getBody().getBucket(),  "OK", new Gson().toJson(request),
-					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
-			
-		}catch(Exception e) {
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()),
+					status.getReasonPhrase(), provision);
+
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
+
+		} catch (Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), e.getMessage(), null);
-		
-			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(), request.getBody().getDocumentType(),
-					request.getBody().getOrderCode(), request.getBody().getBucket(),  "ERROR", new Gson().toJson(request),
-					new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), e.getMessage(), null);
+
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_GET_BY_ORDER_CODE);
 		}
-		
+
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 }

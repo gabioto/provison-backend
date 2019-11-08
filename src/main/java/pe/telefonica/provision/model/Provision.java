@@ -1,6 +1,7 @@
 package pe.telefonica.provision.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -100,6 +101,9 @@ public class Provision implements Serializable {
 
 	@Field("customer")
 	private Customer customer;
+
+	@Field("contacts")
+	private List<Contacts> contacts;
 
 	@Field("work_zone")
 	private String workZone;
@@ -345,6 +349,14 @@ public class Provision implements Serializable {
 		this.customer = customer;
 	}
 
+	public List<Contacts> getContacts() {
+		return contacts;
+	}
+
+	public void setContacts(List<Contacts> contacts) {
+		this.contacts = contacts;
+	}
+
 	public String getLastTrackingStatus() {
 		return lastTrackingStatus;
 	}
@@ -386,7 +398,14 @@ public class Provision implements Serializable {
 
 		@Field("inserted_date")
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-
+		
+		@Field("scheduled_date")
+		private LocalDate scheduledDate = LocalDate.now(ZoneOffset.of("-05:00"));
+		
+		@Field("scheduled_range")
+		private String scheduledRange;
+		
+		
 		public String getStatus() {
 			return status;
 		}
@@ -402,6 +421,24 @@ public class Provision implements Serializable {
 		public void setInsertedDate(LocalDateTime insertedDate) {
 			this.insertedDate = insertedDate;
 		}
+
+		public LocalDate getScheduledDate() {
+			return scheduledDate;
+		}
+
+		public void setScheduledDate(LocalDate scheduledDate) {
+			this.scheduledDate = scheduledDate;
+		}
+
+		public String getScheduledRange() {
+			return scheduledRange;
+		}
+
+		public void setScheduledRange(String scheduledRange) {
+			this.scheduledRange = scheduledRange;
+		}
+		
+		
 	}
 
 }

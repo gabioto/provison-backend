@@ -874,16 +874,19 @@ public class ProvisionController {
 	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule (
 			@RequestBody ProvisionScheduler request) throws ParseException {
 		
-		log.info("idProvision:" + request.getIdProvision());
+		//log.info("idProvision:" + request.getIdProvision());
 		ProvisionResponse<Boolean> apiResponse;
 		HttpStatus status = null;
 		try {
 			status = HttpStatus.OK;
-			log.info("Date Schedule:" + request.getScheduleDate());
+			//log.info("Date Schedule:" + request.getScheduleDate());
 			String[] scheduledDateStrArr = request.getScheduleDate().split("/");
 			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[2]),
 					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[0]));
-			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), scheduledDate, request.getScheduleRange());
+			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), 
+					                                           scheduledDate, 
+					                                           request.getScheduleRange(),
+					                                           request.getScheduleType());
 		}
 		catch(Exception e) {
 			log.info("Date Schedule:" + request.getScheduleDate());
@@ -968,7 +971,7 @@ public class ProvisionController {
 
 			if (statusProvision != null) {
 				updated = provisionService.updateTrackingStatus(statusProvision.getXaRequest(),
-						statusProvision.getXaIdSt(), request.getBody().getStatus(), false,null,null);
+						statusProvision.getXaIdSt(), request.getBody().getStatus(), false,null,null,null);
 
 				status = updated ? HttpStatus.OK : HttpStatus.NOT_FOUND;
 			} else {

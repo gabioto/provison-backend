@@ -41,11 +41,18 @@ public interface ProvisionService {
 	
 	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId,
 			                                              LocalDate scheduledDate,
-			  											  String scheduledRange);
+			  											  String scheduledRange,
+			  											  Integer scheduledType);
 	
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 	
-	Boolean updateTrackingStatus(String xaRequest, String xaIdSt,  String status, boolean comesFromSchedule, LocalDate scheduledDate,String scheduledRange);
+	Boolean updateTrackingStatus(String xaRequest, 
+			                     String xaIdSt,  
+			                     String status, 
+			                     boolean comesFromSchedule, 
+			                     LocalDate scheduledDate,
+			                     String scheduledRange,
+			                     Integer scheduleType);
 	
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 }

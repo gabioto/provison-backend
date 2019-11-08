@@ -710,15 +710,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public ProvisionResponse<Boolean> updateOrderSchedule(String provisionId,
 			                                              LocalDate scheduledDate,
-            											  String scheduledRange) {
+            											  String scheduledRange,
+            											  Integer scheduledType) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 		ProvisionResponse<Boolean> response = new ProvisionResponse<Boolean>();
 		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 		try {
 			if (optional.isPresent()) {
 				Provision provision = optional.get();
+				String nomEstado = "";
+				
+				if(scheduledType == 2)
+					nomEstado = Status.FICTICIOUS_SCHEDULED.getStatusName();
+				else
+					nomEstado = Status.SCHEDULED.getStatusName();
+				
+				
 				boolean updated = updateTrackingStatus(provision.getXaRequest(), provision.getXaIdSt(),
-						Status.SCHEDULED.getStatusName(), true, scheduledDate, scheduledRange);
+						nomEstado, true, scheduledDate, scheduledRange, scheduledType);
 
 				if (updated) {
 					header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
@@ -755,7 +764,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			                            String status, 
 			                            boolean comesFromSchedule,
 			                            LocalDate scheduledDate,
-			                            String scheduledRange) {
+			                            String scheduledRange,
+			                            Integer scheduleType) {
 		boolean updated = false;
 		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
 		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
@@ -773,6 +783,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			
 			if(scheduledRange != null && !scheduledRange.equals(""))
 				statusLog.setScheduledRange(scheduledRange);
+			
+			
 			
 			logStatus.add(statusLog);
 

@@ -233,4 +233,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		return provision;
 	}
+
+	@Override
+	public Provision getByOrderCodeForUpdate(String orderCode) {
+		Provision provision = this.mongoOperations.findOne(
+				new Query(Criteria.where("xaRequest").is(orderCode)), Provision.class);
+		
+		return provision;
+	}
 }

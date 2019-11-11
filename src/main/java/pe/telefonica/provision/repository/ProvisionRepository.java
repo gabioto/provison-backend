@@ -21,7 +21,7 @@ public interface ProvisionRepository {
 	Optional<Provision> getProvisionByXaRequest(String xaRequest);
 	
 	Provision getProvisionBySaleCode(String saleCode);
-
+	
 	Provision getProvisionByXaIdSt(String xaIdSt);
 
 	Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt);
@@ -52,4 +52,6 @@ public interface ProvisionRepository {
 	Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 
 	Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
+	
+	Provision getByOrderCodeForUpdate(String orderCode);
 }

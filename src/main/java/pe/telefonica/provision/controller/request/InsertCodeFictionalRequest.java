@@ -2,7 +2,7 @@ package pe.telefonica.provision.controller.request;
 
 public class InsertCodeFictionalRequest {
 	private String saleCode;
-	private String codeFictional;
+	private String FictionalCode;
 
 	public String getSaleCode() {
 		return saleCode;
@@ -12,12 +12,12 @@ public class InsertCodeFictionalRequest {
 		this.saleCode = saleCode;
 	}
 
-	public String getCodeFictional() {
-		return codeFictional;
+	public String getFictionalCode() {
+		return FictionalCode;
 	}
 
-	public void setCodeFictional(String codeFictional) {
-		this.codeFictional = codeFictional;
+	public void setFictionalCode(String fictionalCode) {
+		FictionalCode = fictionalCode;
 	}
 
 }

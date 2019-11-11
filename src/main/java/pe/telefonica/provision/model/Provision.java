@@ -84,6 +84,18 @@ public class Provision implements Serializable {
 	@Field("product_sub")
 	private String productSub;
 	
+	@Field("product_internal_equipment")
+	private String productInternalEquipment;
+	
+	@Field("product_signal")
+	private String productSignal;
+	
+	@Field("product_ps_admin")
+	private String[] productPsAdmin;
+	
+	@Field("sva_code")
+	private String[] svaCode;
+	
 	@Field("legacies")
 	private String legacies;
 	

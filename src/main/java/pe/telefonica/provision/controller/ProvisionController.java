@@ -41,6 +41,7 @@ import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
+import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.request.UpdateStatusRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
@@ -282,6 +283,40 @@ public class ProvisionController {
 		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 	
+	@RequestMapping(value = "/updateOrderFromTOA", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<Provision>> updateOrderFromTOA(
+			@RequestBody @Valid ApiRequest<UpdateFromToaRequest> request) {
+		ApiResponse<Provision> apiResponse;
+		HttpStatus status;
+
+		try {
+			Boolean provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+
+			if (provisions) {
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(null);
+			} else {
+				status = HttpStatus.NOT_FOUND;
+
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()),
+						"No se encontro registro", null);
+				apiResponse.setBody(null);
+			}
+		} catch (Exception ex) {
+
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+		// return
+		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
+	}
 	@RequestMapping(value = "/provisionInsertCodeFictional", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> provisionInsertCodeFictional(
 			@RequestBody @Valid ApiRequest<InsertCodeFictionalRequest> request) {

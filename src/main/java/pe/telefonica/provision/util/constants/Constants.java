@@ -68,6 +68,7 @@ public final class Constants {
 	public static final String OPER_VALIDATE_USER = "OPER_VALIDATE_USER";
 	public static final String OPER_GET_PROVISION_ALL = "OPER_GET_PROVISION_ALL";
 	public static final String OPER_INSERT_PROVISION = "OPER_INSERT_PROVISION";
+	public static final String OPER_PROVISION_UPDATE_FROM_TOA = "OPER_PROVISION_UPDATE_FROM_TOA";
 	public static final String OPER_INSERT_PROVISION_CODE_FICT = "OPER_INSERT_PROVISION_CODE_FICT";
 	public static final String OPER_ORDER_CANCELLATION = "OPER_ORDER_CANCELLATION";
 	public static final String OPER_CANCEL_SCHEDULE = "OPER_CANCEL_SCHEDULE";

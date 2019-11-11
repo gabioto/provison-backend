@@ -38,6 +38,7 @@ import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
+import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.controller.response.SMSByIdResponse;
@@ -901,7 +902,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provisionAdd = new Provision();
 			
 			provisionAdd.setSaleCode(request.getSaleCode());
-			provisionAdd.setXaIdStFict(request.getCodeFictional());
+			provisionAdd.setXaIdStFict(request.getFictionalCode());
 			
 			provisionRepository.insertProvision(provisionAdd);
 			
@@ -909,6 +910,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) {
+		
+		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
+		if(provision != null) {
+			
+			Update update = new Update();
+			update.set("xaRequest", request.getOrderCode());
+			update.set("product_name", "update test from toa");
+			
+			provisionRepository.updateProvision(provision, update);
+			return true;
+		} 
+			
+		return false;
 	}
 
 	

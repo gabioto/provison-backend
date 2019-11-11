@@ -55,6 +55,7 @@ import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ErrorCode;
+import pe.telefonica.provision.util.constants.InternalError;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
 
 @RestController
@@ -434,30 +435,38 @@ public class ProvisionController {
 
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
+		String errorInternal = "";
 		try {
 
 			ApiTrazaSetContactInfoUpdateRequest requestBody = request.getBody();
 			
 			//Validate PSICode
-			if (requestBody.getPsiCode() == null) {
+			if (requestBody.getPsiCode() == null || requestBody.getPsiCode().equals("")) {
 
 				status = HttpStatus.BAD_REQUEST;
+				errorInternal = InternalError.TRZ01.toString();
+				errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-						String.valueOf(status.value()), "PSICode obligatorio", null);
+						errorInternal, "PSICode obligatorio", null);
 				return ResponseEntity.status(status).body(apiResponse);
 			}
 
 			if (requestBody.getPsiCode() != null) {
 				status = HttpStatus.BAD_REQUEST;
 				if(requestBody.getPsiCode().length() > 11) {
+					errorInternal = InternalError.TRZ02.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-							String.valueOf(status.value()), "PSICode maximo 11 caracteres", null);
+							errorInternal, "PSICode maximo 11 caracteres", null);
 					return ResponseEntity.status(status).body(apiResponse);
 				}
 				Boolean typedata = requestBody.getPsiCode() instanceof String;
 				if(!typedata) {
+					errorInternal = InternalError.TRZ03.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-							String.valueOf(status.value()), "PSICode debe ser una cadena", null);
+							errorInternal, "PSICode debe ser una cadena", null);
 					return ResponseEntity.status(status).body(apiResponse);
 				}
 					
@@ -468,8 +477,10 @@ public class ProvisionController {
 			if (requestBody.getEmail() != null && requestBody.getEmail().trim().length() > 0 ) {
 				status = HttpStatus.BAD_REQUEST;
 				if(requestBody.getEmail().length() > 100) {
+					errorInternal = InternalError.TRZ02.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-							String.valueOf(status.value()), "email maximo 100 caracteres", null);
+							errorInternal, "email maximo 100 caracteres", null);
 					return ResponseEntity.status(status).body(apiResponse);
 				}
 				
@@ -477,8 +488,11 @@ public class ProvisionController {
 				Pattern pattern = Pattern.compile(regex);
 				Matcher matcher = pattern.matcher(requestBody.getEmail());
 				if(!matcher.matches()) {
+					errorInternal = InternalError.TRZ03.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+			
 					apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-							String.valueOf(status.value()), "email formato invalido ", null);
+							errorInternal, "email formato invalido ", null);
 					return ResponseEntity.status(status).body(apiResponse);
 				}
 					
@@ -495,31 +509,42 @@ public class ProvisionController {
 					if(list.getFullName() == null) {
 						//contactFullname;
 						//contactCellphone;
+						errorInternal = InternalError.TRZ01.toString();
+						errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
 						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-								String.valueOf(status.value()), "fullName obligatorio", null);
+								errorInternal, "fullName obligatorio", null);
 
 						 return ResponseEntity.status(status).body(apiResponse);
 					}
 					if(list.getPhoneNumber() == null) {
+						errorInternal = InternalError.TRZ01.toString();
+						errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
 						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-								String.valueOf(status.value()), "phoneNumber obligatorio", null);
+								errorInternal, "phoneNumber obligatorio", null);
 
 						 return ResponseEntity.status(status).body(apiResponse);
 					}
 					
 					boolean typePhone = list.getPhoneNumber() instanceof Integer;
 					if(!typePhone) {
+						errorInternal = InternalError.TRZ03.toString();
+						errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
 						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-								String.valueOf(status.value()), "phoneNumber debe ser numerico", null);
+								errorInternal, "phoneNumber debe ser numerico", null);
 
 						 return ResponseEntity.status(status).body(apiResponse);
 					}
 					
 					String countPhone = list.getPhoneNumber().toString();
 					if(countPhone.length() > 9) {
-						
+						errorInternal = InternalError.TRZ02.toString();
+						errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
 						apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-								String.valueOf(status.value()), "phoneNumber maximo 9 caracteres", null);
+								errorInternal, "phoneNumber maximo 9 caracteres", null);
 
 						 return ResponseEntity.status(status).body(apiResponse);
 					}
@@ -530,12 +555,11 @@ public class ProvisionController {
 			if (requestBody.getContacts().size() == 0 || requestBody.getContacts().size() > 4) {
 				
 				status = HttpStatus.BAD_REQUEST;
-				
-				
-				
-				status = HttpStatus.BAD_REQUEST;
+				errorInternal = InternalError.TRZ04.toString();
+				errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-						String.valueOf(status.value()), "Minimo 1 y maximo 4 datos datos de contacto", null);
+						errorInternal, "Minimo 1 y maximo 4 datos datos de contacto", null);
 
 				 return ResponseEntity.status(status).body(apiResponse);
 			}
@@ -567,8 +591,11 @@ public class ProvisionController {
 
 			} else {
 				status = HttpStatus.NOT_FOUND;
+				errorInternal = InternalError.TRZ05.toString();
+				errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-						String.valueOf(status.value()), "No existe registro", null);
+						errorInternal, "No existe registro", null);
 
 				/*
 				 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
@@ -606,7 +633,7 @@ public class ProvisionController {
 				errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
-						String.valueOf(status.value()), ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
+						errorCode, ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
 
 				/*
 				 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),

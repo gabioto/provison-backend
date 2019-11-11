@@ -33,9 +33,12 @@ import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRe
 import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.controller.request.ContactRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
+import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
+import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.controller.response.SMSByIdResponse;
@@ -197,7 +200,37 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return resultList;
 	}
+	
+	@Override
+	public boolean insertProvision(InsertOrderRequest request) {
+		
+		String data = "VENTASFIJA_PARKUR|TGESTIONA_FVD|MT15149|ARMANDO AUGUSTO CALVO QUIROZ CALVO QUIROZ|07578669|987654321|AVDMIRO QUESADA, AURELIO          260   INT:1401 - URB SANTA INES-|LIMA|LIMA|SAN ISIDRO|Movistar Total 24GB TV Estándar Digital HD 60Mbps||MIGRACION|DNI||CAIDA|07/11/2019 15:56:57|05/11/2019 20:40:57||pruebas@hotmail.com||TRIO||||59|No||59|||MOVISTAR TOTAL|||NO APLICA||||||||ATIS||||||||||||||||||||||||||||||||||||||";
+		
+		String getData[] = data.split("\\|");
+		
+		System.out.println(getData);
+		Provision provision = new Provision();
+		
+		System.out.println(getData[3]);
+		
+		provision.setSaleCode(getData[2]);
+		
+		Customer customer = new Customer();
+		customer.setName(getData[3]);
+		customer.setDocumentType(getData[13]);
+		customer.setDocumentNumber(getData[4]);
+			
+		
+		provision.setCustomer(customer);
 
+		
+		
+		provisionRepository.insertProvision(provision);
+		//Provision provision = provisionRepository.getProvisionBySaleCode("as");
+		
+	
+		return true;
+	}
 	@Override
 	public Provision setProvisionIsValidated(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
@@ -611,68 +644,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	}
 
-	private Boolean sendRequestToBO(Provision provision, String action) {
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
-		String sendRequestBO = api.getBoUrl() + api.getSendRequestToBO();
-
-		log.info("sendRequestToBO - BO - URL: " + sendRequestBO);
-
-		String formattedDate = "";
-		Date scheduledDate = new Date();
-		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_BO);
-		try {
-			dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_BO);
-			dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
-			formattedDate = dateFormat.format(scheduledDate);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		BORequest boRequest = new BORequest();
-		boRequest.setCodUser("47381888");
-		boRequest.setDescription(provision.getProductName());
-		boRequest.setNrodocumentotitular(provision.getCustomer().getDocumentNumber());
-		boRequest.setNombretitular(provision.getCustomer().getName());
-		boRequest.setTelefonotitular(String.valueOf(provision.getCustomer().getPhoneNumber()));
-		boRequest.setTelefonocontacto(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
-		boRequest.setNombrecontacto(provision.getCustomer().getContactName());
-		boRequest.setCorreotitular(provision.getCustomer().getMail());
-		boRequest.setDireccion(provision.getCustomer().getAddress());
-		boRequest.setFechaagenda(formattedDate);
-		boRequest.setFranja("");
-		boRequest.setCodorigin(1); // 1 provision, 2 averia
-		boRequest.setCodaction(action); // 1 agenda, 2 datos contacto, 3 datos direccion, 4 cancelar
-		boRequest.setCodigoTraza(provision.getIdProvision());
-		boRequest.setCodigostpsi(provision.getXaIdSt());
-		boRequest.setCodigopedido(provision.getXaRequest());
-		boRequest.setCarrier(Boolean.valueOf(provision.getCustomer().getCarrier()));
-
-		// TODO: poner en parametros o properties
-		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
-		headersMap.add("Access-Token", "iAJiahANAjahIOaoPAIUnIAUZPzOPIW");
-		headersMap.add("Content-Type", "application/json");
-
-		HttpEntity<BORequest> entityBO = new HttpEntity<BORequest>(boRequest, headersMap);
-
-		try {
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendRequestBO, entityBO, String.class);
-
-			log.info("sendRequestToBO - BO - Response: " + responseEntity.getBody());
-
-			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
-			return false;
-		}
-	}
-
+	
 	@Override
 	public ProvisionResponse<String> getStatus(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getStatus(provisionId);
@@ -914,5 +886,49 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 	}
+
+	@Override
+	public boolean provisionInsertCodeFictional(InsertCodeFictionalRequest request) {
+		
+		Provision provision = provisionRepository.getProvisionBySaleCode(request.getSaleCode());
+		if(provision != null) {
+			Update update = new Update();
+			update.set("sale_code", request.getSaleCode());
+			
+			provisionRepository.updateProvision(provision, update);
+			
+		} else {
+			
+			Provision provisionAdd = new Provision();
+			
+			provisionAdd.setSaleCode(request.getSaleCode());
+			provisionAdd.setXaIdStFict(request.getFictionalCode());
+			
+			provisionRepository.insertProvision(provisionAdd);
+			
+			
+		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) {
+		
+		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
+		if(provision != null) {
+			
+			Update update = new Update();
+			update.set("xaRequest", request.getOrderCode());
+			update.set("product_name", "update test from toa");
+			
+			provisionRepository.updateProvision(provision, update);
+			return true;
+		} 
+			
+		return false;
+	}
+
+	
 
 }

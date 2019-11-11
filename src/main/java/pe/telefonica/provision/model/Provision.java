@@ -36,6 +36,9 @@ public class Provision implements Serializable {
 	@Field("xa_id_st")
 	private String xaIdSt;
 
+	@Field("xa_id_st_fict")
+	private String xaIdStFict;
+
 	@Field("xa_requirement_number")
 	private String xaRequirementNumber;
 
@@ -51,14 +54,62 @@ public class Provision implements Serializable {
 	@Field("order_code")
 	private String orderCode;
 
+	@Field("sale_code")
+	private String saleCode;
+	
+	@Field("sale_request_date")
+	private String saleRequestDate;
+	
+	@Field("sale_register_date")
+	private String saleRegisterDate;
+	
+	@Field("sale_channel")
+	private String saleChannel;
+	
+	@Field("protected_data")
+	private String protectedData;
+	
+	@Field("kafka_date_send")
+	private String kafkaDateSend;
+
 	@Field("product_name")
 	private String productName;
-
+	
+	@Field("product_name_source")
+	private String productNameSource;
+	
+	@Field("product_type")
+	private String productType;
+	
+	@Field("product_sub")
+	private String productSub;
+	
+	@Field("product_internal_equipment")
+	private String productInternalEquipment;
+	
+	@Field("product_signal")
+	private String productSignal;
+	
+	@Field("product_ps_admin")
+	private String[] productPsAdmin;
+	
+	@Field("sva_code")
+	private String[] svaCode;
+	
+	@Field("legacies")
+	private String legacies;
+	
 	@Field("commercial_op")
 	private String commercialOp;
-
+	
+	@Field("product_code")
+	private String productCode;
+	
 	@Field("payment_method")
 	private String paymentMethod;
+	
+	@Field("campaign")
+	private String campaign;
 
 	@Field("regular_price")
 	private Double regularPrice;
@@ -117,22 +168,8 @@ public class Provision implements Serializable {
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
 
-	public LocalDateTime getUpdatedDate() {
-		return updatedDate;
-	}
-
-	public void setUpdatedDate(LocalDateTime updatedDate) {
-		this.updatedDate = updatedDate;
-	}
-
-	public String getWorkZone() {
-		return workZone;
-	}
-
-	public void setWorkZone(String workZone) {
-		this.workZone = workZone;
-	}
-
+	
+	
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -171,6 +208,14 @@ public class Provision implements Serializable {
 
 	public void setXaIdSt(String xaIdSt) {
 		this.xaIdSt = xaIdSt;
+	}
+
+	public String getXaIdStFict() {
+		return xaIdStFict;
+	}
+
+	public void setXaIdStFict(String xaIdStFict) {
+		this.xaIdStFict = xaIdStFict;
 	}
 
 	public String getXaRequirementNumber() {
@@ -213,12 +258,92 @@ public class Provision implements Serializable {
 		this.orderCode = orderCode;
 	}
 
+	public String getSaleCode() {
+		return saleCode;
+	}
+
+	public void setSaleCode(String saleCode) {
+		this.saleCode = saleCode;
+	}
+
+	public String getSaleRequestDate() {
+		return saleRequestDate;
+	}
+
+	public void setSaleRequestDate(String saleRequestDate) {
+		this.saleRequestDate = saleRequestDate;
+	}
+
+	public String getSaleRegisterDate() {
+		return saleRegisterDate;
+	}
+
+	public void setSaleRegisterDate(String saleRegisterDate) {
+		this.saleRegisterDate = saleRegisterDate;
+	}
+
+	public String getSaleChannel() {
+		return saleChannel;
+	}
+
+	public void setSaleChannel(String saleChannel) {
+		this.saleChannel = saleChannel;
+	}
+
+	public String getProtectedData() {
+		return protectedData;
+	}
+
+	public void setProtectedData(String protectedData) {
+		this.protectedData = protectedData;
+	}
+
+	public String getKafkaDateSend() {
+		return kafkaDateSend;
+	}
+
+	public void setKafkaDateSend(String kafkaDateSend) {
+		this.kafkaDateSend = kafkaDateSend;
+	}
+
 	public String getProductName() {
 		return productName;
 	}
 
 	public void setProductName(String productName) {
 		this.productName = productName;
+	}
+
+	public String getProductNameSource() {
+		return productNameSource;
+	}
+
+	public void setProductNameSource(String productNameSource) {
+		this.productNameSource = productNameSource;
+	}
+
+	public String getProductType() {
+		return productType;
+	}
+
+	public void setProductType(String productType) {
+		this.productType = productType;
+	}
+
+	public String getProductSub() {
+		return productSub;
+	}
+
+	public void setProductSub(String productSub) {
+		this.productSub = productSub;
+	}
+
+	public String getLegacies() {
+		return legacies;
+	}
+
+	public void setLegacies(String legacies) {
+		this.legacies = legacies;
 	}
 
 	public String getCommercialOp() {
@@ -229,12 +354,28 @@ public class Provision implements Serializable {
 		this.commercialOp = commercialOp;
 	}
 
+	public String getProductCode() {
+		return productCode;
+	}
+
+	public void setProductCode(String productCode) {
+		this.productCode = productCode;
+	}
+
 	public String getPaymentMethod() {
 		return paymentMethod;
 	}
 
 	public void setPaymentMethod(String paymentMethod) {
 		this.paymentMethod = paymentMethod;
+	}
+
+	public String getCampaign() {
+		return campaign;
+	}
+
+	public void setCampaign(String campaign) {
+		this.campaign = campaign;
 	}
 
 	public Double getRegularPrice() {
@@ -357,6 +498,22 @@ public class Provision implements Serializable {
 		this.contacts = contacts;
 	}
 
+	public String getWorkZone() {
+		return workZone;
+	}
+
+	public void setWorkZone(String workZone) {
+		this.workZone = workZone;
+	}
+
+	public LocalDateTime getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(LocalDateTime updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+
 	public String getLastTrackingStatus() {
 		return lastTrackingStatus;
 	}
@@ -398,14 +555,13 @@ public class Provision implements Serializable {
 
 		@Field("inserted_date")
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-		
+
 		@Field("scheduled_date")
 		private LocalDate scheduledDate = LocalDate.now(ZoneOffset.of("-05:00"));
-		
+
 		@Field("scheduled_range")
 		private String scheduledRange;
-		
-		
+
 		public String getStatus() {
 			return status;
 		}
@@ -437,8 +593,7 @@ public class Provision implements Serializable {
 		public void setScheduledRange(String scheduledRange) {
 			this.scheduledRange = scheduledRange;
 		}
-		
-		
+
 	}
 
 }

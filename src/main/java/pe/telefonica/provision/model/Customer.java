@@ -17,13 +17,13 @@ public class Customer implements Serializable {
 	@Field("name")
 	private String name;
 
-	@Field("pat_surname")
+	/*@Field("pat_surname")
 	private String patSurname;
 
 	@Field("mat_surname")
 	private String matSurname;
 
-	@Field("carrier")
+	@Field("carrier")*/
 	private String carrier;
 
 	@Field("contact_carrier")
@@ -105,7 +105,8 @@ public class Customer implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
+	/*
 	public String getPatSurname() {
 		return patSurname;
 	}
@@ -121,7 +122,7 @@ public class Customer implements Serializable {
 	public void setMatSurname(String matSurname) {
 		this.matSurname = matSurname;
 	}
-
+*/
 	public String getCarrier() {
 		return carrier;
 	}

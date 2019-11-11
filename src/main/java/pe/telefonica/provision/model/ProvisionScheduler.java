@@ -20,6 +20,9 @@ public class ProvisionScheduler implements Serializable {
 	
 	@Field("scheduleRange")
 	private String scheduleRange;
+	
+	@Field("scheduleType")
+	private Integer scheduleType;
 
 	public String getIdProvision() {
 		return idProvision;
@@ -44,6 +47,16 @@ public class ProvisionScheduler implements Serializable {
 	public void setScheduleRange(String scheduleRange) {
 		this.scheduleRange = scheduleRange;
 	}
+
+	public Integer getScheduleType() {
+		return scheduleType;
+	}
+
+	public void setScheduleType(Integer scheduleType) {
+		this.scheduleType = scheduleType;
+	}
+	
+	
 	
 	
 }

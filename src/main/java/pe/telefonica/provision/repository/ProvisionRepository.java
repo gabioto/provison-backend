@@ -19,6 +19,8 @@ public interface ProvisionRepository {
 	Optional<Provision> getOrder(String documentType, String documentNumber);
 
 	Optional<Provision> getProvisionByXaRequest(String xaRequest);
+	
+	Provision getProvisionBySaleCode(String saleCode);
 
 	Provision getProvisionByXaIdSt(String xaIdSt);
 

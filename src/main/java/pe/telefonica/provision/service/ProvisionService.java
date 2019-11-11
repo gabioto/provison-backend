@@ -7,6 +7,8 @@ import java.util.List;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
+import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.model.Customer;
@@ -21,6 +23,12 @@ public interface ProvisionService {
 	ProvisionResponse<String> getStatus(String provisionId);
 
 	List<Provision> insertProvisionList(List<Provision> provisionList);
+	
+	
+	
+	boolean insertProvision(InsertOrderRequest request);
+	
+	boolean provisionInsertCodeFictional(InsertCodeFictionalRequest request);
 
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);

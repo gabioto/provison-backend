@@ -36,6 +36,8 @@ import pe.telefonica.provision.controller.request.CancelOrderRequest;
 import pe.telefonica.provision.controller.request.ContactRequest;
 import pe.telefonica.provision.controller.request.GetAllInTimeRangeRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
+import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
@@ -209,8 +211,8 @@ public class ProvisionController {
 	 * return
 	 * ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq)); }
 	 */
-	@RequestMapping(value = "/insertOrders", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> insertOrders(
+	@RequestMapping(value = "/insertOrdersOld", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<Provision>>> insertOrdersOld(
 			@RequestBody @Valid ApiRequest<List<Provision>> provisionListReq) {
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
@@ -243,7 +245,77 @@ public class ProvisionController {
 		// return
 		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
+	
+	
+	@RequestMapping(value = "/insertOrder", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<Provision>> insertOrder(
+			@RequestBody @Valid ApiRequest<InsertOrderRequest> request) {
+		ApiResponse<Provision> apiResponse;
+		HttpStatus status;
 
+		try {
+			Boolean provisions = provisionService.insertProvision(request.getBody());
+
+			if (provisions) {
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_INSERT_PROVISION, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(null);
+			} else {
+				status = HttpStatus.NOT_FOUND;
+
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_INSERT_PROVISION, String.valueOf(status.value()),
+						"No se pudo insetar provision", null);
+				apiResponse.setBody(null);
+			}
+		} catch (Exception ex) {
+
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_INSERT_PROVISION, String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+		// return
+		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
+	}
+	
+	@RequestMapping(value = "/provisionInsertCodeFictional", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<Provision>> provisionInsertCodeFictional(
+			@RequestBody @Valid ApiRequest<InsertCodeFictionalRequest> request) {
+		ApiResponse<Provision> apiResponse;
+		HttpStatus status;
+
+		try {
+			Boolean provisions = provisionService.provisionInsertCodeFictional(request.getBody());
+
+			if (provisions) {
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_INSERT_PROVISION_CODE_FICT, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(null);
+			} else {
+				status = HttpStatus.NOT_FOUND;
+
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_INSERT_PROVISION_CODE_FICT, String.valueOf(status.value()),
+						"No se pudo actualizar provision", null);
+				apiResponse.setBody(null);
+			}
+		} catch (Exception ex) {
+
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_INSERT_PROVISION_CODE_FICT, String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+		// return
+		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
+	}
 	/**
 	 * 
 	 * @param provisionId

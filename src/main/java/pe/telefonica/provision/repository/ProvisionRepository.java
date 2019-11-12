@@ -54,4 +54,6 @@ public interface ProvisionRepository {
 	Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 	
 	Provision getByOrderCodeForUpdate(String orderCode);
+	
+	
 }

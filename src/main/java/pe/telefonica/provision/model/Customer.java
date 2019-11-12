@@ -22,8 +22,8 @@ public class Customer implements Serializable {
 
 	@Field("mat_surname")
 	private String matSurname;
-
-	@Field("carrier")*/
+	*/
+	@Field("carrier")
 	private String carrier;
 
 	@Field("contact_carrier")
@@ -33,7 +33,7 @@ public class Customer implements Serializable {
 	private String mail;
 
 	@Field("phone_number")
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	@Field("district")
 	private String district;
@@ -147,11 +147,11 @@ public class Customer implements Serializable {
 		this.mail = mail;
 	}
 
-	public Integer getPhoneNumber() {
+	public String getPhoneNumber() {
 		return phoneNumber;
 	}
 
-	public void setPhoneNumber(Integer phoneNumber) {
+	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
 

@@ -24,7 +24,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
@@ -268,4 +273,59 @@ public class PSIApi extends ConfigRestTemplate {
 		}
 		return null;
 	}
+	
+	public boolean getCarrier(String phoneNumber) {
+		try {
+			Client client = Client.create();
+			WebResource webResource = client.resource("https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/customerinformation/v2/searchCustomer");
+
+			JsonObject jsonBody = new JsonObject();
+			JsonObject jsonTefHeaderReq = new JsonObject();
+			JsonObject jsonSearchCustomer = new JsonObject();
+			JsonObject jsonCustomerId = new JsonObject();
+			JsonObject jsonTelephoneNumber = new JsonObject();
+			jsonTefHeaderReq.addProperty("userLogin", "10223928");
+			jsonTefHeaderReq.addProperty("serviceChannel", "MS");
+			jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
+			jsonTefHeaderReq.addProperty("application", "APPVENTAS");
+			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
+			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
+			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
+			jsonTefHeaderReq.addProperty("transactionTimestamp", "2019-05-28T15:08:31.960");
+			jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
+			jsonTefHeaderReq.addProperty("version", "1.0");
+
+			jsonTelephoneNumber.addProperty("number", phoneNumber);
+			jsonCustomerId.add("telephoneNumber", jsonTelephoneNumber);
+			jsonSearchCustomer.add("customerIdentification", jsonCustomerId);
+
+			jsonBody.add("TefHeaderReq", jsonTefHeaderReq);
+			jsonBody.add("SearchCustomerRequestData", jsonSearchCustomer);
+
+			Gson gson = new Gson();
+			String input = gson.toJson(jsonBody);
+
+			// GENESIS
+			ClientResponse clientResponse = webResource.accept(new String[] { "application/json" })
+					.header("Content-type", "application/json")
+					.header("X-IBM-Client-Id", "42eac6bc-c8a8-4faf-b96b-6650a929a28d")
+					.header("X-IBM-Client-Secret", "kY1vH1tQ8iX2uO7nX7sP5tD5mR0cO5cM6qD8cK3bW5vK3eG8gE")
+					.post(ClientResponse.class, input);
+			String output = (String) clientResponse.getEntity(String.class);
+
+			JsonElement jsonElement = gson.fromJson(output, JsonElement.class);
+			JsonObject jsonOutput = jsonElement.getAsJsonObject();
+
+			JsonObject joOutputSearchData = jsonOutput.getAsJsonObject("SearchCustomerResponseData");
+			JsonObject joOutputSearchList = joOutputSearchData.getAsJsonObject("searchCustomerResultsList");
+			JsonArray jaCustomerResults = joOutputSearchList.getAsJsonArray("searchCustomerResults");
+
+			return jaCustomerResults.size() > 0;
+		} catch (Exception e) {
+			// Se detecta error, por lo tanto se considera otro operador.
+			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
+			return false;
+		}
+	}
+	
 }

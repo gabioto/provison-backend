@@ -56,4 +56,7 @@ public interface ProvisionService {
 			LocalDate scheduledDate, String scheduledRange, Integer scheduleType);
 
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
+	
+	public boolean getCarrier(String phoneNumber);
+	
 }

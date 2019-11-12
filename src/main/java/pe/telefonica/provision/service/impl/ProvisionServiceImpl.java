@@ -215,10 +215,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 		
 		provision.setSaleCode(getData[2]);
 		
+		
 		Customer customer = new Customer();
+		
 		customer.setName(getData[3]);
 		customer.setDocumentType(getData[13]);
 		customer.setDocumentNumber(getData[4]);
+		customer.setPhoneNumber(getData[5]);
+		customer.setMail(getData[20]);
+		customer.setAddress(getData[6]);
+		customer.setDistrict(getData[9]);
+		customer.setProvince(getData[8]);
+		customer.setDepartment(getData[7]);
+		
 			
 		
 		provision.setCustomer(customer);
@@ -927,6 +936,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} 
 			
 		return false;
+	}
+
+	@Override
+	public Customer getCustomerByOrderCode(String orderCode) {
+		
+		Provision provision = provisionRepository.getByOrderCodeForUpdate(orderCode);
+		
+		if(provision != null) {
+			return provision.getCustomer();
+		}
+		return null;
 	}
 
 	

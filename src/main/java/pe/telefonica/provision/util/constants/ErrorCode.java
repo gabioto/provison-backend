@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ErrorCode {
+	/*COD ERROR TRAZABILIDAD */
+	E2138("204TRZ01"),//Campos requeridos
+	E2139("204TRZ02"),//Tamanio no permitido
+	E2140("204TRZ03"),//Valor no valido
+	E2141("204TRZ04"),//La lista no tiene la cantidad de elementos suficientes
+	E2142("204TRZ05"),//No existe registro
 	
 	E2100("201ERR10"),
 	E2101("201ERR11"),
@@ -17,6 +23,7 @@ public enum ErrorCode {
 	E2109("201ERR04"),
 	E2110("201ERR18"),
 	E2111("201ERR05"),
+	
 	E2112("202ERR10"),
 	E2113("202ERR11"),
 	E2114("202ERR02"),
@@ -27,6 +34,7 @@ public enum ErrorCode {
 	E2119("202ERR04"),
 	E2120("202ERR18"),
 	E2121("202ERR05"),
+	
 	E2122("203ERR10"),
 	E2123("203ERR11"),
 	E2124("203ERR02"),
@@ -35,6 +43,7 @@ public enum ErrorCode {
 	E2127("203ERR19"),
 	E2128("203ERR18"),
 	E2129("203ERR05"),
+	
 	E2130("204ERR10"),
 	E2131("204ERR11"),
 	E2132("204ERR02"),
@@ -43,6 +52,9 @@ public enum ErrorCode {
 	E2135("204ERR19"),
 	E2136("204ERR18"),
 	E2137("204ERR05");
+	
+	
+	
 	
 	private String externalCode;
 	 

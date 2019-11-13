@@ -51,16 +51,9 @@ public class Provision implements Serializable {
 	@Field("xa_id_st")
 	private String xaIdSt;
 
-	@Field("xa_id_st_fict")
-	private String xaIdStFict;
+	@Field("dummy_st_psi_code")
+	private String dummyStPsiCode;
 
-	/*
-	 * @Field("purchase_date") private String purchaseDate;
-	 * 
-	 * @Field("purchase_hour") private String purchaseHour;
-	 * 
-	 * @Field("order_code") private String orderCode;
-	 */
 	@Field("back")
 	private String back;
 
@@ -76,8 +69,8 @@ public class Provision implements Serializable {
 	@Field("sale_register_date")
 	private String saleRegisterDate;
 
-	@Field("sale_channel")
-	private String saleChannel;
+	@Field("channel_entered")
+	private String channelEntered;
 
 	@Field("protected_data")
 	private String protectedData;
@@ -104,10 +97,10 @@ public class Provision implements Serializable {
 	private String productSignal;
 
 	@Field("product_ps_admin")
-	private String[] productPsAdmin;
+	private List<String> productPsAdmin;
 
 	@Field("sva_code")
-	private String[] svaCode;
+	private List<String> svaCode;
 
 	@Field("legacies")
 	private String legacies;
@@ -125,10 +118,10 @@ public class Provision implements Serializable {
 	private String campaign;
 
 	@Field("regular_price")
-	private Double regularPrice;
+	private String regularPrice;
 
 	@Field("promo_price")
-	private Double promoPrice;
+	private String promoPrice;
 
 	@Field("time_promo_price")
 	private Integer timePromoPrice;
@@ -264,12 +257,14 @@ public class Provision implements Serializable {
 		this.xaIdSt = xaIdSt;
 	}
 
-	public String getXaIdStFict() {
-		return xaIdStFict;
+	
+
+	public String getDummyStPsiCode() {
+		return dummyStPsiCode;
 	}
 
-	public void setXaIdStFict(String xaIdStFict) {
-		this.xaIdStFict = xaIdStFict;
+	public void setDummyStPsiCode(String dummyStPsiCode) {
+		this.dummyStPsiCode = dummyStPsiCode;
 	}
 
 	public String getBack() {
@@ -312,12 +307,12 @@ public class Provision implements Serializable {
 		this.saleRegisterDate = saleRegisterDate;
 	}
 
-	public String getSaleChannel() {
-		return saleChannel;
+	public String getChannelEntered() {
+		return channelEntered;
 	}
 
-	public void setSaleChannel(String saleChannel) {
-		this.saleChannel = saleChannel;
+	public void setChannelEntered(String channelEntered) {
+		this.channelEntered = channelEntered;
 	}
 
 	public String getProtectedData() {
@@ -384,19 +379,19 @@ public class Provision implements Serializable {
 		this.productSignal = productSignal;
 	}
 
-	public String[] getProductPsAdmin() {
+	public List<String> getProductPsAdmin() {
 		return productPsAdmin;
 	}
 
-	public void setProductPsAdmin(String[] productPsAdmin) {
+	public void setProductPsAdmin(List<String> productPsAdmin) {
 		this.productPsAdmin = productPsAdmin;
 	}
 
-	public String[] getSvaCode() {
+	public List<String> getSvaCode() {
 		return svaCode;
 	}
 
-	public void setSvaCode(String[] svaCode) {
+	public void setSvaCode(List<String> svaCode) {
 		this.svaCode = svaCode;
 	}
 
@@ -440,19 +435,19 @@ public class Provision implements Serializable {
 		this.campaign = campaign;
 	}
 
-	public Double getRegularPrice() {
+	public String getRegularPrice() {
 		return regularPrice;
 	}
 
-	public void setRegularPrice(Double regularPrice) {
+	public void setRegularPrice(String regularPrice) {
 		this.regularPrice = regularPrice;
 	}
 
-	public Double getPromoPrice() {
+	public String getPromoPrice() {
 		return promoPrice;
 	}
 
-	public void setPromoPrice(Double promoPrice) {
+	public void setPromoPrice(String promoPrice) {
 		this.promoPrice = promoPrice;
 	}
 

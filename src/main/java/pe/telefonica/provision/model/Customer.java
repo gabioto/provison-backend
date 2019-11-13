@@ -17,12 +17,6 @@ public class Customer implements Serializable {
 	@Field("name")
 	private String name;
 
-	/*@Field("pat_surname")
-	private String patSurname;
-
-	@Field("mat_surname")
-	private String matSurname;
-	*/
 	@Field("carrier")
 	private String carrier;
 
@@ -75,10 +69,13 @@ public class Customer implements Serializable {
 	private Integer contactPhoneNumber3;
 
 	@Field("latitude")
-	private Double latitude;
+	private String latitude;
 
 	@Field("longitude")
-	private Double longitude;
+	private String longitude;
+
+	@Field("origin_data")
+	private String originData;
 
 	private String productName;
 
@@ -105,24 +102,7 @@ public class Customer implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	/*
-	public String getPatSurname() {
-		return patSurname;
-	}
 
-	public void setPatSurname(String patSurname) {
-		this.patSurname = patSurname;
-	}
-
-	public String getMatSurname() {
-		return matSurname;
-	}
-
-	public void setMatSurname(String matSurname) {
-		this.matSurname = matSurname;
-	}
-*/
 	public String getCarrier() {
 		return carrier;
 	}
@@ -259,20 +239,28 @@ public class Customer implements Serializable {
 		this.contactPhoneNumber3 = contactPhoneNumber3;
 	}
 
-	public Double getLatitude() {
+	public String getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(Double latitude) {
+	public void setLatitude(String latitude) {
 		this.latitude = latitude;
 	}
 
-	public Double getLongitude() {
+	public String getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(Double longitude) {
+	public void setLongitude(String longitude) {
 		this.longitude = longitude;
+	}
+
+	public String getOriginData() {
+		return originData;
+	}
+
+	public void setOriginData(String originData) {
+		this.originData = originData;
 	}
 
 	public String getProductName() {

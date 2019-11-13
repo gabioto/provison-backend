@@ -54,6 +54,7 @@ import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Television;
+import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.BORequest;
@@ -281,8 +282,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		System.out.println(getData[23]);
 		System.out.println(getData[24]);
 		
-		customer.setLongitude(getData[22]);
-		customer.setLatitude(getData[23]);
+		customer.setLongitude(getData[23]);
+		customer.setLatitude(getData[24]);
 		customer.setOriginData(request.getDataOrigin());
 
 		Internet internet = new Internet();
@@ -467,8 +468,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(request.getStatus());
-			
+		//	status_toa
 			update.set("active_status", request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? Constants.PROVISION_STATUS_ACTIVE: Constants.PROVISION_STATUS_CANCELLED);
+			//update.set("status_toa", request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? Constants.PROVISION_STATUS_ACTIVE: Constants.PROVISION_STATUS_CANCELLED);
+			
 			update.set("last_tracking_status", request.getStatus());
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
@@ -1165,21 +1168,59 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) {
 
 		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
+		
+		String[] getData = request.getData().split("\\|",-1);
+		
 		if (provision != null) {
-			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_INIT)) {
+			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.IN_TOA)) {
+				
+				
+				
 				Update update = new Update();
-				String[] getData = request.getData().split("\\|",-1);
+				update.set("xa_creation_date", getData[3]);
+				update.set("xa_id_st", getData[4]);
+				update.set("xa_requirement_number", getData[5]);
+				update.set("appt_number", getData[6] );
+				update.set("activity_type", getData[8]);
+				update.set("work_zone", getData[16]);
 				
+				InToa inToa = new InToa();
 				
-				update.set("xaRequest", request.getOrderCode());
-				update.set("xa_id_st","");
-				update.set("product_name", "update test from toa");
-
+				inToa.setXaNote(getData[9]);
+				//update.set("xa_note", getData[9]);
+				inToa.setDate(getData[15]);
+				//update.set("date", getData[15]);
+				inToa.setXaScheduler(getData[16]);
+				//update.set("xa_scheduler", getData[16]);
+				inToa.setLongitude(getData[18]);
+				//update.set("longitude", getData[18]);
+				inToa.setLatitude(getData[19]);
+				//update.set("latitude", getData[19]);
+				
+				update.set("in_toa", inToa);
+				
+				List<StatusLog> listLog = provision.getLogStatus();
+				
+				StatusLog statusLog = new StatusLog();
+				statusLog.setStatus(ConstantsTracking.IN_TOA);
+					
+				update.set("last_tracking_status", ConstantsTracking.IN_TOA);
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
+				
 				provisionRepository.updateProvision(provision, update);
+				return true;
 			}
-
+			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_PRESTAR)) {
+				
+				Update update = new Update();
+				update.set("external_id", getData[1]);
+				
+				
+				
+			}
 			
-			return true;
+			
 		}
 
 		return false;

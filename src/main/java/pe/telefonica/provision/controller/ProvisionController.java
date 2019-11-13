@@ -35,6 +35,7 @@ import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRe
 import pe.telefonica.provision.controller.request.CancelOrderRequest;
 import pe.telefonica.provision.controller.request.ContactRequest;
 import pe.telefonica.provision.controller.request.GetAllInTimeRangeRequest;
+import pe.telefonica.provision.controller.request.GetCustomerByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
@@ -236,21 +237,8 @@ public class ProvisionController {
 		return ResponseEntity.ok(provisionService.getStatus(provisionId));
 	}
 
-	/**
-	 * 
-	 * @param provisionListReq
-	 * @return ProvisionResponse<Provision>
-	 * @description insert a list of provisions
-	 */
-	/*
-	 * @RequestMapping(value = "/insertOrders", method = RequestMethod.POST) public
-	 * ResponseEntity<ProvisionArrayResponse<Provision>> insertOrders(
-	 * 
-	 * @RequestBody @Valid List<Provision> provisionListReq) {
-	 * 
-	 * return
-	 * ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq)); }
-	 */
+	
+	
 	@RequestMapping(value = "/insertOrdersOld", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<Provision>>> insertOrdersOld(
 			@RequestBody @Valid ApiRequest<List<Provision>> provisionListReq) {
@@ -286,6 +274,41 @@ public class ProvisionController {
 		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 	
+	
+	@RequestMapping(value = "/getCustomerByOrderCode", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<Customer>> getCustomerByOrderCode(
+			@RequestBody @Valid ApiRequest<GetCustomerByOrderCodeRequest> request) {
+		ApiResponse<Customer> apiResponse;
+		HttpStatus status;
+
+		try {
+			Customer customer = provisionService.getCustomerByOrderCode(request.getBody().getOrderCode());
+
+			if (customer != null) {
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_CUSTOMER_BY_ORDER_CODE, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(customer);
+			} else {
+				status = HttpStatus.NOT_FOUND;
+
+				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_CUSTOMER_BY_ORDER_CODE, String.valueOf(status.value()),
+						"No se encontro registro", null);
+				apiResponse.setBody(null);
+			}
+		} catch (Exception ex) {
+
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_CUSTOMER_BY_ORDER_CODE, String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+		// return
+		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
+	}
 	
 	@RequestMapping(value = "/insertOrder", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> insertOrder(
@@ -329,6 +352,7 @@ public class ProvisionController {
 		HttpStatus status;
 
 		try {
+			
 			Boolean provisions = provisionService.provisionUpdateFromTOA(request.getBody());
 
 			if (provisions) {

@@ -30,92 +30,98 @@ public class Provision implements Serializable {
 	@Field("xa_request")
 	private String xaRequest;
 
-	@Field("xa_creation_date")
-	private String xaCreationDate;
-
-	@Field("xa_id_st")
-	private String xaIdSt;
-
-	@Field("xa_id_st_fict")
-	private String xaIdStFict;
-
 	@Field("xa_requirement_number")
 	private String xaRequirementNumber;
 
 	@Field("appt_number")
 	private String apptNumber;
 
-	@Field("purchase_date")
-	private String purchaseDate;
+	@Field("xa_number_service_order")
+	private String xaNumberServiceOrder;
 
-	@Field("purchase_hour")
-	private String purchaseHour;
+	@Field("xa_number_work_order")
+	private String xaNumberWorkOrder;
 
-	@Field("order_code")
-	private String orderCode;
+	@Field("activity_type")
+	private String activityType;
+
+	@Field("xa_creation_date")
+	private String xaCreationDate;
+
+	@Field("xa_id_st")
+	private String xaIdSt;
+
+	@Field("dummy_st_psi_code")
+	private String dummyStPsiCode;
+
+	@Field("back")
+	private String back;
+
+	@Field("sale_source")
+	private String saleSource;
 
 	@Field("sale_code")
 	private String saleCode;
-	
+
 	@Field("sale_request_date")
 	private String saleRequestDate;
-	
+
 	@Field("sale_register_date")
 	private String saleRegisterDate;
-	
-	@Field("sale_channel")
-	private String saleChannel;
-	
+
+	@Field("channel_entered")
+	private String channelEntered;
+
 	@Field("protected_data")
 	private String protectedData;
-	
+
 	@Field("kafka_date_send")
 	private String kafkaDateSend;
 
 	@Field("product_name")
 	private String productName;
-	
+
 	@Field("product_name_source")
 	private String productNameSource;
-	
+
 	@Field("product_type")
 	private String productType;
-	
+
 	@Field("product_sub")
 	private String productSub;
-	
+
 	@Field("product_internal_equipment")
 	private String productInternalEquipment;
-	
+
 	@Field("product_signal")
 	private String productSignal;
-	
+
 	@Field("product_ps_admin")
-	private String[] productPsAdmin;
-	
+	private List<String> productPsAdmin;
+
 	@Field("sva_code")
-	private String[] svaCode;
-	
+	private List<String> svaCode;
+
 	@Field("legacies")
 	private String legacies;
-	
+
 	@Field("commercial_op")
 	private String commercialOp;
-	
+
 	@Field("product_code")
 	private String productCode;
-	
+
 	@Field("payment_method")
 	private String paymentMethod;
-	
+
 	@Field("campaign")
 	private String campaign;
 
 	@Field("regular_price")
-	private Double regularPrice;
+	private String regularPrice;
 
 	@Field("promo_price")
-	private Double promoPrice;
+	private String promoPrice;
 
 	@Field("time_promo_price")
 	private Integer timePromoPrice;
@@ -125,6 +131,9 @@ public class Provision implements Serializable {
 
 	@Field("install_price")
 	private String installPrice;
+
+	@Field("install_price_month")
+	private String installPriceMonth;
 
 	@Field("active_status")
 	private String activeStatus;
@@ -168,8 +177,6 @@ public class Provision implements Serializable {
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
 
-	
-	
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -194,30 +201,6 @@ public class Provision implements Serializable {
 		this.xaRequest = xaRequest;
 	}
 
-	public String getXaCreationDate() {
-		return xaCreationDate;
-	}
-
-	public void setXaCreationDate(String xaCreationDate) {
-		this.xaCreationDate = xaCreationDate;
-	}
-
-	public String getXaIdSt() {
-		return xaIdSt;
-	}
-
-	public void setXaIdSt(String xaIdSt) {
-		this.xaIdSt = xaIdSt;
-	}
-
-	public String getXaIdStFict() {
-		return xaIdStFict;
-	}
-
-	public void setXaIdStFict(String xaIdStFict) {
-		this.xaIdStFict = xaIdStFict;
-	}
-
 	public String getXaRequirementNumber() {
 		return xaRequirementNumber;
 	}
@@ -234,28 +217,70 @@ public class Provision implements Serializable {
 		this.apptNumber = apptNumber;
 	}
 
-	public String getPurchaseDate() {
-		return purchaseDate;
+	public String getXaNumberServiceOrder() {
+		return xaNumberServiceOrder;
 	}
 
-	public void setPurchaseDate(String purchaseDate) {
-		this.purchaseDate = purchaseDate;
+	public void setXaNumberServiceOrder(String xaNumberServiceOrder) {
+		this.xaNumberServiceOrder = xaNumberServiceOrder;
 	}
 
-	public String getPurchaseHour() {
-		return purchaseHour;
+	public String getXaNumberWorkOrder() {
+		return xaNumberWorkOrder;
 	}
 
-	public void setPurchaseHour(String purchaseHour) {
-		this.purchaseHour = purchaseHour;
+	public void setXaNumberWorkOrder(String xaNumberWorkOrder) {
+		this.xaNumberWorkOrder = xaNumberWorkOrder;
 	}
 
-	public String getOrderCode() {
-		return orderCode;
+	public String getActivityType() {
+		return activityType;
 	}
 
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
+	public void setActivityType(String activityType) {
+		this.activityType = activityType;
+	}
+
+	public String getXaCreationDate() {
+		return xaCreationDate;
+	}
+
+	public void setXaCreationDate(String xaCreationDate) {
+		this.xaCreationDate = xaCreationDate;
+	}
+
+	public String getXaIdSt() {
+		return xaIdSt;
+	}
+
+	public void setXaIdSt(String xaIdSt) {
+		this.xaIdSt = xaIdSt;
+	}
+
+	
+
+	public String getDummyStPsiCode() {
+		return dummyStPsiCode;
+	}
+
+	public void setDummyStPsiCode(String dummyStPsiCode) {
+		this.dummyStPsiCode = dummyStPsiCode;
+	}
+
+	public String getBack() {
+		return back;
+	}
+
+	public void setBack(String back) {
+		this.back = back;
+	}
+
+	public String getSaleSource() {
+		return saleSource;
+	}
+
+	public void setSaleSource(String saleSource) {
+		this.saleSource = saleSource;
 	}
 
 	public String getSaleCode() {
@@ -282,12 +307,12 @@ public class Provision implements Serializable {
 		this.saleRegisterDate = saleRegisterDate;
 	}
 
-	public String getSaleChannel() {
-		return saleChannel;
+	public String getChannelEntered() {
+		return channelEntered;
 	}
 
-	public void setSaleChannel(String saleChannel) {
-		this.saleChannel = saleChannel;
+	public void setChannelEntered(String channelEntered) {
+		this.channelEntered = channelEntered;
 	}
 
 	public String getProtectedData() {
@@ -338,6 +363,38 @@ public class Provision implements Serializable {
 		this.productSub = productSub;
 	}
 
+	public String getProductInternalEquipment() {
+		return productInternalEquipment;
+	}
+
+	public void setProductInternalEquipment(String productInternalEquipment) {
+		this.productInternalEquipment = productInternalEquipment;
+	}
+
+	public String getProductSignal() {
+		return productSignal;
+	}
+
+	public void setProductSignal(String productSignal) {
+		this.productSignal = productSignal;
+	}
+
+	public List<String> getProductPsAdmin() {
+		return productPsAdmin;
+	}
+
+	public void setProductPsAdmin(List<String> productPsAdmin) {
+		this.productPsAdmin = productPsAdmin;
+	}
+
+	public List<String> getSvaCode() {
+		return svaCode;
+	}
+
+	public void setSvaCode(List<String> svaCode) {
+		this.svaCode = svaCode;
+	}
+
 	public String getLegacies() {
 		return legacies;
 	}
@@ -378,19 +435,19 @@ public class Provision implements Serializable {
 		this.campaign = campaign;
 	}
 
-	public Double getRegularPrice() {
+	public String getRegularPrice() {
 		return regularPrice;
 	}
 
-	public void setRegularPrice(Double regularPrice) {
+	public void setRegularPrice(String regularPrice) {
 		this.regularPrice = regularPrice;
 	}
 
-	public Double getPromoPrice() {
+	public String getPromoPrice() {
 		return promoPrice;
 	}
 
-	public void setPromoPrice(Double promoPrice) {
+	public void setPromoPrice(String promoPrice) {
 		this.promoPrice = promoPrice;
 	}
 
@@ -416,6 +473,14 @@ public class Provision implements Serializable {
 
 	public void setInstallPrice(String installPrice) {
 		this.installPrice = installPrice;
+	}
+
+	public String getInstallPriceMonth() {
+		return installPriceMonth;
+	}
+
+	public void setInstallPriceMonth(String installPriceMonth) {
+		this.installPriceMonth = installPriceMonth;
 	}
 
 	public String getActiveStatus() {
@@ -538,8 +603,7 @@ public class Provision implements Serializable {
 	public String toString() {
 		return "Provision [idProvision=" + idProvision + ", externalId=" + externalId + ", xaRequest=" + xaRequest
 				+ ", xaCreationDate=" + xaCreationDate + ", xaIdSt=" + xaIdSt + ", xaRequirementNumber="
-				+ xaRequirementNumber + ", apptNumber=" + apptNumber + ", purchaseDate=" + purchaseDate
-				+ ", purchaseHour=" + purchaseHour + ", orderCode=" + orderCode + ", productName=" + productName
+				+ xaRequirementNumber + ", apptNumber=" + apptNumber + ", productName=" + productName
 				+ ", commercialOp=" + commercialOp + ", paymentMethod=" + paymentMethod + ", regularPrice="
 				+ regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency="
 				+ currency + ", installPrice=" + installPrice + ", activeStatus=" + activeStatus + ", statusToa="

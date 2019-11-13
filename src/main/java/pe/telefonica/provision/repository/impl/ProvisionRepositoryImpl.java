@@ -244,4 +244,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		return provision;
 	}
+
+	@Override
+	public Provision getProvisionByDummyStPsiCode(String dummyStPsiCode) {
+		
+		Provision provision = this.mongoOperations.findOne(
+				new Query(Criteria.where("dummy_st_psi_code").is(dummyStPsiCode)), Provision.class);
+		
+		return provision;
+	}
 }

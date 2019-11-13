@@ -23,6 +23,8 @@ public interface ProvisionRepository {
 	Provision getProvisionBySaleCode(String saleCode);
 	
 	Provision getProvisionByXaIdSt(String xaIdSt);
+	
+	Provision getProvisionByDummyStPsiCode(String dummyStPsiCode);
 
 	Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt);
 
@@ -54,4 +56,6 @@ public interface ProvisionRepository {
 	Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 	
 	Provision getByOrderCodeForUpdate(String orderCode);
+	
+	
 }

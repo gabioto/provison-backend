@@ -18,6 +18,8 @@ import pe.telefonica.provision.model.Provision;
 public interface ProvisionService {
 
 	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
+	
+	Customer getCustomerByOrderCode(String orderCode);
 
 	List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 
@@ -56,4 +58,7 @@ public interface ProvisionService {
 			LocalDate scheduledDate, String scheduledRange, Integer scheduleType);
 
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
+	
+	public boolean getCarrier(String phoneNumber);
+	
 }

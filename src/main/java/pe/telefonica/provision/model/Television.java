@@ -15,7 +15,7 @@ public class Television implements Serializable{
 	@Field("description")
 	private String description;
 	
-	@Field("tv_equipment")
+	@Field("equipment")
 	private String equipment;
 	
 	@Field("total_equipments_number")

@@ -58,6 +58,8 @@ public final class Constants {
 	public static final String PSI_CODE_CANCEL = "203";
 	public static final String PSI_CODE_UPDATE_CONTACT = "204";
 
+	public static final String GET_ORDERS = "205";
+	
 	public static final String OPER_SEND_SMS_BY_ID = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID = "OPER_SEND_MAIL_BY_ID";
 

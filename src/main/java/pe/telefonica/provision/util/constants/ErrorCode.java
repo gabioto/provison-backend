@@ -5,6 +5,10 @@ import java.util.Map;
 
 public enum ErrorCode {
 	/*COD ERROR TRAZABILIDAD */
+	
+	E2143("205TRZ06"),//Campos requeridos
+	E2144("205TRZ07"),//Valor no valido
+	
 	E2138("204TRZ01"),//Campos requeridos
 	E2139("204TRZ02"),//Tamanio no permitido
 	E2140("204TRZ03"),//Valor no valido

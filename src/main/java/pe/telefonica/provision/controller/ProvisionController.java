@@ -142,6 +142,44 @@ public class ProvisionController {
 
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
+		String errorInternal = "";
+		
+		//Validate documentType
+		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
+
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ06.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_ALL,
+					errorInternal, "Tipo de documento obligatorio", null);
+			return ResponseEntity.status(status).body(apiResponse);
+		}
+		
+		//Validate documentNumber
+		if (request.getBody().getDocumentNumber() == null || request.getBody().getDocumentNumber().equals("")) {
+
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ06.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_ALL,
+							errorInternal, "Numero de documento obligatorio", null);
+			return ResponseEntity.status(status).body(apiResponse);
+		}
+		
+		Boolean typedata = request.getBody().getDocumentType() instanceof String;
+		if(!typedata) {
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ07.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_PROVISION_ALL,
+							errorInternal, "Tipo de documento debe ser cadena", null);
+			return ResponseEntity.status(status).body(apiResponse);
+
+		}
+		
 
 		try {
 			List<Provision> provisions = provisionService.getAll(request);

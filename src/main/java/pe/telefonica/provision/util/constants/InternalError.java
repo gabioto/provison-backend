@@ -6,6 +6,8 @@ public enum InternalError {
 	TRZ02,
 	TRZ03,
 	TRZ04,
-	TRZ05
+	TRZ05,
+	TRZ06,
+	TRZ07
 
 }

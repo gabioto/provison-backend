@@ -140,11 +140,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 		 */
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("CE")) {
-			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentType());
+			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentNumber());
 		}
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
-			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentType());
+			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentNumber());
 		}
 
 		if (provisions.isPresent() && !provisions.get().isEmpty()) {

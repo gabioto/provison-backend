@@ -1020,7 +1020,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) {
 
-		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
+		Provision provision = provisionRepository.getProvisionByDummyStPsiCode(request.getPsiCode());
 
 		if (provision != null) {
 
@@ -1110,17 +1110,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			Update update = new Update();
 
-			update.set("customer.contact_name", contactName1);
-			update.set("customer.contact_name1", contactName2);
-			update.set("customer.contact_name2", contactName3);
-			update.set("customer.contact_name3", contactName4);
+			//update.set("customer.contact_name", contactName1);
+			//update.set("customer.contact_name1", contactName2);
+			//update.set("customer.contact_name2", contactName3);
+			//update.set("customer.contact_name3", contactName4);
 
 			update.set("customer.mail", request.getEmail());
 
-			update.set("customer.contact_phone_number", Integer.valueOf(contactPhone1));
-			update.set("customer.contact_phone_number1", Integer.valueOf(contactPhone2));
-			update.set("customer.contact_phone_number2", Integer.valueOf(contactPhone3));
-			update.set("customer.contact_phone_number3", Integer.valueOf(contactPhone4));
+			//update.set("customer.contact_phone_number", Integer.valueOf(contactPhone1));
+			//update.set("customer.contact_phone_number1", Integer.valueOf(contactPhone2));
+			//update.set("customer.contact_phone_number2", Integer.valueOf(contactPhone3));
+			//update.set("customer.contact_phone_number3", Integer.valueOf(contactPhone4));
 
 			update.set("contacts", contactsList);
 			// update.set("customer.contact_carrier",
@@ -1166,15 +1166,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
 		if (provision != null) {
-			//if(request.getStatus().equalsIgnoreCase(anotherString)) {
+			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_INIT)) {
+				Update update = new Update();
+				String[] getData = request.getData().split("\\|",-1);
 				
-			//}
+				
+				update.set("xaRequest", request.getOrderCode());
+				update.set("xa_id_st","");
+				update.set("product_name", "update test from toa");
 
-			Update update = new Update();
-			update.set("xaRequest", request.getOrderCode());
-			update.set("product_name", "update test from toa");
+				provisionRepository.updateProvision(provision, update);
+			}
 
-			provisionRepository.updateProvision(provision, update);
+			
 			return true;
 		}
 

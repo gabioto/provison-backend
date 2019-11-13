@@ -1181,6 +1181,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return false;
 	}
 
+	public boolean getCarrier(String phoneNumber) {
+		return restPSI.getCarrier(phoneNumber);
+	}
+
 	@Override
 	public Customer getCustomerByOrderCode(String orderCode) {
 

@@ -1128,7 +1128,7 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
-	@RequestMapping(value = "/updateTrackingStatus", method = RequestMethod.POST)
+	/*@RequestMapping(value = "/updateTrackingStatus", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Boolean>> updateTrackingStatus(
 			@RequestBody @Valid ApiRequest<UpdateStatusRequest> request) {
 
@@ -1183,7 +1183,7 @@ public class ProvisionController {
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);
-	}
+	}*/
 
 	@RequestMapping(value = "/getProvisionByOrderCode", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> getProvisionByOrderCode(

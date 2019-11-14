@@ -1010,7 +1010,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLog.setStatus(status);
 
 			if (scheduledDate != null)
-				statusLog.setScheduledDate(scheduledDate.toString());
+				statusLog.setScheduledDate(scheduledDate);
 
 			if (scheduledRange != null && !scheduledRange.equals(""))
 				statusLog.setScheduledRange(scheduledRange);
@@ -1188,6 +1188,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			StatusPendiente.setStatus(ConstantsTracking.PENDIENTE);
 			
 			statusLogDummy.setStatus(ConstantsTracking.DUMMY_SCHEDULED);
+			
+			
 			statusLogDummy.setScheduledDate(request.getScheduleDate());
 			statusLogDummy.setScheduledRange(request.getScheduleRange());
 			

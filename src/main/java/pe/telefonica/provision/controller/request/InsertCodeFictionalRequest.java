@@ -1,10 +1,11 @@
 package pe.telefonica.provision.controller.request;
 
+import java.time.LocalDate;
 
 public class InsertCodeFictionalRequest {
 	private String saleCode;
 	private String fictionalCode;
-	private String scheduleDate;
+	private LocalDate scheduleDate;
 	private String scheduleRange;
 	private String bucket;
 
@@ -24,11 +25,11 @@ public class InsertCodeFictionalRequest {
 		this.fictionalCode = fictionalCode;
 	}
 
-	public String getScheduleDate() {
+	public LocalDate getScheduleDate() {
 		return scheduleDate;
 	}
 
-	public void setScheduleDate(String scheduleDate) {
+	public void setScheduleDate(LocalDate scheduleDate) {
 		this.scheduleDate = scheduleDate;
 	}
 

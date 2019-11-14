@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.WoComplete;
 import pe.telefonica.provision.model.provision.WoInit;
-import pe.telefonica.provision.model.provision.WoPrestart;
+import pe.telefonica.provision.model.provision.WoPreStart;
 
 @Document(collection = "collProvision")
 @JsonPropertyOrder({ "idProvision" })
@@ -190,7 +190,7 @@ public class Provision implements Serializable {
 	private InToa inToa;
 	
 	@Field("wo_prestart")
-	private WoPrestart woPrestart;
+	private WoPreStart woPreStart;
 	
 	@Field("in_init")
 	private WoInit woInit;
@@ -634,12 +634,12 @@ public class Provision implements Serializable {
 		this.inToa = inToa;
 	}
 
-	public WoPrestart getWoPrestart() {
-		return woPrestart;
+	public WoPreStart getWoPrestart() {
+		return woPreStart;
 	}
 
-	public void setWoPrestart(WoPrestart woPrestart) {
-		this.woPrestart = woPrestart;
+	public void setWoPrestart(WoPreStart woPrestart) {
+		this.woPreStart = woPrestart;
 	}
 
 	public WoInit getWoInit() {
@@ -684,7 +684,7 @@ public class Provision implements Serializable {
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 		@Field("scheduled_date")
-		private LocalDate scheduledDate = LocalDate.now(ZoneOffset.of("-05:00"));
+		private String scheduledDate; /*= LocalDate.now(ZoneOffset.of("-05:00"));*/
 
 		@Field("scheduled_range")
 		private String scheduledRange;
@@ -705,11 +705,11 @@ public class Provision implements Serializable {
 			this.insertedDate = insertedDate;
 		}
 
-		public LocalDate getScheduledDate() {
+		public String getScheduledDate() {
 			return scheduledDate;
 		}
 
-		public void setScheduledDate(LocalDate scheduledDate) {
+		public void setScheduledDate(String scheduledDate) {
 			this.scheduledDate = scheduledDate;
 		}
 

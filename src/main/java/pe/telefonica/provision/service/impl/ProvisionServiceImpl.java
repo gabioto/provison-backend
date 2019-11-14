@@ -55,6 +55,9 @@ import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.provision.InToa;
+import pe.telefonica.provision.model.provision.WoComplete;
+import pe.telefonica.provision.model.provision.WoInit;
+import pe.telefonica.provision.model.provision.WoPreStart;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.BORequest;
@@ -207,11 +210,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	private Provision fillProvisionInsert(InsertOrderRequest request) {
-		
-		//String separador = Pattern.quote("|");
-		//tring[] getData = request.getData().split(separador);
-		
-		String[] getData = request.getData().split("\\|",-1);
+
+		// String separador = Pattern.quote("|");
+		// tring[] getData = request.getData().split(separador);
+
+		String[] getData = request.getData().split("\\|", -1);
 
 		Provision provision = new Provision();
 
@@ -223,7 +226,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setProductName(getData[10]);
 
 		provision.setXaRequest(getData[11]);
-		
+		provision.setXaIdSt("");
+		provision.setDummyStPsiCode("");
+
 		provision.setCommercialOp(getData[12]);
 		provision.setProductCode(getData[14]);
 		provision.setProductNameSource(getData[15]);
@@ -241,9 +246,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setInstallPrice(getData[35]);
 		provision.setInstallPriceMonth(getData[36]);
 		provision.setProductInternalEquipment(getData[41]);
+		provision.setCodePsCode(getData[28]);
 		provision.setLegacies(getData[42]);
 		provision.setProductSignal(getData[43]);
-		provision.setActiveStatus(ConstantsTracking.PENDIENTE);
+		provision.setActiveStatus(ConstantsTracking.PENDIENTE.toLowerCase());
 
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
@@ -278,10 +284,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 		customer.setDistrict(getData[9]);
 		customer.setProvince(getData[8]);
 		customer.setDepartment(getData[7]);
-		
+
 		System.out.println(getData[23]);
-		System.out.println(getData[24]);
 		
+		System.out.println(getData[24]);
+
 		customer.setLongitude(getData[23]);
 		customer.setLatitude(getData[24]);
 		customer.setOriginData(request.getDataOrigin());
@@ -302,89 +309,87 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setTvDetail(television);
 
 		provision.setCustomer(customer);
-		
+
 		provision.setLastTrackingStatus(ConstantsTracking.PENDIENTE);
 		List<StatusLog> listLog = new ArrayList<>();
-		
+
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(ConstantsTracking.PENDIENTE);
 		listLog.add(statusLog);
-		
+
 		provision.setLogStatus(listLog);
-		
+
 		return provision;
 	}
-	
-	private Update fillProvisionUpdate(String data ) {
-		String getData[] = data.split("\\|",-1);
+
+	private Update fillProvisionUpdate(String data) {
+		String getData[] = data.split("\\|", -1);
 		System.out.println(getData[3]);
-		
-		
-		//Provision provision = new Provision();
+
+		// Provision provision = new Provision();
 
 		Update update = new Update();
 
-		//provision.setSaleSource(getData[0]);
+		// provision.setSaleSource(getData[0]);
 		update.set("sale_source", getData[0]);
-		//provision.setBack(getData[1]);
+		// provision.setBack(getData[1]);
 		update.set("back", getData[1]);
-		//provision.setSaleCode(getData[2]);
-		
-		//provision.setProductName(getData[10]);
+		// provision.setSaleCode(getData[2]);
+
+		// provision.setProductName(getData[10]);
 		update.set("product_name", getData[10]);
-		
-		//provision.setXaRequest(getData[11]);
+
+		// provision.setXaRequest(getData[11]);
 		update.set("xa_request", getData[11]);
-		
-		//provision.setCommercialOp(getData[12]);
+
+		// provision.setCommercialOp(getData[12]);
 		update.set("commercial_op", getData[12]);
-		//provision.setProductCode(getData[14]);
+		// provision.setProductCode(getData[14]);
 		update.set("product_code", getData[14]);
-		//provision.setProductNameSource(getData[15]);
+		// provision.setProductNameSource(getData[15]);
 		update.set("product_name_source", getData[15]);
-		//provision.setKafkaDateSend(getData[17]);
+		// provision.setKafkaDateSend(getData[17]);
 		update.set("kafka_date_send", getData[17]);
-		//provision.setSaleRequestDate(getData[18]);
+		// provision.setSaleRequestDate(getData[18]);
 		update.set("sale_request_date", getData[18]);
-		//provision.setSaleRegisterDate(getData[19]);
+		// provision.setSaleRegisterDate(getData[19]);
 		update.set("sale_register_date", getData[19]);
-		//provision.setProductSub(getData[21]);
+		// provision.setProductSub(getData[21]);
 		update.set("product_sub", getData[21]);
-		//provision.setProductType(getData[22]);
+		// provision.setProductType(getData[22]);
 		update.set("product_type", getData[22]);
-		//provision.setChannelEntered(getData[26]);
+		// provision.setChannelEntered(getData[26]);
 		update.set("channel_entered", getData[26]);
-		//provision.setProtectedData(getData[27]);
+		// provision.setProtectedData(getData[27]);
 		update.set("protected_data", getData[27]);
-		//provision.setRegularPrice(getData[29]);
+		// provision.setRegularPrice(getData[29]);
 		update.set("regular_price", getData[29]);
-		//provision.setPromoPrice(getData[30]);
+		// provision.setPromoPrice(getData[30]);
 		update.set("promo_price", getData[30]);
-		//provision.setCampaign(getData[31]);
+		// provision.setCampaign(getData[31]);
 		update.set("campaign", getData[31]);
-		//provision.setPaymentMethod(getData[34]);
+		// provision.setPaymentMethod(getData[34]);
 		update.set("payment_method", getData[34]);
-		//provision.setInstallPrice(getData[35]);
+		// provision.setInstallPrice(getData[35]);
 		update.set("install_price", getData[35]);
-		//provision.setInstallPriceMonth(getData[36]);
+		// provision.setInstallPriceMonth(getData[36]);
 		update.set("install_price_month", getData[36]);
-		//provision.setProductInternalEquipment(getData[41]);
+		// provision.setProductInternalEquipment(getData[41]);
 		update.set("product_internal_equipment", getData[41]);
-		//provision.setLegacies(getData[42]);
+		// provision.setLegacies(getData[42]);
 		update.set("legacies", getData[42]);
-		//provision.setProductSignal(getData[43]);
+		// provision.setProductSignal(getData[43]);
 		update.set("product_signal", getData[43]);
-		
-		
-		//provision.setActiveStatus("pendiente");
-		
+
+		// provision.setActiveStatus("pendiente");
+
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
 		productPsAdmin.add(getData[45]);
 		productPsAdmin.add(getData[46]);
 		productPsAdmin.add(getData[47]);
 
-		//provision.setProductPsAdmin(productPsAdmin);
+		// provision.setProductPsAdmin(productPsAdmin);
 		update.set("product_ps_admin", productPsAdmin);
 
 		List<String> svaCode = new ArrayList<>();
@@ -400,90 +405,96 @@ public class ProvisionServiceImpl implements ProvisionService {
 		svaCode.add(getData[56]);
 		svaCode.add(getData[57]);
 
-		//provision.setSvaCode(svaCode);
+		// provision.setSvaCode(svaCode);
 		update.set("sva_code", svaCode);
 
-		//Customer customer = new Customer();
-		//customer.setName(getData[3]);
+		// Customer customer = new Customer();
+		// customer.setName(getData[3]);
 		update.set("customer.name", getData[3]);
-		//customer.setDocumentType(getData[13]);
+		// customer.setDocumentType(getData[13]);
 		update.set("customer.document_type", getData[13]);
-		//customer.setDocumentNumber(getData[4]);
+		// customer.setDocumentNumber(getData[4]);
 		update.set("customer.document_number", getData[4]);
-		//customer.setPhoneNumber(getData[5]);
+		// customer.setPhoneNumber(getData[5]);
 		update.set("customer.phone_number", getData[5]);
-		//customer.setMail(getData[20]);
+		// customer.setMail(getData[20]);
 		update.set("customer.mail", getData[20]);
-		//customer.setAddress(getData[6]);
+		// customer.setAddress(getData[6]);
 		update.set("customer.address", getData[6]);
-		//customer.setDistrict(getData[9]);
+		// customer.setDistrict(getData[9]);
 		update.set("customer.district", getData[9]);
-		//customer.setProvince(getData[8]);
+		// customer.setProvince(getData[8]);
 		update.set("customer.province", getData[8]);
-		//customer.setDepartment(getData[7]);
+		// customer.setDepartment(getData[7]);
 		update.set("customer.department", getData[7]);
-		//customer.setLongitude(Double.parseDouble(getData[23]));
+		// customer.setLongitude(Double.parseDouble(getData[23]));
 		update.set("customer.longitude", getData[23]);
-		//customer.setLatitude(Double.parseDouble(getData[24]));
+		// customer.setLatitude(Double.parseDouble(getData[24]));
 		update.set("customer.latitude", getData[24]);
 
-		//Internet internet = new Internet();
-		//internet.setSpeed(getData[25]);
+		// Internet internet = new Internet();
+		// internet.setSpeed(getData[25]);
 		update.set("internet_detail.speed", getData[25]);
-		//internet.setTimePromoSpeed(getData[32]);
+		// internet.setTimePromoSpeed(getData[32]);
 		update.set("internet_detail.time_promo_speed", getData[32]);
-		//internet.setPromoSpeed(getData[33]);
+		// internet.setPromoSpeed(getData[33]);
 		update.set("internet_detail.promo_speed", getData[33]);
-		//internet.setTechnology(getData[37]);
+		// internet.setTechnology(getData[37]);
 		update.set("internet_detail.technology", getData[37]);
-		
-		//provision.setInternetDetail(internet);
 
-		//Television television = new Television();
-		//television.setTechnology(getData[38]);
+		// provision.setInternetDetail(internet);
+
+		// Television television = new Television();
+		// television.setTechnology(getData[38]);
 		update.set("television_detail.technology", getData[38]);
-		//television.setTvSignal(getData[39]);
+		// television.setTvSignal(getData[39]);
 		update.set("television_detail.tv_signal", getData[39]);
-		//television.setEquipment(getData[40]);
+		// television.setEquipment(getData[40]);
 		update.set("television_detail.equipment", getData[40]);
 
-		//provision.setTvDetail(television);
+		// provision.setTvDetail(television);
 
-		//provision.setCustomer(customer);
+		// provision.setCustomer(customer);
 		return update;
-		//return null;
+		// return null;
 	}
+
 	@Override
 	public boolean insertProvision(InsertOrderRequest request) {
 
 		String data = "VENTASFIJA_PARKUR|TGESTIONA_FVD|MT15149|ARMANDO AUGUSTO CALVO QUIROZ CALVO QUIROZ|07578669|987654321|AVDMIRO QUESADA, AURELIO          260   INT:1401 - URB SANTA INES-|LIMA|LIMA|SAN ISIDRO|Movistar Total 24GB TV Estándar Digital HD 60Mbps||MIGRACION|DNI||CAIDA|07/11/2019 15:56:57|05/11/2019 20:40:57||pruebas@hotmail.com||TRIO||||59|No||59|||MOVISTAR TOTAL|||NO APLICA||||||||ATIS||||||||||||||||||||||||||||||||||||||";
-		//String getData[] = data.split("\\|");
+		// String getData[] = data.split("\\|");
 		String getData[] = request.getData().split("\\|");
 		Provision provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
-		if(provisionx != null) {
-			
-			Update update = fillProvisionUpdate(data);
-			
+		if (provisionx != null) {
+
+			Update update = fillProvisionUpdate(request.getData());
+
 			List<StatusLog> listLog = provisionx.getLogStatus();
-			
+
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(request.getStatus());
-		//	status_toa
-			update.set("active_status", request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? Constants.PROVISION_STATUS_ACTIVE: Constants.PROVISION_STATUS_CANCELLED);
-			//update.set("status_toa", request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? Constants.PROVISION_STATUS_ACTIVE: Constants.PROVISION_STATUS_CANCELLED);
-			
+			// status_toa
+			update.set("active_status",
+					request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO)
+							? Constants.PROVISION_STATUS_ACTIVE
+							: Constants.PROVISION_STATUS_CANCELLED);
+			// update.set("status_toa",
+			// request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ?
+			// Constants.PROVISION_STATUS_ACTIVE: Constants.PROVISION_STATUS_CANCELLED);
+
 			update.set("last_tracking_status", request.getStatus());
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
-			
-			//provisionx.setLogStatus(listLog);
-			
+
+			// provisionx.setLogStatus(listLog);
+
 			provisionRepository.updateProvision(provisionx, update);
-			
+
 		} else {
-			
+
 			provisionRepository.insertProvision(fillProvisionInsert(request));
-			
+
 		}
 		return true;
 	}
@@ -999,7 +1010,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLog.setStatus(status);
 
 			if (scheduledDate != null)
-				statusLog.setScheduledDate(scheduledDate);
+				statusLog.setScheduledDate(scheduledDate.toString());
 
 			if (scheduledRange != null && !scheduledRange.equals(""))
 				statusLog.setScheduledRange(scheduledRange);
@@ -1113,17 +1124,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			Update update = new Update();
 
-			//update.set("customer.contact_name", contactName1);
-			//update.set("customer.contact_name1", contactName2);
-			//update.set("customer.contact_name2", contactName3);
-			//update.set("customer.contact_name3", contactName4);
+			// update.set("customer.contact_name", contactName1);
+			// update.set("customer.contact_name1", contactName2);
+			// update.set("customer.contact_name2", contactName3);
+			// update.set("customer.contact_name3", contactName4);
 
 			update.set("customer.mail", request.getEmail());
 
-			//update.set("customer.contact_phone_number", Integer.valueOf(contactPhone1));
-			//update.set("customer.contact_phone_number1", Integer.valueOf(contactPhone2));
-			//update.set("customer.contact_phone_number2", Integer.valueOf(contactPhone3));
-			//update.set("customer.contact_phone_number3", Integer.valueOf(contactPhone4));
+			// update.set("customer.contact_phone_number", Integer.valueOf(contactPhone1));
+			// update.set("customer.contact_phone_number1", Integer.valueOf(contactPhone2));
+			// update.set("customer.contact_phone_number2", Integer.valueOf(contactPhone3));
+			// update.set("customer.contact_phone_number3", Integer.valueOf(contactPhone4));
 
 			update.set("contacts", contactsList);
 			// update.set("customer.contact_carrier",
@@ -1144,9 +1155,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public boolean provisionInsertCodeFictional(InsertCodeFictionalRequest request) {
 
 		Provision provision = provisionRepository.getProvisionBySaleCode(request.getSaleCode());
+		
 		if (provision != null) {
 			Update update = new Update();
-			update.set("sale_code", request.getSaleCode());
+			List<StatusLog> listLog = provision.getLogStatus();
+			
+			update.set("dummy_st_psi_code", request.getFictionalCode());
+			
+			StatusLog statusLog = new StatusLog();
+			statusLog.setStatus(ConstantsTracking.DUMMY_SCHEDULED);
+			statusLog.setScheduledDate(request.getScheduleDate());
+			statusLog.setScheduledRange(request.getScheduleRange());
+		
+			update.set("work_zone", request.getBucket());
+			update.set("last_tracking_status", ConstantsTracking.DUMMY_SCHEDULED);
+			listLog.add(statusLog);
+			update.set("log_status", listLog);
 
 			provisionRepository.updateProvision(provision, update);
 
@@ -1156,6 +1180,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setSaleCode(request.getSaleCode());
 			provisionAdd.setDummyStPsiCode(request.getFictionalCode());
+			provisionAdd.setActiveStatus(ConstantsTracking.PENDIENTE.toLowerCase());
+			List<StatusLog> listLog = new ArrayList<>();
+			
+			StatusLog StatusPendiente = new StatusLog();
+			StatusLog statusLogDummy = new StatusLog();
+			StatusPendiente.setStatus(ConstantsTracking.PENDIENTE);
+			
+			statusLogDummy.setStatus(ConstantsTracking.DUMMY_SCHEDULED);
+			statusLogDummy.setScheduledDate(request.getScheduleDate());
+			statusLogDummy.setScheduledRange(request.getScheduleRange());
+			
+			listLog.add(StatusPendiente);
+			listLog.add(statusLogDummy);
+			
+			provisionAdd.setLogStatus(listLog);
+			provisionAdd.setLastTrackingStatus(ConstantsTracking.DUMMY_SCHEDULED);
 
 			provisionRepository.insertProvision(provisionAdd);
 
@@ -1168,59 +1208,121 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) {
 
 		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
-		
-		String[] getData = request.getData().split("\\|",-1);
-		
+		List<StatusLog> listLog = provision.getLogStatus();
+		String[] getData = request.getData().split("\\|", -1);
+
 		if (provision != null) {
-			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.IN_TOA)) {
-				
-				
-				
+			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.IN_TOA)) {
+
 				Update update = new Update();
 				update.set("xa_creation_date", getData[3]);
 				update.set("xa_id_st", getData[4]);
 				update.set("xa_requirement_number", getData[5]);
-				update.set("appt_number", getData[6] );
+				update.set("appt_number", getData[6]);
 				update.set("activity_type", getData[8]);
 				update.set("work_zone", getData[16]);
-				
+
 				InToa inToa = new InToa();
-				
+
 				inToa.setXaNote(getData[9]);
-				//update.set("xa_note", getData[9]);
+				// update.set("xa_note", getData[9]);
 				inToa.setDate(getData[15]);
-				//update.set("date", getData[15]);
+				// update.set("date", getData[15]);
 				inToa.setXaScheduler(getData[16]);
-				//update.set("xa_scheduler", getData[16]);
+				// update.set("xa_scheduler", getData[16]);
 				inToa.setLongitude(getData[18]);
-				//update.set("longitude", getData[18]);
+				// update.set("longitude", getData[18]);
 				inToa.setLatitude(getData[19]);
-				//update.set("latitude", getData[19]);
-				
+				// update.set("latitude", getData[19]);
+
 				update.set("in_toa", inToa);
-				
-				List<StatusLog> listLog = provision.getLogStatus();
-				
+
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(ConstantsTracking.IN_TOA);
-					
 				update.set("last_tracking_status", ConstantsTracking.IN_TOA);
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-				
+
 				provisionRepository.updateProvision(provision, update);
 				return true;
 			}
-			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_PRESTAR)) {
-				
+			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_PRESTAR)) {
+
 				Update update = new Update();
 				update.set("external_id", getData[1]);
-				
-				
-				
+
+				WoPreStart woPreStart = new WoPreStart();
+
+				woPreStart.setNameResource(getData[3]);
+				woPreStart.setDate(getData[4]);
+				update.set("wo_prestart", woPreStart);
+
+				StatusLog statusLog = new StatusLog();
+				statusLog.setStatus(ConstantsTracking.WO_PRESTAR);
+				update.set("last_tracking_status", ConstantsTracking.WO_PRESTAR);
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
+
+				provisionRepository.updateProvision(provision, update);
+				return true;
+
 			}
-			
-			
+
+			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_INIT)) {
+
+				Update update = new Update();
+
+				WoInit woInit = new WoInit();
+
+				woInit.setNameResource(getData[2]);
+				woInit.setEtaStartTime(getData[10]);
+				woInit.setEtaEndTime(getData[2]);
+				woInit.setXaCreationDate(getData[6]);
+				woInit.setDate(getData[23]);
+				woInit.setXaNote(getData[15]);
+				update.set("wo_init", woInit);
+
+				StatusLog statusLog = new StatusLog();
+
+				statusLog.setStatus(ConstantsTracking.WO_INIT);
+				update.set("last_tracking_status", ConstantsTracking.WO_INIT);
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
+
+				provisionRepository.updateProvision(provision, update);
+				return true;
+
+			}
+
+			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_COMPLETE)) {
+				Update update = new Update();
+
+				WoComplete woComplete = new WoComplete();
+
+				woComplete.setXaCreationDate(getData[7]);
+				woComplete.setDate(getData[4]);
+				woComplete.setXaNote(getData[14]);
+				woComplete.setEtaStartTime(getData[2]);
+				woComplete.setEtaEndTime(getData[3]);
+
+				woComplete.setObservation(getData[22]);
+				woComplete.setReceivePersonName(getData[23]);
+				woComplete.setReceivePersonId(getData[24]);
+				woComplete.setRelationship(getData[25]);
+				update.set("wo_complete", woComplete);
+
+				StatusLog statusLog = new StatusLog();
+
+				statusLog.setStatus(ConstantsTracking.WO_COMPLETE);
+				update.set("last_tracking_status", ConstantsTracking.WO_COMPLETE);
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
+
+				provisionRepository.updateProvision(provision, update);
+				return true;
+
+			}
+
 		}
 
 		return false;

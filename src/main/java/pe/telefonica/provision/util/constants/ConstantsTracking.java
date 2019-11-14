@@ -10,5 +10,7 @@ public class ConstantsTracking {
 	public static final String WO_INIT = "WO_INIT";
 	public static final String WO_COMPLETE = "WO_COMPLETE";
 	
+	public static final String DUMMY_SCHEDULED = "DUMMY_SCHEDULED";
+	
 
 }

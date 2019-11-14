@@ -55,12 +55,13 @@ import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.provision.InToa;
-import pe.telefonica.provision.model.provision.WoComplete;
+import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.BORequest;
+import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ConstantsTracking;
@@ -793,12 +794,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		MailParameter mailParameter3 = new MailParameter();
 		mailParameter3.setParamKey("CONTACTFULLNAME");
-		mailParameter3.setParamValue(provision.getCustomer().getContactName());
+		mailParameter3.setParamValue("contact name");
 		mailParameters.add(mailParameter3);
 
 		MailParameter mailParameter4 = new MailParameter();
 		mailParameter4.setParamKey("CONTACTID");
-		mailParameter4.setParamValue(provision.getCustomer().getContactPhoneNumber().toString());
+		mailParameter4.setParamValue("123456789");
 		mailParameters.add(mailParameter4);
 
 		MailParameter mailParameter5 = new MailParameter();
@@ -869,13 +870,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
-			provision.getCustomer().setContactName(contactFullname);
-			provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
+			//provision.getCustomer().setContactName(contactFullname);
+			//provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
 			provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());
 
 			// boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-			boolean contactUpdated = restPSI.updatePSIClient(provision);
-
+			//boolean contactUpdated = restPSI.updatePSIClient(provision);
+			boolean contactUpdated = true;
 			if (contactUpdated) {
 				Update update = new Update();
 				update.set("customer.contact_name", contactFullname);
@@ -1035,22 +1036,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) {
 
 		Provision provision = provisionRepository.getProvisionByDummyStPsiCode(request.getPsiCode());
-
+		
+		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
 		if (provision != null) {
 
 			// Provision provision = optional.get();
 			List<ContactRequest> listContact = request.getContacts();
 			List<Contacts> contactsList = new ArrayList<>();
-
-			String contactName1 = "";
-			String contactName2 = "";
-			String contactName3 = "";
-			String contactName4 = "";
-
-			Integer contactPhone1 = 0;
-			Integer contactPhone2 = 0;
-			Integer contactPhone3 = 0;
-			Integer contactPhone4 = 0;
 
 			for (int a = 0; a < 4; a++) {
 
@@ -1066,48 +1058,44 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 
 				if (a == 0) {
-					contactName1 = a < quanty_contact ? listContact.get(a).getFullName() : null;
-					contactPhone1 = a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0;
-
-					provision.getCustomer()
-							.setContactName(a < quanty_contact ? listContact.get(a).getFullName() : null);
-					provision.getCustomer()
-							.setContactPhoneNumber(a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0);
+					
+					
+					psiRequest.getBodyUpdateClient().setNombre_completo(a < quanty_contact ? listContact.get(a).getFullName() : "");
+					psiRequest.getBodyUpdateClient().setTelefono1(a < quanty_contact ? listContact.get(a).getPhoneNumber().toString() : "");
+					
+					
 				}
 				if (a == 1) {
+					
 
-					contactName2 = a < quanty_contact ? listContact.get(a).getFullName() : null;
-					contactPhone2 = a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0;
+					psiRequest.getBodyUpdateClient().setNombre_completo2(a < quanty_contact ? listContact.get(a).getFullName() : "");
+					psiRequest.getBodyUpdateClient().setTelefono2(a < quanty_contact ? listContact.get(a).getPhoneNumber().toString() : "");
+				
 
-					provision.getCustomer()
-							.setContactName1(a < quanty_contact ? listContact.get(a).getFullName() : null);
-					provision.getCustomer()
-							.setContactPhoneNumber1(a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0);
 				}
 				if (a == 2) {
-
-					contactName3 = a < quanty_contact ? listContact.get(a).getFullName() : null;
-					contactPhone3 = a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0;
-
-					provision.getCustomer()
-							.setContactName2(a < quanty_contact ? listContact.get(a).getFullName() : null);
-					provision.getCustomer()
-							.setContactPhoneNumber2(a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0);
+					psiRequest.getBodyUpdateClient().setNombre_completo3(a < quanty_contact ? listContact.get(a).getFullName() : "");
+					psiRequest.getBodyUpdateClient().setTelefono3(a < quanty_contact ? listContact.get(a).getPhoneNumber().toString() : "");
+				
+					
 				}
 				if (a == 3) {
-
-					contactName4 = a < quanty_contact ? listContact.get(a).getFullName() : null;
-					contactPhone4 = a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0;
-
-					provision.getCustomer()
-							.setContactName3(a < quanty_contact ? listContact.get(a).getFullName() : null);
-					provision.getCustomer()
-							.setContactPhoneNumber3(a < quanty_contact ? listContact.get(a).getPhoneNumber() : 0);
+					psiRequest.getBodyUpdateClient().setNombre_completo4(a < quanty_contact ? listContact.get(a).getFullName() : "");
+					psiRequest.getBodyUpdateClient().setTelefono4(a < quanty_contact ? listContact.get(a).getPhoneNumber().toString() : "");
+				
 				}
 
 			}
-			provision.getCustomer().setMail(request.getEmail());
-
+			
+			psiRequest.getBodyUpdateClient().setCorreo(request.getEmail());
+			psiRequest.getBodyUpdateClient().setSolicitud(provision.getDummyStPsiCode());
+			
+			
+			Customer customer = provision.getCustomer() != null ? provision.getCustomer() : new Customer();
+			
+			customer.setMail(request.getEmail());
+			
+			provision.setCustomer(customer);
 			provision.setContacts(contactsList);
 
 			/*
@@ -1120,7 +1108,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			// boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
 
-			restPSI.updatePSIClient(provision);
+			restPSI.updatePSIClient(psiRequest);
 
 			Update update = new Update();
 
@@ -1296,27 +1284,27 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_COMPLETE)) {
+			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_COMPLETED)) {
 				Update update = new Update();
 
-				WoComplete woComplete = new WoComplete();
+				WoCompleted woCompleted = new WoCompleted();
 
-				woComplete.setXaCreationDate(getData[7]);
-				woComplete.setDate(getData[4]);
-				woComplete.setXaNote(getData[14]);
-				woComplete.setEtaStartTime(getData[2]);
-				woComplete.setEtaEndTime(getData[3]);
+				woCompleted.setXaCreationDate(getData[7]);
+				woCompleted.setDate(getData[4]);
+				woCompleted.setXaNote(getData[14]);
+				woCompleted.setEtaStartTime(getData[2]);
+				woCompleted.setEtaEndTime(getData[3]);
 
-				woComplete.setObservation(getData[22]);
-				woComplete.setReceivePersonName(getData[23]);
-				woComplete.setReceivePersonId(getData[24]);
-				woComplete.setRelationship(getData[25]);
-				update.set("wo_complete", woComplete);
+				woCompleted.setObservation(getData[22]);
+				woCompleted.setReceivePersonName(getData[23]);
+				woCompleted.setReceivePersonId(getData[24]);
+				woCompleted.setRelationship(getData[25]);
+				update.set("wo_completed", woCompleted);
 
 				StatusLog statusLog = new StatusLog();
 
-				statusLog.setStatus(ConstantsTracking.WO_COMPLETE);
-				update.set("last_tracking_status", ConstantsTracking.WO_COMPLETE);
+				statusLog.setStatus(ConstantsTracking.WO_COMPLETED);
+				update.set("last_tracking_status", ConstantsTracking.WO_COMPLETED);
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 

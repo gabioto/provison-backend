@@ -44,29 +44,7 @@ public class Customer implements Serializable {
 	@Field("reference")
 	private String reference;
 
-	@Field("contact_name")
-	private String contactName;
 
-	@Field("contact_name1")
-	private String contactName1;
-
-	@Field("contact_name2")
-	private String contactName2;
-
-	@Field("contact_name3")
-	private String contactName3;
-
-	@Field("contact_phone_number")
-	private Integer contactPhoneNumber;
-
-	@Field("contact_phone_number1")
-	private Integer contactPhoneNumber1;
-
-	@Field("contact_phone_number2")
-	private Integer contactPhoneNumber2;
-
-	@Field("contact_phone_number3")
-	private Integer contactPhoneNumber3;
 
 	@Field("latitude")
 	private String latitude;
@@ -174,70 +152,7 @@ public class Customer implements Serializable {
 	public void setReference(String reference) {
 		this.reference = reference;
 	}
-
-	public String getContactName() {
-		return contactName;
-	}
-
-	public void setContactName(String contactName) {
-		this.contactName = contactName;
-	}
-
-	public String getContactName1() {
-		return contactName1;
-	}
-
-	public void setContactName1(String contactName1) {
-		this.contactName1 = contactName1;
-	}
-
-	public String getContactName2() {
-		return contactName2;
-	}
-
-	public void setContactName2(String contactName2) {
-		this.contactName2 = contactName2;
-	}
-
-	public String getContactName3() {
-		return contactName3;
-	}
-
-	public void setContactName3(String contactName3) {
-		this.contactName3 = contactName3;
-	}
-
-	public Integer getContactPhoneNumber() {
-		return contactPhoneNumber;
-	}
-
-	public void setContactPhoneNumber(Integer contactPhoneNumber) {
-		this.contactPhoneNumber = contactPhoneNumber;
-	}
-
-	public Integer getContactPhoneNumber1() {
-		return contactPhoneNumber1;
-	}
-
-	public void setContactPhoneNumber1(Integer contactPhoneNumber1) {
-		this.contactPhoneNumber1 = contactPhoneNumber1;
-	}
-
-	public Integer getContactPhoneNumber2() {
-		return contactPhoneNumber2;
-	}
-
-	public void setContactPhoneNumber2(Integer contactPhoneNumber2) {
-		this.contactPhoneNumber2 = contactPhoneNumber2;
-	}
-
-	public Integer getContactPhoneNumber3() {
-		return contactPhoneNumber3;
-	}
-
-	public void setContactPhoneNumber3(Integer contactPhoneNumber3) {
-		this.contactPhoneNumber3 = contactPhoneNumber3;
-	}
+	
 
 	public String getLatitude() {
 		return latitude;

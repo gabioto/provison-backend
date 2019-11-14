@@ -56,8 +56,8 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 		boRequest.setNrodocumentotitular(provision.getCustomer().getDocumentNumber());
 		boRequest.setNombretitular(provision.getCustomer().getName());
 		boRequest.setTelefonotitular(String.valueOf(provision.getCustomer().getPhoneNumber()));
-		boRequest.setTelefonocontacto(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
-		boRequest.setNombrecontacto(provision.getCustomer().getContactName());
+		boRequest.setTelefonocontacto(String.valueOf("123456789"));
+		boRequest.setNombrecontacto("contact name");
 		boRequest.setCorreotitular(provision.getCustomer().getMail());
 		boRequest.setDireccion(provision.getCustomer().getAddress());
 		boRequest.setFechaagenda(formattedDate);

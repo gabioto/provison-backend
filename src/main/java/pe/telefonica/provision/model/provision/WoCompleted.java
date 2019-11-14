@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class WoComplete implements Serializable {
+public class WoCompleted implements Serializable {
 	private static final long serialVersionUID = 3775714898258466530L;
 
 	@Field("xa_creation_date")

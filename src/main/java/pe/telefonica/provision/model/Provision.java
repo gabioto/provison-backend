@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import pe.telefonica.provision.model.provision.InToa;
-import pe.telefonica.provision.model.provision.WoComplete;
+import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
 
@@ -195,8 +195,8 @@ public class Provision implements Serializable {
 	@Field("in_init")
 	private WoInit woInit;
 	
-	@Field("wo_complete")
-	private WoComplete woComplete;
+	@Field("wo_completed")
+	private WoCompleted woCompleted;
 	
 	
 	
@@ -650,12 +650,12 @@ public class Provision implements Serializable {
 		this.woInit = woInit;
 	}
 
-	public WoComplete getWoComplete() {
-		return woComplete;
+	public WoCompleted getWoComplete() {
+		return woCompleted;
 	}
 
-	public void setWoComplete(WoComplete woComplete) {
-		this.woComplete = woComplete;
+	public void setWoComplete(WoCompleted woComplete) {
+		this.woCompleted = woComplete;
 	}
 
 	public Provision() {

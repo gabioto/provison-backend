@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class WoPrestar implements Serializable {
+public class WoPrestart implements Serializable {
 
 	private static final long serialVersionUID = 3375714898258466530L;
 

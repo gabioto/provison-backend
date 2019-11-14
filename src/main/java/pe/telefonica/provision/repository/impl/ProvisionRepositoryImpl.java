@@ -45,6 +45,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
 						.is(documentNumber)
+						.and("xa_request").ne("")
+						.and("work_zone").ne("")
+						.and("xa_id_st").ne("")
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
 				Provision.class);

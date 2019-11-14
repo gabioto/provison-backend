@@ -14,6 +14,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import pe.telefonica.provision.model.provision.InToa;
+import pe.telefonica.provision.model.provision.WoComplete;
+import pe.telefonica.provision.model.provision.WoInit;
+import pe.telefonica.provision.model.provision.WoPrestart;
+
 @Document(collection = "collProvision")
 @JsonPropertyOrder({ "idProvision" })
 public class Provision implements Serializable {
@@ -74,6 +79,9 @@ public class Provision implements Serializable {
 
 	@Field("protected_data")
 	private String protectedData;
+
+	@Field("code_ps_code")
+	private String codePsCode;
 
 	@Field("kafka_date_send")
 	private String kafkaDateSend;
@@ -176,7 +184,23 @@ public class Provision implements Serializable {
 
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
-
+	
+	
+	@Field("in_toa")
+	private InToa inToa;
+	
+	@Field("wo_prestart")
+	private WoPrestart woPrestart;
+	
+	@Field("in_init")
+	private WoInit woInit;
+	
+	@Field("wo_complete")
+	private WoComplete woComplete;
+	
+	
+	
+	
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -257,8 +281,6 @@ public class Provision implements Serializable {
 		this.xaIdSt = xaIdSt;
 	}
 
-	
-
 	public String getDummyStPsiCode() {
 		return dummyStPsiCode;
 	}
@@ -321,6 +343,14 @@ public class Provision implements Serializable {
 
 	public void setProtectedData(String protectedData) {
 		this.protectedData = protectedData;
+	}
+
+	public String getCodePsCode() {
+		return codePsCode;
+	}
+
+	public void setCodePsCode(String codePsCode) {
+		this.codePsCode = codePsCode;
 	}
 
 	public String getKafkaDateSend() {
@@ -593,6 +623,39 @@ public class Provision implements Serializable {
 
 	public void setLogStatus(List<StatusLog> logStatus) {
 		this.logStatus = logStatus;
+	}
+	
+	
+	public InToa getInToa() {
+		return inToa;
+	}
+
+	public void setInToa(InToa inToa) {
+		this.inToa = inToa;
+	}
+
+	public WoPrestart getWoPrestart() {
+		return woPrestart;
+	}
+
+	public void setWoPrestart(WoPrestart woPrestart) {
+		this.woPrestart = woPrestart;
+	}
+
+	public WoInit getWoInit() {
+		return woInit;
+	}
+
+	public void setWoInit(WoInit woInit) {
+		this.woInit = woInit;
+	}
+
+	public WoComplete getWoComplete() {
+		return woComplete;
+	}
+
+	public void setWoComplete(WoComplete woComplete) {
+		this.woComplete = woComplete;
 	}
 
 	public Provision() {

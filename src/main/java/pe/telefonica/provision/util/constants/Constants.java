@@ -11,6 +11,8 @@ public final class Constants {
 	public static final String PROVISION_STATUS_ACTIVE = "active";
 	public static final String PROVISION_STATUS_ADDRESS_CHANGED = "addressChanged";
 	public static final String PROVISION_STATUS_CANCELLED = "cancelled";
+	public static final String PROVISION_STATUS_COMPLETED = "completed";
+	
 
 	public static final String DATE_FORMAT_WS = "dd/MM/yyyy";
 	public static final String DATE_FORMAT_BO = "yyyy-MM-dd";
@@ -58,6 +60,8 @@ public final class Constants {
 	public static final String PSI_CODE_CANCEL = "203";
 	public static final String PSI_CODE_UPDATE_CONTACT = "204";
 
+	public static final String GET_ORDERS = "205";
+	
 	public static final String OPER_SEND_SMS_BY_ID = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID = "OPER_SEND_MAIL_BY_ID";
 

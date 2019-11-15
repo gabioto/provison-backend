@@ -4,8 +4,11 @@ import java.io.Serializable;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class WoComplete implements Serializable {
+public class WoCompleted implements Serializable {
 	private static final long serialVersionUID = 3775714898258466530L;
+
+	@Field("xa_creation_date")
+	private String xaCreationDate;
 
 	@Field("eta_start_time")
 	private String etaStartTime;
@@ -60,6 +63,14 @@ public class WoComplete implements Serializable {
 
 	@Field("complete_rep_cbl")
 	private String completeRepCbl;
+
+	public String getXaCreationDate() {
+		return xaCreationDate;
+	}
+
+	public void setXaCreationDate(String xaCreationDate) {
+		this.xaCreationDate = xaCreationDate;
+	}
 
 	public String getEtaStartTime() {
 		return etaStartTime;

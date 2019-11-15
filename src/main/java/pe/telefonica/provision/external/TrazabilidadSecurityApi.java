@@ -159,13 +159,12 @@ public class TrazabilidadSecurityApi {
 		contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); // TODO: Cambiar integer a string
 		contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
 
-		if (customer.getContactPhoneNumber() != null) {
+		/*if (customer.getContactPhoneNumber() != null) {
 			Contact contactContact = new Contact();
-			contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString()); // TODO: Cambiar integer a
-																						// string
+			contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString()); 
 			contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
 			contacts.add(contactContact);
-		}
+		}*/
 
 		contacts.add(contactCustomer);
 

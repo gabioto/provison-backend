@@ -14,6 +14,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import pe.telefonica.provision.model.provision.InToa;
+import pe.telefonica.provision.model.provision.WoCompleted;
+import pe.telefonica.provision.model.provision.WoInit;
+import pe.telefonica.provision.model.provision.WoPreStart;
+
 @Document(collection = "collProvision")
 @JsonPropertyOrder({ "idProvision" })
 public class Provision implements Serializable {
@@ -74,6 +79,9 @@ public class Provision implements Serializable {
 
 	@Field("protected_data")
 	private String protectedData;
+
+	@Field("code_ps_code")
+	private String codePsCode;
 
 	@Field("kafka_date_send")
 	private String kafkaDateSend;
@@ -176,7 +184,23 @@ public class Provision implements Serializable {
 
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
-
+	
+	
+	@Field("in_toa")
+	private InToa inToa;
+	
+	@Field("wo_prestart")
+	private WoPreStart woPreStart;
+	
+	@Field("in_init")
+	private WoInit woInit;
+	
+	@Field("wo_completed")
+	private WoCompleted woCompleted;
+	
+	
+	
+	
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -257,8 +281,6 @@ public class Provision implements Serializable {
 		this.xaIdSt = xaIdSt;
 	}
 
-	
-
 	public String getDummyStPsiCode() {
 		return dummyStPsiCode;
 	}
@@ -321,6 +343,14 @@ public class Provision implements Serializable {
 
 	public void setProtectedData(String protectedData) {
 		this.protectedData = protectedData;
+	}
+
+	public String getCodePsCode() {
+		return codePsCode;
+	}
+
+	public void setCodePsCode(String codePsCode) {
+		this.codePsCode = codePsCode;
 	}
 
 	public String getKafkaDateSend() {
@@ -594,6 +624,39 @@ public class Provision implements Serializable {
 	public void setLogStatus(List<StatusLog> logStatus) {
 		this.logStatus = logStatus;
 	}
+	
+	
+	public InToa getInToa() {
+		return inToa;
+	}
+
+	public void setInToa(InToa inToa) {
+		this.inToa = inToa;
+	}
+
+	public WoPreStart getWoPrestart() {
+		return woPreStart;
+	}
+
+	public void setWoPrestart(WoPreStart woPrestart) {
+		this.woPreStart = woPrestart;
+	}
+
+	public WoInit getWoInit() {
+		return woInit;
+	}
+
+	public void setWoInit(WoInit woInit) {
+		this.woInit = woInit;
+	}
+
+	public WoCompleted getWoComplete() {
+		return woCompleted;
+	}
+
+	public void setWoComplete(WoCompleted woComplete) {
+		this.woCompleted = woComplete;
+	}
 
 	public Provision() {
 
@@ -621,7 +684,7 @@ public class Provision implements Serializable {
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 		@Field("scheduled_date")
-		private LocalDate scheduledDate = LocalDate.now(ZoneOffset.of("-05:00"));
+		private LocalDate scheduledDate; /*= LocalDate.now(ZoneOffset.of("-05:00"));*/
 
 		@Field("scheduled_range")
 		private String scheduledRange;

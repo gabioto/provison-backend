@@ -61,7 +61,7 @@ public class PSIApi extends ConfigRestTemplate {
 	@Autowired
 	private IBMSecuritySeguridad security;
 
-	public Boolean updatePSIClient(Provision provision) {
+	public Boolean updatePSIClient(PSIUpdateClientRequest requestx) {
 		String oAuthToken;
 
 		RestTemplate restTemplate = new RestTemplate(
@@ -75,7 +75,7 @@ public class PSIApi extends ConfigRestTemplate {
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
 		log.info("updatePSIClient - URL: " + requestUrl);
 
-		PSIUpdateClientRequest request = new PSIUpdateClientRequest();
+		PSIUpdateClientRequest request = requestx;
 		request.getHeaderIn().setCountry("PE");
 		request.getHeaderIn().setLang("es");
 		request.getHeaderIn().setEntity("TDP");
@@ -93,7 +93,7 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
 		
-		System.out.println(provision.getCustomer().getContactPhoneNumber3());
+		
 		/*
 		 * request.getHeaderIn().setSystem("COL");
 		 * request.getHeaderIn().setSubsystem("TRA");
@@ -114,8 +114,9 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getBodyUpdateClient().getUser().setLogin("appmovistar");
 		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
 		request.getBodyUpdateClient().getUser().setAuth_string(generateAuthString());
-		request.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 		
+		
+		/*request.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
 		
 		request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().getContactName());
@@ -127,11 +128,10 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getBodyUpdateClient().setTelefono2(provision.getCustomer().getContactPhoneNumber1() != null ? String.valueOf(provision.getCustomer().getContactPhoneNumber1()): "");
 		request.getBodyUpdateClient().setTelefono3(provision.getCustomer().getContactPhoneNumber2() != null ? String.valueOf(provision.getCustomer().getContactPhoneNumber2()): "");
 		request.getBodyUpdateClient().setTelefono4(provision.getCustomer().getContactPhoneNumber2() != null ? String.valueOf(provision.getCustomer().getContactPhoneNumber3()): "");
-		
+		*/
 		log.info("updatePSIClient - request: " + request.toString());
-		System.out.println(String.valueOf(provision.getCustomer().getContactPhoneNumber1()));
-		System.out.println(provision.getCustomer().getContactName3());
-		oAuthToken = getAuthToken(provision.getCustomer().getName());
+		
+		oAuthToken = getAuthToken(request.getBodyUpdateClient().getNombre_completo());
 		//log.info("updatePSIClient - oAuthToken: " + oAuthToken);
 
 		if (oAuthToken.isEmpty()) {

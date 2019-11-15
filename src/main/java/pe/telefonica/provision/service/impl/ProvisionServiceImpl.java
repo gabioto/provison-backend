@@ -1091,12 +1091,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 			psiRequest.getBodyUpdateClient().setSolicitud(provision.getDummyStPsiCode());
 			
 			
-			Customer customer = provision.getCustomer() != null ? provision.getCustomer() : new Customer();
+			/*Customer customer = provision.getCustomer() != null ? provision.getCustomer() : new Customer();
 			
 			customer.setMail(request.getEmail());
 			
 			provision.setCustomer(customer);
-			provision.setContacts(contactsList);
+			provision.setContacts(contactsList);*/
 
 			/*
 			 * provision.getCustomer().setContactName(contactFullname);
@@ -1112,7 +1112,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			Update update = new Update();
 
-			// update.set("customer.contact_name", contactName1);
+			//update.set("customer.contact_name", contactName1);
 			// update.set("customer.contact_name1", contactName2);
 			// update.set("customer.contact_name2", contactName3);
 			// update.set("customer.contact_name3", contactName4);
@@ -1328,6 +1328,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Provision provision = provisionRepository.getByOrderCodeForUpdate(orderCode);
 
 		if (provision != null) {
+			provision.getCustomer().setProductName(provision.getProductName());
 			return provision.getCustomer();
 		}
 		return null;

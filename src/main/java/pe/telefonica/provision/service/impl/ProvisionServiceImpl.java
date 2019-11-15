@@ -1236,7 +1236,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionRepository.updateProvision(provision, update);
 				return true;
 			}
-			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_PRESTAR)) {
+			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_PRESTART)) {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
@@ -1248,8 +1248,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("wo_prestart", woPreStart);
 
 				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(ConstantsTracking.WO_PRESTAR);
-				update.set("last_tracking_status", ConstantsTracking.WO_PRESTAR);
+				statusLog.setStatus(ConstantsTracking.WO_PRESTART);
+				update.set("last_tracking_status", ConstantsTracking.WO_PRESTART);
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 

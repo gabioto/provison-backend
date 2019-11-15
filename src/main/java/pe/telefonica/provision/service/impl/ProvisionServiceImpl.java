@@ -312,12 +312,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setCustomer(customer);
 
 		provision.setLastTrackingStatus(ConstantsTracking.PENDIENTE);
+		
 		List<StatusLog> listLog = new ArrayList<>();
 
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(ConstantsTracking.PENDIENTE);
 		listLog.add(statusLog);
+		
+		if(request.getStatus() != ConstantsTracking.PENDIENTE) {
+			StatusLog statusLogCurrent = new StatusLog();
+			statusLogCurrent.setStatus(request.getStatus());
+			listLog.add(statusLogCurrent);
+			
+			provision.setLastTrackingStatus(request.getStatus());
+			provision.setActiveStatus(request.getStatus().toLowerCase());
+			
+		}
+		
 
+		
 		provision.setLogStatus(listLog);
 
 		return provision;
@@ -478,7 +491,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			// status_toa
 			update.set("active_status",
 					request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO)
-							? Constants.PROVISION_STATUS_ACTIVE
+							? ConstantsTracking.INGRESADO.toLowerCase()
 							: Constants.PROVISION_STATUS_CANCELLED);
 			// update.set("status_toa",
 			// request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ?
@@ -1203,7 +1216,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (provision != null) {
 			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.IN_TOA)) {
-
+				
+				
 				Update update = new Update();
 				update.set("xa_creation_date", getData[3]);
 				update.set("xa_id_st", getData[4]);
@@ -1211,7 +1225,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("appt_number", getData[6]);
 				update.set("activity_type", getData[8]);
 				update.set("work_zone", getData[16]);
-
+				
+				if(provision.getXaIdSt() != null || provision.getXaIdSt() != "") {
+					
+					update.set("has_schedule", false);
+				}
 				InToa inToa = new InToa();
 
 				inToa.setXaNote(getData[9]);
@@ -1226,7 +1244,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("latitude", getData[19]);
 
 				update.set("in_toa", inToa);
-
+				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+				
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(ConstantsTracking.IN_TOA);
 				update.set("last_tracking_status", ConstantsTracking.IN_TOA);
@@ -1300,7 +1319,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woCompleted.setReceivePersonId(getData[24]);
 				woCompleted.setRelationship(getData[25]);
 				update.set("wo_completed", woCompleted);
-
+				
+				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
+				
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(ConstantsTracking.WO_COMPLETED);

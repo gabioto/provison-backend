@@ -251,6 +251,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setLegacies(getData[42]);
 		provision.setProductSignal(getData[43]);
 		provision.setActiveStatus(ConstantsTracking.PENDIENTE.toLowerCase());
+		provision.setStatusToa(Constants.PROVISION_STATUS_INCOMPLETE);
 
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
@@ -317,11 +318,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(ConstantsTracking.PENDIENTE);
+		statusLog.setDescription(ConstantsTracking.PENDIENTE_DESCRIPTION);
+		
 		listLog.add(statusLog);
 		
-		if(request.getStatus() != ConstantsTracking.PENDIENTE) {
+		if(!request.getStatus().equalsIgnoreCase(ConstantsTracking.PENDIENTE)) {
 			StatusLog statusLogCurrent = new StatusLog();
 			statusLogCurrent.setStatus(request.getStatus());
+			statusLogCurrent.setDescription(request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? ConstantsTracking.INGRESADO_DESCRIPTION : ConstantsTracking.CAIDO_DESCRIPTION );
+			
 			listLog.add(statusLogCurrent);
 			
 			provision.setLastTrackingStatus(request.getStatus());
@@ -488,6 +493,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(request.getStatus());
+			statusLog.setDescription(request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? ConstantsTracking.INGRESADO_DESCRIPTION : ConstantsTracking.CAIDO_DESCRIPTION );
+			
 			// status_toa
 			update.set("active_status",
 					request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO)
@@ -498,6 +505,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			// Constants.PROVISION_STATUS_ACTIVE: Constants.PROVISION_STATUS_CANCELLED);
 
 			update.set("last_tracking_status", request.getStatus());
+			
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
 
@@ -1165,10 +1173,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(ConstantsTracking.DUMMY_SCHEDULED);
+			statusLog.setDescription(ConstantsTracking.DUMMY_SCHEDULED_DESCRIPTION);
+			
 			statusLog.setScheduledDate(request.getScheduleDate());
 			statusLog.setScheduledRange(request.getScheduleRange());
 		
 			update.set("work_zone", request.getBucket());
+			update.set("origin_code", request.getOriginCode());
 			update.set("last_tracking_status", ConstantsTracking.DUMMY_SCHEDULED);
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
@@ -1181,6 +1192,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setSaleCode(request.getSaleCode());
 			provisionAdd.setDummyStPsiCode(request.getFictionalCode());
+			provisionAdd.setOriginCode(request.getOriginCode());
 			provisionAdd.setActiveStatus(ConstantsTracking.PENDIENTE.toLowerCase());
 			List<StatusLog> listLog = new ArrayList<>();
 			
@@ -1245,9 +1257,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				update.set("in_toa", inToa);
 				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+				update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 				
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(ConstantsTracking.IN_TOA);
+				statusLog.setDescription(ConstantsTracking.IN_TOA_DESCRIPTION);
+				
 				update.set("last_tracking_status", ConstantsTracking.IN_TOA);
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
@@ -1268,6 +1283,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(ConstantsTracking.WO_PRESTART);
+				statusLog.setDescription(ConstantsTracking.WO_PRESTART_DESCRIPTION);
+				
 				update.set("last_tracking_status", ConstantsTracking.WO_PRESTART);
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
@@ -1294,6 +1311,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(ConstantsTracking.WO_INIT);
+				statusLog.setDescription(ConstantsTracking.WO_INIT_DESCRIPTION);
+				
 				update.set("last_tracking_status", ConstantsTracking.WO_INIT);
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
@@ -1325,6 +1344,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(ConstantsTracking.WO_COMPLETED);
+				statusLog.setDescription(ConstantsTracking.WO_COMPLETED_DESCRIPTION);
+				
 				update.set("last_tracking_status", ConstantsTracking.WO_COMPLETED);
 				listLog.add(statusLog);
 				update.set("log_status", listLog);

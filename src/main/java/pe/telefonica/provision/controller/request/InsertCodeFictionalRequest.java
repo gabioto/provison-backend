@@ -8,6 +8,7 @@ public class InsertCodeFictionalRequest {
 	private LocalDate scheduleDate;
 	private String scheduleRange;
 	private String bucket;
+	private String originCode;
 
 	public String getSaleCode() {
 		return saleCode;
@@ -48,7 +49,13 @@ public class InsertCodeFictionalRequest {
 	public void setBucket(String bucket) {
 		this.bucket = bucket;
 	}
-	
-	
+
+	public String getOriginCode() {
+		return originCode;
+	}
+
+	public void setOriginCode(String originCode) {
+		this.originCode = originCode;
+	}
 
 }

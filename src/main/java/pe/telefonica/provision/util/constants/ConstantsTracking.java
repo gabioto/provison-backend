@@ -13,6 +13,17 @@ public class ConstantsTracking {
 	
 	public static final String DUMMY_SCHEDULED = "DUMMY_SCHEDULED";
 	
+	public static final String PENDIENTE_DESCRIPTION = "PENDIENTE_DESCRIPTION";
+	public static final String INGRESADO_DESCRIPTION = "INGRESADO_DESCRIPTION";
+	public static final String CAIDO_DESCRIPTION = "CAIDO_DESCRIPTION";
+	
+	public static final String IN_TOA_DESCRIPTION = "IN_TOA_DESCRIPTION";
+	public static final String WO_PRESTART_DESCRIPTION = "WO_PRESTART_DESCRIPTION";
+	public static final String WO_INIT_DESCRIPTION = "WO_INIT_DESCRIPTION";
+	public static final String WO_COMPLETED_DESCRIPTION = "WO_COMPLETED_DESCRIPTION";
+	
+	public static final String DUMMY_SCHEDULED_DESCRIPTION = "DUMMY_SCHEDULED_DESCRIPTION";
+	
 	
 	
 	

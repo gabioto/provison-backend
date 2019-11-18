@@ -68,6 +68,9 @@ public class Provision implements Serializable {
 	@Field("sale_code")
 	private String saleCode;
 
+	@Field("origin_code")
+	private String originCode;
+
 	@Field("sale_request_date")
 	private String saleRequestDate;
 
@@ -184,23 +187,19 @@ public class Provision implements Serializable {
 
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
-	
-	
+
 	@Field("in_toa")
 	private InToa inToa;
-	
+
 	@Field("wo_prestart")
 	private WoPreStart woPreStart;
-	
+
 	@Field("in_init")
 	private WoInit woInit;
-	
+
 	@Field("wo_completed")
 	private WoCompleted woCompleted;
-	
-	
-	
-	
+
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -311,6 +310,14 @@ public class Provision implements Serializable {
 
 	public void setSaleCode(String saleCode) {
 		this.saleCode = saleCode;
+	}
+
+	public String getOriginCode() {
+		return originCode;
+	}
+
+	public void setOriginCode(String originCode) {
+		this.originCode = originCode;
 	}
 
 	public String getSaleRequestDate() {
@@ -624,8 +631,7 @@ public class Provision implements Serializable {
 	public void setLogStatus(List<StatusLog> logStatus) {
 		this.logStatus = logStatus;
 	}
-	
-	
+
 	public InToa getInToa() {
 		return inToa;
 	}
@@ -634,12 +640,12 @@ public class Provision implements Serializable {
 		this.inToa = inToa;
 	}
 
-	public WoPreStart getWoPrestart() {
+	public WoPreStart getWoPreStart() {
 		return woPreStart;
 	}
 
-	public void setWoPrestart(WoPreStart woPrestart) {
-		this.woPreStart = woPrestart;
+	public void setWoPreStart(WoPreStart woPreStart) {
+		this.woPreStart = woPreStart;
 	}
 
 	public WoInit getWoInit() {
@@ -650,12 +656,12 @@ public class Provision implements Serializable {
 		this.woInit = woInit;
 	}
 
-	public WoCompleted getWoComplete() {
+	public WoCompleted getWoCompleted() {
 		return woCompleted;
 	}
 
-	public void setWoComplete(WoCompleted woComplete) {
-		this.woCompleted = woComplete;
+	public void setWoCompleted(WoCompleted woCompleted) {
+		this.woCompleted = woCompleted;
 	}
 
 	public Provision() {
@@ -680,17 +686,28 @@ public class Provision implements Serializable {
 		@Field("status")
 		private String status;
 
+		@Field("description")
+		private String description;
+
 		@Field("inserted_date")
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 		@Field("scheduled_date")
-		private LocalDate scheduledDate; /*= LocalDate.now(ZoneOffset.of("-05:00"));*/
+		private LocalDate scheduledDate; /* = LocalDate.now(ZoneOffset.of("-05:00")); */
 
 		@Field("scheduled_range")
 		private String scheduledRange;
 
 		public String getStatus() {
 			return status;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
 		}
 
 		public void setStatus(String status) {

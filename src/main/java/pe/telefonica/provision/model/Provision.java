@@ -59,6 +59,9 @@ public class Provision implements Serializable {
 	@Field("dummy_st_psi_code")
 	private String dummyStPsiCode;
 
+	@Field("is_update_dummy_st_psi_code")
+	private boolean isUpdatedummyStPsiCode;
+
 	@Field("back")
 	private String back;
 
@@ -286,6 +289,14 @@ public class Provision implements Serializable {
 
 	public void setDummyStPsiCode(String dummyStPsiCode) {
 		this.dummyStPsiCode = dummyStPsiCode;
+	}
+
+	public boolean isUpdatedummyStPsiCode() {
+		return isUpdatedummyStPsiCode;
+	}
+
+	public void setUpdatedummyStPsiCode(boolean isUpdatedummyStPsiCode) {
+		this.isUpdatedummyStPsiCode = isUpdatedummyStPsiCode;
 	}
 
 	public String getBack() {

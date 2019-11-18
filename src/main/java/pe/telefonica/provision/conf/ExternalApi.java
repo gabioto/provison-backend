@@ -13,7 +13,7 @@ public class ExternalApi {
 	String boUrl;
 	String psiUrl;
 	String oauthToken;
-	
+
 	String oauth2Client;
 	String oauth2RefreshToken;
 
@@ -22,6 +22,7 @@ public class ExternalApi {
 	String sendRequestToBO;
 	String psiUpdateClient;
 	String updateSchedule;
+	String scheduleUpdateFicticious;
 	String getPSIToken;
 	String securitySaveLogData;
 	String sendSMSById;
@@ -56,6 +57,14 @@ public class ExternalApi {
 
 	public void setGetPSIToken(String getPSIToken) {
 		this.getPSIToken = getPSIToken;
+	}
+
+	public String getScheduleUpdateFicticious() {
+		return scheduleUpdateFicticious;
+	}
+
+	public void setScheduleUpdateFicticious(String scheduleUpdateFicticious) {
+		this.scheduleUpdateFicticious = scheduleUpdateFicticious;
 	}
 
 	public String getSendRequestToBO() {

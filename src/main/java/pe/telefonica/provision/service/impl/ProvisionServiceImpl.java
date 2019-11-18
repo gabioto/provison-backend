@@ -16,15 +16,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.ProvisionTexts;
@@ -47,6 +43,7 @@ import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
+import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Internet;
@@ -334,7 +331,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 			
 		}
 		
-
 		
 		provision.setLogStatus(listLog);
 
@@ -481,7 +477,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public boolean insertProvision(InsertOrderRequest request) {
 
-		String data = "VENTASFIJA_PARKUR|TGESTIONA_FVD|MT15149|ARMANDO AUGUSTO CALVO QUIROZ CALVO QUIROZ|07578669|987654321|AVDMIRO QUESADA, AURELIO          260   INT:1401 - URB SANTA INES-|LIMA|LIMA|SAN ISIDRO|Movistar Total 24GB TV Estándar Digital HD 60Mbps||MIGRACION|DNI||CAIDA|07/11/2019 15:56:57|05/11/2019 20:40:57||pruebas@hotmail.com||TRIO||||59|No||59|||MOVISTAR TOTAL|||NO APLICA||||||||ATIS||||||||||||||||||||||||||||||||||||||";
+		//String data = "VENTASFIJA_PARKUR|TGESTIONA_FVD|MT15149|ARMANDO AUGUSTO CALVO QUIROZ CALVO QUIROZ|07578669|987654321|AVDMIRO QUESADA, AURELIO          260   INT:1401 - URB SANTA INES-|LIMA|LIMA|SAN ISIDRO|Movistar Total 24GB TV Estándar Digital HD 60Mbps||MIGRACION|DNI||CAIDA|07/11/2019 15:56:57|05/11/2019 20:40:57||pruebas@hotmail.com||TRIO||||59|No||59|||MOVISTAR TOTAL|||NO APLICA||||||||ATIS||||||||||||||||||||||||||||||||||||||";
 		// String getData[] = data.split("\\|");
 		String getData[] = request.getData().split("\\|");
 		Provision provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
@@ -495,6 +491,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLog.setStatus(request.getStatus());
 			statusLog.setDescription(request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? ConstantsTracking.INGRESADO_DESCRIPTION : ConstantsTracking.CAIDO_DESCRIPTION );
 			
+			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) && !provisionx.getDummyStPsiCode().isEmpty()) {
+				ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
+				updateFicRequest.setOrderCode(getData[11]);
+				updateFicRequest.setOriginCode(provisionx.getOriginCode() );
+				updateFicRequest.setSaleCode(provisionx.getSaleCode());
+				updateFicRequest.setFictitiousCode(provisionx.getDummyStPsiCode());
+				
+				boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+				update.set("is_update_dummy_st_psi_code", updateFicticious ? true: false);
+				
+			}
 			// status_toa
 			update.set("active_status",
 					request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO)

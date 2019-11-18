@@ -978,14 +978,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (optional.isPresent()) {
 				Provision provision = optional.get();
 				String nomEstado = "";
+				String description = "";
 
-				if (scheduledType == 2)
+				if (scheduledType == 2) {
 					nomEstado = Status.FICTICIOUS_SCHEDULED.getStatusName();
-				else
+					description = Status.FICTICIOUS_SCHEDULED.getDescription();
+				}
+				else {
 					nomEstado = Status.SCHEDULED.getStatusName();
-
+					description = Status.SCHEDULED.getDescription();
+				}
+					
 				boolean updated = updateTrackingStatus(provision.getXaRequest(), provision.getXaIdSt(), nomEstado, true,
-						scheduledDate, scheduledRange, scheduledType);
+						scheduledDate, scheduledRange, scheduledType, description);
+				
 
 				if (updated) {
 					header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
@@ -1018,7 +1024,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,
-			LocalDate scheduledDate, String scheduledRange, Integer scheduleType) {
+			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description) {
 		boolean updated = false;
 		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
 		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
@@ -1030,6 +1036,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(status);
+			statusLog.setDescription(description);
 
 			if (scheduledDate != null)
 				statusLog.setScheduledDate(scheduledDate);

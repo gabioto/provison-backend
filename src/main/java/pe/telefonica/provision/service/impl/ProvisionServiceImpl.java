@@ -57,11 +57,9 @@ import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
-import pe.telefonica.provision.service.request.BORequest;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
-import pe.telefonica.provision.util.constants.ConstantsTracking;
 import pe.telefonica.provision.util.constants.Status;
 
 @Service("provisionService")
@@ -226,6 +224,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setXaRequest(getData[11]);
 		provision.setXaIdSt("");
 		provision.setDummyStPsiCode("");
+		provision.setOriginCode("");
 
 		provision.setCommercialOp(getData[12]);
 		provision.setProductCode(getData[14]);
@@ -247,7 +246,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setCodePsCode(getData[28]);
 		provision.setLegacies(getData[42]);
 		provision.setProductSignal(getData[43]);
-		provision.setActiveStatus(ConstantsTracking.PENDIENTE.toLowerCase());
+		provision.setActiveStatus(Status.PENDIENTE.getStatusName());
 		provision.setStatusToa(Constants.PROVISION_STATUS_INCOMPLETE);
 
 		List<String> productPsAdmin = new ArrayList<>();
@@ -309,20 +308,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		provision.setCustomer(customer);
 
-		provision.setLastTrackingStatus(ConstantsTracking.PENDIENTE);
+		provision.setLastTrackingStatus(Status.PENDIENTE.getStatusName());
 		
 		List<StatusLog> listLog = new ArrayList<>();
 
 		StatusLog statusLog = new StatusLog();
-		statusLog.setStatus(ConstantsTracking.PENDIENTE);
-		statusLog.setDescription(ConstantsTracking.PENDIENTE_DESCRIPTION);
+		statusLog.setStatus(Status.PENDIENTE.getStatusName());
+		statusLog.setDescription(Status.PENDIENTE.getDescription());
 		
 		listLog.add(statusLog);
 		
-		if(!request.getStatus().equalsIgnoreCase(ConstantsTracking.PENDIENTE)) {
+		if(!request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
 			StatusLog statusLogCurrent = new StatusLog();
 			statusLogCurrent.setStatus(request.getStatus());
-			statusLogCurrent.setDescription(request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? ConstantsTracking.INGRESADO_DESCRIPTION : ConstantsTracking.CAIDO_DESCRIPTION );
+			statusLogCurrent.setDescription(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ? Status.INGRESADO.getDescription() : Status.CAIDO.getDescription() );
 			
 			listLog.add(statusLogCurrent);
 			
@@ -489,9 +488,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(request.getStatus());
-			statusLog.setDescription(request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ? ConstantsTracking.INGRESADO_DESCRIPTION : ConstantsTracking.CAIDO_DESCRIPTION );
+			statusLog.setDescription(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ? Status.INGRESADO.getDescription() : Status.CAIDO.getDescription() );
 			
-			if(request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) && !provisionx.getDummyStPsiCode().isEmpty()) {
+			if(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) && !provisionx.getDummyStPsiCode().isEmpty()) {
 				ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
 				updateFicRequest.setOrderCode(getData[11]);
 				updateFicRequest.setOriginCode(provisionx.getOriginCode() );
@@ -504,8 +503,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 			// status_toa
 			update.set("active_status",
-					request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO)
-							? ConstantsTracking.INGRESADO.toLowerCase()
+					request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
+							? Status.INGRESADO.getStatusName().toLowerCase()
 							: Constants.PROVISION_STATUS_CANCELLED);
 			// update.set("status_toa",
 			// request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ?
@@ -1186,15 +1185,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("dummy_st_psi_code", request.getFictionalCode());
 			
 			StatusLog statusLog = new StatusLog();
-			statusLog.setStatus(ConstantsTracking.DUMMY_SCHEDULED);
-			statusLog.setDescription(ConstantsTracking.DUMMY_SCHEDULED_DESCRIPTION);
+			statusLog.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
+			statusLog.setDescription(Status.FICTICIOUS_SCHEDULED.getDescription());
 			
 			statusLog.setScheduledDate(request.getScheduleDate());
 			statusLog.setScheduledRange(request.getScheduleRange());
 		
 			update.set("work_zone", request.getBucket());
 			update.set("origin_code", request.getOriginCode());
-			update.set("last_tracking_status", ConstantsTracking.DUMMY_SCHEDULED);
+			update.set("last_tracking_status", Status.FICTICIOUS_SCHEDULED.getStatusName());
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
 
@@ -1207,14 +1206,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setSaleCode(request.getSaleCode());
 			provisionAdd.setDummyStPsiCode(request.getFictionalCode());
 			provisionAdd.setOriginCode(request.getOriginCode());
-			provisionAdd.setActiveStatus(ConstantsTracking.PENDIENTE.toLowerCase());
+			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
 			List<StatusLog> listLog = new ArrayList<>();
 			
 			StatusLog StatusPendiente = new StatusLog();
 			StatusLog statusLogDummy = new StatusLog();
-			StatusPendiente.setStatus(ConstantsTracking.PENDIENTE);
+			StatusPendiente.setStatus(Status.PENDIENTE.getStatusName());
 			
-			statusLogDummy.setStatus(ConstantsTracking.DUMMY_SCHEDULED);
+			statusLogDummy.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			
 			
 			statusLogDummy.setScheduledDate(request.getScheduleDate());
@@ -1224,7 +1223,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			listLog.add(statusLogDummy);
 			
 			provisionAdd.setLogStatus(listLog);
-			provisionAdd.setLastTrackingStatus(ConstantsTracking.DUMMY_SCHEDULED);
+			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 
 			provisionRepository.insertProvision(provisionAdd);
 
@@ -1241,7 +1240,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		String[] getData = request.getData().split("\\|", -1);
 
 		if (provision != null) {
-			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.IN_TOA)) {
+			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 				
 				
 				Update update = new Update();
@@ -1274,17 +1273,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 				
 				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(ConstantsTracking.IN_TOA);
-				statusLog.setDescription(ConstantsTracking.IN_TOA_DESCRIPTION);
+				statusLog.setStatus(Status.IN_TOA.getStatusName());
+				statusLog.setDescription(Status.IN_TOA.getDescription());
 				
-				update.set("last_tracking_status", ConstantsTracking.IN_TOA);
+				update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
 				provisionRepository.updateProvision(provision, update);
 				return true;
 			}
-			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_PRESTART)) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())) {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
@@ -1296,10 +1295,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("wo_prestart", woPreStart);
 
 				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(ConstantsTracking.WO_PRESTART);
-				statusLog.setDescription(ConstantsTracking.WO_PRESTART_DESCRIPTION);
+				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
+				statusLog.setDescription(Status.WO_PRESTART.getDescription());
 				
-				update.set("last_tracking_status", ConstantsTracking.WO_PRESTART);
+				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1308,7 +1307,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_INIT)) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_INIT.getStatusName())) {
 
 				Update update = new Update();
 
@@ -1324,10 +1323,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 
-				statusLog.setStatus(ConstantsTracking.WO_INIT);
-				statusLog.setDescription(ConstantsTracking.WO_INIT_DESCRIPTION);
+				statusLog.setStatus(Status.WO_INIT.getStatusName());
+				statusLog.setDescription(Status.WO_INIT.getDescription());
 				
-				update.set("last_tracking_status", ConstantsTracking.WO_INIT);
+				update.set("last_tracking_status", Status.WO_INIT.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1336,7 +1335,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(ConstantsTracking.WO_COMPLETED)) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_COMPLETED.getStatusName())) {
 				Update update = new Update();
 
 				WoCompleted woCompleted = new WoCompleted();
@@ -1357,10 +1356,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				
 				StatusLog statusLog = new StatusLog();
 
-				statusLog.setStatus(ConstantsTracking.WO_COMPLETED);
-				statusLog.setDescription(ConstantsTracking.WO_COMPLETED_DESCRIPTION);
+				statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
+				statusLog.setDescription(Status.WO_COMPLETED.getDescription());
 				
-				update.set("last_tracking_status", ConstantsTracking.WO_COMPLETED);
+				update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 

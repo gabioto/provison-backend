@@ -329,8 +329,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision.setLastTrackingStatus(request.getStatus());
 			
 			provision.setActiveStatus(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ? 
-					Status.INGRESADO.getDescription() : Constants.PROVISION_STATUS_CANCELLED);
+					Status.INGRESADO.getStatusName().toLowerCase() : Constants.PROVISION_STATUS_CANCELLED);
 			
+			provision.setStatusToa(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ? 
+					Status.INGRESADO.getStatusName().toLowerCase() : Constants.PROVISION_STATUS_CANCELLED);
 		}
 		
 		

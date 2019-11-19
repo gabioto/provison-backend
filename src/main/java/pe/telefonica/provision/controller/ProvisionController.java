@@ -381,14 +381,14 @@ public class ProvisionController {
 		// return
 		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
-	@RequestMapping(value = "/provisionInsertCodeFictional", method = RequestMethod.POST)
+	@RequestMapping(value = "/provisionInsertCodeFictitious", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> provisionInsertCodeFictional(
 			@RequestBody @Valid ApiRequest<InsertCodeFictionalRequest> request) {
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
 
 		try {
-			Boolean provisions = provisionService.provisionInsertCodeFictional(request.getBody());
+			Boolean provisions = provisionService.provisionInsertCodeFictitious(request.getBody());
 
 			if (provisions) {
 				status = HttpStatus.OK;

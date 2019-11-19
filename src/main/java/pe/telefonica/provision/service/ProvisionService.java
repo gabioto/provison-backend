@@ -29,7 +29,7 @@ public interface ProvisionService {
 
 	boolean insertProvision(InsertOrderRequest request);
 
-	boolean provisionInsertCodeFictional(InsertCodeFictionalRequest request);
+	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
 	boolean provisionUpdateFromTOA(UpdateFromToaRequest request);
 

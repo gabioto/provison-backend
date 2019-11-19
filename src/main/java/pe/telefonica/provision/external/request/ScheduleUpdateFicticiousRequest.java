@@ -2,7 +2,7 @@ package pe.telefonica.provision.external.request;
 
 public class ScheduleUpdateFicticiousRequest {
 	private String originCode;
-	private String fictitiousCode;
+	private Integer fictitiousCode;
 	private String orderCode;
 	private String saleCode;
 
@@ -14,11 +14,11 @@ public class ScheduleUpdateFicticiousRequest {
 		this.originCode = originCode;
 	}
 
-	public String getFictitiousCode() {
+	public Integer getFictitiousCode() {
 		return fictitiousCode;
 	}
 
-	public void setFictitiousCode(String fictitiousCode) {
+	public void setFictitiousCode(Integer fictitiousCode) {
 		this.fictitiousCode = fictitiousCode;
 	}
 

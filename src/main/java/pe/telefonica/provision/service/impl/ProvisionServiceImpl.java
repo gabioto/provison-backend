@@ -498,7 +498,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				updateFicRequest.setOrderCode(getData[11]);
 				updateFicRequest.setOriginCode(provisionx.getOriginCode() );
 				updateFicRequest.setSaleCode(provisionx.getSaleCode());
-				updateFicRequest.setFictitiousCode(provisionx.getDummyStPsiCode());
+				updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
 				
 				boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
 				update.set("is_update_dummy_st_psi_code", updateFicticious ? true: false);
@@ -509,9 +509,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 							? Status.INGRESADO.getStatusName().toLowerCase()
 							: Constants.PROVISION_STATUS_CANCELLED);
-			// update.set("status_toa",
-			// request.getStatus().equalsIgnoreCase(ConstantsTracking.INGRESADO) ?
-			// Constants.PROVISION_STATUS_ACTIVE: Constants.PROVISION_STATUS_CANCELLED);
+			update.set("status_toa",
+					request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ?
+							Status.INGRESADO.getStatusName().toLowerCase(): Constants.PROVISION_STATUS_CANCELLED);
 
 			update.set("last_tracking_status", request.getStatus());
 			
@@ -1177,7 +1177,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public boolean provisionInsertCodeFictional(InsertCodeFictionalRequest request) {
+	public boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request) {
 
 		Provision provision = provisionRepository.getProvisionBySaleCode(request.getSaleCode());
 		
@@ -1185,7 +1185,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Update update = new Update();
 			List<StatusLog> listLog = provision.getLogStatus();
 			
-			update.set("dummy_st_psi_code", request.getFictionalCode());
+			update.set("dummy_st_psi_code", request.getDummyStPsiCode());
+			update.set("dummy_xa_request", request.getDummyXaRequest());
 			
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
@@ -1207,7 +1208,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provisionAdd = new Provision();
 
 			provisionAdd.setSaleCode(request.getSaleCode());
-			provisionAdd.setDummyStPsiCode(request.getFictionalCode());
+			provisionAdd.setDummyXaRequest(request.getDummyXaRequest());
+			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setOriginCode(request.getOriginCode());
 			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
 			List<StatusLog> listLog = new ArrayList<>();

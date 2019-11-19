@@ -16,15 +16,14 @@ public class InToa implements Serializable {
 	@Field("xa_scheduler")
 	private String xaScheduler;
 
+	@Field("xa_creation_date")
+	private String xaCreationDate;
 
 	@Field("longitude")
 	private String longitude;
 
 	@Field("latitude")
 	private String latitude;
-
-	
-
 
 	public String getXaNote() {
 		return xaNote;
@@ -48,6 +47,14 @@ public class InToa implements Serializable {
 
 	public void setXaScheduler(String xaScheduler) {
 		this.xaScheduler = xaScheduler;
+	}
+
+	public String getXaCreationDate() {
+		return xaCreationDate;
+	}
+
+	public void setXaCreationDate(String xaCreationDate) {
+		this.xaCreationDate = xaCreationDate;
 	}
 
 	public String getLongitude() {

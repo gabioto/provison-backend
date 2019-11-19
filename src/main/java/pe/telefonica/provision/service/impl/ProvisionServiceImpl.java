@@ -224,7 +224,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setXaRequest(getData[11]);
 		provision.setXaIdSt("");
 		provision.setDummyStPsiCode("");
-		provision.setOriginCode("");
+		provision.setOriginCode(request.getDataOrigin());
 
 		provision.setCommercialOp(getData[12]);
 		provision.setProductCode(getData[14]);
@@ -246,8 +246,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setCodePsCode(getData[28]);
 		provision.setLegacies(getData[42]);
 		provision.setProductSignal(getData[43]);
-		provision.setActiveStatus(Status.PENDIENTE.getStatusName());
-		provision.setStatusToa(Constants.PROVISION_STATUS_INCOMPLETE);
+		provision.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
+		provision.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
@@ -321,12 +321,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if(!request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
 			StatusLog statusLogCurrent = new StatusLog();
 			statusLogCurrent.setStatus(request.getStatus());
-			statusLogCurrent.setDescription(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ? Status.INGRESADO.getDescription() : Status.CAIDO.getDescription() );
+			statusLogCurrent.setDescription(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ? 
+						Status.INGRESADO.getDescription() : Status.CAIDO.getDescription() );
 			
 			listLog.add(statusLogCurrent);
 			
 			provision.setLastTrackingStatus(request.getStatus());
-			provision.setActiveStatus(request.getStatus().toLowerCase());
+			
+			provision.setActiveStatus(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName()) ? 
+					Status.INGRESADO.getDescription() : Constants.PROVISION_STATUS_CANCELLED);
 			
 		}
 		
@@ -336,8 +339,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return provision;
 	}
 
-	private Update fillProvisionUpdate(String data) {
-		String getData[] = data.split("\\|", -1);
+	private Update fillProvisionUpdate(InsertOrderRequest request) {
+		String getData[] = request.getData().split("\\|", -1);
 		System.out.println(getData[3]);
 
 		// Provision provision = new Provision();
@@ -355,7 +358,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		// provision.setXaRequest(getData[11]);
 		update.set("xa_request", getData[11]);
-
+		update.set("origin_code", request.getDataOrigin());
 		// provision.setCommercialOp(getData[12]);
 		update.set("commercial_op", getData[12]);
 		// provision.setProductCode(getData[14]);
@@ -482,7 +485,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Provision provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
 		if (provisionx != null) {
 
-			Update update = fillProvisionUpdate(request.getData());
+			Update update = fillProvisionUpdate(request);
 
 			List<StatusLog> listLog = provisionx.getLogStatus();
 

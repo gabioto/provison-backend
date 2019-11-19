@@ -13,7 +13,6 @@ import javax.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -43,7 +42,6 @@ import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
-import pe.telefonica.provision.controller.request.UpdateStatusRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -51,10 +49,6 @@ import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.ProvisionScheduler;
-import pe.telefonica.provision.model.StatusProvision;
-import pe.telefonica.provision.model.WoCompletedProvision;
-import pe.telefonica.provision.model.WoInitProvision;
-import pe.telefonica.provision.model.WoPreStartProvision;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
@@ -381,14 +375,14 @@ public class ProvisionController {
 		// return
 		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
-	@RequestMapping(value = "/provisionInsertCodeFictional", method = RequestMethod.POST)
+	@RequestMapping(value = "/provisionInsertCodeFictitious", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> provisionInsertCodeFictional(
 			@RequestBody @Valid ApiRequest<InsertCodeFictionalRequest> request) {
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
 
 		try {
-			Boolean provisions = provisionService.provisionInsertCodeFictional(request.getBody());
+			Boolean provisions = provisionService.provisionInsertCodeFictitious(request.getBody());
 
 			if (provisions) {
 				status = HttpStatus.OK;

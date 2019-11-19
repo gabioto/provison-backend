@@ -35,6 +35,9 @@ public class Provision implements Serializable {
 	@Field("xa_request")
 	private String xaRequest;
 
+	@Field("dummy_xa_request")
+	private Integer dummyXaRequest;
+
 	@Field("xa_requirement_number")
 	private String xaRequirementNumber;
 
@@ -224,6 +227,14 @@ public class Provision implements Serializable {
 		this.xaRequest = xaRequest;
 	}
 
+	public Integer getDummyXaRequest() {
+		return dummyXaRequest;
+	}
+
+	public void setDummyXaRequest(Integer dummyXaRequest) {
+		this.dummyXaRequest = dummyXaRequest;
+	}
+
 	public String getXaRequirementNumber() {
 		return xaRequirementNumber;
 	}
@@ -263,8 +274,6 @@ public class Provision implements Serializable {
 	public void setActivityType(String activityType) {
 		this.activityType = activityType;
 	}
-
-
 
 	public String getXaIdSt() {
 		return xaIdSt;
@@ -673,14 +682,14 @@ public class Provision implements Serializable {
 	@Override
 	public String toString() {
 		return "Provision [idProvision=" + idProvision + ", externalId=" + externalId + ", xaRequest=" + xaRequest
-				 + ", xaIdSt=" + xaIdSt + ", xaRequirementNumber="
-				+ xaRequirementNumber + ", apptNumber=" + apptNumber + ", productName=" + productName
-				+ ", commercialOp=" + commercialOp + ", paymentMethod=" + paymentMethod + ", regularPrice="
-				+ regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency="
-				+ currency + ", installPrice=" + installPrice + ", activeStatus=" + activeStatus + ", statusToa="
-				+ statusToa + ", validatedAddress=" + validatedAddress + ", registerDate=" + registerDate
-				+ ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail
-				+ ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", workZone=" + workZone + "]";
+				+ ", xaIdSt=" + xaIdSt + ", xaRequirementNumber=" + xaRequirementNumber + ", apptNumber=" + apptNumber
+				+ ", productName=" + productName + ", commercialOp=" + commercialOp + ", paymentMethod=" + paymentMethod
+				+ ", regularPrice=" + regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice
+				+ ", currency=" + currency + ", installPrice=" + installPrice + ", activeStatus=" + activeStatus
+				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
+				+ registerDate + ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail="
+				+ tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", workZone="
+				+ workZone + "]";
 	}
 
 	public static class StatusLog {

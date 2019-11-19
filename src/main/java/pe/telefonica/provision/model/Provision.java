@@ -50,9 +50,6 @@ public class Provision implements Serializable {
 	@Field("activity_type")
 	private String activityType;
 
-	@Field("xa_creation_date")
-	private String xaCreationDate;
-
 	@Field("xa_id_st")
 	private String xaIdSt;
 
@@ -267,13 +264,7 @@ public class Provision implements Serializable {
 		this.activityType = activityType;
 	}
 
-	public String getXaCreationDate() {
-		return xaCreationDate;
-	}
 
-	public void setXaCreationDate(String xaCreationDate) {
-		this.xaCreationDate = xaCreationDate;
-	}
 
 	public String getXaIdSt() {
 		return xaIdSt;
@@ -682,7 +673,7 @@ public class Provision implements Serializable {
 	@Override
 	public String toString() {
 		return "Provision [idProvision=" + idProvision + ", externalId=" + externalId + ", xaRequest=" + xaRequest
-				+ ", xaCreationDate=" + xaCreationDate + ", xaIdSt=" + xaIdSt + ", xaRequirementNumber="
+				 + ", xaIdSt=" + xaIdSt + ", xaRequirementNumber="
 				+ xaRequirementNumber + ", apptNumber=" + apptNumber + ", productName=" + productName
 				+ ", commercialOp=" + commercialOp + ", paymentMethod=" + paymentMethod + ", regularPrice="
 				+ regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency="

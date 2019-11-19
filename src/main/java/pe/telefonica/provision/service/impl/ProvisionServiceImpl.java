@@ -1247,7 +1247,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				
 				
 				Update update = new Update();
-				update.set("xa_creation_date", getData[3]);
+				//update.set("xa_creation_date", getData[3]);
 				update.set("xa_id_st", getData[4]);
 				update.set("xa_requirement_number", getData[5]);
 				update.set("appt_number", getData[6]);
@@ -1261,6 +1261,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				InToa inToa = new InToa();
 
 				inToa.setXaNote(getData[9]);
+				inToa.setXaCreationDate(getData[3]);
 				// update.set("xa_note", getData[9]);
 				inToa.setDate(getData[15]);
 				// update.set("date", getData[15]);

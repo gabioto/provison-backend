@@ -132,7 +132,7 @@ public class ProvisionController {
 	 * @description get all provisions related to type and number of the document
 	 */
 
-	@RequestMapping(value = "/getOrders", method = RequestMethod.POST)
+	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<Provision>>> getOrders(@RequestBody ApiRequest<ProvisionRequest> request) {
 
 		ApiResponse<List<Provision>> apiResponse;
@@ -592,7 +592,7 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
-	@RequestMapping(value = "/apiTrazaSetContactInfoUpdate", method = RequestMethod.POST)
+	@RequestMapping(value = "/update-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<String>> apiTrazaSetContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");

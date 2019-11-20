@@ -1189,6 +1189,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			
 			update.set("dummy_st_psi_code", request.getDummyStPsiCode());
 			update.set("dummy_xa_request", request.getDummyXaRequest());
+			update.set("has_schedule", true);
 			
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
@@ -1212,21 +1213,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setSaleCode(request.getSaleCode());
 			provisionAdd.setDummyXaRequest(request.getDummyXaRequest());
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
+			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
 			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
+			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
+			
 			List<StatusLog> listLog = new ArrayList<>();
 			
-			StatusLog StatusPendiente = new StatusLog();
+			StatusLog statusPendiente = new StatusLog();
 			StatusLog statusLogDummy = new StatusLog();
-			StatusPendiente.setStatus(Status.PENDIENTE.getStatusName());
+			statusPendiente.setStatus(Status.PENDIENTE.getStatusName());
+			statusPendiente.setDescription(Status.PENDIENTE.getDescription());
 			
 			statusLogDummy.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
-			
+			statusLogDummy.setDescription(Status.FICTICIOUS_SCHEDULED.getDescription());
 			
 			statusLogDummy.setScheduledDate(request.getScheduleDate().toString());
 			statusLogDummy.setScheduledRange(request.getScheduleRange());
 			
-			listLog.add(StatusPendiente);
+			listLog.add(statusPendiente);
 			listLog.add(statusLogDummy);
 			
 			provisionAdd.setLogStatus(listLog);

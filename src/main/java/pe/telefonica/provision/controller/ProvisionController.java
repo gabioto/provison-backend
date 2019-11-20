@@ -595,6 +595,7 @@ public class ProvisionController {
 	public ResponseEntity<ApiResponse<String>> apiTrazaSetContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+		
 
 		ApiResponse<String> apiResponse;
 		HttpStatus status;

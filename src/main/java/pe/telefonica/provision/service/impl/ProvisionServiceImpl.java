@@ -1050,7 +1050,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLog.setDescription(description);
 
 			if (scheduledDate != null)
-				statusLog.setScheduledDate(scheduledDate);
+				statusLog.setScheduledDate(scheduledDate.toString());
 
 			if (scheduledRange != null && !scheduledRange.equals(""))
 				statusLog.setScheduledRange(scheduledRange);
@@ -1194,7 +1194,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLog.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			statusLog.setDescription(Status.FICTICIOUS_SCHEDULED.getDescription());
 			
-			statusLog.setScheduledDate(request.getScheduleDate());
+			statusLog.setScheduledDate(request.getScheduleDate().toString());
 			statusLog.setScheduledRange(request.getScheduleRange());
 		
 			update.set("work_zone", request.getBucket());
@@ -1223,7 +1223,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLogDummy.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			
 			
-			statusLogDummy.setScheduledDate(request.getScheduleDate());
+			statusLogDummy.setScheduledDate(request.getScheduleDate().toString());
 			statusLogDummy.setScheduledRange(request.getScheduleRange());
 			
 			listLog.add(StatusPendiente);

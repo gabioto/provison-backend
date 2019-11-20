@@ -704,7 +704,7 @@ public class Provision implements Serializable {
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 		@Field("scheduled_date")
-		private LocalDate scheduledDate; /* = LocalDate.now(ZoneOffset.of("-05:00")); */
+		private String scheduledDate; /* = LocalDate.now(ZoneOffset.of("-05:00")); */
 
 		@Field("scheduled_range")
 		private String scheduledRange;
@@ -733,11 +733,11 @@ public class Provision implements Serializable {
 			this.insertedDate = insertedDate;
 		}
 
-		public LocalDate getScheduledDate() {
+		public String getScheduledDate() {
 			return scheduledDate;
 		}
 
-		public void setScheduledDate(LocalDate scheduledDate) {
+		public void setScheduledDate(String scheduledDate) {
 			this.scheduledDate = scheduledDate;
 		}
 

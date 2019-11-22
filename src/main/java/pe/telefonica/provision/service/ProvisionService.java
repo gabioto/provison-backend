@@ -19,7 +19,7 @@ public interface ProvisionService {
 
 	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
 	
-	Customer getCustomerByOrderCode(String orderCode);
+	Provision getProvisionBySaleCode(String saleCode);
 
 	List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 
@@ -58,7 +58,6 @@ public interface ProvisionService {
 			LocalDate scheduledDate, String scheduledRange, Integer scheduleType,String description);
 
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
-	
-	public boolean getCarrier(String phoneNumber);
+
 	
 }

@@ -3,6 +3,7 @@ package pe.telefonica.provision.service.impl;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -1253,48 +1254,100 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (provision != null) {
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-				
-				
-				Update update = new Update();
-				//update.set("xa_creation_date", getData[3]);
-				update.set("xa_id_st", getData[4]);
-				update.set("xa_requirement_number", getData[5]);
-				update.set("appt_number", getData[6]);
-				update.set("activity_type", getData[8]);
-				update.set("work_zone", getData[16]);
-				
-				if(provision.getXaIdSt() != null || provision.getXaIdSt() != "") {
+				//IN_TO fictitious
+				if(getData[2].toString().equals(getData[6].toString()) && getData[6].toString().equals(getData[8].toString())) {
+
+					Update update = new Update();
+
+					StatusLog statusLog = new StatusLog();
+					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
+					statusLog.setDescription(Status.DUMMY_IN_TOA.getDescription());
 					
-					update.set("has_schedule", false);
+					listLog.add(statusLog);
+					update.set("log_status", listLog);
+
+					provisionRepository.updateProvision(provision, update);
+					return true;
+					
+				} else {
+					
+					Update update = new Update();
+					//update.set("xa_creation_date", getData[3]);
+					update.set("xa_id_st", getData[4]);
+					update.set("xa_requirement_number", getData[5]);
+					update.set("appt_number", getData[6]);
+					update.set("activity_type", getData[8]);
+					update.set("work_zone", getData[16]);
+					
+					if(provision.getXaIdSt() != null || provision.getXaIdSt() != "") {
+						
+						update.set("has_schedule", false);
+					}
+					
+					InToa inToa = new InToa();
+
+					inToa.setXaNote(getData[9]);
+					inToa.setXaCreationDate(getData[3]);
+					inToa.setDate(getData[15]);
+					inToa.setXaScheduler(getData[16]);
+					inToa.setLongitude(getData[18]);
+					inToa.setLatitude(getData[19]);
+
+
+					update.set("in_toa", inToa);
+					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
+					
+					StatusLog statusLog = new StatusLog();
+					statusLog.setStatus(Status.IN_TOA.getStatusName());
+					statusLog.setDescription(Status.IN_TOA.getDescription());
+					
+					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+					listLog.add(statusLog);
+					update.set("log_status", listLog);
+					
+					
+					LocalDateTime dateSendedSMS = LocalDateTime.now(ZoneOffset.of("-05:00"));
+					provision.setDateSendedSMS(dateSendedSMS);
+					
+					
+					
+					
+					
+					//send sms invitation
+					if(!provision.getDummyStPsiCode().isEmpty()) {
+						provision.setHasSendedSMS(sendedSMSInvitationHasSchedule() ? true: false);
+						
+					} else {
+						provision.setHasSendedSMS(sendedSMSInvitationNotSchedule() ? true: false);
+					}
+					
+					update.set("customer.carrier", getCarrier(provision.getCustomer().getPhoneNumber()));
+					
+					
+					
+					//Add carrier phone contact
+					List<Contacts> contacts = provision.getContacts();
+					
+					if(contacts != null) {
+						
+						for(Contacts list: contacts) {
+							//boolean phoneCarrier =  ;
+							list.setCarrier(getCarrier(list.getPhoneNumber()));
+							
+						}
+						update.set("contacts", contacts);
+					}
+					
+					
+					provisionRepository.updateProvision(provision, update);
+					
+					return true;
+					
 				}
-				InToa inToa = new InToa();
-
-				inToa.setXaNote(getData[9]);
-				inToa.setXaCreationDate(getData[3]);
-				// update.set("xa_note", getData[9]);
-				inToa.setDate(getData[15]);
-				// update.set("date", getData[15]);
-				inToa.setXaScheduler(getData[16]);
-				// update.set("xa_scheduler", getData[16]);
-				inToa.setLongitude(getData[18]);
-				// update.set("longitude", getData[18]);
-				inToa.setLatitude(getData[19]);
-				// update.set("latitude", getData[19]);
-
-				update.set("in_toa", inToa);
-				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
-				update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 				
-				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(Status.IN_TOA.getStatusName());
-				statusLog.setDescription(Status.IN_TOA.getDescription());
 				
-				update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-				listLog.add(statusLog);
-				update.set("log_status", listLog);
-
-				provisionRepository.updateProvision(provision, update);
-				return true;
+				
 			}
 			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())) {
 
@@ -1385,19 +1438,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return false;
 	}
-
-	public boolean getCarrier(String phoneNumber) {
+	
+	private boolean sendedSMSInvitationNotSchedule() {
+		return true;
+	}
+	private boolean sendedSMSInvitationHasSchedule() {
+		return true;
+	}
+	
+	private boolean getCarrier(String phoneNumber) {
 		return restPSI.getCarrier(phoneNumber);
 	}
 
 	@Override
-	public Customer getCustomerByOrderCode(String orderCode) {
+	public Provision getProvisionBySaleCode(String saleCode) {
 
-		Provision provision = provisionRepository.getByOrderCodeForUpdate(orderCode);
+		Provision provision = provisionRepository.getProvisionBySaleCode(saleCode);
 
 		if (provision != null) {
-			provision.getCustomer().setProductName(provision.getProductName());
-			return provision.getCustomer();
+
+			return provision;
 		}
 		return null;
 	}

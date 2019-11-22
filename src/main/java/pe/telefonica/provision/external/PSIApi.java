@@ -319,7 +319,8 @@ public class PSIApi extends ConfigRestTemplate {
 			JsonObject joOutputSearchData = jsonOutput.getAsJsonObject("SearchCustomerResponseData");
 			JsonObject joOutputSearchList = joOutputSearchData.getAsJsonObject("searchCustomerResultsList");
 			JsonArray jaCustomerResults = joOutputSearchList.getAsJsonArray("searchCustomerResults");
-
+			
+			
 			return jaCustomerResults.size() > 0;
 		} catch (Exception e) {
 			// Se detecta error, por lo tanto se considera otro operador.

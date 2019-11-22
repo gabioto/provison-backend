@@ -178,11 +178,18 @@ public class TrazabilidadSecurityApi {
 
 		ParameterizedTypeReference<ApiResponse<SMSByIdResponse>> parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<SMSByIdResponse>>() {
 		};
+		
+		try {
+			
+			ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.POST,
+					entity, parameterizedTypeReference);
 
-		ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.POST,
-				entity, parameterizedTypeReference);
-
-		return responseEntity.getBody();
+			return responseEntity.getBody();
+			
+		} catch (Exception e) {
+			return null;
+		}
+		
 	}
 
 }

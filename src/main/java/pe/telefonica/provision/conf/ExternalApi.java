@@ -23,6 +23,7 @@ public class ExternalApi {
 	String psiUpdateClient;
 	String updateSchedule;
 	String scheduleUpdateFicticious;
+	String scheduleUpdatePSICodeReal;
 	String getPSIToken;
 	String securitySaveLogData;
 	String sendSMSById;
@@ -65,6 +66,14 @@ public class ExternalApi {
 
 	public void setScheduleUpdateFicticious(String scheduleUpdateFicticious) {
 		this.scheduleUpdateFicticious = scheduleUpdateFicticious;
+	}
+
+	public String getScheduleUpdatePSICodeReal() {
+		return scheduleUpdatePSICodeReal;
+	}
+
+	public void setScheduleUpdatePSICodeReal(String scheduleUpdatePSICodeReal) {
+		this.scheduleUpdatePSICodeReal = scheduleUpdatePSICodeReal;
 	}
 
 	public String getSendRequestToBO() {

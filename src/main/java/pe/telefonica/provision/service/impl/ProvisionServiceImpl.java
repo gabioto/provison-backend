@@ -35,6 +35,7 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
@@ -45,6 +46,7 @@ import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
+import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Internet;
@@ -272,10 +274,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		svaCode.add(getData[57]);
 
 		provision.setSvaCode(svaCode);
-
+		
 		Customer customer = new Customer();
 		customer.setName(getData[3]);
-		customer.setDocumentType(getData[13]);
+		
+		customer.setDocumentType(getData[13].toUpperCase());
+		
 		customer.setDocumentNumber(getData[4]);
 		customer.setPhoneNumber(getData[5]);
 		customer.setMail(getData[20]);
@@ -605,7 +609,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					msgParameters.add(paramName);
 					msgParameters.add(paramProduct);
-					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(),
+					
+					List<Contact> contacts = new ArrayList<>();
+
+					Contact contactCustomer = new Contact();
+					contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+					contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+					contacts.add(contactCustomer);
+					
+					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
 							Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]),
 							"");
 					// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
@@ -636,8 +648,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				msgParameters.add(paramProduct);
 
-				// TODO: url como parametro?
-				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(),
+				List<Contact> contacts = new ArrayList<>();
+
+				Contact contactCustomer = new Contact();
+				contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+				contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+				contacts.add(contactCustomer);
+				
+				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
 						Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new MsgParameter[0]),
 						"http://www.movistar.com.pe");
 
@@ -667,8 +685,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				if (updated) {
 					List<MsgParameter> msgParameters = new ArrayList<>();
+					List<Contact> contacts = new ArrayList<>();
 
-					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(),
+					Contact contactCustomer = new Contact();
+					contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+					contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+					contacts.add(contactCustomer);
+					
+					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
 							Constants.MSG_ADDRESS_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
 							provisionTexts.getWebUrl());
 
@@ -783,8 +807,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			msgParameters.add(paramName);
 			msgParameters.add(paramProduct);
+			
+			List<Contact> contacts = new ArrayList<>();
 
-			ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(),
+			Contact contactCustomer = new Contact();
+			contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+			contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+			contacts.add(contactCustomer);
+			
+			ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
 					Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]), "");
 
 			// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
@@ -932,7 +963,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 				// Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new
 				// MsgParameter[0]), provisionTexts.getWebUrl());
-				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(provision.getCustomer(),
+				List<Contact> contacts = new ArrayList<>();
+
+				Contact contactCustomer = new Contact();
+				contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+				contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+				contacts.add(contactCustomer);
+				
+				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
 						Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
 						provisionTexts.getWebUrl());
 
@@ -1251,7 +1289,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
 		List<StatusLog> listLog = provision.getLogStatus();
 		String[] getData = request.getData().split("\\|", -1);
-
+		// validate bucket and name product
+		
 		if (provision != null) {
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 				//IN_TO fictitious
@@ -1265,7 +1304,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-
+					
 					provisionRepository.updateProvision(provision, update);
 					return true;
 					
@@ -1325,7 +1364,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("customer.carrier", getCarrier(provision.getCustomer().getPhoneNumber()));
 					
 					
-					
 					//Add carrier phone contact
 					List<Contacts> contacts = provision.getContacts();
 					
@@ -1339,6 +1377,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("contacts", contacts);
 					}
 					
+					//update psiCode by schedule
+					trazabilidadScheduleApi.updatePSICodeReal(provision.getXaRequest(), getData[4]);
 					
 					provisionRepository.updateProvision(provision, update);
 					

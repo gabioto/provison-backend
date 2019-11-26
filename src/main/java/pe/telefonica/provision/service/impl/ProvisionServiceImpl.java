@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -21,7 +22,6 @@ import org.springframework.http.HttpStatus;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.ProvisionTexts;
@@ -47,6 +47,8 @@ import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
+import pe.telefonica.provision.external.response.BucketBodyResponse.OrigenBean;
+import pe.telefonica.provision.external.response.ResponseBucket;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Internet;
@@ -1284,13 +1286,43 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return true;
 	}
 
+	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
+		boolean errorBucket=false; 
+		//validar IN_TOA
+		if(Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0]==null?"":getData[0])) {
+			// validate bucket and name product
+			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
+			if(errorBucket) {
+				//valida DNI
+				if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
+						&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
+					errorBucket=false;
+					log.info("No es persona natural. Documento: "
+							+ provision.getCustomer().getDocumentType() + " NumDoc: "
+							+ provision.getCustomer().getDocumentNumber());
+				} else {
+					log.info("Es persona natural. Documento: "
+							+ provision.getCustomer().getDocumentType() + " NumDoc: "
+							+ provision.getCustomer().getDocumentNumber());
+				}
+			}
+		}
+		return errorBucket;
+	}
+	
 	@Override
-	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) {
+	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception{
 
 		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
 		List<StatusLog> listLog = provision.getLogStatus();
 		String[] getData = request.getData().split("\\|", -1);
-		// validate bucket and name product
+		//GENESIS
+		//valida Bucket x Producto
+		boolean boolBucket = validateBuckectProduct(getData, provision);
+
+		if(!boolBucket) {
+			return false;
+		}
 		
 		if (provision != null) {
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
@@ -1539,4 +1571,48 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return null;
 	}
 
+	@Override
+	public boolean getBucketByProduct(String channel, String product, String bucket) throws Exception {
+		Boolean errorValidate = false;
+
+		log.info("ScheduleServiceImpl.getBucketByProduct()");
+
+		try {
+			ResponseBucket responseBucket = restPSI.getBucketByProduct();
+
+			if (responseBucket != null) {
+				// HACER MATCH BUCKET POR PRODUCTO - GENESIS
+
+				for (Map.Entry<String, List<OrigenBean>> entry : responseBucket.getBody().getContent().entrySet()) {
+					if (channel.trim().equalsIgnoreCase(entry.getKey())) {
+						for (int i = 0; i < entry.getValue().size(); i++) {
+							for (int j = 0; j < entry.getValue().get(i).getBuckets().size(); j++) {
+								if (entry.getValue().get(i).getBuckets().get(j).trim().equalsIgnoreCase(bucket.trim())
+										&& entry.getValue().get(i).getProduct().trim().equalsIgnoreCase(product)) {
+									System.out.println("bucket => " + entry.getValue().get(i).getBuckets().get(j)
+											+ ", product => " + entry.getValue().get(i).getProduct());
+									errorValidate = true;
+									break;
+								}
+							}
+							if (errorValidate) {
+								break;
+							}
+						}
+						if (errorValidate) {
+							break;
+						}
+					}
+				}
+
+				return errorValidate;
+			} else {
+				throw new Exception();
+			}
+
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
 }

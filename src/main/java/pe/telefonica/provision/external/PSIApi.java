@@ -14,8 +14,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -37,21 +35,22 @@ import pe.telefonica.provision.conf.SSLClientFactory;
 import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
-import pe.telefonica.provision.util.exception.ServerNotFoundException;
-import pe.telefonica.provision.util.exception.FunctionalErrorException;
+import pe.telefonica.provision.external.response.ResponseBucket;
 import pe.telefonica.provision.model.OAuthToken;
-import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.repository.OAuthTokenRepository;
-import pe.telefonica.provision.repository.impl.ProvisionRepositoryImpl;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.service.response.PSIUpdateClientResponse;
 import pe.telefonica.provision.util.DateUtil;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.exception.FunctionalErrorException;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @Component
 public class PSIApi extends ConfigRestTemplate {
 	private static final Log log = LogFactory.getLog(PSIApi.class);
 
+	final Gson gson = new Gson();
+	
 	@Autowired
 	private OAuthTokenRepository oAuthTokenRepository;
 
@@ -327,6 +326,26 @@ public class PSIApi extends ConfigRestTemplate {
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
 			return false;
 		}
+	}
+	
+	public ResponseBucket getBucketByProduct() {
+		log.info("PSIApi.getBucketByProduct()");
+		Client client = Client.create();
+		WebResource webResource = client.resource(api.getSecurityUrl() + api.getBucketsByProduct());
+
+		ClientResponse clientResponse = webResource.accept(new String[] { "application/json" })
+				.header("Content-type", "application/json")
+				.header("Authorization", security.getAuth())
+				.header("X-IBM-Client-Id", security.getClientId())
+				.header("X-IBM-Client-Secret", security.getClientSecret()).get(ClientResponse.class);
+				/*headersMap.add("Authorization", security.getAuth());
+				headersMap.add("X-IBM-Client-Id", security.getClientId());
+				headersMap.add("X-IBM-Client-Secret", security.getClientSecret());*/
+		String output = (String) clientResponse.getEntity(String.class);
+
+		log.info("output ==> " + output);
+		return gson.fromJson(output, ResponseBucket.class);
+
 	}
 	
 }

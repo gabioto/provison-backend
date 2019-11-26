@@ -31,7 +31,7 @@ public interface ProvisionService {
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request);
+	boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception;
 
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
@@ -59,5 +59,6 @@ public interface ProvisionService {
 
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 
+	boolean getBucketByProduct(String channel, String product, String bucket) throws Exception;
 	
 }

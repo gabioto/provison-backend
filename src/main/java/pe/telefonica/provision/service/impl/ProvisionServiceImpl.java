@@ -63,6 +63,7 @@ import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
+import pe.telefonica.provision.util.constants.ConstantsMessageKey;
 import pe.telefonica.provision.util.constants.Status;
 
 @Service("provisionService")
@@ -225,8 +226,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setProductName(getData[10]);
 
 		provision.setXaRequest(getData[11]);
-		provision.setXaIdSt("");
-		provision.setDummyStPsiCode("");
+		//provision.setXaIdSt("");
+		//provision.setDummyStPsiCode("");
 		provision.setOriginCode(request.getDataOrigin());
 
 		provision.setCommercialOp(getData[12]);
@@ -1352,16 +1353,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 					
 					
 					
-					
-					//send sms invitation
-					if(!provision.getDummyStPsiCode().isEmpty()) {
-						provision.setHasSendedSMS(sendedSMSInvitationHasSchedule() ? true: false);
-						
-					} else {
-						provision.setHasSendedSMS(sendedSMSInvitationNotSchedule() ? true: false);
-					}
-					
-					update.set("customer.carrier", getCarrier(provision.getCustomer().getPhoneNumber()));
+					//carrier titular
+					boolean carrierTitular = getCarrier(provision.getCustomer().getPhoneNumber());
+					provision.getCustomer().setCarrier(carrierTitular);
+					update.set("customer.carrier", carrierTitular );
 					
 					
 					//Add carrier phone contact
@@ -1377,6 +1372,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("contacts", contacts);
 					}
 					
+					
+					//send sms invitation
+					provision.setContacts(contacts);
+					if(!provision.getDummyStPsiCode().isEmpty()) {
+						provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true: false);
+						
+					} else {
+						provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true: false);
+					}
+					
 					//update psiCode by schedule
 					trazabilidadScheduleApi.updatePSICodeReal(provision.getXaRequest(), getData[4]);
 					
@@ -1389,7 +1394,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				
 				
 			}
-			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName()) && !provision.getXaIdSt().isEmpty()) {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
@@ -1413,7 +1418,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_INIT.getStatusName())) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_INIT.getStatusName()) && !provision.getXaIdSt().isEmpty()) {
 
 				Update update = new Update();
 
@@ -1441,7 +1446,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_COMPLETED.getStatusName())) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_COMPLETED.getStatusName()) && !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
 
 				WoCompleted woCompleted = new WoCompleted();
@@ -1479,11 +1484,43 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return false;
 	}
 	
-	private boolean sendedSMSInvitationNotSchedule() {
-		return true;
+	private boolean sendedSMSInvitationNotSchedule(Provision provision) {
+		List<MsgParameter> msgParameters = new ArrayList<>();
+		
+		List<Contact> contacts = new ArrayList<>();
+
+		Contact contactCustomer = new Contact();
+		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+		contacts.add(contactCustomer);
+		
+		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
+				ConstantsMessageKey.MSG_NOT_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
+				provisionTexts.getWebUrl());
+		
+		if(apiResponse != null) {
+			return true;
+		}
+		return false;	
+		
 	}
-	private boolean sendedSMSInvitationHasSchedule() {
-		return true;
+	private boolean sendedSMSInvitationHasSchedule(Provision provision) {
+		List<MsgParameter> msgParameters = new ArrayList<>();
+		
+		List<Contact> contacts = new ArrayList<>();
+
+		Contact contactCustomer = new Contact();
+		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+		contacts.add(contactCustomer);
+		
+		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
+				ConstantsMessageKey.MSG_HAS_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
+				provisionTexts.getWebUrl());
+		if(apiResponse != null) {
+			return true;
+		}
+		return false;
 	}
 	
 	private boolean getCarrier(String phoneNumber) {

@@ -81,5 +81,11 @@ public final class Constants {
 	
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
-	public static final String OPER_GET_CUSTOMER_BY_ORDER_CODE = "OPER_GET_CUSTOMER_BY_ORDER_CODE";
+	public static final String OPER_GET_PROVISION_BY_SALE_CODE = "OPER_GET_PROVISION_BY_SALE_CODE";
+	
+	public static final String STATUS_IN_TOA = "IN_TOA";
+	public static final String TIPO_RUC = "ruc";
+	public static final String RUC_NATURAL = "10";
+	
+	
 }

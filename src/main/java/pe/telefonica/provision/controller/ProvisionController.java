@@ -265,40 +265,37 @@ public class ProvisionController {
 		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 
-	@RequestMapping(value = "/getCustomerByOrderCode", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<Customer>> getCustomerByOrderCode(
+	@RequestMapping(value = "/getProvisionBySaleCode", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<Provision>> getCustomerByOrderCode(
 			@RequestBody @Valid ApiRequest<GetCustomerByOrderCodeRequest> request) {
-		ApiResponse<Customer> apiResponse;
+		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
 
 		try {
-			Customer customer = provisionService.getCustomerByOrderCode(request.getBody().getOrderCode());
+			Provision provision = provisionService.getProvisionBySaleCode(request.getBody().getSaleCode());
 
-			if (customer != null) {
+			if (provision != null) {
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_GET_CUSTOMER_BY_ORDER_CODE, String.valueOf(status.value()),
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_BY_SALE_CODE, String.valueOf(status.value()),
 						status.getReasonPhrase(), null);
-				apiResponse.setBody(customer);
+				apiResponse.setBody(provision);
 			} else {
 				status = HttpStatus.NOT_FOUND;
 
-				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_GET_CUSTOMER_BY_ORDER_CODE, String.valueOf(status.value()),
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_BY_SALE_CODE, String.valueOf(status.value()),
 						"No se encontro registro", null);
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
 
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_CUSTOMER_BY_ORDER_CODE, String.valueOf(status.value()),
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_BY_SALE_CODE, String.valueOf(status.value()),
 					ex.getMessage().toString(), null);
-
 		}
 		return ResponseEntity.status(status).body(apiResponse);
-		// return
-		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 
 	@RequestMapping(value = "/insertOrder", method = RequestMethod.POST)

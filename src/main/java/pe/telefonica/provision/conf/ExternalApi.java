@@ -23,9 +23,11 @@ public class ExternalApi {
 	String psiUpdateClient;
 	String updateSchedule;
 	String scheduleUpdateFicticious;
+	String scheduleUpdatePSICodeReal;
 	String getPSIToken;
 	String securitySaveLogData;
 	String sendSMSById;
+	String bucketsByProduct;
 
 	public String getSendSMSById() {
 		return sendSMSById;
@@ -65,6 +67,14 @@ public class ExternalApi {
 
 	public void setScheduleUpdateFicticious(String scheduleUpdateFicticious) {
 		this.scheduleUpdateFicticious = scheduleUpdateFicticious;
+	}
+
+	public String getScheduleUpdatePSICodeReal() {
+		return scheduleUpdatePSICodeReal;
+	}
+
+	public void setScheduleUpdatePSICodeReal(String scheduleUpdatePSICodeReal) {
+		this.scheduleUpdatePSICodeReal = scheduleUpdatePSICodeReal;
 	}
 
 	public String getSendRequestToBO() {
@@ -161,5 +171,13 @@ public class ExternalApi {
 
 	public void setOauthToken(String oauthToken) {
 		this.oauthToken = oauthToken;
+	}
+
+	public String getBucketsByProduct() {
+		return bucketsByProduct;
+	}
+
+	public void setBucketsByProduct(String bucketsByProduct) {
+		this.bucketsByProduct = bucketsByProduct;
 	}
 }

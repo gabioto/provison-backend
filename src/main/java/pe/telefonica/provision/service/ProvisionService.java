@@ -19,7 +19,7 @@ public interface ProvisionService {
 
 	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
 	
-	Customer getCustomerByOrderCode(String orderCode);
+	Provision getProvisionBySaleCode(String saleCode);
 
 	List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 
@@ -31,7 +31,7 @@ public interface ProvisionService {
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request);
+	boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception;
 
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
@@ -58,7 +58,7 @@ public interface ProvisionService {
 			LocalDate scheduledDate, String scheduledRange, Integer scheduleType,String description);
 
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
-	
-	public boolean getCarrier(String phoneNumber);
+
+	boolean getBucketByProduct(String channel, String product, String bucket) throws Exception;
 	
 }

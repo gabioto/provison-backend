@@ -21,6 +21,7 @@ import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
+import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
@@ -130,4 +131,55 @@ public class TrazabilidadScheduleApi {
 			return false;
 		}
 	}
+	
+	public boolean updatePSICodeReal(String orderCode, String stPsiCode) {
+		
+		log.info("updatePSICodeReal");
+		RestTemplate restTemplate = new RestTemplate();
+		String urlSchedule = api.getScheduleUrl() + api.getScheduleUpdatePSICodeReal();
+		System.out.println(urlSchedule);
+		//String urlSchedule = "https://agendamiento-trazabilidad-dev.mybluemix.net/schedule/cancelSchedule";
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", iBMSecurityAgendamiento.getAuth());
+		headersMap.add("X-IBM-Client-Id", iBMSecurityAgendamiento.getClientId());
+		headersMap.add("X-IBM-Client-Secret", iBMSecurityAgendamiento.getClientSecret());
+		
+		ScheduleUpdatePSICodeRealRequest updateStPsiCodeRequest = new ScheduleUpdatePSICodeRealRequest();
+		updateStPsiCodeRequest.setOrderCode(orderCode);
+		updateStPsiCodeRequest.setStPsiCode(stPsiCode);
+		
+		ApiRequest<ScheduleUpdatePSICodeRealRequest> apiRequest = new ApiRequest<ScheduleUpdatePSICodeRealRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_SCHEDULE_UPDATE_CODE_FICT, updateStPsiCodeRequest);
+		//HttpEntity<ApiRequest<LoginRequest>> entity = new HttpEntity<ApiRequest<LoginRequest>>(apiRequest, headersMap);
+
+		HttpEntity<ApiRequest<ScheduleUpdatePSICodeRealRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleUpdatePSICodeRealRequest>>(apiRequest, headersMap);
+
+		try {
+			//ParameterizedTypeReference<ApiResponse<String>>  parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<String>>(){};
+			
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
+					String.class);
+			
+			log.info("responseEntity: " + responseEntity.getBody());
+
+			return responseEntity.getStatusCode().equals(HttpStatus.OK);
+		} catch (HttpClientErrorException ex) {
+			log.info("Exception = " + ex.getMessage());
+			log.info("Exception = " + ex.getResponseBodyAsString());
+			
+			return false;
+
+		} catch (Exception ex) {
+			
+			log.info("Exception = " + ex.getMessage());
+			//throw new ServerNotFoundException(ex.getMessage());
+			
+			return false;
+		}
+		
+		
+	}
+	
 }

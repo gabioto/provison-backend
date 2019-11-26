@@ -1,14 +1,14 @@
 package pe.telefonica.provision.controller.request;
 
 public class GetCustomerByOrderCodeRequest {
-	private String OrderCode;
+	private String saleCode;
 
-	public String getOrderCode() {
-		return OrderCode;
+	public String getSaleCode() {
+		return saleCode;
 	}
 
-	public void setOrderCode(String orderCode) {
-		OrderCode = orderCode;
+	public void setSaleCode(String saleCode) {
+		this.saleCode = saleCode;
 	}
 
 }

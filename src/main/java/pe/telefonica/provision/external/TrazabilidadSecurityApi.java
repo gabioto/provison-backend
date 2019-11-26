@@ -131,7 +131,7 @@ public class TrazabilidadSecurityApi {
 
 	}
 
-	public ApiResponse<SMSByIdResponse> sendSMS(Customer customer, String msgKey, MsgParameter[] msgParameters,
+	public ApiResponse<SMSByIdResponse> sendSMS(List<Contact> contacts, String msgKey, MsgParameter[] msgParameters,
 			String webURL) {
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
@@ -153,11 +153,11 @@ public class TrazabilidadSecurityApi {
 
 		System.out.println(webURL);
 
-		List<Contact> contacts = new ArrayList<>();
+		//List<Contact> contacts = new ArrayList<>();
 
-		Contact contactCustomer = new Contact();
+		/*Contact contactCustomer = new Contact();
 		contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); // TODO: Cambiar integer a string
-		contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
+		contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));*/
 
 		/*if (customer.getContactPhoneNumber() != null) {
 			Contact contactContact = new Contact();
@@ -166,7 +166,7 @@ public class TrazabilidadSecurityApi {
 			contacts.add(contactContact);
 		}*/
 
-		contacts.add(contactCustomer);
+		//contacts.add(contactCustomer);
 
 		smsByIdRequest.setContacts(contacts.toArray(new Contact[0]));
 		smsByIdRequest.setMessage(message);
@@ -178,11 +178,18 @@ public class TrazabilidadSecurityApi {
 
 		ParameterizedTypeReference<ApiResponse<SMSByIdResponse>> parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<SMSByIdResponse>>() {
 		};
+		
+		try {
+			
+			ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.POST,
+					entity, parameterizedTypeReference);
 
-		ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.POST,
-				entity, parameterizedTypeReference);
-
-		return responseEntity.getBody();
+			return responseEntity.getBody();
+			
+		} catch (Exception e) {
+			return null;
+		}
+		
 	}
 
 }

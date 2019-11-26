@@ -1517,7 +1517,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 	
 	private boolean sendedSMSInvitationNotSchedule(Provision provision) {
-		List<MsgParameter> msgParameters = new ArrayList<>();
+		return true;
+		/*List<MsgParameter> msgParameters = new ArrayList<>();
 		
 		List<Contact> contacts = new ArrayList<>();
 
@@ -1533,11 +1534,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if(apiResponse != null) {
 			return true;
 		}
-		return false;	
+		return false;*/
 		
 	}
 	private boolean sendedSMSInvitationHasSchedule(Provision provision) {
-		List<MsgParameter> msgParameters = new ArrayList<>();
+		return true;
+		
+		/*List<MsgParameter> msgParameters = new ArrayList<>();
 		
 		List<Contact> contacts = new ArrayList<>();
 
@@ -1552,7 +1555,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if(apiResponse != null) {
 			return true;
 		}
-		return false;
+		
+		return false;*/
+		
 	}
 	
 	private boolean getCarrier(String phoneNumber) {

@@ -232,7 +232,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		//provision.setDummyStPsiCode("");
 		provision.setOriginCode(request.getDataOrigin());
 
-		provision.setCommercialOp(getData[12]);
+		provision.setCommercialOp(getData[12].toUpperCase());
 		provision.setProductCode(getData[14]);
 		provision.setProductNameSource(getData[15]);
 		provision.setKafkaDateSend(getData[17]);
@@ -370,7 +370,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		update.set("xa_request", getData[11]);
 		update.set("origin_code", request.getDataOrigin());
 		// provision.setCommercialOp(getData[12]);
-		update.set("commercial_op", getData[12]);
+		update.set("commercial_op", getData[12].toUpperCase());
 		// provision.setProductCode(getData[14]);
 		update.set("product_code", getData[14]);
 		// provision.setProductNameSource(getData[15]);

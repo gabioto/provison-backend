@@ -5,6 +5,8 @@ public class ScheduleUpdateFicticiousRequest {
 	private Integer fictitiousCode;
 	private String orderCode;
 	private String saleCode;
+	private String requestType;
+	private String requestName;
 
 	public String getOriginCode() {
 		return originCode;
@@ -38,4 +40,21 @@ public class ScheduleUpdateFicticiousRequest {
 		this.saleCode = saleCode;
 	}
 
+	public String getRequestType() {
+		return requestType;
+	}
+
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
+	}
+
+	public String getRequestName() {
+		return requestName;
+	}
+
+	public void setRequestName(String requestName) {
+		this.requestName = requestName;
+	}
+	
+	
 }

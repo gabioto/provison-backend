@@ -1314,20 +1314,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception{
 
 		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
-		List<StatusLog> listLog = provision.getLogStatus();
+		
 		String[] getData = request.getData().split("\\|", -1);
 		//GENESIS
-		//valida Bucket x Producto
-		boolean boolBucket = validateBuckectProduct(getData, provision);
-
-		if(!boolBucket) {
-			return false;
-		}
 		
 		if (provision != null) {
+			
+			List<StatusLog> listLog = provision.getLogStatus();
+			//valida Bucket x Producto
+			boolean boolBucket = validateBuckectProduct(getData, provision);
+
+			if(!boolBucket) {
+				return false;
+			}
+			
+			
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 				//IN_TO fictitious
-				if(getData[2].toString().equals(getData[6].toString()) && getData[6].toString().equals(getData[8].toString())) {
+				if(getData[2].toString().equals(getData[4].toString()) && getData[4].toString().equals(getData[6].toString())) {
 
 					Update update = new Update();
 

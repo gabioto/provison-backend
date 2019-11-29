@@ -1324,7 +1324,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 			}
 		}
-		return errorBucket;
+		return true;
 	}
 
 	@Override

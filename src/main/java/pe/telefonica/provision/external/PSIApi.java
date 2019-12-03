@@ -50,7 +50,7 @@ public class PSIApi extends ConfigRestTemplate {
 	private static final Log log = LogFactory.getLog(PSIApi.class);
 
 	final Gson gson = new Gson();
-	
+
 	@Autowired
 	private OAuthTokenRepository oAuthTokenRepository;
 
@@ -59,6 +59,9 @@ public class PSIApi extends ConfigRestTemplate {
 
 	@Autowired
 	private IBMSecuritySeguridad security;
+
+	@Autowired
+	TrazabilidadSecurityApi loggerApi;
 
 	public Boolean updatePSIClient(PSIUpdateClientRequest requestx) {
 		String oAuthToken;
@@ -91,8 +94,7 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
-		
-		
+
 		/*
 		 * request.getHeaderIn().setSystem("COL");
 		 * request.getHeaderIn().setSubsystem("TRA");
@@ -113,25 +115,36 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getBodyUpdateClient().getUser().setLogin("appmovistar");
 		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
 		request.getBodyUpdateClient().getUser().setAuth_string(generateAuthString());
-		
-		
-		/*request.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
-		request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
-		
-		request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().getContactName());
-		request.getBodyUpdateClient().setNombre_completo2(provision.getCustomer().getContactName1());
-		request.getBodyUpdateClient().setNombre_completo3(provision.getCustomer().getContactName2());
-		request.getBodyUpdateClient().setNombre_completo4(provision.getCustomer().getContactName3());
-		
-		request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.getCustomer().getContactPhoneNumber()));
-		request.getBodyUpdateClient().setTelefono2(provision.getCustomer().getContactPhoneNumber1() != null ? String.valueOf(provision.getCustomer().getContactPhoneNumber1()): "");
-		request.getBodyUpdateClient().setTelefono3(provision.getCustomer().getContactPhoneNumber2() != null ? String.valueOf(provision.getCustomer().getContactPhoneNumber2()): "");
-		request.getBodyUpdateClient().setTelefono4(provision.getCustomer().getContactPhoneNumber2() != null ? String.valueOf(provision.getCustomer().getContactPhoneNumber3()): "");
-		*/
+
+		/*
+		 * request.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
+		 * request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
+		 * 
+		 * request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().
+		 * getContactName());
+		 * request.getBodyUpdateClient().setNombre_completo2(provision.getCustomer().
+		 * getContactName1());
+		 * request.getBodyUpdateClient().setNombre_completo3(provision.getCustomer().
+		 * getContactName2());
+		 * request.getBodyUpdateClient().setNombre_completo4(provision.getCustomer().
+		 * getContactName3());
+		 * 
+		 * request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.
+		 * getCustomer().getContactPhoneNumber()));
+		 * request.getBodyUpdateClient().setTelefono2(provision.getCustomer().
+		 * getContactPhoneNumber1() != null ?
+		 * String.valueOf(provision.getCustomer().getContactPhoneNumber1()): "");
+		 * request.getBodyUpdateClient().setTelefono3(provision.getCustomer().
+		 * getContactPhoneNumber2() != null ?
+		 * String.valueOf(provision.getCustomer().getContactPhoneNumber2()): "");
+		 * request.getBodyUpdateClient().setTelefono4(provision.getCustomer().
+		 * getContactPhoneNumber2() != null ?
+		 * String.valueOf(provision.getCustomer().getContactPhoneNumber3()): "");
+		 */
 		log.info("updatePSIClient - request: " + request.toString());
-		
+
 		oAuthToken = getAuthToken(request.getBodyUpdateClient().getNombre_completo());
-		//log.info("updatePSIClient - oAuthToken: " + oAuthToken);
+		// log.info("updatePSIClient - oAuthToken: " + oAuthToken);
 
 		if (oAuthToken.isEmpty()) {
 			return false;
@@ -145,7 +158,7 @@ public class PSIApi extends ConfigRestTemplate {
 		log.info("updatePSIClient - headers: " + headers.toString());
 
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
-		
+
 		System.out.println(entity);
 		try {
 
@@ -157,6 +170,8 @@ public class PSIApi extends ConfigRestTemplate {
 			 * getRestTemplate().postForEntity(requestUrl, entity,
 			 * PSIUpdateClientResponse.class);
 			 */
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request),
+					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl);
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
@@ -165,6 +180,9 @@ public class PSIApi extends ConfigRestTemplate {
 
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
+
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getResponseBodyAsString(),
+					requestUrl);
 
 			// JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -180,8 +198,8 @@ public class PSIApi extends ConfigRestTemplate {
 			// return false;
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl);
 			throw new ServerNotFoundException(ex.getMessage());
-			// return false;
 		}
 	}
 
@@ -272,12 +290,14 @@ public class PSIApi extends ConfigRestTemplate {
 		}
 		return null;
 	}
-	
-	public boolean getCarrier(String phoneNumber) {
-		try {
-			Client client = Client.create();
-			WebResource webResource = client.resource("https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/customerinformation/v2/searchCustomer");
 
+	public boolean getCarrier(String phoneNumber) {
+		String input = "";
+		Client client = Client.create();
+		WebResource webResource = client.resource(
+				"https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/customerinformation/v2/searchCustomer");
+
+		try {
 			JsonObject jsonBody = new JsonObject();
 			JsonObject jsonTefHeaderReq = new JsonObject();
 			JsonObject jsonSearchCustomer = new JsonObject();
@@ -302,7 +322,7 @@ public class PSIApi extends ConfigRestTemplate {
 			jsonBody.add("SearchCustomerRequestData", jsonSearchCustomer);
 
 			Gson gson = new Gson();
-			String input = gson.toJson(jsonBody);
+			input = gson.toJson(jsonBody);
 
 			// GENESIS
 			ClientResponse clientResponse = webResource.accept(new String[] { "application/json" })
@@ -312,40 +332,44 @@ public class PSIApi extends ConfigRestTemplate {
 					.post(ClientResponse.class, input);
 			String output = (String) clientResponse.getEntity(String.class);
 
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output, webResource.getURI().getPath());
+
 			JsonElement jsonElement = gson.fromJson(output, JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
 
 			JsonObject joOutputSearchData = jsonOutput.getAsJsonObject("SearchCustomerResponseData");
 			JsonObject joOutputSearchList = joOutputSearchData.getAsJsonObject("searchCustomerResultsList");
 			JsonArray jaCustomerResults = joOutputSearchList.getAsJsonArray("searchCustomerResults");
-			
-			
+
 			return jaCustomerResults.size() > 0;
 		} catch (Exception e) {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(),
+					webResource.getURI().getPath());
 			return false;
 		}
 	}
-	
+
 	public ResponseBucket getBucketByProduct() {
 		log.info("PSIApi.getBucketByProduct()");
 		Client client = Client.create();
 		WebResource webResource = client.resource(api.getSecurityUrl() + api.getBucketsByProduct());
 
 		ClientResponse clientResponse = webResource.accept(new String[] { "application/json" })
-				.header("Content-type", "application/json")
-				.header("Authorization", security.getAuth())
+				.header("Content-type", "application/json").header("Authorization", security.getAuth())
 				.header("X-IBM-Client-Id", security.getClientId())
 				.header("X-IBM-Client-Secret", security.getClientSecret()).get(ClientResponse.class);
-				/*headersMap.add("Authorization", security.getAuth());
-				headersMap.add("X-IBM-Client-Id", security.getClientId());
-				headersMap.add("X-IBM-Client-Secret", security.getClientSecret());*/
+		/*
+		 * headersMap.add("Authorization", security.getAuth());
+		 * headersMap.add("X-IBM-Client-Id", security.getClientId());
+		 * headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
+		 */
 		String output = (String) clientResponse.getEntity(String.class);
 
 		log.info("output ==> " + output);
 		return gson.fromJson(output, ResponseBucket.class);
 
 	}
-	
+
 }

@@ -18,6 +18,10 @@ public class LogDataRequest {
 
 	private String action;
 
+	private String third;
+	private String operation;
+	private String url;
+
 	public String getDocumentNumber() {
 		return documentNumber;
 	}
@@ -80,6 +84,30 @@ public class LogDataRequest {
 
 	public void setAction(String action) {
 		this.action = action;
+	}
+
+	public String getThird() {
+		return third;
+	}
+
+	public void setThird(String third) {
+		this.third = third;
+	}
+
+	public String getOperation() {
+		return operation;
+	}
+
+	public void setOperation(String operation) {
+		this.operation = operation;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }

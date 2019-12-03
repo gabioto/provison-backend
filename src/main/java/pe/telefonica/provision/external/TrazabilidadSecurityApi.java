@@ -1,6 +1,5 @@
 package pe.telefonica.provision.external;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -8,8 +7,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,6 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.external.request.LogDataRequest;
-import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.util.constants.Constants;
 
 @Component
@@ -95,6 +95,42 @@ public class TrazabilidadSecurityApi {
 
 	}
 
+	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl) {
+		log.info(this.getClass().getName() + " - " + "logEvent");
+
+		String url = api.getSecurityUrl() + api.getSaveThirdLogData();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headers.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
+		headers.add("Authorization", ibmSecuritySeguridad.getAuth());
+
+		LogDataRequest logRequest = new LogDataRequest();
+		logRequest.setThird(third);
+		logRequest.setOperation(operation);
+		logRequest.setRequest(request);
+		logRequest.setResponse(response);
+		logRequest.setUrl(serviceUrl);
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logRequest, headers);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
+
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				log.info(this.getClass().getName() + " - " + "logEvent - OK");
+			} else {
+				log.info(this.getClass().getName() + " - " + "logEvent - ERR");
+			}
+		} catch (Exception e) {
+			log.info(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
+		}
+	}
+
 	public Boolean sendMail(String templateId, MailParameter[] mailParameters) {
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -153,20 +189,24 @@ public class TrazabilidadSecurityApi {
 
 		System.out.println(webURL);
 
-		//List<Contact> contacts = new ArrayList<>();
+		// List<Contact> contacts = new ArrayList<>();
 
-		/*Contact contactCustomer = new Contact();
-		contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); // TODO: Cambiar integer a string
-		contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));*/
+		/*
+		 * Contact contactCustomer = new Contact();
+		 * contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); //
+		 * TODO: Cambiar integer a string
+		 * contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
+		 */
 
-		/*if (customer.getContactPhoneNumber() != null) {
-			Contact contactContact = new Contact();
-			contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString()); 
-			contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
-			contacts.add(contactContact);
-		}*/
+		/*
+		 * if (customer.getContactPhoneNumber() != null) { Contact contactContact = new
+		 * Contact();
+		 * contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString());
+		 * contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
+		 * contacts.add(contactContact); }
+		 */
 
-		//contacts.add(contactCustomer);
+		// contacts.add(contactCustomer);
 
 		smsByIdRequest.setContacts(contacts.toArray(new Contact[0]));
 		smsByIdRequest.setMessage(message);
@@ -178,18 +218,18 @@ public class TrazabilidadSecurityApi {
 
 		ParameterizedTypeReference<ApiResponse<SMSByIdResponse>> parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<SMSByIdResponse>>() {
 		};
-		
+
 		try {
-			
+
 			ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.POST,
 					entity, parameterizedTypeReference);
 
 			return responseEntity.getBody();
-			
+
 		} catch (Exception e) {
 			return null;
 		}
-		
+
 	}
 
 }

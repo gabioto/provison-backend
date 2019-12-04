@@ -1,5 +1,6 @@
 package pe.telefonica.provision.external;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -95,7 +96,8 @@ public class TrazabilidadSecurityApi {
 
 	}
 
-	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl) {
+	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
+			LocalDateTime startHour, LocalDateTime endHour) {
 		log.info(this.getClass().getName() + " - " + "logEvent");
 
 		String url = api.getSecurityUrl() + api.getSaveThirdLogData();
@@ -112,6 +114,8 @@ public class TrazabilidadSecurityApi {
 		logRequest.setRequest(request);
 		logRequest.setResponse(response);
 		logRequest.setUrl(serviceUrl);
+		logRequest.setStartHour(startHour);
+		logRequest.setEndHour(endHour);
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

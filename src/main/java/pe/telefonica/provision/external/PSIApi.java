@@ -1,6 +1,8 @@
 package pe.telefonica.provision.external;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
 
@@ -65,6 +67,8 @@ public class PSIApi extends ConfigRestTemplate {
 
 	public Boolean updatePSIClient(PSIUpdateClientRequest requestx) {
 		String oAuthToken;
+		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		LocalDateTime endHour;
 
 		RestTemplate restTemplate = new RestTemplate(
 				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
@@ -170,8 +174,9 @@ public class PSIApi extends ConfigRestTemplate {
 			 * getRestTemplate().postForEntity(requestUrl, entity,
 			 * PSIUpdateClientResponse.class);
 			 */
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request),
-					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl);
+					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour, endHour);
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
@@ -181,8 +186,9 @@ public class PSIApi extends ConfigRestTemplate {
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getResponseBodyAsString(),
-					requestUrl);
+					requestUrl, startHour, endHour);
 
 			// JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -198,7 +204,9 @@ public class PSIApi extends ConfigRestTemplate {
 			// return false;
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl);
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl,
+					startHour, endHour);
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
@@ -293,6 +301,8 @@ public class PSIApi extends ConfigRestTemplate {
 
 	public boolean getCarrier(String phoneNumber) {
 		String input = "";
+		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		LocalDateTime endHour;
 		Client client = Client.create();
 		WebResource webResource = client.resource(
 				"https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/customerinformation/v2/searchCustomer");
@@ -332,7 +342,9 @@ public class PSIApi extends ConfigRestTemplate {
 					.post(ClientResponse.class, input);
 			String output = (String) clientResponse.getEntity(String.class);
 
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output, webResource.getURI().getPath());
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output, webResource.getURI().getPath(), startHour,
+					endHour);
 
 			JsonElement jsonElement = gson.fromJson(output, JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
@@ -345,8 +357,9 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception e) {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(),
-					webResource.getURI().getPath());
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(), webResource.getURI().getPath(),
+					startHour, endHour);
 			return false;
 		}
 	}

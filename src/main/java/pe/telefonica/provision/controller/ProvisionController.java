@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -1282,8 +1283,9 @@ public class ProvisionController {
 	}
 
 	public String getTimestamp() {
+		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.S");
-		String timeStamp  = dateFormat.format(new Date());
+		String timeStamp  = dateFormat.format(dateNow);
 		//Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		return timeStamp;
 	}

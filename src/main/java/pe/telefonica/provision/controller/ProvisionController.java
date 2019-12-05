@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -1283,8 +1284,10 @@ public class ProvisionController {
 	}
 
 	public String getTimestamp() {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.S");
-		String timeStamp  = dateFormat.format(new Date());
+		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
+		String timeStamp  = dateNow.format(formatter);
 		return timeStamp;
 	}
+	
 }

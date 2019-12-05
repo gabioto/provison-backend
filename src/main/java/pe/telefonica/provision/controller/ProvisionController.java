@@ -1284,9 +1284,11 @@ public class ProvisionController {
 	}
 
 	public String getTimestamp() {
+		log.info("ProvisionController.getTimestamp()");
 		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
 		String timeStamp  = dateNow.format(formatter);
+		log.info("timeStamp => "+timeStamp);
 		return timeStamp;
 	}
 	

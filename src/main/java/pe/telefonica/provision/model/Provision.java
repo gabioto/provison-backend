@@ -185,6 +185,12 @@ public class Provision implements Serializable {
 	@Field("registro_actualizado")
 	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
+	@Field("has_sended_sms")
+	private boolean hasSendedSMS;
+
+	@Field("date_sended_sms")
+	private LocalDateTime dateSendedSMS;
+
 	@Field("last_tracking_status")
 	private String lastTrackingStatus;
 
@@ -627,6 +633,22 @@ public class Provision implements Serializable {
 		this.updatedDate = updatedDate;
 	}
 
+	public boolean isHasSendedSMS() {
+		return hasSendedSMS;
+	}
+
+	public void setHasSendedSMS(boolean hasSendedSMS) {
+		this.hasSendedSMS = hasSendedSMS;
+	}
+
+	public LocalDateTime getDateSendedSMS() {
+		return dateSendedSMS;
+	}
+
+	public void setDateSendedSMS(LocalDateTime dateSendedSMS) {
+		this.dateSendedSMS = dateSendedSMS;
+	}
+
 	public String getLastTrackingStatus() {
 		return lastTrackingStatus;
 	}
@@ -704,7 +726,7 @@ public class Provision implements Serializable {
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 		@Field("scheduled_date")
-		private LocalDate scheduledDate; /* = LocalDate.now(ZoneOffset.of("-05:00")); */
+		private String scheduledDate; /* = LocalDate.now(ZoneOffset.of("-05:00")); */
 
 		@Field("scheduled_range")
 		private String scheduledRange;
@@ -733,11 +755,11 @@ public class Provision implements Serializable {
 			this.insertedDate = insertedDate;
 		}
 
-		public LocalDate getScheduledDate() {
+		public String getScheduledDate() {
 			return scheduledDate;
 		}
 
-		public void setScheduledDate(LocalDate scheduledDate) {
+		public void setScheduledDate(String scheduledDate) {
 			this.scheduledDate = scheduledDate;
 		}
 

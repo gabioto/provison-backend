@@ -18,7 +18,7 @@ public class Customer implements Serializable {
 	private String name;
 
 	@Field("carrier")
-	private String carrier;
+	private boolean carrier;
 
 	@Field("contact_carrier")
 	private String contactCarrier;
@@ -43,7 +43,6 @@ public class Customer implements Serializable {
 
 	@Field("reference")
 	private String reference;
-
 
 
 	@Field("latitude")
@@ -81,11 +80,11 @@ public class Customer implements Serializable {
 		this.name = name;
 	}
 
-	public String getCarrier() {
+	public boolean getCarrier() {
 		return carrier;
 	}
 
-	public void setCarrier(String carrier) {
+	public void setCarrier(boolean carrier) {
 		this.carrier = carrier;
 	}
 

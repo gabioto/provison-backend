@@ -1,5 +1,7 @@
 package pe.telefonica.provision.external.request;
 
+import java.time.LocalDateTime;
+
 public class LogDataRequest {
 
 	private String documentNumber;
@@ -17,6 +19,12 @@ public class LogDataRequest {
 	private String response;
 
 	private String action;
+
+	private String third;
+	private String operation;
+	private String url;
+	private LocalDateTime startHour;
+	private LocalDateTime endHour;
 
 	public String getDocumentNumber() {
 		return documentNumber;
@@ -80,6 +88,46 @@ public class LogDataRequest {
 
 	public void setAction(String action) {
 		this.action = action;
+	}
+
+	public String getThird() {
+		return third;
+	}
+
+	public void setThird(String third) {
+		this.third = third;
+	}
+
+	public String getOperation() {
+		return operation;
+	}
+
+	public void setOperation(String operation) {
+		this.operation = operation;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public LocalDateTime getStartHour() {
+		return startHour;
+	}
+
+	public void setStartHour(LocalDateTime startHour) {
+		this.startHour = startHour;
+	}
+
+	public LocalDateTime getEndHour() {
+		return endHour;
+	}
+
+	public void setEndHour(LocalDateTime endHour) {
+		this.endHour = endHour;
 	}
 
 }

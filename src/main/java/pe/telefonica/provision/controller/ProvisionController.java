@@ -833,6 +833,8 @@ public class ProvisionController {
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
 						errorInternal, "No existe registro", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
+				log.info("timestamp => "+timestamp);
+				log.info("MessageId => "+request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(),
 						"", "","", "ERROR", new Gson().toJson(request), new

@@ -25,6 +25,10 @@ public class LogDataRequest {
 	private String url;
 	private LocalDateTime startHour;
 	private LocalDateTime endHour;
+	
+	private String messageId;
+	private String firstDate;
+	private String lastDate;
 
 	public String getDocumentNumber() {
 		return documentNumber;
@@ -128,6 +132,30 @@ public class LogDataRequest {
 
 	public void setEndHour(LocalDateTime endHour) {
 		this.endHour = endHour;
+	}
+
+	public String getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(String messageId) {
+		this.messageId = messageId;
+	}
+
+	public String getFirstDate() {
+		return firstDate;
+	}
+
+	public void setFirstDate(String firstDate) {
+		this.firstDate = firstDate;
+	}
+
+	public String getLastDate() {
+		return lastDate;
+	}
+
+	public void setLastDate(String lastDate) {
+		this.lastDate = lastDate;
 	}
 
 }

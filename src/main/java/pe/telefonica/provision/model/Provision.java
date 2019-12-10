@@ -729,6 +729,9 @@ public class Provision implements Serializable {
 
 		@Field("scheduled_range")
 		private String scheduledRange;
+		
+		@Field("xa_id_st")
+		private String xaidst;
 
 		public String getStatus() {
 			return status;
@@ -768,6 +771,14 @@ public class Provision implements Serializable {
 
 		public void setScheduledRange(String scheduledRange) {
 			this.scheduledRange = scheduledRange;
+		}
+
+		public String getXaidst() {
+			return xaidst;
+		}
+
+		public void setXaidst(String xaidst) {
+			this.xaidst = xaidst;
 		}
 
 	}

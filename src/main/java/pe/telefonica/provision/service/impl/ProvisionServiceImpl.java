@@ -1394,6 +1394,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.IN_TOA.getStatusName());
 					statusLog.setDescription(Status.IN_TOA.getDescription());
+					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					listLog.add(statusLog);
@@ -1454,6 +1455,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setDescription(Status.WO_PRESTART.getDescription());
+				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
 				listLog.add(statusLog);
@@ -1483,6 +1485,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				statusLog.setStatus(Status.WO_INIT.getStatusName());
 				statusLog.setDescription(Status.WO_INIT.getDescription());
+				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("last_tracking_status", Status.WO_INIT.getStatusName());
 				listLog.add(statusLog);
@@ -1517,6 +1520,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
 				statusLog.setDescription(Status.WO_COMPLETED.getDescription());
+				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
 				listLog.add(statusLog);

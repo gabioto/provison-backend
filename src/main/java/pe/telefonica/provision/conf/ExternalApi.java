@@ -26,6 +26,7 @@ public class ExternalApi {
 	String scheduleUpdatePSICodeReal;
 	String getPSIToken;
 	String securitySaveLogData;
+	String saveThirdLogData;
 	String sendSMSById;
 	String bucketsByProduct;
 
@@ -180,4 +181,13 @@ public class ExternalApi {
 	public void setBucketsByProduct(String bucketsByProduct) {
 		this.bucketsByProduct = bucketsByProduct;
 	}
+
+	public String getSaveThirdLogData() {
+		return saveThirdLogData;
+	}
+
+	public void setSaveThirdLogData(String saveThirdLogData) {
+		this.saveThirdLogData = saveThirdLogData;
+	}
+
 }

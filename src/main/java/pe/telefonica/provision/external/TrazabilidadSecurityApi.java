@@ -44,7 +44,7 @@ public class TrazabilidadSecurityApi {
 	private ExternalApi api;
 
 	public void saveLogData(String documentNumber, String documentType, String orderCode, String bucket, String typeLog,
-			String request, String response, String action) {
+			String request, String response, String action, String messageId, String firstDate, String lastDate) {
 
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -58,6 +58,10 @@ public class TrazabilidadSecurityApi {
 		logDataRequest.setRequest(request);
 		logDataRequest.setResponse(response);
 		logDataRequest.setAction(action);
+		logDataRequest.setMessageId(messageId);
+		logDataRequest.setFirstDate(firstDate);
+		logDataRequest.setLastDate(lastDate);
+		
 		/*
 		 * security.ibm.seguridad.clientId=ddcc9f10-166e-4643-bc40-1759901b54fe
 		 * security.ibm.seguridad.clientSecret=e2eafa5e-2f92-497c-8d7c-fc4ae534898c

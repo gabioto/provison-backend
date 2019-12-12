@@ -8,7 +8,7 @@ public class ScheduleUpdateFicticiousRequest {
 	private String requestType;
 	private String requestName;
 	private String requestId;
-	
+
 	public String getOriginCode() {
 		return originCode;
 	}
@@ -64,7 +64,12 @@ public class ScheduleUpdateFicticiousRequest {
 	public void setRequestId(String requestId) {
 		this.requestId = requestId;
 	}
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return "ScheduleUpdateFicticiousRequest [originCode=" + originCode + ", fictitiousCode=" + fictitiousCode
+				+ ", orderCode=" + orderCode + ", saleCode=" + saleCode + ", requestType=" + requestType
+				+ ", requestName=" + requestName + ", requestId=" + requestId + "]";
+	}
+
 }

@@ -6,20 +6,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +43,6 @@ import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
-import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
 import pe.telefonica.provision.external.response.BucketBodyResponse.OrigenBean;
 import pe.telefonica.provision.external.response.ResponseBucket;
 import pe.telefonica.provision.model.Contacts;
@@ -201,7 +197,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (provisionRepository.resetProvision(oldProvision)) {
 						// Enviar al log el cambio
 						trazabilidadSecurityApi.saveLogData("", "", "", "", "UPDATE", "oldST = " + oldSt,
-								"newST = " + newProvision.getXaIdSt(), ConstantsLogData.PROVISION_UPDATE_ST,"","","");
+								"newST = " + newProvision.getXaIdSt(), ConstantsLogData.PROVISION_UPDATE_ST, "", "",
+								"");
 					}
 				}
 				resultList.add(oldProvision);
@@ -526,9 +523,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				updateFicRequest.setRequestName(provisionx.getProductName());
 				updateFicRequest.setRequestId(provisionx.getIdProvision());
 
+				log.info("request: " + updateFicRequest.toString());
+
 				boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
 				update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
-
 			}
 			// status_toa
 			String status = request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())
@@ -1347,9 +1345,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 				// IN_TO fictitious
-				
-				if (Integer.parseInt(getData[2]) == 0
-						&& getData[4].toString().equals(getData[6].toString())) {
+
+				if (Integer.parseInt(getData[2]) == 0 && getData[4].toString().equals(getData[6].toString())) {
 
 					Update update = new Update();
 
@@ -1431,7 +1428,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 
 					// update psiCode by schedule
+
 					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(), getData[4], getData[8].toLowerCase());
+
 
 					provisionRepository.updateProvision(provision, update);
 

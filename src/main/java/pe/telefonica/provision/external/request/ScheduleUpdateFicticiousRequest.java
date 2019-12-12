@@ -59,8 +59,8 @@ public class ScheduleUpdateFicticiousRequest {
 	@Override
 	public String toString() {
 		return "ScheduleUpdateFicticiousRequest [originCode=" + originCode + ", fictitiousCode=" + fictitiousCode
-				+ ", orderCode=" + orderCode + ", saleCode=" + saleCode + ", requestType=" + requestType
-				+ ", requestName=" + requestName + ", requestId=" + requestId + "]";
+				+ ", orderCode=" + orderCode + ", saleCode=" + saleCode + ", requestName=" + requestName
+				+ ", requestId=" + requestId + "]";
 	}
 
 }

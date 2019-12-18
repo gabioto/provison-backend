@@ -6,24 +6,20 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
@@ -46,7 +42,6 @@ import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
-import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
 import pe.telefonica.provision.external.response.BucketBodyResponse.OrigenBean;
 import pe.telefonica.provision.external.response.ResponseBucket;
 import pe.telefonica.provision.model.Contacts;
@@ -76,9 +71,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private ProvisionRepository provisionRepository;
 
 	@Autowired
-	private ExternalApi api;
-
-	@Autowired
 	private ProvisionTexts provisionTexts;
 
 	@Autowired
@@ -102,8 +94,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
 		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
 				provisionRequest.getBody().getDocumentNumber());
-		ProvisionResponse<Customer> response = new ProvisionResponse<Customer>();
-		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
 
 		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equals("CE")) {
 			provision = provisionRepository.getOrder("CEX", provisionRequest.getBody().getDocumentNumber());
@@ -201,7 +191,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (provisionRepository.resetProvision(oldProvision)) {
 						// Enviar al log el cambio
 						trazabilidadSecurityApi.saveLogData("", "", "", "", "UPDATE", "oldST = " + oldSt,
-								"newST = " + newProvision.getXaIdSt(), ConstantsLogData.PROVISION_UPDATE_ST,"","","");
+								"newST = " + newProvision.getXaIdSt(), ConstantsLogData.PROVISION_UPDATE_ST, "", "",
+								"");
 					}
 				}
 				resultList.add(oldProvision);
@@ -1002,7 +993,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} else {
 			return null;
 		}
-
 	}
 
 	@Override
@@ -1130,6 +1120,77 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
+	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
+		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
+
+		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
+
+		try {
+			if (provision != null) {
+				List<ContactRequest> listContact = request.getContacts();
+				List<Contacts> contactsList = new ArrayList<>();
+
+				for (int a = 0; a < request.getContacts().size(); a++) {
+
+					Contacts contacts = new Contacts();
+					contacts.setFullName(listContact.get(a).getFullName());
+					contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
+					boolean isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
+					contacts.setCarrier(isMovistar);
+					contactsList.add(contacts);
+
+					if (a == 0) {
+						psiRequest.getBodyUpdateClient().setNombre_completo(listContact.get(a).getFullName());
+						psiRequest.getBodyUpdateClient().setTelefono1(listContact.get(a).getPhoneNumber().toString());
+					}
+
+					if (a == 1) {
+						psiRequest.getBodyUpdateClient().setNombre_completo2(listContact.get(a).getFullName());
+						psiRequest.getBodyUpdateClient().setTelefono2(listContact.get(a).getPhoneNumber().toString());
+					}
+
+					if (a == 2) {
+						psiRequest.getBodyUpdateClient().setNombre_completo3(listContact.get(a).getFullName());
+						psiRequest.getBodyUpdateClient().setTelefono3(listContact.get(a).getPhoneNumber().toString());
+					}
+
+					if (a == 3) {
+						psiRequest.getBodyUpdateClient().setNombre_completo4(listContact.get(a).getFullName());
+						psiRequest.getBodyUpdateClient().setTelefono4(listContact.get(a).getPhoneNumber().toString());
+					}
+
+				}
+
+				psiRequest.getBodyUpdateClient().setCorreo(request.getEmail());
+				psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
+
+				boolean updatedPsi = restPSI.updatePSIClient(psiRequest);
+
+				if (updatedPsi) {
+					Update update = new Update();
+					update.set("customer.mail", request.getEmail());
+					update.set("contacts", contactsList);
+
+					provisionRepository.updateProvision(provision, update);
+
+					provision.getContacts().clear();
+					provision.setContacts(contactsList);
+					provision.getCustomer().setMail(request.getEmail());
+				} else {
+					throw new Exception();
+				}
+
+				return provision;
+
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	@Override
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) {
 
 		Provision provision = provisionRepository.getProvisionByDummyStPsiCode(request.getPsiCode());
@@ -1237,7 +1298,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			return false;
 		}
-
 	}
 
 	@Override
@@ -1348,9 +1408,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 				// IN_TO fictitious
-				
-				if (Integer.parseInt(getData[2]) == 0
-						&& getData[4].toString().equals(getData[6].toString())) {
+
+				if (Integer.parseInt(getData[2]) == 0 && getData[4].toString().equals(getData[6].toString())) {
 
 					Update update = new Update();
 
@@ -1432,7 +1491,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 
 					// update psiCode by schedule
-					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(), getData[4]);
+					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
+							getData[4]);
 
 					provisionRepository.updateProvision(provision, update);
 

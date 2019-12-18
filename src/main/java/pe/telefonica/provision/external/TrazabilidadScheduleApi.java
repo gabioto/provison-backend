@@ -3,7 +3,6 @@ package pe.telefonica.provision.external;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +18,13 @@ import com.google.gson.JsonObject;
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
+import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
-import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.util.constants.Constants;
-import pe.telefonica.provision.util.exception.ServerNotFoundException;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
 @Component
 public class TrazabilidadScheduleApi {
 	private static final Log log = LogFactory.getLog(TrazabilidadScheduleApi.class);
@@ -132,7 +131,7 @@ public class TrazabilidadScheduleApi {
 		}
 	}
 	
-	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode) {
+	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode, String requestType) {
 		
 		log.info("updatePSICodeReal");
 		RestTemplate restTemplate = new RestTemplate();
@@ -151,6 +150,7 @@ public class TrazabilidadScheduleApi {
 		updateStPsiCodeRequest.setOrderCode(orderCode);
 		updateStPsiCodeRequest.setStPsiCode(stPsiCode);
 		updateStPsiCodeRequest.setRequestId(idProvision);
+		updateStPsiCodeRequest.setRequestType(requestType);
 		
 		ApiRequest<ScheduleUpdatePSICodeRealRequest> apiRequest = new ApiRequest<ScheduleUpdatePSICodeRealRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_SCHEDULE_UPDATE_CODE_FICT, updateStPsiCodeRequest);
 		//HttpEntity<ApiRequest<LoginRequest>> entity = new HttpEntity<ApiRequest<LoginRequest>>(apiRequest, headersMap);

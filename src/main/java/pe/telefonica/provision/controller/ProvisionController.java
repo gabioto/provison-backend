@@ -42,7 +42,6 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.ReceiveAddressUpdateBORequest;
-import pe.telefonica.provision.controller.request.SetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
@@ -528,48 +527,324 @@ public class ProvisionController {
 	 * @param request
 	 * @return
 	 */
+	/*
+	 * @RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
+	 * public ResponseEntity<ApiResponse<List<Provision>>> setContactInfoUpdate(
+	 * 
+	 * @RequestBody ApiRequest<SetContactInfoUpdateRequest> request) {
+	 * log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+	 * 
+	 * ApiResponse<List<Provision>> apiResponse; HttpStatus status; try {
+	 * 
+	 * Provision result =
+	 * provisionService.setContactInfoUpdate(request.getBody().getProvisionId(),
+	 * request.getBody().getContactFullname(),
+	 * request.getBody().getContactCellphone(),
+	 * request.getBody().getContactCellphoneIsMovistar());
+	 * 
+	 * if (result != null) {
+	 * 
+	 * List<Provision> provisions = new ArrayList<>(); provisions.add(result);
+	 * 
+	 * status = HttpStatus.OK; apiResponse = new
+	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+	 * Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()),
+	 * status.getReasonPhrase(), null); apiResponse.setBody(provisions);
+	 * 
+	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+	 * request.getBody().getBucket(), "OK", new Gson().toJson(request), new
+	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
+	 * "", "", "");
+	 * 
+	 * } else { status = HttpStatus.BAD_REQUEST; apiResponse = new
+	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+	 * Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()),
+	 * "No existe registro", null);
+	 * 
+	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+	 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
+	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
+	 * "", "", "");
+	 * 
+	 * }
+	 * 
+	 * } catch (Exception ex) { if (ex instanceof FunctionalErrorException) {
+	 * 
+	 * status = HttpStatus.BAD_REQUEST;
+	 * 
+	 * String errorCode = ((FunctionalErrorException)
+	 * ex).getErrorCode().replace("\"", ""); if (errorCode.equals("ERR10") ||
+	 * errorCode.equals("ERR11") || errorCode.equals("ERR02")) { status =
+	 * HttpStatus.BAD_REQUEST; } else if (errorCode.equals("ERR15")) { status =
+	 * HttpStatus.UNAUTHORIZED; } else if (errorCode.equals("ERR03")) { status =
+	 * HttpStatus.NOT_FOUND; } else if (errorCode.equals("ERR19")) { status =
+	 * HttpStatus.CONFLICT; }
+	 * 
+	 * errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT +
+	 * errorCode.replace("\"", "")).toString();
+	 * 
+	 * apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+	 * Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException)
+	 * ex).getMessage().replace("\"", ""), null);
+	 * 
+	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+	 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
+	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
+	 * "", "", "");
+	 * 
+	 * } else { status = HttpStatus.INTERNAL_SERVER_ERROR; apiResponse = new
+	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+	 * Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()),
+	 * ex.getMessage().toString(), null);
+	 * 
+	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+	 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
+	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
+	 * "", "", ""); } }
+	 * 
+	 * return ResponseEntity.status(status).body(apiResponse); }
+	 */
+
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> setContactInfoUpdate(
-			@RequestBody ApiRequest<SetContactInfoUpdateRequest> request) {
+	public ResponseEntity<ApiResponse<Provision>> setContactInfoUpdate(
+			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
 
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
+		String errorInternal = "";
+		String timestamp = "";
+
 		try {
 
-			Provision result = provisionService.setContactInfoUpdate(request.getBody().getProvisionId(),
-					request.getBody().getContactFullname(), request.getBody().getContactCellphone(),
-					request.getBody().getContactCellphoneIsMovistar());
+			ApiTrazaSetContactInfoUpdateRequest requestBody = request.getBody();
 
-			if (result != null) {
+			// Validate PSICode
+			if (requestBody.getPsiCode() == null || requestBody.getPsiCode().equals("")) {
 
-				List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-
-				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), status.getReasonPhrase(),
-						null);
-				apiResponse.setBody(provisions);
-
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, "", "", "");
-
-			} else {
 				status = HttpStatus.BAD_REQUEST;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), "No existe registro", null);
+				errorInternal = InternalError.TRZ01.toString();
+				errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+						.toString();
 
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, "", "", "");
+				timestamp = getTimestamp();
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode obligatorio", null);
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				return ResponseEntity.status(status).body(apiResponse);
+			}
+
+			if (requestBody.getPsiCode() != null) {
+				status = HttpStatus.BAD_REQUEST;
+				if (requestBody.getPsiCode().length() > 11) {
+					errorInternal = InternalError.TRZ02.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+							.toString();
+					timestamp = getTimestamp();
+					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode maximo 11 caracteres", null);
+					apiResponse.getHeader().setTimestamp(timestamp);
+					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+					return ResponseEntity.status(status).body(apiResponse);
+				}
+				Boolean typedata = requestBody.getPsiCode() instanceof String;
+				if (!typedata) {
+					errorInternal = InternalError.TRZ03.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+							.toString();
+					timestamp = getTimestamp();
+					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode debe ser una cadena", null);
+					apiResponse.getHeader().setTimestamp(timestamp);
+					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+					return ResponseEntity.status(status).body(apiResponse);
+				}
 
 			}
 
-		} catch (Exception ex) {
+			// Validate email
+
+			if (requestBody.getEmail() != null && requestBody.getEmail().trim().length() > 0) {
+				status = HttpStatus.BAD_REQUEST;
+				if (requestBody.getEmail().length() > 100) {
+					errorInternal = InternalError.TRZ02.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+							.toString();
+					timestamp = getTimestamp();
+					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "email maximo 100 caracteres", null);
+					apiResponse.getHeader().setTimestamp(timestamp);
+					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+					return ResponseEntity.status(status).body(apiResponse);
+				}
+
+				String regex = "^(.+)@(.+)$";
+				Pattern pattern = Pattern.compile(regex);
+				Matcher matcher = pattern.matcher(requestBody.getEmail());
+				if (!matcher.matches()) {
+					errorInternal = InternalError.TRZ03.toString();
+					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+							.toString();
+
+					timestamp = getTimestamp();
+					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "email formato invalido ", null);
+					apiResponse.getHeader().setTimestamp(timestamp);
+					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+					return ResponseEntity.status(status).body(apiResponse);
+				}
+
+			}
+			// Validate contact
+
+			List<ContactRequest> contact = requestBody.getContacts();
+
+			if (requestBody.getContacts().size() > 0) {
+				status = HttpStatus.BAD_REQUEST;
+
+				for (ContactRequest list : contact) {
+					if (list.getFullName() == null) {
+						// contactFullname;
+						// contactCellphone;
+						errorInternal = InternalError.TRZ01.toString();
+						errorInternal = ErrorCode
+								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
+						timestamp = getTimestamp();
+						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "fullName obligatorio", null);
+
+						apiResponse.getHeader().setTimestamp(timestamp);
+						apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+						return ResponseEntity.status(status).body(apiResponse);
+					}
+					if (list.getPhoneNumber() == null) {
+						errorInternal = InternalError.TRZ01.toString();
+						errorInternal = ErrorCode
+								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
+						timestamp = getTimestamp();
+						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber obligatorio", null);
+						apiResponse.getHeader().setTimestamp(timestamp);
+						apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+						return ResponseEntity.status(status).body(apiResponse);
+					}
+
+					boolean typePhone = list.getPhoneNumber() instanceof Integer;
+					if (!typePhone) {
+						errorInternal = InternalError.TRZ03.toString();
+						errorInternal = ErrorCode
+								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
+						timestamp = getTimestamp();
+						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber debe ser numerico",
+								null);
+						apiResponse.getHeader().setTimestamp(timestamp);
+						apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+						return ResponseEntity.status(status).body(apiResponse);
+					}
+
+					String countPhone = list.getPhoneNumber().toString();
+					if (countPhone.length() > 9) {
+						errorInternal = InternalError.TRZ02.toString();
+						errorInternal = ErrorCode
+								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
+
+						timestamp = getTimestamp();
+						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber maximo 9 caracteres",
+								null);
+						apiResponse.getHeader().setTimestamp(timestamp);
+						apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+						return ResponseEntity.status(status).body(apiResponse);
+					}
+
+				}
+			}
+
+			if (requestBody.getContacts().size() == 0 || requestBody.getContacts().size() > 4) {
+
+				status = HttpStatus.BAD_REQUEST;
+				errorInternal = InternalError.TRZ04.toString();
+				errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+						.toString();
+
+				timestamp = getTimestamp();
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal,
+						"Minimo 1 y maximo 4 datos datos de contacto", null);
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				return ResponseEntity.status(status).body(apiResponse);
+			}
+
+			Provision result = provisionService.setContactInfoUpdate(request.getBody());
+
+			if (result != null) {
+
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), status.getReasonPhrase(),
+						result);
+
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+				timestamp = getTimestamp();
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK",
+						new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp);
+
+			} else {
+				status = HttpStatus.NOT_FOUND;
+				errorInternal = InternalError.TRZ05.toString();
+				errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+						.toString();
+
+				timestamp = getTimestamp();
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "No existe registro", null);
+				apiResponse.getHeader().setTimestamp(timestamp);
+				log.info("timestamp => " + timestamp);
+				log.info("MessageId => " + request.getHeader().getMessageId());
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+						new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp);
+
+			}
+
+		} catch (BadRequest ex) {
+			System.out.println(ex.getMessage());
+			status = HttpStatus.BAD_REQUEST;
+
+			timestamp = getTimestamp();
+			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+					String.valueOf(status.value()), ex.getMessage().toString(), null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+					new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp);
+
+		}catch (Exception ex) {
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
@@ -587,27 +862,37 @@ public class ProvisionController {
 
 				errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				timestamp = getTimestamp();
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorCode,
 						((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, "", "", "");
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+						new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp);
 
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				timestamp = getTimestamp();
+				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, "", "", "");
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+						new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp);
 			}
 		}
+
+		restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
+				new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
+				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}

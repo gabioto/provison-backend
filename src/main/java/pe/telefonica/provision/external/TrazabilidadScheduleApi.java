@@ -132,7 +132,7 @@ public class TrazabilidadScheduleApi {
 		}
 	}
 	
-	public boolean updatePSICodeReal(String orderCode, String stPsiCode) {
+	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode, String requestType) {
 		
 		log.info("updatePSICodeReal");
 		RestTemplate restTemplate = new RestTemplate();
@@ -150,6 +150,8 @@ public class TrazabilidadScheduleApi {
 		ScheduleUpdatePSICodeRealRequest updateStPsiCodeRequest = new ScheduleUpdatePSICodeRealRequest();
 		updateStPsiCodeRequest.setOrderCode(orderCode);
 		updateStPsiCodeRequest.setStPsiCode(stPsiCode);
+		updateStPsiCodeRequest.setRequestId(idProvision);
+		updateStPsiCodeRequest.setRequestType(requestType);
 		
 		ApiRequest<ScheduleUpdatePSICodeRealRequest> apiRequest = new ApiRequest<ScheduleUpdatePSICodeRealRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_SCHEDULE_UPDATE_CODE_FICT, updateStPsiCodeRequest);
 		//HttpEntity<ApiRequest<LoginRequest>> entity = new HttpEntity<ApiRequest<LoginRequest>>(apiRequest, headersMap);

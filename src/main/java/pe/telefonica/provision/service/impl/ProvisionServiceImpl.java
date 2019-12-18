@@ -514,7 +514,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				updateFicRequest.setOriginCode(provisionx.getOriginCode());
 				updateFicRequest.setSaleCode(provisionx.getSaleCode());
 				updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
-				updateFicRequest.setRequestType(provisionx.getActivityType());
 				updateFicRequest.setRequestName(provisionx.getProductName());
 				updateFicRequest.setRequestId(provisionx.getIdProvision());
 
@@ -1430,7 +1429,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
-					update.set("activity_type", getData[8]);
+					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[16]);
 
 					if (provision.getXaIdSt() != null) {
@@ -1492,15 +1491,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// update psiCode by schedule
 					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
-							getData[4]);
+							getData[4], getData[8].toLowerCase());
 
 					provisionRepository.updateProvision(provision, update);
 
 					return true;
-
 				}
-
 			}
+			
 			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 

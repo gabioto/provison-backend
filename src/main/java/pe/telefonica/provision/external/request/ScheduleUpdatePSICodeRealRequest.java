@@ -4,6 +4,7 @@ public class ScheduleUpdatePSICodeRealRequest {
 	private String orderCode;
 	private String stPsiCode;
 	private String requestId;
+	private String requestType;
 
 	public String getOrderCode() {
 		return orderCode;
@@ -28,6 +29,15 @@ public class ScheduleUpdatePSICodeRealRequest {
 	public void setRequestId(String requestId) {
 		this.requestId = requestId;
 	}
+
+	public String getRequestType() {
+		return requestType;
+	}
+
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
+	}
+	
 	
 
 }

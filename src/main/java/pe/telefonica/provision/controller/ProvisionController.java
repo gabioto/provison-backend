@@ -844,7 +844,7 @@ public class ProvisionController {
 					ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 					request.getHeader().getTimestamp(), timestamp);
 
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
@@ -1333,13 +1333,12 @@ public class ProvisionController {
 			@RequestBody ApiRequest<CancelOrderRequest> request) {
 		log.info(this.getClass().getName() + " - " + "orderCancellation");
 
-		// ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
-
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 
 		try {
-			Provision result = provisionService.orderCancellation(request.getBody().getProvisionId());
+			Provision result = provisionService.orderCancellation(request.getBody().getProvisionId(),
+					request.getBody().getCause(), request.getBody().getDetail());
 
 			if (result != null) {
 

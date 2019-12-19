@@ -628,9 +628,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
 					contacts.add(contactCustomer);
 
-					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-							Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]),
-							"");
+//					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
+//							Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]),
+//							"");
 					// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 					// Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
 					// MsgParameter[0]), "");
@@ -666,9 +666,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
 				contacts.add(contactCustomer);
 
-				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-						Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new MsgParameter[0]),
-						"http://www.movistar.com.pe");
+//				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
+//						Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new MsgParameter[0]),
+//						"http://www.movistar.com.pe");
 
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 				// Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new
@@ -695,7 +695,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				boolean updated = provisionRepository.updateProvision(provision, update);
 
 				if (updated) {
-					List<MsgParameter> msgParameters = new ArrayList<>();
+//					List<MsgParameter> msgParameters = new ArrayList<>();
 					List<Contact> contacts = new ArrayList<>();
 
 					Contact contactCustomer = new Contact();
@@ -703,9 +703,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
 					contacts.add(contactCustomer);
 
-					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-							Constants.MSG_ADDRESS_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
-							provisionTexts.getWebUrl());
+//					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
+//							Constants.MSG_ADDRESS_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
+//							provisionTexts.getWebUrl());
 
 					// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 					// Constants.MSG_ADDRESS_UPDATED_KEY, msgParameters.toArray(new
@@ -762,7 +762,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision orderCancellation(String provisionId) {
+	public Provision orderCancellation(String provisionId, String cause, String detail) {
 		boolean sentBOCancellation;
 		boolean messageSent;
 		boolean provisionUpdated;
@@ -774,9 +774,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provision = optional.get();
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
-			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
+			update.set("cancellation_cause", cause);
+			update.set("cancellation_detail", detail);
 
-			// sentBOCancellation = sendCancellation(provision);
+			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
+			provision.setCancellationCause(cause);
+			provision.setCancellationDetail(detail);
+
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 
 			if (!sentBOCancellation) {
@@ -784,8 +788,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provision.getHasSchedule()) {
-				// scheduleUpdated = provisionRepository.updateCancelSchedule(new
-				// CancelRequest(provision.getIdProvision(), "provision"));
 				scheduleUpdated = trazabilidadScheduleApi.updateCancelSchedule(
 						new CancelRequest(provision.getIdProvision(), "provision", provision.getXaIdSt()));
 				if (!scheduleUpdated) {
@@ -828,10 +830,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
 					Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]), "");
-
-			// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
-			// Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
-			// MsgParameter[0]), "");
 
 			if (apiResponse.getHeader().getResultCode().equals(String.valueOf(HttpStatus.OK.value()))) {
 				messageSent = true;
@@ -968,7 +966,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return provision;
 				}
 
-				List<MsgParameter> msgParameters = new ArrayList<>();
+//				List<MsgParameter> msgParameters = new ArrayList<>();
 				// Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no
 				// se valida la respuesta
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
@@ -981,9 +979,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
 				contacts.add(contactCustomer);
 
-				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-						Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
-						provisionTexts.getWebUrl());
+//				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
+//						Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
+//						provisionTexts.getWebUrl());
 
 				return provision;
 			} else {
@@ -1498,7 +1496,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return true;
 				}
 			}
-			
+
 			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 

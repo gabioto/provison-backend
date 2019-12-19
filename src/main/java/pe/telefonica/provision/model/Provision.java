@@ -208,6 +208,12 @@ public class Provision implements Serializable {
 	@Field("wo_completed")
 	private WoCompleted woCompleted;
 
+	@Field("cancellation_cause")
+	private String cancellationCause;
+
+	@Field("cancellation_detail")
+	private String cancellationDetail;
+
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -696,6 +702,22 @@ public class Provision implements Serializable {
 		this.woCompleted = woCompleted;
 	}
 
+	public String getCancellationCause() {
+		return cancellationCause;
+	}
+
+	public void setCancellationCause(String cancellationCause) {
+		this.cancellationCause = cancellationCause;
+	}
+
+	public String getCancellationDetail() {
+		return cancellationDetail;
+	}
+
+	public void setCancellationDetail(String cancellationDetail) {
+		this.cancellationDetail = cancellationDetail;
+	}
+
 	public Provision() {
 
 	}
@@ -729,7 +751,7 @@ public class Provision implements Serializable {
 
 		@Field("scheduled_range")
 		private String scheduledRange;
-		
+
 		@Field("xa_id_st")
 		private String xaidst;
 

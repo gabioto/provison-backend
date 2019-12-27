@@ -1169,6 +1169,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 
 				psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
+				psiRequest.getBodyUpdateClient()
+						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
 
 				boolean updatedPsi = restPSI.updatePSIClient(psiRequest);
 

@@ -1128,8 +1128,18 @@ public class ProvisionServiceImpl implements ProvisionService {
 				List<ContactRequest> listContact = request.getContacts();
 				List<Contacts> contactsList = new ArrayList<>();
 
-				for (int a = 0; a < request.getContacts().size(); a++) {
+				if (request.isHolderWillReceive()) {
+					ContactRequest contactRequest = new ContactRequest();
+					contactRequest.setFullName(provision.getCustomer().getName());
+					contactRequest.setPhoneNumber((provision.getCustomer().getPhoneNumber() != null
+							&& !provision.getCustomer().getPhoneNumber().isEmpty())
+									? Integer.valueOf(provision.getCustomer().getPhoneNumber())
+									: 0);
+					request.getContacts().clear();
+					request.getContacts().add(contactRequest);
+				}
 
+				for (int a = 0; a < request.getContacts().size(); a++) {
 					Contacts contacts = new Contacts();
 					contacts.setFullName(listContact.get(a).getFullName());
 					contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
@@ -1159,7 +1169,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				}
 
-				psiRequest.getBodyUpdateClient().setCorreo(request.getEmail());
 				psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 
 				boolean updatedPsi = restPSI.updatePSIClient(psiRequest);

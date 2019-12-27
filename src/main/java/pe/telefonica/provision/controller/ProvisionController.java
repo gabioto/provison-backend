@@ -670,41 +670,7 @@ public class ProvisionController {
 
 			}
 
-			// Validate email
-
-			if (requestBody.getEmail() != null && requestBody.getEmail().trim().length() > 0) {
-				status = HttpStatus.BAD_REQUEST;
-				if (requestBody.getEmail().length() > 100) {
-					errorInternal = InternalError.TRZ02.toString();
-					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
-							.toString();
-					timestamp = getTimestamp();
-					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "email maximo 100 caracteres", null);
-					apiResponse.getHeader().setTimestamp(timestamp);
-					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-					return ResponseEntity.status(status).body(apiResponse);
-				}
-
-				String regex = "^(.+)@(.+)$";
-				Pattern pattern = Pattern.compile(regex);
-				Matcher matcher = pattern.matcher(requestBody.getEmail());
-				if (!matcher.matches()) {
-					errorInternal = InternalError.TRZ03.toString();
-					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
-							.toString();
-
-					timestamp = getTimestamp();
-					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "email formato invalido ", null);
-					apiResponse.getHeader().setTimestamp(timestamp);
-					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-					return ResponseEntity.status(status).body(apiResponse);
-				}
-
-			}
 			// Validate contact
-
 			List<ContactRequest> contact = requestBody.getContacts();
 
 			if (requestBody.getContacts().size() > 0) {
@@ -776,7 +742,8 @@ public class ProvisionController {
 				}
 			}
 
-			if (requestBody.getContacts().size() == 0 || requestBody.getContacts().size() > 4) {
+			if (!requestBody.isHolderWillReceive()
+					&& (requestBody.getContacts().size() == 0 || requestBody.getContacts().size() > 4)) {
 
 				status = HttpStatus.BAD_REQUEST;
 				errorInternal = InternalError.TRZ04.toString();

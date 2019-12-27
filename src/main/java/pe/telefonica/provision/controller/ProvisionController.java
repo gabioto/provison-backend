@@ -742,7 +742,8 @@ public class ProvisionController {
 				}
 			}
 
-			if (requestBody.getContacts().size() == 0 || requestBody.getContacts().size() > 4) {
+			if (!requestBody.isHolderWillReceive()
+					&& (requestBody.getContacts().size() == 0 || requestBody.getContacts().size() > 4)) {
 
 				status = HttpStatus.BAD_REQUEST;
 				errorInternal = InternalError.TRZ04.toString();

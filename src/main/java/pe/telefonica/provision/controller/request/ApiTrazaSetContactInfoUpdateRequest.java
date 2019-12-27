@@ -5,6 +5,7 @@ import java.util.List;
 public class ApiTrazaSetContactInfoUpdateRequest {
 	private String psiCode;
 	private String email;
+	private boolean holderWillReceive;
 	private List<ContactRequest> contacts;
 
 	public String getPsiCode() {
@@ -21,6 +22,14 @@ public class ApiTrazaSetContactInfoUpdateRequest {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public boolean isHolderWillReceive() {
+		return holderWillReceive;
+	}
+
+	public void setHolderWillReceive(boolean holderWillReceive) {
+		this.holderWillReceive = holderWillReceive;
 	}
 
 	public List<ContactRequest> getContacts() {

@@ -36,6 +36,8 @@ public interface ProvisionService {
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
 
+	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
+	
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);
 
 	public Provision setProvisionIsValidated(String provisionId);
@@ -45,7 +47,7 @@ public interface ProvisionService {
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);
 
-	public Provision orderCancellation(String provisionId);
+	public Provision orderCancellation(String provisionId, String cause, String detail);
 
 	ProvisionResponse<Boolean> validateQueue();
 

@@ -1170,20 +1170,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 				psiRequest.getBodyUpdateClient()
-						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
-
+						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "ghost@gmail.com");
+				
+				System.out.println(provision.getCustomer().getMail());
+				
 				boolean updatedPsi = restPSI.updatePSIClient(psiRequest);
 
 				if (updatedPsi) {
 					Update update = new Update();
-					update.set("customer.mail", request.getEmail());
-					update.set("contacts", contactsList);
+					//update.set("customer.mail", provision.getCustomer().getMail());
+					update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
 
 					provisionRepository.updateProvision(provision, update);
 
 					provision.getContacts().clear();
-					provision.setContacts(contactsList);
-					provision.getCustomer().setMail(request.getEmail());
+					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
+					//provision.getCustomer().setMail(request.getEmail());
 				} else {
 					throw new Exception();
 				}

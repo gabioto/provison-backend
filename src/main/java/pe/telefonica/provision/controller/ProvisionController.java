@@ -360,10 +360,22 @@ public class ProvisionController {
 			@RequestBody @Valid ApiRequest<UpdateFromToaRequest> request) {
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
-
+		String separador = Pattern.quote(Constants.BARRA_VERTICAL);
+		String[] parts = request.getBody().getData().split(separador);
+		Boolean provisions=false;
+		
 		try {
-
-			Boolean provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+			//Lógica diferencia Averias - Provision
+			Object[] obj = new Object[2]; 
+			obj = validateActivityType(parts);
+			boolean provision = (boolean)obj[0];
+			String xaRequest = (String)obj[1];
+			
+			if (provision) {
+				provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+			}else {
+				//Averia
+			}
 
 			if (provisions) {
 				status = HttpStatus.OK;
@@ -1544,6 +1556,89 @@ public class ProvisionController {
 		String timeStamp = dateNow.format(formatter);
 		log.info("timeStamp => " + timeStamp);
 		return timeStamp;
+	}
+	
+	public Object[] validateActivityType(String[] parts) {
+		Object[] obj = new Object[2];
+		String status=parts[0]==null?"":parts[0], xaRequest="";
+		boolean provision=false;
+		if(Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
+			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
+				xaRequest=parts[5].trim();
+				if(!xaRequest.equals("0")) {
+					provision = true;
+				}
+			}else {
+				provision = false;
+				xaRequest="";
+			}
+		}else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
+			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
+				xaRequest=parts[6].trim();
+				if(!xaRequest.equals("0")) {
+					provision = true;
+				}
+			}else {
+				provision = false;
+				xaRequest="";
+			}
+		}else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
+			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
+				xaRequest=parts[7].trim();
+				if(!xaRequest.equals("0")) {
+					provision = true;
+				}
+			}else {
+				provision = false;
+				xaRequest="";
+			}
+		}else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
+			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
+				xaRequest=parts[2].trim();
+				if(!xaRequest.equals("0")) {
+					provision = true;
+				}
+			}else {
+				provision = false;
+				xaRequest="";
+			}
+		}else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
+			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest=parts[2].trim();
+				if(!xaRequest.equals("0")) {
+					provision = true;
+				}
+			}else {
+				provision = false;
+				xaRequest="";
+			}
+		}else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
+			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest=parts[2].trim();
+				if(!xaRequest.equals("0")) {
+					provision = true;
+				}
+			}else {
+				provision = false;
+				xaRequest="";
+			}
+		}else if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(status)) {
+			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest=parts[8].trim();
+				if(!xaRequest.equals("0")) {
+					provision = true;
+				}
+			}else {
+				provision = false;
+				xaRequest="";
+			}
+		}else {
+			provision = false;
+			xaRequest="";
+		}
+		obj[0]=provision;
+		obj[1]=xaRequest;
+		return obj;
 	}
 
 }

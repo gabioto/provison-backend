@@ -20,6 +20,8 @@ import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.CancelRequest;
+import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
+import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
 import pe.telefonica.provision.util.constants.Constants;
@@ -36,6 +38,96 @@ public class TrazabilidadScheduleApi {
 	@Autowired
 	private ExternalApi api;
 
+	public boolean cancelSchedule(ScheduleNotDoneRequest scheduleNotDoneRequest) {
+		log.info("updateSchedule");
+		RestTemplate restTemplate = new RestTemplate();
+		String urlSchedule = api.getScheduleUrl() + api.getCancelLocalSchedule();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", iBMSecurityAgendamiento.getAuth());
+		headersMap.add("X-IBM-Client-Id", iBMSecurityAgendamiento.getClientId());
+		headersMap.add("X-IBM-Client-Secret", iBMSecurityAgendamiento.getClientSecret());
+		
+		ApiRequest<ScheduleNotDoneRequest> apiRequest = new ApiRequest<ScheduleNotDoneRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_NOTDONE_SCHEDULE, scheduleNotDoneRequest);
+
+		HttpEntity<ApiRequest<ScheduleNotDoneRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleNotDoneRequest>>(apiRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
+					String.class);
+			
+			log.info("responseEntity: " + responseEntity.getBody());
+
+			return responseEntity.getStatusCode().equals(HttpStatus.OK);
+		} catch (HttpClientErrorException ex) {
+			log.info("Exception = " + ex.getMessage());
+			log.info("Exception = " + ex.getResponseBodyAsString());
+			if(ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+				throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode().value() +"_"+ "401" ));
+			} else {
+				
+				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+				
+				String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
+				String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
+				
+				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
+				
+			}
+			
+		} catch (Exception ex) {
+			log.info("Exception = " + ex.getMessage());
+			throw new ServerNotFoundException(ex.getMessage());
+		}
+	}
+	
+	public boolean updateSchedule(ScheduleRequest scheduleRequest) {
+		log.info("updateSchedule");
+		RestTemplate restTemplate = new RestTemplate();
+		String urlSchedule = api.getScheduleUrl() + api.getUpdateScheduleDate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", iBMSecurityAgendamiento.getAuth());
+		headersMap.add("X-IBM-Client-Id", iBMSecurityAgendamiento.getClientId());
+		headersMap.add("X-IBM-Client-Secret", iBMSecurityAgendamiento.getClientSecret());
+		
+		ApiRequest<ScheduleRequest> apiRequest = new ApiRequest<ScheduleRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_UPDATE_RESCHEDULE, scheduleRequest);
+
+		HttpEntity<ApiRequest<ScheduleRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleRequest>>(apiRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
+					String.class);
+			
+			log.info("responseEntity: " + responseEntity.getBody());
+
+			return responseEntity.getStatusCode().equals(HttpStatus.OK);
+		} catch (HttpClientErrorException ex) {
+			log.info("Exception = " + ex.getMessage());
+			log.info("Exception = " + ex.getResponseBodyAsString());
+			if(ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+				throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode().value() +"_"+ "401" ));
+			} else {
+				
+				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+				
+				String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
+				String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
+				
+				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
+				
+			}
+			
+		} catch (Exception ex) {
+			log.info("Exception = " + ex.getMessage());
+			throw new ServerNotFoundException(ex.getMessage());
+		}
+	}
+	
 	public boolean updateCancelSchedule(CancelRequest cancelRequest) {
 		log.info("updateCancelSchedule");
 		RestTemplate restTemplate = new RestTemplate();

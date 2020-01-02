@@ -29,6 +29,8 @@ public class ExternalApi {
 	String saveThirdLogData;
 	String sendSMSById;
 	String bucketsByProduct;
+	String updateScheduleDate;
+	String cancelLocalSchedule;
 
 	public String getSendSMSById() {
 		return sendSMSById;
@@ -188,6 +190,22 @@ public class ExternalApi {
 
 	public void setSaveThirdLogData(String saveThirdLogData) {
 		this.saveThirdLogData = saveThirdLogData;
+	}
+
+	public String getUpdateScheduleDate() {
+		return updateScheduleDate;
+	}
+
+	public void setUpdateScheduleDate(String updateScheduleDate) {
+		this.updateScheduleDate = updateScheduleDate;
+	}
+
+	public String getCancelLocalSchedule() {
+		return cancelLocalSchedule;
+	}
+
+	public void setCancelLocalSchedule(String cancelLocalSchedule) {
+		this.cancelLocalSchedule = cancelLocalSchedule;
 	}
 
 }

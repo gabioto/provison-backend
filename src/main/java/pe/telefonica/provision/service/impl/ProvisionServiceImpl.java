@@ -523,7 +523,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				updateFicRequest.setRequestName(provisionx.getProductName());
 				updateFicRequest.setRequestId(provisionx.getIdProvision());
 
-				//Actualiza agenda
+				// Actualiza agenda
 				boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
 				update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
 
@@ -544,7 +544,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("log_status", listLog);
 
 			// provisionx.setLogStatus(listLog);
-			//Actualiza provision
+			// Actualiza provision
 			provisionRepository.updateProvision(provisionx, update);
 
 		} else {
@@ -1177,22 +1177,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 				psiRequest.getBodyUpdateClient()
-						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "ghost@gmail.com");
-				
+						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail()
+								: "ghost@gmail.com");
+
 				System.out.println(provision.getCustomer().getMail());
-				
+
 				boolean updatedPsi = restPSI.updatePSIClient(psiRequest);
 
 				if (updatedPsi) {
 					Update update = new Update();
-					//update.set("customer.mail", provision.getCustomer().getMail());
+					// update.set("customer.mail", provision.getCustomer().getMail());
 					update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
 
 					provisionRepository.updateProvision(provision, update);
 
 					provision.getContacts().clear();
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
-					//provision.getCustomer().setMail(request.getEmail());
+					// provision.getCustomer().setMail(request.getEmail());
 				} else {
 					throw new Exception();
 				}
@@ -1406,40 +1407,48 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception {
+	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
+			throws Exception {
 		boolean bool = false;
 		String[] getData = request.getData().split("\\|", -1);
-		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
+		Provision provision = new Provision();
+		// validar si es vf o mt
+		if (!xaRequirementNumber.startsWith("MT") && !xaRequirementNumber.startsWith("VF")) {
+			provision = provisionRepository.getByOrderCodeForUpdate(xaRequest);
+		} else {
+			//Llamar al método de busqueda ficticio
+			provision = provisionRepository.getByOrderCodeForUpdateFicticious(xaRequirementNumber);
+		}
 
 		bool = updateProvision(provision, getData, request);
-
 		return bool;
 	}
 
-	private boolean updateProvision(Provision provision, String[] getData, UpdateFromToaRequest request) throws Exception {
+	private boolean updateProvision(Provision provision, String[] getData, UpdateFromToaRequest request)
+			throws Exception {
 
 		if (provision != null) {
 
 			List<StatusLog> listLog = provision.getLogStatus();
 			/*
-			// valida Bucket x Producto
-			boolean boolBucket = validateBuckectProduct(getData, provision);
-
-			if (!boolBucket) {
-				return false;
-			}
-			*/
+			 * // valida Bucket x Producto boolean boolBucket =
+			 * validateBuckectProduct(getData, provision);
+			 * 
+			 * if (!boolBucket) { return false; }
+			 */
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-				if (Integer.parseInt(getData[2]) == 0 && getData[4].toString().equals(getData[6].toString())) {
+				
+				 if (Integer.parseInt(getData[2]) == 0 && (getData[6].toString().trim().startsWith("VF")
+						|| getData[6].toString().trim().startsWith("MT"))) {
 					// IN_TO fictitious
 					Update update = new Update();
-					
+
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
 					statusLog.setDescription(Status.DUMMY_IN_TOA.getDescription());
 					listLog.add(statusLog);
-					
+
 					update.set("log_status", listLog);
 					update.set("xa_request", getData[2]);
 					update.set("xa_id_st", getData[4]);
@@ -1448,13 +1457,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[16]);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+
+					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 					
 					provisionRepository.updateProvision(provision, update);
 					return true;
 
-				} else if (Integer.parseInt(getData[2]) == 0
-						&& !getData[5].toString().equalsIgnoreCase(getData[6].toString())) {
-					//IN_TOA Monoproducto
+				} else if (Integer.parseInt(getData[2]) == 0 && (!getData[6].toString().trim().startsWith("VF")
+						&& !getData[6].toString().trim().startsWith("MT"))) {
+					// IN_TOA Monoproducto
 					Update update = new Update();
 
 					StatusLog statusLog = new StatusLog();
@@ -1469,6 +1481,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+					
+					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
@@ -1482,7 +1497,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("work_zone", getData[16]);
 
 					if (provision.getXaIdSt() != null) {
-
 						update.set("has_schedule", false);
 					}
 
@@ -1638,16 +1652,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return true;
 
 			}
-			
+
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
-				
+
 				WoCancel woCancel = new WoCancel();
 				woCancel.setUserCancel(getData[15]);
 				woCancel.setXaCancelReason(getData[16]);
 				update.set("wo_cancel", woCancel);
-				//update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
+				// update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_CANCEL.getStatusName());
@@ -1660,28 +1674,28 @@ public class ProvisionServiceImpl implements ProvisionService {
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
-				//Actualiza estado en provision
+				// Actualiza estado en provision
 				provisionRepository.updateProvision(provision, update);
 
-				//Cancela agenda
-				trazabilidadScheduleApi.updateCancelSchedule(
-						new CancelRequest(provision.getIdProvision(), provision.getActivityType().toLowerCase(), provision.getXaIdSt()));
-				
+				// Cancela agenda
+				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provision.getIdProvision(),
+						provision.getActivityType().toLowerCase(), provision.getXaIdSt()));
+
 				return true;
 			}
-			
+
 			if (request.getStatus().equalsIgnoreCase(Status.WO_RESCHEDULE.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
 				WoReshedule woReshedule = new WoReshedule();
 				String range = "";
 
-				if(getData[17].trim().equals("09-13")||getData[17].trim().equals("9-13")) {
-					range="AM";
-				}else {
-					range="PM";
+				if (getData[17].trim().equals("09-13") || getData[17].trim().equals("9-13")) {
+					range = "AM";
+				} else {
+					range = "PM";
 				}
-				
+
 				woReshedule.setXaAppointmentScheduler(getData[23]);
 				woReshedule.setTimeSlot(range);
 				update.set("wo_reschedule", woReshedule);
@@ -1699,18 +1713,18 @@ public class ProvisionServiceImpl implements ProvisionService {
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
-				//Actualizar provision
+				// Actualizar provision
 				provisionRepository.updateProvision(provision, update);
-				
+
 				// el que parsea
 				SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yy");
 				// el que formatea
 				SimpleDateFormat formateador = new SimpleDateFormat("dd/MM/yy");
 
-				Date date = parseador.parse(getData[16]);//("31-03-2016");
-				System.out.println("Fecha de reschedule => "+formateador.format(date));
+				Date date = parseador.parse(getData[16]);// ("31-03-2016");
+				System.out.println("Fecha de reschedule => " + formateador.format(date));
 				String dateString = formateador.format(date);
-				
+
 				ScheduleRequest scheduleRequest = new ScheduleRequest();
 				scheduleRequest.setBucket(provision.getWorkZone());
 				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
@@ -1721,13 +1735,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleRequest.setSelectedDate(dateString);
 				scheduleRequest.setSelectedRange(range);
 				scheduleRequest.setStpsiCode(getData[4]);
-				
-				//Actualiza el agendamiento.
+
+				// Actualiza el agendamiento.
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
-				
+
 				return true;
 			}
-			
+
 			if (request.getStatus().equalsIgnoreCase(Status.WO_NOTDONE.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
@@ -1741,7 +1755,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woNotdone.setaNotDoneReasonRepair(getData[26]);
 				woNotdone.setaObservation(getData[27]);
 				woNotdone.setUserNotdone(getData[28]);
-				
+
 				update.set("wo_notdone", woNotdone);
 
 				update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
@@ -1758,24 +1772,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
-				//Actualiza provision
+				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
-				//Solo cancelar agenda sin ir a PSI
-				//Llamar al método de augusto.
+				// Solo cancelar agenda sin ir a PSI
+				// Llamar al método de augusto.
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
 				scheduleNotDoneRequest.setStPsiCode(getData[9]);
-				
-				//Cancela agenda sin ir a PSI
+
+				// Cancela agenda sin ir a PSI
 				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
-				
+
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean sendedSMSInvitationNotSchedule(Provision provision) {
 
 		List<MsgParameter> msgParameters = new ArrayList<>();

@@ -1407,13 +1407,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception {
+	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
+			throws Exception {
 		boolean bool = false;
 		String[] getData = request.getData().split("\\|", -1);
-		Provision provision = provisionRepository.getByOrderCodeForUpdate(request.getOrderCode());
+		Provision provision = new Provision();
+		// validar si es vf o mt
+		if (!xaRequirementNumber.startsWith("MT") && !xaRequirementNumber.startsWith("VF")) {
+			provision = provisionRepository.getByOrderCodeForUpdate(xaRequest);
+		} else {
+			// Llamar al método de busqueda ficticio
+			provision = provisionRepository.getByOrderCodeForUpdateFicticious(xaRequirementNumber);
+		}
 
 		bool = updateProvision(provision, getData, request);
-
 		return bool;
 	}
 
@@ -1431,7 +1438,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 			 */
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-				if (Integer.parseInt(getData[2]) == 0 && getData[4].toString().equals(getData[6].toString())) {
+
+				if (Integer.parseInt(getData[2]) == 0 && (getData[6].toString().trim().startsWith("VF")
+						|| getData[6].toString().trim().startsWith("MT"))) {
 					// IN_TO fictitious
 					Update update = new Update();
 
@@ -1448,12 +1457,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[16]);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
 
-				} else if (Integer.parseInt(getData[2]) == 0
-						&& !getData[5].toString().equalsIgnoreCase(getData[6].toString())) {
+				} else if (Integer.parseInt(getData[2]) == 0 && (!getData[6].toString().trim().startsWith("VF")
+						&& !getData[6].toString().trim().startsWith("MT"))) {
+
 					// IN_TOA Monoproducto
 					Update update = new Update();
 
@@ -1470,6 +1482,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 
+					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
+
 					provisionRepository.updateProvision(provision, update);
 					return true;
 				} else {
@@ -1482,7 +1497,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("work_zone", getData[16]);
 
 					if (provision.getXaIdSt() != null) {
-
 						update.set("has_schedule", false);
 					}
 
@@ -1531,11 +1545,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-					if (!provision.getDummyStPsiCode().isEmpty()) {
-						provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
+					if (provision.getDummyStPsiCode() != null) {
+						if (!provision.getDummyStPsiCode().isEmpty()) {
+							provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
 
-					} else {
-						provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true : false);
+						} else {
+							provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true : false);
+						}
 					}
 
 					// update psiCode by schedule
@@ -1894,7 +1910,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					for (Contacts cont : provision.getContacts()) {
 						cont.setHolder(false);
 					}
-					
+
 					Contacts contacts = new Contacts();
 					contacts.setCarrier(provision.getCustomer().getCarrier());
 					contacts.setFullName(provision.getCustomer().getName());
@@ -1902,7 +1918,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					contacts.setHolder(true);
 					provision.getContacts().add(contacts);
 				}
-			}else {
+			} else {
 				List<Contacts> lContacts = new ArrayList<Contacts>();
 				Contacts contacts = new Contacts();
 				contacts.setCarrier(provision.getCustomer().getCarrier());

@@ -369,11 +369,13 @@ public class ProvisionController {
 			// Lógica diferencia Averias - Provision
 			Object[] obj = new Object[2];
 			obj = validateActivityType(parts);
+
 			boolean provision = (boolean) obj[0];
 			String xaRequest = (String) obj[1];
+			String xaRequirementNumber = (String) obj[2];
 
 			if (provision) {
-				provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+				provisions = provisionService.provisionUpdateFromTOA(request.getBody(), xaRequest, xaRequirementNumber);
 			} else {
 				// Averia
 			}
@@ -1566,85 +1568,88 @@ public class ProvisionController {
 	}
 
 	public Object[] validateActivityType(String[] parts) {
-		Object[] obj = new Object[2];
-		String status = parts[0] == null ? "" : parts[0], xaRequest = "";
+		Object[] obj = new Object[3];
+		String status = parts[0] == null ? "" : parts[0], xaRequest = "", xaRequirementNumber = "";
 		boolean provision = false;
 		if (Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[5].trim();
-				if (!xaRequest.equals("0")) {
-					provision = true;
-				}
+				xaRequest = parts[5].trim() == "0" ? parts[8].trim() : parts[5].trim();
+				provision = true;
+				xaRequirementNumber = parts[8].trim();
 			} else {
 				provision = false;
 				xaRequest = "";
+				xaRequirementNumber = "";
 			}
 		} else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
-				xaRequest = parts[6].trim();
-				if (!xaRequest.equals("0")) {
-					provision = true;
-				}
+				xaRequest = parts[6].trim() == "0" ? parts[9].trim() : parts[6].trim();
+				provision = true;
+				xaRequirementNumber = parts[9].trim();
 			} else {
 				provision = false;
 				xaRequest = "";
+				xaRequirementNumber = "";
 			}
 		} else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[7].trim();
-				if (!xaRequest.equals("0")) {
-					provision = true;
-				}
+				xaRequest = parts[7].trim() == "0" ? parts[10].trim() : parts[7].trim();
+				provision = true;
+				xaRequirementNumber = parts[10].trim();
 			} else {
 				provision = false;
 				xaRequest = "";
+				xaRequirementNumber = "";
 			}
 		} else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
-				xaRequest = parts[2].trim();
-				if (!xaRequest.equals("0")) {
-					provision = true;
-				}
+				xaRequest = parts[2].trim() == "0" ? parts[7].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[7].trim();
 			} else {
 				provision = false;
 				xaRequest = "";
+				xaRequirementNumber = "";
 			}
 		} else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim();
-				if (!xaRequest.equals("0")) {
-					provision = true;
-				}
+				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[5].trim();
 			} else {
 				provision = false;
 				xaRequest = "";
+				xaRequirementNumber = "";
 			}
 		} else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim();
-				if (!xaRequest.equals("0")) {
-					provision = true;
-				}
+				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[5].trim();
 			} else {
 				provision = false;
 				xaRequest = "";
+				xaRequirementNumber = "";
 			}
 		} else if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[8].trim();
-				if (!xaRequest.equals("0")) {
-					provision = true;
-				}
+				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[5].trim();
 			} else {
 				provision = false;
 				xaRequest = "";
+				xaRequirementNumber = "";
 			}
 		} else {
 			provision = false;
 			xaRequest = "";
+			xaRequirementNumber = "";
 		}
+		
 		obj[0] = provision;
 		obj[1] = xaRequest;
+		obj[2] = xaRequirementNumber;
 		return obj;
 	}
 

@@ -17,6 +17,8 @@ public class Contacts implements Serializable {
 	@Field("carrier")
 	private boolean carrier;
 
+	private boolean holder;
+
 	public String getFullName() {
 		return fullName;
 	}
@@ -39,6 +41,14 @@ public class Contacts implements Serializable {
 
 	public void setCarrier(boolean carrier) {
 		this.carrier = carrier;
+	}
+
+	public boolean isHolder() {
+		return holder;
+	}
+
+	public void setHolder(boolean holder) {
+		this.holder = holder;
 	}
 
 }

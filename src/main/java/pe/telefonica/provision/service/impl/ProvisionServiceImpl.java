@@ -1419,7 +1419,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (!xaRequirementNumber.startsWith("MT") && !xaRequirementNumber.startsWith("VF")) {
 			provision = provisionRepository.getByOrderCodeForUpdate(xaRequest);
 		} else {
-			//Llamar al método de busqueda ficticio
+			// Llamar al método de busqueda ficticio
 			provision = provisionRepository.getByOrderCodeForUpdateFicticious(xaRequirementNumber);
 		}
 
@@ -1441,8 +1441,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			 */
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-				
-				 if (Integer.parseInt(getData[2]) == 0 && (getData[6].toString().trim().startsWith("VF")
+
+				if (Integer.parseInt(getData[2]) == 0 && (getData[6].toString().trim().startsWith("VF")
 						|| getData[6].toString().trim().startsWith("MT"))) {
 					// IN_TO fictitious
 					Update update = new Update();
@@ -1460,15 +1460,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[16]);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
-					
+
 					provisionRepository.updateProvision(provision, update);
 					return true;
 
 				} else if (Integer.parseInt(getData[2]) == 0 && (!getData[6].toString().trim().startsWith("VF")
 						&& !getData[6].toString().trim().startsWith("MT"))) {
+
 					// IN_TOA Monoproducto
 					Update update = new Update();
 
@@ -1484,7 +1484,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-					
+
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
@@ -1548,7 +1548,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-					if(provision.getDummyStPsiCode()!=null) {
+					if (provision.getDummyStPsiCode() != null) {
 						if (!provision.getDummyStPsiCode().isEmpty()) {
 							provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
 
@@ -1897,6 +1897,49 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+
+	@Override
+	public ProvisionResponse<List<Contacts>> getContactList(String provisionId) {
+		Optional<Provision> optional = provisionRepository.getStatus(provisionId);
+		ProvisionResponse<List<Contacts>> response = new ProvisionResponse<List<Contacts>>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+
+		if (optional.isPresent()) {
+			Provision provision = optional.get();
+
+			if (provision.getContacts() != null && provision.getContacts().size() > 0) {
+				if (!provision.getCustomer().getPhoneNumber().equals(provision.getContacts().get(0).getPhoneNumber())) {
+					for (Contacts cont : provision.getContacts()) {
+						cont.setHolder(false);
+					}
+
+					Contacts contacts = new Contacts();
+					contacts.setCarrier(provision.getCustomer().getCarrier());
+					contacts.setFullName(provision.getCustomer().getName());
+					contacts.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+					contacts.setHolder(true);
+					provision.getContacts().add(contacts);
+				}
+			} else {
+				List<Contacts> lContacts = new ArrayList<Contacts>();
+				Contacts contacts = new Contacts();
+				contacts.setCarrier(provision.getCustomer().getCarrier());
+				contacts.setFullName(provision.getCustomer().getName());
+				contacts.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+				contacts.setHolder(true);
+				lContacts.add(contacts);
+				provision.setContacts(lContacts);
+			}
+
+			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+			response.setHeader(header).setData(provision.getContacts());
+		} else {
+			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+			response.setHeader(header);
+		}
+
+		return response;
 	}
 
 }

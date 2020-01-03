@@ -1545,11 +1545,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-					if (!provision.getDummyStPsiCode().isEmpty()) {
-						provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
+					if(provision.getDummyStPsiCode()!=null) {
+						if (!provision.getDummyStPsiCode().isEmpty()) {
+							provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
 
-					} else {
-						provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true : false);
+						} else {
+							provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true : false);
+						}
 					}
 
 					// update psiCode by schedule

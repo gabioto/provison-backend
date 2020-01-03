@@ -47,6 +47,7 @@ import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
+import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.ProvisionScheduler;
@@ -362,19 +363,19 @@ public class ProvisionController {
 		HttpStatus status;
 		String separador = Pattern.quote(Constants.BARRA_VERTICAL);
 		String[] parts = request.getBody().getData().split(separador);
-		Boolean provisions=false;
-		
+		Boolean provisions = false;
+
 		try {
-			//Lógica diferencia Averias - Provision
-			Object[] obj = new Object[2]; 
+			// Lógica diferencia Averias - Provision
+			Object[] obj = new Object[2];
 			obj = validateActivityType(parts);
-			boolean provision = (boolean)obj[0];
-			String xaRequest = (String)obj[1];
-			
+			boolean provision = (boolean) obj[0];
+			String xaRequest = (String) obj[1];
+
 			if (provision) {
 				provisions = provisionService.provisionUpdateFromTOA(request.getBody());
-			}else {
-				//Averia
+			} else {
+				// Averia
 			}
 
 			if (provisions) {
@@ -1549,6 +1550,12 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
+	@RequestMapping(value = "/getContacts", method = RequestMethod.GET)
+	public ResponseEntity<ProvisionResponse<List<Contacts>>> getContacts(
+			@RequestParam(value = "provisionId", required = true) String provisionId) {
+		return ResponseEntity.ok(provisionService.getContactList(provisionId));
+	}
+
 	public String getTimestamp() {
 		log.info("ProvisionController.getTimestamp()");
 		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -1557,87 +1564,87 @@ public class ProvisionController {
 		log.info("timeStamp => " + timeStamp);
 		return timeStamp;
 	}
-	
+
 	public Object[] validateActivityType(String[] parts) {
 		Object[] obj = new Object[2];
-		String status=parts[0]==null?"":parts[0], xaRequest="";
-		boolean provision=false;
-		if(Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
-			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest=parts[5].trim();
-				if(!xaRequest.equals("0")) {
+		String status = parts[0] == null ? "" : parts[0], xaRequest = "";
+		boolean provision = false;
+		if (Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
+				xaRequest = parts[5].trim();
+				if (!xaRequest.equals("0")) {
 					provision = true;
 				}
-			}else {
+			} else {
 				provision = false;
-				xaRequest="";
+				xaRequest = "";
 			}
-		}else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
-			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
-				xaRequest=parts[6].trim();
-				if(!xaRequest.equals("0")) {
+		} else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
+				xaRequest = parts[6].trim();
+				if (!xaRequest.equals("0")) {
 					provision = true;
 				}
-			}else {
+			} else {
 				provision = false;
-				xaRequest="";
+				xaRequest = "";
 			}
-		}else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
-			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest=parts[7].trim();
-				if(!xaRequest.equals("0")) {
+		} else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
+				xaRequest = parts[7].trim();
+				if (!xaRequest.equals("0")) {
 					provision = true;
 				}
-			}else {
+			} else {
 				provision = false;
-				xaRequest="";
+				xaRequest = "";
 			}
-		}else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
-			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
-				xaRequest=parts[2].trim();
-				if(!xaRequest.equals("0")) {
+		} else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
+				xaRequest = parts[2].trim();
+				if (!xaRequest.equals("0")) {
 					provision = true;
 				}
-			}else {
+			} else {
 				provision = false;
-				xaRequest="";
+				xaRequest = "";
 			}
-		}else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
-			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest=parts[2].trim();
-				if(!xaRequest.equals("0")) {
+		} else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest = parts[2].trim();
+				if (!xaRequest.equals("0")) {
 					provision = true;
 				}
-			}else {
+			} else {
 				provision = false;
-				xaRequest="";
+				xaRequest = "";
 			}
-		}else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
-			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest=parts[2].trim();
-				if(!xaRequest.equals("0")) {
+		} else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest = parts[2].trim();
+				if (!xaRequest.equals("0")) {
 					provision = true;
 				}
-			}else {
+			} else {
 				provision = false;
-				xaRequest="";
+				xaRequest = "";
 			}
-		}else if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(status)) {
-			if(Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest=parts[8].trim();
-				if(!xaRequest.equals("0")) {
+		} else if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest = parts[8].trim();
+				if (!xaRequest.equals("0")) {
 					provision = true;
 				}
-			}else {
+			} else {
 				provision = false;
-				xaRequest="";
+				xaRequest = "";
 			}
-		}else {
+		} else {
 			provision = false;
-			xaRequest="";
+			xaRequest = "";
 		}
-		obj[0]=provision;
-		obj[1]=xaRequest;
+		obj[0] = provision;
+		obj[1] = xaRequest;
 		return obj;
 	}
 

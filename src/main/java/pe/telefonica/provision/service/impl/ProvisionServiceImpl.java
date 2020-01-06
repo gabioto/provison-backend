@@ -1582,6 +1582,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 
 					// update psiCode by schedule
+
 					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
 							getData[4], getData[8].toLowerCase());
 

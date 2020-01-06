@@ -514,21 +514,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 							? Status.INGRESADO.getDescription()
 							: Status.CAIDO.getDescription());
 
-			if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
-					&& !provisionx.getDummyStPsiCode().isEmpty()) {
-				ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
-				updateFicRequest.setOrderCode(getData[11]);
-				updateFicRequest.setOriginCode(provisionx.getOriginCode());
-				updateFicRequest.setSaleCode(provisionx.getSaleCode());
-				updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
-				updateFicRequest.setRequestName(provisionx.getProductName());
-				updateFicRequest.setRequestId(provisionx.getIdProvision());
+			if(provisionx.getDummyStPsiCode()!=null) {
+				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
+						&& !provisionx.getDummyStPsiCode().isEmpty()) {
+					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
+					updateFicRequest.setOrderCode(getData[11]);
+					updateFicRequest.setOriginCode(provisionx.getOriginCode());
+					updateFicRequest.setSaleCode(provisionx.getSaleCode());
+					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
+					updateFicRequest.setRequestName(provisionx.getProductName());
+					updateFicRequest.setRequestId(provisionx.getIdProvision());
 
-				// Actualiza agenda
-				boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
-				update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+					// Actualiza agenda
+					boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+					update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
 
+				}
 			}
+			
 			// status_toa
 			String status = request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())
 					? Status.PENDIENTE.getStatusName().toLowerCase()

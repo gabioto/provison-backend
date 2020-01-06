@@ -1602,6 +1602,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
+				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
 

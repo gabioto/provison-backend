@@ -1134,6 +1134,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (scheduledRange != null && !scheduledRange.equals(""))
 				statusLog.setScheduledRange(scheduledRange);
+			
+			if (xaIdSt != null)
+				statusLog.setXaidst(xaIdSt);
 
 			logStatus.add(statusLog);
 

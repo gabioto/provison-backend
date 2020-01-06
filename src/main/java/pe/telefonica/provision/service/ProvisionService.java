@@ -12,6 +12,7 @@ import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
 
@@ -24,6 +25,8 @@ public interface ProvisionService {
 	List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 
 	ProvisionResponse<String> getStatus(String provisionId);
+	
+	ProvisionResponse<List<Contacts>> getContactList(String provisionId);
 
 	List<Provision> insertProvisionList(List<Provision> provisionList);
 
@@ -31,7 +34,7 @@ public interface ProvisionService {
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception;
+	boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber) throws Exception;
 
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);

@@ -13,7 +13,8 @@ public final class Constants {
 	public static final String PROVISION_STATUS_CANCELLED = "cancelled";
 	public static final String PROVISION_STATUS_COMPLETED = "completed";
 	public static final String PROVISION_STATUS_DONE = "done";
-	
+	public static final String PROVISION_STATUS_RESCHEDULE = "reschedule";
+	public static final String PROVISION_STATUS_NOTDONE = "notDone";
 
 	public static final String DATE_FORMAT_WS = "dd/MM/yyyy";
 	public static final String DATE_FORMAT_BO = "yyyy-MM-dd";
@@ -78,6 +79,8 @@ public final class Constants {
 	public static final String OPER_ORDER_CANCELLATION = "OPER_ORDER_CANCELLATION";
 	public static final String OPER_CANCEL_SCHEDULE = "OPER_CANCEL_SCHEDULE";
 	public static final String OPER_SCHEDULE_UPDATE_CODE_FICT = "OPER_SCHEDULE_UPDATE_CODE_FICT";
+	public static final String OPER_UPDATE_RESCHEDULE = "OPER_UPDATE_RESCHEDULE";
+	public static final String OPER_NOTDONE_SCHEDULE = "OPER_NOTDONE_SCHEDULE";
 	
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
@@ -87,5 +90,15 @@ public final class Constants {
 	public static final String TIPO_RUC = "ruc";
 	public static final String RUC_NATURAL = "10";
 	
+	public static final String STATUS_WO_PRESTART="WO_PRESTART";
+	public static final String STATUS_WO_INIT="WO_INIT";
+	public static final String STATUS_WO_COMPLETED="WO_COMPLETED";
+	public static final String STATUS_WO_PRE_NOTDONE="WO_PRE_NOTDONE";
+	public static final String STATUS_WO_NOTDONE="WO_NOTDONE";
+	public static final String STATUS_WO_CANCEL="WO_CANCEL";
+	public static final String STATUS_WO_RESCHEDULE="WO_RESCHEDULE";
+
+	public static final String ACTIVITY_TYPE_PROVISION="PROVISION";
+	public static final String BARRA_VERTICAL = "|";
 	
 }

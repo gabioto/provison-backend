@@ -514,7 +514,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 							? Status.INGRESADO.getDescription()
 							: Status.CAIDO.getDescription());
 
-			if(provisionx.getDummyStPsiCode()!=null) {
+			if (provisionx.getDummyStPsiCode() != null) {
 				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 						&& !provisionx.getDummyStPsiCode().isEmpty()) {
 					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
@@ -531,7 +531,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				}
 			}
-			
+
 			// status_toa
 			String status = request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())
 					? Status.PENDIENTE.getStatusName().toLowerCase()
@@ -820,36 +820,38 @@ public class ProvisionServiceImpl implements ProvisionService {
 				log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 			}
 
-			String name = provision.getCustomer().getName().split(" ")[0];
+			/*
+			 * String name = provision.getCustomer().getName().split(" ")[0];
+			 * 
+			 * List<MsgParameter> msgParameters = new ArrayList<>(); MsgParameter paramName
+			 * = new MsgParameter(); paramName.setKey(Constants.TEXT_NAME_REPLACE);
+			 * paramName.setValue(name);
+			 * 
+			 * MsgParameter paramProduct = new MsgParameter();
+			 * paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
+			 * paramProduct.setValue(provision.getProductName());
+			 * 
+			 * msgParameters.add(paramName); msgParameters.add(paramProduct);
+			 * 
+			 * List<Contact> contacts = new ArrayList<>();
+			 * 
+			 * Contact contactCustomer = new Contact();
+			 * contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+			 * contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+			 * contacts.add(contactCustomer);
+			 * 
+			 * ApiResponse<SMSByIdResponse> apiResponse =
+			 * trazabilidadSecurityApi.sendSMS(contacts,
+			 * Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
+			 * MsgParameter[0]), "");
+			 * 
+			 * if
+			 * (apiResponse.getHeader().getResultCode().equals(String.valueOf(HttpStatus.OK.
+			 * value()))) { messageSent = true; } else { messageSent = false; } return
+			 * messageSent ? provision : null;
+			 */
 
-			List<MsgParameter> msgParameters = new ArrayList<>();
-			MsgParameter paramName = new MsgParameter();
-			paramName.setKey(Constants.TEXT_NAME_REPLACE);
-			paramName.setValue(name);
-
-			MsgParameter paramProduct = new MsgParameter();
-			paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
-			paramProduct.setValue(provision.getProductName());
-
-			msgParameters.add(paramName);
-			msgParameters.add(paramProduct);
-
-			List<Contact> contacts = new ArrayList<>();
-
-			Contact contactCustomer = new Contact();
-			contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-			contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-			contacts.add(contactCustomer);
-
-			ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-					Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]), "");
-
-			if (apiResponse.getHeader().getResultCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-				messageSent = true;
-			} else {
-				messageSent = false;
-			}
-			return messageSent ? provision : null;
+			return provision;
 		} else {
 			return null;
 		}
@@ -1216,7 +1218,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					provision.getContacts().clear();
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
-					
+
 					sendInfoUpdateSMS(provision);
 
 				} else {
@@ -1237,8 +1239,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		ProvisionResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
 		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getData());
 
-		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null,
-				provisionTexts.getWebUrl());
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
 	}
 
 	@Override

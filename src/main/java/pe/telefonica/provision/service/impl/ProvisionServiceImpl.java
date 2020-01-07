@@ -32,6 +32,7 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.request.SMSByIdRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
@@ -513,7 +514,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 							? Status.INGRESADO.getDescription()
 							: Status.CAIDO.getDescription());
 
-			if(provisionx.getDummyStPsiCode()!=null) {
+			if (provisionx.getDummyStPsiCode() != null) {
 				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 						&& !provisionx.getDummyStPsiCode().isEmpty()) {
 					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
@@ -530,7 +531,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				}
 			}
-			
+
 			// status_toa
 			String status = request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())
 					? Status.PENDIENTE.getStatusName().toLowerCase()
@@ -674,11 +675,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Contact contactCustomer = new Contact();
 				contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
 				contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+				contactCustomer.setHolder(true);
+				contactCustomer.setFullName(provision.getCustomer().getName());
 				contacts.add(contactCustomer);
 
-//				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-//						Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new MsgParameter[0]),
-//						"http://www.movistar.com.pe");
+				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY,
+						msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
 
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 				// Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new
@@ -812,41 +814,44 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			try {
+				sendCancelBySMS(provision);
 				sendCancelledMailByUser(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
 			} catch (Exception e) {
 				log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 			}
 
-			String name = provision.getCustomer().getName().split(" ")[0];
+			/*
+			 * String name = provision.getCustomer().getName().split(" ")[0];
+			 * 
+			 * List<MsgParameter> msgParameters = new ArrayList<>(); MsgParameter paramName
+			 * = new MsgParameter(); paramName.setKey(Constants.TEXT_NAME_REPLACE);
+			 * paramName.setValue(name);
+			 * 
+			 * MsgParameter paramProduct = new MsgParameter();
+			 * paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
+			 * paramProduct.setValue(provision.getProductName());
+			 * 
+			 * msgParameters.add(paramName); msgParameters.add(paramProduct);
+			 * 
+			 * List<Contact> contacts = new ArrayList<>();
+			 * 
+			 * Contact contactCustomer = new Contact();
+			 * contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+			 * contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+			 * contacts.add(contactCustomer);
+			 * 
+			 * ApiResponse<SMSByIdResponse> apiResponse =
+			 * trazabilidadSecurityApi.sendSMS(contacts,
+			 * Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
+			 * MsgParameter[0]), "");
+			 * 
+			 * if
+			 * (apiResponse.getHeader().getResultCode().equals(String.valueOf(HttpStatus.OK.
+			 * value()))) { messageSent = true; } else { messageSent = false; } return
+			 * messageSent ? provision : null;
+			 */
 
-			List<MsgParameter> msgParameters = new ArrayList<>();
-			MsgParameter paramName = new MsgParameter();
-			paramName.setKey(Constants.TEXT_NAME_REPLACE);
-			paramName.setValue(name);
-
-			MsgParameter paramProduct = new MsgParameter();
-			paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
-			paramProduct.setValue(provision.getProductName());
-
-			msgParameters.add(paramName);
-			msgParameters.add(paramProduct);
-
-			List<Contact> contacts = new ArrayList<>();
-
-			Contact contactCustomer = new Contact();
-			contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-			contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-			contacts.add(contactCustomer);
-
-			ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-					Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]), "");
-
-			if (apiResponse.getHeader().getResultCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-				messageSent = true;
-			} else {
-				messageSent = false;
-			}
-			return messageSent ? provision : null;
+			return provision;
 		} else {
 			return null;
 		}
@@ -893,6 +898,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return trazabilidadSecurityApi.sendMail("186162", mailParameters.toArray(new MailParameter[0]));
 
 		// return sendMail("179833", mailParameters.toArray(new MailParameter[0]));
+	}
+
+	private void sendCancelBySMS(Provision provision) {
+		List<MsgParameter> msgParameters = new ArrayList<>();
+		MsgParameter paramName = new MsgParameter();
+		paramName.setKey(Constants.TEXT_NAME_REPLACE);
+		paramName.setValue("");
+
+		msgParameters.add(paramName);
+
+		List<Contact> contacts = new ArrayList<>();
+		Contact contactCustomer = new Contact();
+		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+		contactCustomer.setHolder(true);
+		contactCustomer.setFullName(provision.getCustomer().getName());
+		contacts.add(contactCustomer);
+
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY,
+				msgParameters.toArray(new MsgParameter[0]), "");
 	}
 
 	private Boolean sendCancelledMailByUser(Provision provision, String cancellationReason) {
@@ -1109,6 +1134,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (scheduledRange != null && !scheduledRange.equals(""))
 				statusLog.setScheduledRange(scheduledRange);
+			
+			if (xaIdSt != null)
+				statusLog.setXaidst(xaIdSt);
 
 			logStatus.add(statusLog);
 
@@ -1180,8 +1208,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 				psiRequest.getBodyUpdateClient()
-						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail()
-								: "ghost@gmail.com");
+						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
 
 				System.out.println(provision.getCustomer().getMail());
 
@@ -1189,14 +1216,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				if (updatedPsi) {
 					Update update = new Update();
-					// update.set("customer.mail", provision.getCustomer().getMail());
 					update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
-
 					provisionRepository.updateProvision(provision, update);
 
 					provision.getContacts().clear();
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
-					// provision.getCustomer().setMail(request.getEmail());
+
+					sendInfoUpdateSMS(provision);
+
 				} else {
 					throw new Exception();
 				}
@@ -1209,6 +1236,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+
+	private void sendInfoUpdateSMS(Provision provision) {
+		ProvisionResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
+		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getData());
+
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
 	}
 
 	@Override
@@ -1266,7 +1300,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 							.setTelefono4(a < quanty_contact ? listContact.get(a).getPhoneNumber().toString() : "");
 
 				}
-
 			}
 
 			psiRequest.getBodyUpdateClient().setCorreo(request.getEmail());
@@ -1387,27 +1420,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return true;
 	}
 
-	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
-		boolean errorBucket = false;
-		// validar IN_TOA
-		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) {
-			// validate bucket and name product
-			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
-			if (errorBucket) {
-				// valida DNI
-				if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
-						&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
-					errorBucket = false;
-					log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType()
-							+ " NumDoc: " + provision.getCustomer().getDocumentNumber());
-				} else {
-					log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
-							+ provision.getCustomer().getDocumentNumber());
-				}
-			}
-		}
-		return true;
-	}
+	/*
+	 * private boolean validateBuckectProduct(String[] getData, Provision provision)
+	 * throws Exception { boolean errorBucket = false; // validar IN_TOA if
+	 * (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" :
+	 * getData[0])) { // validate bucket and name product errorBucket =
+	 * getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(),
+	 * getData[17]); if (errorBucket) { // valida DNI if
+	 * (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().
+	 * toLowerCase()) &&
+	 * !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL
+	 * )) { errorBucket = false; log.info("No es persona natural. Documento: " +
+	 * provision.getCustomer().getDocumentType() + " NumDoc: " +
+	 * provision.getCustomer().getDocumentNumber()); } else {
+	 * log.info("Es persona natural. Documento: " +
+	 * provision.getCustomer().getDocumentType() + " NumDoc: " +
+	 * provision.getCustomer().getDocumentNumber()); } } } return true; }
+	 */
 
 	@Override
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
@@ -1572,6 +1601,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
+				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
 

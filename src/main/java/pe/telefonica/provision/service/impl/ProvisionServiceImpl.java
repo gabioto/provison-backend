@@ -1442,8 +1442,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 
-				if (Integer.parseInt(getData[2]) == 0 && (getData[6].toString().trim().startsWith("VF")
-						|| getData[6].toString().trim().startsWith("MT"))) {
+				String origin = getData[6].toString().substring(0, 2);
+				if (getData[2].toString().equals("0") && (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
 					// IN_TO fictitious
 					Update update = new Update();
 
@@ -1466,8 +1466,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					provisionRepository.updateProvision(provision, update);
 					return true;
 
-				} else if (Integer.parseInt(getData[2]) == 0 && (!getData[6].toString().trim().startsWith("VF")
-						&& !getData[6].toString().trim().startsWith("MT"))) {
+				} else if (getData[2].toString().equals("0") && (!origin.equalsIgnoreCase("VF")
+						&& !origin.equalsIgnoreCase("MT"))) {
 
 					// IN_TOA Monoproducto
 					Update update = new Update();

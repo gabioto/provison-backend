@@ -57,5 +57,6 @@ public interface ProvisionRepository {
 	
 	Provision getByOrderCodeForUpdate(String orderCode);
 	
+	Provision getByOrderCodeForUpdateFicticious(String xaRequirementNumber);
 	
 }

@@ -47,6 +47,7 @@ import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
+import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.ProvisionScheduler;
@@ -360,10 +361,24 @@ public class ProvisionController {
 			@RequestBody @Valid ApiRequest<UpdateFromToaRequest> request) {
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
+		String separador = Pattern.quote(Constants.BARRA_VERTICAL);
+		String[] parts = request.getBody().getData().split(separador);
+		Boolean provisions = false;
 
 		try {
+			// Lógica diferencia Averias - Provision
+			Object[] obj = new Object[2];
+			obj = validateActivityType(parts);
 
-			Boolean provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+			boolean provision = (boolean) obj[0];
+			String xaRequest = (String) obj[1];
+			String xaRequirementNumber = (String) obj[2];
+
+			if (provision) {
+				provisions = provisionService.provisionUpdateFromTOA(request.getBody(), xaRequest, xaRequirementNumber);
+			} else {
+				// Averia
+			}
 
 			if (provisions) {
 				status = HttpStatus.OK;
@@ -1242,7 +1257,6 @@ public class ProvisionController {
 		HttpStatus status;
 
 		try {
-
 			Boolean result = provisionService.receiveAddressUpdateBO(request.getBody().getAction(),
 					request.getBody().getProvisionId(), request.getBody().getNewDepartment(),
 					request.getBody().getNewProvince(), request.getBody().getNewDistrict(),
@@ -1250,7 +1264,6 @@ public class ProvisionController {
 					request.getBody().getIsSMSRequired());
 
 			if (result) {
-
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Object>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESSBO,
 						String.valueOf(status.value()), status.getReasonPhrase(), null);
@@ -1538,6 +1551,12 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
+	@RequestMapping(value = "/getContacts", method = RequestMethod.GET)
+	public ResponseEntity<ProvisionResponse<List<Contacts>>> getContacts(
+			@RequestParam(value = "provisionId", required = true) String provisionId) {
+		return ResponseEntity.ok(provisionService.getContactList(provisionId));
+	}
+
 	public String getTimestamp() {
 		log.info("ProvisionController.getTimestamp()");
 		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -1545,6 +1564,92 @@ public class ProvisionController {
 		String timeStamp = dateNow.format(formatter);
 		log.info("timeStamp => " + timeStamp);
 		return timeStamp;
+	}
+
+	public Object[] validateActivityType(String[] parts) {
+		Object[] obj = new Object[3];
+		String status = parts[0] == null ? "" : parts[0], xaRequest = "", xaRequirementNumber = "";
+		boolean provision = false;
+		if (Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
+				xaRequest = parts[5].trim() == "0" ? parts[8].trim() : parts[5].trim();
+				provision = true;
+				xaRequirementNumber = parts[8].trim();
+			} else {
+				provision = false;
+				xaRequest = "";
+				xaRequirementNumber = "";
+			}
+		} else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
+				xaRequest = parts[6].trim() == "0" ? parts[9].trim() : parts[6].trim();
+				provision = true;
+				xaRequirementNumber = parts[9].trim();
+			} else {
+				provision = false;
+				xaRequest = "";
+				xaRequirementNumber = "";
+			}
+		} else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
+				xaRequest = parts[7].trim() == "0" ? parts[10].trim() : parts[7].trim();
+				provision = true;
+				xaRequirementNumber = parts[10].trim();
+			} else {
+				provision = false;
+				xaRequest = "";
+				xaRequirementNumber = "";
+			}
+		} else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
+				xaRequest = parts[2].trim() == "0" ? parts[7].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[7].trim();
+			} else {
+				provision = false;
+				xaRequest = "";
+				xaRequirementNumber = "";
+			}
+		} else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[5].trim();
+			} else {
+				provision = false;
+				xaRequest = "";
+				xaRequirementNumber = "";
+			}
+		} else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[5].trim();
+			} else {
+				provision = false;
+				xaRequest = "";
+				xaRequirementNumber = "";
+			}
+		} else if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(status)) {
+			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
+				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				provision = true;
+				xaRequirementNumber = parts[5].trim();
+			} else {
+				provision = false;
+				xaRequest = "";
+				xaRequirementNumber = "";
+			}
+		} else {
+			provision = false;
+			xaRequest = "";
+			xaRequirementNumber = "";
+		}
+		
+		obj[0] = provision;
+		obj[1] = xaRequest;
+		obj[2] = xaRequirementNumber;
+		return obj;
 	}
 
 }

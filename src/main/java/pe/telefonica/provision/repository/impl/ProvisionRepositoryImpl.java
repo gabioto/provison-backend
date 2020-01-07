@@ -44,12 +44,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber)
-						.and("xa_request").ne("")
-						.and("work_zone").ne("")
-						.and("xa_id_st").ne("")
+						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 				Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
@@ -59,12 +57,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
 		Provision provision = this.mongoOperations
 				.findOne(
-						new Query(
-								Criteria.where("customer.document_type").is(documentType)
-										.and("customer.document_number").is(documentNumber).orOperator(
-												Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-												Criteria.where("active_status")
-														.is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
+						new Query(Criteria.where("customer.document_type").is(documentType)
+								.and("customer.document_number").is(documentNumber)
+								.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
+										Criteria.where("active_status")
+												.is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 						Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
@@ -92,7 +90,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			provision = this.mongoOperations.findOne(
 					new Query(Criteria.where("idProvision").is(new ObjectId(provisionId)).orOperator(
 							Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-							Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
+							Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
+							Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 					Provision.class);
 		} catch (Exception e) {
 			log.info(e.getMessage());
@@ -221,36 +220,43 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Provision getProvisionByXaIdSt(String xaIdSt) {
-		
-		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("xaIdSt").is(xaIdSt)), Provision.class);
-		
+
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaIdSt").is(xaIdSt)),
+				Provision.class);
+
 		return provision;
 	}
 
 	@Override
 	public Provision getProvisionBySaleCode(String saleCode) {
-		
-		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("sale_code").is(saleCode)), Provision.class);
-		
+
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("sale_code").is(saleCode)),
+				Provision.class);
+
 		return provision;
 	}
 
 	@Override
 	public Provision getByOrderCodeForUpdate(String orderCode) {
-		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("xaRequest").is(orderCode)), Provision.class);
-		
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(orderCode)),
+				Provision.class);
+
+		return provision;
+	}
+
+	@Override
+	public Provision getByOrderCodeForUpdateFicticious(String xaRequirementNumber) {
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("saleCode").is(xaRequirementNumber)), Provision.class);
 		return provision;
 	}
 
 	@Override
 	public Provision getProvisionByDummyStPsiCode(String dummyStPsiCode) {
-		
-		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("dummy_st_psi_code").is(dummyStPsiCode)), Provision.class);
-		
+
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("dummy_st_psi_code").is(dummyStPsiCode)), Provision.class);
+
 		return provision;
 	}
 }

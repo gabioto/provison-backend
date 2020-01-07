@@ -1724,33 +1724,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 				WoReshedule woReshedule = new WoReshedule();
 				String range = "";
+				String identificadorSt=getData[4].toString();
 
-				if (getData[17].trim().equals("09-13") || getData[17].trim().equals("9-13")) {
+				if (getData[17].toString().trim().equals("09-13") || getData[17].toString().trim().equals("9-13")) {
 					range = "AM";
 				} else {
 					range = "PM";
 				}
-
-				woReshedule.setXaAppointmentScheduler(getData[23]);
-				woReshedule.setTimeSlot(range);
-				update.set("wo_reschedule", woReshedule);
-				update.set("active_status", Constants.PROVISION_STATUS_RESCHEDULE);
-
-				StatusLog statusLog = new StatusLog();
-
-				statusLog.setStatus(Status.WO_RESCHEDULE.getStatusName());
-				statusLog.setDescription(Status.WO_RESCHEDULE.getDescription());
-				statusLog.setXaidst(provision.getXaIdSt());
-
-				update.set("date", getData[16]);
-				update.set("time_slot", range);
-				update.set("last_tracking_status", Status.WO_RESCHEDULE.getStatusName());
-				listLog.add(statusLog);
-				update.set("log_status", listLog);
-
-				// Actualizar provision
-				provisionRepository.updateProvision(provision, update);
-
+				
 				// el que parsea
 				SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yy");
 				// el que formatea
@@ -1759,6 +1740,28 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Date date = parseador.parse(getData[16]);// ("31-03-2016");
 				System.out.println("Fecha de reschedule => " + formateador.format(date));
 				String dateString = formateador.format(date);
+
+				if(identificadorSt.equals(provision.getXaIdSt()))
+				
+				woReshedule.setXaAppointmentScheduler(getData[23]);
+				woReshedule.setTimeSlot(range);
+				update.set("wo_schedule", woReshedule);
+				update.set("active_status", Constants.PROVISION_STATUS_RESCHEDULE);
+
+				StatusLog statusLog = new StatusLog();
+
+				statusLog.setStatus(Status.SCHEDULED.getStatusName());
+				statusLog.setDescription(Status.SCHEDULED.getDescription());
+				statusLog.setXaidst(provision.getXaIdSt());
+
+				update.set("date", getData[16]);
+				update.set("time_slot", range);
+				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
+
+				// Actualizar provision
+				provisionRepository.updateProvision(provision, update);
 
 				ScheduleRequest scheduleRequest = new ScheduleRequest();
 				scheduleRequest.setBucket(provision.getWorkZone());

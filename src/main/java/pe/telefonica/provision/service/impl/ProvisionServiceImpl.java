@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1552,6 +1553,27 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					listLog.add(statusLog);
+					
+					//Regularizar Agenda Ficticia
+					
+					if (provision.getXaIdSt() == null) {
+						if (!provision.getDummyStPsiCode().isEmpty()) {
+							List<StatusLog> listLogx = listLog.stream().filter(x -> "FICTICIOUS_SCHEDULED".equals(x.getStatus())).collect(Collectors.toList());
+							if(listLogx.size() > 0) {
+								StatusLog statusSchedule = new StatusLog();
+								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
+								statusSchedule.setDescription(Status.SCHEDULED.getDescription());
+								statusSchedule.setXaidst(getData[4]);
+								statusSchedule.setScheduledDate(listLogx.get(0).getScheduledDate());
+								statusSchedule.setScheduledRange(listLogx.get(0).getScheduledRange());
+								listLog.add(statusSchedule);
+								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
+								
+							}
+						}
+						
+					}
+					
 					update.set("log_status", listLog);
 
 					LocalDateTime dateSendedSMS = LocalDateTime.now(ZoneOffset.of("-05:00"));

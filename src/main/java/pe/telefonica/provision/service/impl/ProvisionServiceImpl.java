@@ -1743,27 +1743,43 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_RESCHEDULE.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
+				
+				String identificadorSt=getData[4].toString();
+				
 				Update update = new Update();
 				WoReshedule woReshedule = new WoReshedule();
-				String range = "";
-				String identificadorSt=getData[4].toString();
-
+				String range = "AM";
+				
 				if (getData[17].toString().trim().equals("09-13") || getData[17].toString().trim().equals("9-13")) {
 					range = "AM";
 				} else {
 					range = "PM";
 				}
-				
+				String rangeFinal=range;
 				// el que parsea
 				SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yy");
 				// el que formatea
-				SimpleDateFormat formateador = new SimpleDateFormat("dd/MM/yy");
+				SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
 
 				Date date = parseador.parse(getData[16]);// ("31-03-2016");
 				System.out.println("Fecha de reschedule => " + formateador.format(date));
 				String dateString = formateador.format(date);
-
-				if(identificadorSt.equals(provision.getXaIdSt()))
+				
+				if((identificadorSt==null || identificadorSt.isEmpty()) 
+						&& (rangeFinal==null || rangeFinal.isEmpty()) 
+						&& (dateString==null || dateString.isEmpty())) {
+					return false;
+				}
+					
+				List<StatusLog> listLogx = listLog.stream().filter(x -> "SCHEDULED".equals(x.getStatus()) 
+						&& identificadorSt.equals(x.getXaidst())
+						&& rangeFinal.equals(x.getScheduledRange())
+						&& dateString.equals(x.getScheduledDate())
+						).collect(Collectors.toList());
+				
+				if(listLogx.size() > 0) {
+					return true;
+				}
 				
 				woReshedule.setXaAppointmentScheduler(getData[23]);
 				woReshedule.setTimeSlot(range);
@@ -1785,18 +1801,33 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// Actualizar provision
 				provisionRepository.updateProvision(provision, update);
 
+				// el que parsea
+				SimpleDateFormat parseador2 = new SimpleDateFormat("yyyy-MM-dd");
+				// el que formatea
+				SimpleDateFormat formateador2 = new SimpleDateFormat("dd/MM/yyyy");
+
+				Date date2 = parseador2.parse(getData[16]);// ("31-03-2016");
+				System.out.println("Fecha de reschedule => " + formateador2.format(date2));
+				String dateString2 = formateador2.format(date2);
+				
+				Customer customer = new Customer();
+				customer.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+				customer.setDocumentType(provision.getCustomer().getDocumentType());
 				ScheduleRequest scheduleRequest = new ScheduleRequest();
 				scheduleRequest.setBucket(provision.getWorkZone());
-				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
-				scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
+				//scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+				//scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
 				scheduleRequest.setPilot(false);
-				scheduleRequest.setOrderCode(provision.getXaRequest());
-				scheduleRequest.setRequestId(provision.getActivityType());
-				scheduleRequest.setSelectedDate(dateString);
+				//scheduleRequest.setOrderCode(provision.getXaRequest());
+				scheduleRequest.setXaOrderCode(provision.getXaRequest());
+				scheduleRequest.setRequestId(provision.getIdProvision());
+				scheduleRequest.setRequestType(provision.getActivityType());
+				scheduleRequest.setSelectedDate(dateString2);
 				scheduleRequest.setSelectedRange(range);
 				scheduleRequest.setStpsiCode(getData[4]);
+				scheduleRequest.setCustomer(customer);
 
-				// Actualiza el agendamiento.
+				// Actualiza el agendamiento
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
 
 				return true;

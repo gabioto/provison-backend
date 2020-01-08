@@ -1257,7 +1257,6 @@ public class ProvisionController {
 		HttpStatus status;
 
 		try {
-
 			Boolean result = provisionService.receiveAddressUpdateBO(request.getBody().getAction(),
 					request.getBody().getProvisionId(), request.getBody().getNewDepartment(),
 					request.getBody().getNewProvince(), request.getBody().getNewDistrict(),
@@ -1265,7 +1264,6 @@ public class ProvisionController {
 					request.getBody().getIsSMSRequired());
 
 			if (result) {
-
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Object>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESSBO,
 						String.valueOf(status.value()), status.getReasonPhrase(), null);

@@ -9,11 +9,12 @@ public final class Constants {
 
 	public static final String PROVISION_STATUS_INCOMPLETE = "incomplete";
 	public static final String PROVISION_STATUS_ACTIVE = "active";
+	public static final String PROVISION_STATUS_SCHEDULE_IN_PROGRESS = "scheduleInProgress";
 	public static final String PROVISION_STATUS_ADDRESS_CHANGED = "addressChanged";
 	public static final String PROVISION_STATUS_CANCELLED = "cancelled";
 	public static final String PROVISION_STATUS_COMPLETED = "completed";
 	public static final String PROVISION_STATUS_DONE = "done";
-	public static final String PROVISION_STATUS_RESCHEDULE = "reschedule";
+	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
 	public static final String PROVISION_STATUS_NOTDONE = "notDone";
 
 	public static final String DATE_FORMAT_WS = "dd/MM/yyyy";

@@ -1784,7 +1784,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woReshedule.setXaAppointmentScheduler(getData[23]);
 				woReshedule.setTimeSlot(range);
 				update.set("wo_schedule", woReshedule);
-				update.set("active_status", Constants.PROVISION_STATUS_RESCHEDULE);
+				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 
 				StatusLog statusLog = new StatusLog();
 

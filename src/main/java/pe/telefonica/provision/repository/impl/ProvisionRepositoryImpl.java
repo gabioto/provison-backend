@@ -2,6 +2,7 @@ package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -259,4 +260,29 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		return provision;
 	}
+	
+	@Override
+	public Optional<Provision> getOrderToNotify() {
+		ArrayList<String> status = new ArrayList<String>();
+		status.add(Status.IN_TOA.getStatusName());
+		status.add(Status.WO_CANCEL.getStatusName());
+		status.add(Status.CAIDO.getStatusName());
+		status.add(Status.WO_NOTDONE.getStatusName());
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("send_notify").is(false).andOperator(Criteria.where("last_tracking_status").in(status))), Provision.class);
+		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
+		return optionalOrder;
+	}
+
+	@Override
+	public boolean updateFlagNotify(Provision provision) {
+		Update update = new Update();
+		update.set("send_notify", true);
+		UpdateResult result = this.mongoOperations.updateFirst(
+				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
+				Provision.class);
+
+		return result.getMatchedCount() > 0;
+	}
+	
 }

@@ -1476,7 +1476,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				if (getData[2].toString().equals("0") && (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
 					// IN_TO fictitious
 					Update update = new Update();
-
+					//NO SMS
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
 					statusLog.setDescription(Status.DUMMY_IN_TOA.getDescription());
@@ -1501,6 +1501,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// IN_TOA Monoproducto
 					Update update = new Update();
+					//SI SMS
 
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
@@ -1511,6 +1512,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[16]);
+					update.set("send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
@@ -1523,12 +1525,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				} else {
 					Update update = new Update();
 					// update.set("xa_creation_date", getData[3]);
+					//SI SMS
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[16]);
-
+					update.set("send_notify", false);
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);
 					}
@@ -1725,6 +1728,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setDescription(Status.WO_CANCEL.getDescription());
 				statusLog.setXaidst(provision.getXaIdSt());
 
+				update.set("send_notify", false);
 				update.set("xa_cancel_reason", getData[16]);
 				update.set("user_cancel", getData[15]);
 				update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
@@ -2028,4 +2032,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return response;
 	}
 
+	@Override
+	public ProvisionResponse<String> getOrderToNotify() {
+		//Obtiene provision
+		Optional<Provision> optional = provisionRepository.getOrderToNotify();
+		ProvisionResponse<String> response = new ProvisionResponse<String>();
+		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+		if (optional.isPresent()) {
+			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
+			response.setHeader(header).setData(optional.get().getActiveStatus());
+			//Actualiza Flag de envio Notify en BD
+			provisionRepository.updateFlagNotify(optional.get());
+		} else {
+			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+			response.setHeader(header);
+		}
+
+		return response;
+	}
+	
 }

@@ -1651,5 +1651,10 @@ public class ProvisionController {
 		obj[2] = xaRequirementNumber;
 		return obj;
 	}
-
+	
+	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
+	public ResponseEntity<ProvisionResponse<String>> getOrderToNotify() {
+		return ResponseEntity.ok(provisionService.getOrderToNotify());
+	}
+	
 }

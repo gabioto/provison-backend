@@ -1651,5 +1651,22 @@ public class ProvisionController {
 		obj[2] = xaRequirementNumber;
 		return obj;
 	}
-
+	
+	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
+	public ResponseEntity<ApiResponse<GetAllInTimeRangeResponse>> getOrderToNotify() {
+		log.info("ProvisionController.getOrderToNotify()");
+		ApiResponse<GetAllInTimeRangeResponse> apiResponse;
+		HttpStatus status;
+		
+		List<Provision> provisions = provisionService.getOrderToNotify();
+		GetAllInTimeRangeResponse response = new GetAllInTimeRangeResponse();
+		response.setProvisions(provisions);
+		status = HttpStatus.OK;
+		apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
+				Constants.OPER_GET_ORDER_TO_NOTIFY, String.valueOf(status.value()), status.getReasonPhrase(),
+				response);
+		
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+	
 }

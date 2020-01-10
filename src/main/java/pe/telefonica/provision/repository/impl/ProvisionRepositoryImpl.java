@@ -2,6 +2,7 @@ package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -259,4 +260,35 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		return provision;
 	}
+	
+	@Override
+	public Optional<List<Provision>> getOrderToNotify() {
+		Update update = new Update();
+		update.set("send_notify", true);
+		ArrayList<String> status = new ArrayList<String>();
+		status.add(Status.IN_TOA.getStatusName());
+		status.add(Status.WO_CANCEL.getStatusName());
+		status.add(Status.CAIDO.getStatusName());
+		status.add(Status.WO_NOTDONE.getStatusName());
+		List<Provision> provision = this.mongoOperations
+				.find(new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)).limit(5), Provision.class);
+				//new Query(Criteria.where("xaRequest").is(xaRequest).and("xaIdSt").is(xaIdSt))
+		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
+		return optionalOrder;
+	}
+
+	@Override
+	public boolean updateFlagNotify(List<Provision> listProvision) {
+		
+		Update update = new Update();
+		update.set("send_notify", true);
+		
+//		UpdateResult result = this.mongoOperations.updateFirst(
+//				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
+//				Provision.class);
+
+		//return result.getMatchedCount() > 0;
+		return false;
+	}
+	
 }

@@ -58,5 +58,9 @@ public interface ProvisionRepository {
 	Provision getByOrderCodeForUpdate(String orderCode);
 	
 	Provision getByOrderCodeForUpdateFicticious(String xaRequirementNumber);
+
+	Optional<List<Provision>> getOrderToNotify();
+
+	boolean updateFlagNotify(List<Provision> listProvision);
 	
 }

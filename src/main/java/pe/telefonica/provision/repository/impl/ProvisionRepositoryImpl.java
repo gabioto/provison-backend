@@ -271,21 +271,24 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.CAIDO.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
 		List<Provision> provision = this.mongoOperations
-				.find(new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)), Provision.class);
+				.find(new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)).limit(5), Provision.class);
 				//new Query(Criteria.where("xaRequest").is(xaRequest).and("xaIdSt").is(xaIdSt))
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
 
 	@Override
-	public boolean updateFlagNotify(Provision provision) {
+	public boolean updateFlagNotify(List<Provision> listProvision) {
+		
 		Update update = new Update();
 		update.set("send_notify", true);
-		UpdateResult result = this.mongoOperations.updateFirst(
-				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
-				Provision.class);
+		
+//		UpdateResult result = this.mongoOperations.updateFirst(
+//				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
+//				Provision.class);
 
-		return result.getMatchedCount() > 0;
+		//return result.getMatchedCount() > 0;
+		return false;
 	}
 	
 }

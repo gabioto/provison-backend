@@ -2112,7 +2112,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Optional<List<Provision>> optional = provisionRepository.getOrderToNotify();
 		if (optional.isPresent()) {
 			//Actualiza Flag de envio Notify en BD
-			//provisionRepository.updateFlagNotify(optional.get());
+			provisionRepository.updateFlagNotify(optional.get());
 			return optional.get();
 		}
 		return null;

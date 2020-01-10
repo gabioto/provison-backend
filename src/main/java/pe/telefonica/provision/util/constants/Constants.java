@@ -16,6 +16,16 @@ public final class Constants {
 	public static final String PROVISION_STATUS_DONE = "done";
 	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
 	public static final String PROVISION_STATUS_NOTDONE = "notDone";
+	
+	public static final String COMPONENTS_NAME_TV = "TV";
+	public static final String COMPONENTS_NAME_INTERNET = "INTERNET";
+	public static final String COMPONENTS_NAME_LINE = "LINEA";
+	public static final String COMPONENTS_TITLE_TV = "Television HD";
+	public static final String COMPONENTS_TITLE_INTERNET = "Internet Ilimitado";
+	public static final String COMPONENTS_TITLE_LINE = "Línea Fija";
+	public static final String COMPONENTS_DESC_TV = "Canales exclusivos Movistar";
+	public static final String COMPONENTS_DESC_INTERNET = "Incluye Movistar Play Full";
+	public static final String COMPONENTS_DESC_LINE = "Llamadas ilimitadas a fijos Movistar";
 
 	public static final String DATE_FORMAT_WS = "dd/MM/yyyy";
 	public static final String DATE_FORMAT_BO = "yyyy-MM-dd";

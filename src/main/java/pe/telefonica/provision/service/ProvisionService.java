@@ -66,6 +66,6 @@ public interface ProvisionService {
 
 	boolean getBucketByProduct(String channel, String product, String bucket) throws Exception;
 
-	ProvisionResponse<String> getOrderToNotify();
+	List<Provision> getOrderToNotify();
 	
 }

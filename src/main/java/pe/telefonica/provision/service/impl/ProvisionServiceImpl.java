@@ -2033,22 +2033,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionResponse<String> getOrderToNotify() {
-		//Obtiene provision
-		Optional<Provision> optional = provisionRepository.getOrderToNotify();
-		ProvisionResponse<String> response = new ProvisionResponse<String>();
-		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+	public List<Provision> getOrderToNotify() {
+		Optional<List<Provision>> optional = provisionRepository.getOrderToNotify();
 		if (optional.isPresent()) {
-			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(optional.get().getActiveStatus());
 			//Actualiza Flag de envio Notify en BD
-			provisionRepository.updateFlagNotify(optional.get());
-		} else {
-			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
-			response.setHeader(header);
+			//provisionRepository.updateFlagNotify(optional.get());
+			return optional.get();
 		}
-
-		return response;
+		return null;
 	}
 	
 }

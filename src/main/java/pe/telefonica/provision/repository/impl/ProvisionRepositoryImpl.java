@@ -262,15 +262,18 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 	
 	@Override
-	public Optional<Provision> getOrderToNotify() {
+	public Optional<List<Provision>> getOrderToNotify() {
+		Update update = new Update();
+		update.set("send_notify", true);
 		ArrayList<String> status = new ArrayList<String>();
 		status.add(Status.IN_TOA.getStatusName());
 		status.add(Status.WO_CANCEL.getStatusName());
 		status.add(Status.CAIDO.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
-		Provision provision = this.mongoOperations
-				.findOne(new Query(Criteria.where("send_notify").is(false).andOperator(Criteria.where("last_tracking_status").in(status))), Provision.class);
-		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
+		List<Provision> provision = this.mongoOperations
+				.find(new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)), Provision.class);
+				//new Query(Criteria.where("xaRequest").is(xaRequest).and("xaIdSt").is(xaIdSt))
+		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
 

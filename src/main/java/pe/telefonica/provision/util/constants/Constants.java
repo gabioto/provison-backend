@@ -113,4 +113,6 @@ public final class Constants {
 	public static final String ACTIVITY_TYPE_PROVISION="PROVISION";
 	public static final String BARRA_VERTICAL = "|";
 	
+	public static final String FICTICIOUS_SCHEDULED = "FICTICIOUS_SCHEDULED";
+	
 }

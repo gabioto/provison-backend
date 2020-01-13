@@ -278,17 +278,16 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean updateFlagNotify(List<Provision> listProvision) {
+	public void updateFlagNotify(List<Provision> listProvision) {
 		
 		Update update = new Update();
 		update.set("send_notify", true);
-		
-//		UpdateResult result = this.mongoOperations.updateFirst(
-//				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
-//				Provision.class);
+		for (int i = 0; i < listProvision.size(); i++) {
+			UpdateResult result = this.mongoOperations.updateFirst(
+					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))), update,
+					Provision.class);
+		}
 
-		//return result.getMatchedCount() > 0;
-		return false;
 	}
 	
 }

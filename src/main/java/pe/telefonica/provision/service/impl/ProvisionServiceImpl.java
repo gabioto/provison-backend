@@ -155,7 +155,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (provisions.isPresent() && provisions.get().size() != 0) {
 			provisionList = provisions.get();
-			
+
 			for (Provision provision : provisionList) {
 				if (provision.getTvDetail() != null) {
 					ComponentsDto tv = evaluateTvFields(provision);
@@ -1550,7 +1550,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						&& (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
 					// IN_TO fictitious
 					Update update = new Update();
-					//NO SMS
+					// NO SMS
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
 					statusLog.setDescription(Status.DUMMY_IN_TOA.getDescription());
@@ -1575,7 +1575,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// IN_TOA Monoproducto
 					Update update = new Update();
-					//SI SMS
+					// SI SMS
 
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
@@ -1599,7 +1599,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				} else {
 					Update update = new Update();
 					// update.set("xa_creation_date", getData[3]);
-					//SI SMS
+					// SI SMS
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
@@ -2112,11 +2112,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public List<Provision> getOrderToNotify() {
 		Optional<List<Provision>> optional = provisionRepository.getOrderToNotify();
 		if (optional.isPresent()) {
-			//Actualiza Flag de envio Notify en BD
-			//provisionRepository.updateFlagNotify(optional.get());
-			return optional.get();
+			// Insertar lógica para wo_cancel
+			List<Provision> listita = new ArrayList<Provision>();
+			listita = optional.get();
+			for (int i = 0; i < listita.size(); i++) {
+				List<StatusLog> list = listita.get(i).getLogStatus();
+				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
+						&& !Constants.FICTICIOUS_SCHEDULED.equalsIgnoreCase(list.get(list.size()-2).getStatus())) {
+					listita.remove(i);
+				}
+			}
+			// Actualiza Flag de envio Notify en BD
+			provisionRepository.updateFlagNotify(optional.get());
+			return listita;
 		}
 		return null;
 	}
-	
+
 }

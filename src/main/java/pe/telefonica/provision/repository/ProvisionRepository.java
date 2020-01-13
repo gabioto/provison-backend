@@ -61,6 +61,6 @@ public interface ProvisionRepository {
 
 	Optional<List<Provision>> getOrderToNotify();
 
-	boolean updateFlagNotify(List<Provision> listProvision);
+	void updateFlagNotify(List<Provision> listProvision);
 	
 }

@@ -1653,18 +1653,17 @@ public class ProvisionController {
 	}
 	
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
-	public ResponseEntity<ApiResponse<GetAllInTimeRangeResponse>> getOrderToNotify() {
+	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
 		log.info("ProvisionController.getOrderToNotify()");
-		ApiResponse<GetAllInTimeRangeResponse> apiResponse;
+		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 		
 		List<Provision> provisions = provisionService.getOrderToNotify();
-		GetAllInTimeRangeResponse response = new GetAllInTimeRangeResponse();
-		response.setProvisions(provisions);
+
 		status = HttpStatus.OK;
-		apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
+		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 				Constants.OPER_GET_ORDER_TO_NOTIFY, String.valueOf(status.value()), status.getReasonPhrase(),
-				response);
+				provisions);
 		
 		return ResponseEntity.status(status).body(apiResponse);
 	}

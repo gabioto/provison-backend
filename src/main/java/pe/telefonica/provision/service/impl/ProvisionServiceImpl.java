@@ -2118,8 +2118,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& !Constants.FICTICIOUS_SCHEDULED.equalsIgnoreCase(list.get(list.size()-2).getStatus())) {
+						&& Constants.FICTICIOUS_SCHEDULED.equalsIgnoreCase(list.get(list.size()-2).getStatus())) {
 					listita.remove(i);
+					i--;
 				}
 			}
 			// Actualiza Flag de envio Notify en BD

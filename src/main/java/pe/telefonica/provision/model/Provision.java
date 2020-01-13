@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
@@ -213,6 +214,9 @@ public class Provision implements Serializable {
 
 	@Field("cancellation_detail")
 	private String cancellationDetail;
+
+	@Field("components")
+	private List<ComponentsDto> components = new ArrayList<>();
 
 	public String getIdProvision() {
 		return idProvision;
@@ -716,6 +720,14 @@ public class Provision implements Serializable {
 
 	public void setCancellationDetail(String cancellationDetail) {
 		this.cancellationDetail = cancellationDetail;
+	}
+
+	public List<ComponentsDto> getComponents() {
+		return components;
+	}
+
+	public void setComponents(List<ComponentsDto> components) {
+		this.components = components;
 	}
 
 	public Provision() {

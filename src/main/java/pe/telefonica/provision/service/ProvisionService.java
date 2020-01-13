@@ -65,5 +65,7 @@ public interface ProvisionService {
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 
 	boolean getBucketByProduct(String channel, String product, String bucket) throws Exception;
+
+	List<Provision> getOrderToNotify();
 	
 }

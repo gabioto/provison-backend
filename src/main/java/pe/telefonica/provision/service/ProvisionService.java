@@ -68,4 +68,6 @@ public interface ProvisionService {
 
 	List<Provision> getOrderToNotify();
 	
+	public boolean updateShowLocation(Provision provision);
+	
 }

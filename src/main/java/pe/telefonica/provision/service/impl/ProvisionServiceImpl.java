@@ -1566,6 +1566,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
+					
+					update.set("show_location", false);
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
@@ -1593,6 +1595,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
+					
+					update.set("show_location", false);
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
@@ -1629,6 +1633,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+					
+					update.set("show_location", false);
+					
 					listLog.add(statusLog);
 
 					// Regularizar Agenda Ficticia
@@ -1710,6 +1717,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woPreStart.setNameResource(getData[3]);
 				woPreStart.setDate(getData[4]);
 				update.set("wo_prestart", woPreStart);
+				
+				update.set("show_location", false);
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
@@ -1739,6 +1748,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woInit.setDate(getData[23]);
 				woInit.setXaNote(getData[15]);
 				update.set("wo_init", woInit);
+				update.set("show_location", false);
 
 				StatusLog statusLog = new StatusLog();
 
@@ -1774,6 +1784,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("wo_completed", woCompleted);
 
 				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
+				
+				update.set("show_location", false);
 
 				StatusLog statusLog = new StatusLog();
 
@@ -1809,6 +1821,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_cancel_reason", getData[16]);
 				update.set("user_cancel", getData[15]);
 				update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
+				
+				update.set("show_location", false);
+				
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1877,6 +1892,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
+				
+				update.set("show_location", false);
 
 				// Actualizar provision
 				provisionRepository.updateProvision(provision, update);
@@ -1943,6 +1960,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
+				update.set("show_location", false);
+				
 				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
@@ -2114,7 +2133,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optional.isPresent()) {
 			// Insertar lógica para wo_cancel
 			List<Provision> listita = new ArrayList<Provision>();
+			List<Provision> listitaUpdate = new ArrayList<Provision>();
 			listita = optional.get();
+			// Actualiza Flag de envio Notify en BD
+			provisionRepository.updateFlagNotify(optional.get());
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
@@ -2123,11 +2145,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					i--;
 				}
 			}
-			// Actualiza Flag de envio Notify en BD
-			provisionRepository.updateFlagNotify(optional.get());
+			
 			return listita;
 		}
 		return null;
 	}
 
+	@Override
+	public boolean updateShowLocation(Provision provision){
+		return provisionRepository.updateShowLocation(provision);
+	}
 }

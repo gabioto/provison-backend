@@ -93,6 +93,7 @@ public final class Constants {
 	public static final String OPER_SCHEDULE_UPDATE_CODE_FICT = "OPER_SCHEDULE_UPDATE_CODE_FICT";
 	public static final String OPER_UPDATE_RESCHEDULE = "OPER_UPDATE_RESCHEDULE";
 	public static final String OPER_NOTDONE_SCHEDULE = "OPER_NOTDONE_SCHEDULE";
+	public static final String OPER_SHOW_LOCATION = "OPER_UPDATE_SHOW_LOCATION";
 	
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";

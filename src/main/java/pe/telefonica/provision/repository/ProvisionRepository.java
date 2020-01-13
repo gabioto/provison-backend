@@ -63,4 +63,6 @@ public interface ProvisionRepository {
 
 	void updateFlagNotify(List<Provision> listProvision);
 	
+	boolean updateShowLocation(Provision provision);
+	
 }

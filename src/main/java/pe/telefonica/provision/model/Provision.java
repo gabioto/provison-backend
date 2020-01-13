@@ -215,6 +215,9 @@ public class Provision implements Serializable {
 	@Field("cancellation_detail")
 	private String cancellationDetail;
 
+	@Field("show_location")
+	private String showLocation;
+	
 	@Field("components")
 	private List<ComponentsDto> components = new ArrayList<>();
 
@@ -815,6 +818,14 @@ public class Provision implements Serializable {
 			this.xaidst = xaidst;
 		}
 
+	}
+
+	public String getShowLocation() {
+		return showLocation;
+	}
+
+	public void setShowLocation(String showLocation) {
+		this.showLocation = showLocation;
 	}
 
 }

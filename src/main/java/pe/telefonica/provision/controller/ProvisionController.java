@@ -1668,5 +1668,57 @@ public class ProvisionController {
 		
 		return ResponseEntity.status(status).body(apiResponse);
 	}
+
+	@RequestMapping(value = "/updateShowLocation", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<String>> updateShowLocation(
+			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
+
+		Provision provision = new Provision();
+		provision.setIdProvision(request.getBody().getIdProvision());
+		
+		ApiResponse<String> apiResponse;
+		HttpStatus status;
+
+		try {
+			boolean estado = provisionService.updateShowLocation(provision);
+			
+			if (estado) {
+
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody("OK");
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+			} else {
+
+				status = HttpStatus.OK;
+
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
+						String.valueOf(status.value()), "No se encontraron datos del cliente", null);
+				apiResponse.setBody(null);
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+			}
+
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
+					String.valueOf(status.value()), ex.getMessage(), null);
+
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+		}
+
+		return ResponseEntity.status(status).body(apiResponse);
+	}
 	
 }

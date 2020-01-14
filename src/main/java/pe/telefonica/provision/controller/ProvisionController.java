@@ -1552,7 +1552,7 @@ public class ProvisionController {
 	}
 
 	@RequestMapping(value = "/getContacts", method = RequestMethod.GET)
-	public ResponseEntity<ProvisionResponse<List<Contacts>>> getContacts(
+	public ResponseEntity<ApiResponse<List<Contacts>>> getContacts(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		return ResponseEntity.ok(provisionService.getContactList(provisionId));
 	}

@@ -1691,7 +1691,7 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+						ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
 			} else {
 
 				status = HttpStatus.OK;

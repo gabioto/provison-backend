@@ -616,6 +616,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			update.set("active_status", status);
 			update.set("status_toa", status);
+			update.set("send_notify", false);
+			update.set("show_location", false);
 
 			update.set("last_tracking_status", request.getStatus());
 
@@ -1889,6 +1891,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("date", getData[16]);
+				update.set("send_notify", false);
 				update.set("time_slot", range);
 				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 				listLog.add(statusLog);
@@ -1962,6 +1965,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				update.set("show_location", false);
+				update.set("send_notify", false);
 				
 				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
@@ -2134,7 +2138,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optional.isPresent()) {
 			// Insertar lógica para wo_cancel
 			List<Provision> listita = new ArrayList<Provision>();
-			List<Provision> listitaUpdate = new ArrayList<Provision>();
 			listita = optional.get();
 			// Actualiza Flag de envio Notify en BD
 			provisionRepository.updateFlagNotify(optional.get());
@@ -2146,7 +2149,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					i--;
 				}
 			}
-			
 			return listita;
 		}
 		return null;

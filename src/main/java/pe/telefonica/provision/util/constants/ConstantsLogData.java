@@ -10,6 +10,8 @@ public class ConstantsLogData {
 	public static final String PROVISION_UPDATE_ADDRESSBO = "PROVISION_UPDATE_ADDRESSBO";
 	public static final String PROVISION_CANCEL = "PROVISION_CANCEL";
 
+	public static final String OPER_SHOW_LOCATION = "OPER_SHOW_LOCATION";
+
 	public static final String PROVISION_UPDATE_ST = "PROVISION_UPDATE_ST";
 	
 	public static final String PROVISION_GET_BY_ORDER_CODE = "PROVISION_GET_BY_ORDER_CODE";

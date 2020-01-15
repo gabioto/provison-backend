@@ -633,6 +633,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		// String getData[] = data.split("\\|");
 		String getData[] = request.getData().split("\\|");
 		Provision provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
+
 		if (provisionx != null) {
 
 			Update update = fillProvisionUpdate(request);
@@ -2203,7 +2204,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& Constants.FICTICIOUS_SCHEDULED.equalsIgnoreCase(list.get(list.size() - 2).getStatus())) {
+						&& (!Status.FICTICIOUS_SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()) && !Status.SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()))) {
 					listita.remove(i);
 					i--;
 				}

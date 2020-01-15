@@ -72,6 +72,7 @@ import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ConstantsMessageKey;
+import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 
 @Service("provisionService")
@@ -144,7 +145,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
 				provisionRequest.getBody().getDocumentNumber());
-		List<Provision> provisionList = null;
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("CE")) {
 			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentNumber());
@@ -154,42 +154,62 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentNumber());
 		}
 
-		if (provisions.isPresent() && provisions.get().size() != 0) {
-			provisionList = provisions.get();
-
-			for (Provision provision : provisionList) {
-				if (provision.getTvDetail() != null) {
-					ComponentsDto tv = evaluateTvFields(provision);
-
-					if (tv != null) {
-						provision.getComponents().add(tv);
-					}
-				}
-
-				if (provision.getInternetDetail() != null) {
-					ComponentsDto internet = evaluateInternetFields(provision);
-
-					if (internet != null) {
-						provision.getComponents().add(internet);
-					}
-				}
-
-				if (provision.getHomePhoneDetail() != null) {
-					ComponentsDto line = evaluateLineFields(provision);
-
-					if (line != null) {
-						provision.getComponents().add(line);
-					}
-				}
-			}
-
-			return provisionList;
+		if (provisions.isPresent() && provisions.get().size() > 0) {
+			return provisions.get();
 		} else {
 			return null;
 		}
 	}
 
-	private ComponentsDto evaluateTvFields(Provision provision) {
+	private Provision evaluateProvisionComponents(Provision provision) {
+		ProductType producType = null;
+		try {
+
+			for (ProductType prod : ProductType.values()) {
+				if (provision.getProductType().toUpperCase().equals(prod.getTypeName()))
+					producType = prod;
+			}
+
+			if (provision.getTvDetail() != null) {
+				// ComponentsDto tv =
+				evaluateTvFields(provision);
+
+				/*
+				 * if (tv != null) { provision.getComponents().add(tv); }
+				 */
+			} else if (producType != null && producType.isTv()) {
+				provision.getComponents().add(addTvComponent(null));
+			}
+
+			if (provision.getInternetDetail() != null) {
+				// ComponentsDto internet =
+				evaluateInternetFields(provision);
+
+				/*
+				 * if (internet != null) { provision.getComponents().add(internet); }
+				 */
+			} else if (producType != null && producType.isInternet()) {
+				provision.getComponents().add(addTvComponent(null));
+			}
+
+			if (provision.getHomePhoneDetail() != null) {
+				// ComponentsDto line =
+				evaluateLineFields(provision);
+
+				/*
+				 * if (line != null) { provision.getComponents().add(line); }
+				 */
+			} else if (producType != null && producType.isInternet()) {
+				provision.getComponents().add(addLineComponent(null));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return provision;
+	}
+
+	private void evaluateTvFields(Provision provision) {
 		Television television = provision.getTvDetail();
 		ComponentsDto components = null;
 
@@ -198,18 +218,30 @@ public class ProvisionServiceImpl implements ProvisionService {
 				|| television.getEquipment() != null || television.getDescription() != null
 				|| television.getAdditionalSmartHd() != null || television.getAdditionalHd() != null) {
 
-			components = new ComponentsDto();
-			components.setTitle(Constants.COMPONENTS_TITLE_TV);
-			components.setName(Constants.COMPONENTS_NAME_TV);
+			components = addTvComponent(television);
+		}
+
+		if (components != null) {
+			provision.getComponents().add(components);
+		}
+	}
+
+	private ComponentsDto addTvComponent(Television television) {
+		ComponentsDto components = new ComponentsDto();
+		components.setTitle(Constants.COMPONENTS_TITLE_TV);
+		components.setName(Constants.COMPONENTS_NAME_TV);
+		if (television != null) {
 			components.setDescription((television.getDescription() != null && !television.getDescription().isEmpty())
 					? television.getDescription()
 					: Constants.COMPONENTS_DESC_TV);
+		} else {
+			components.setDescription(Constants.COMPONENTS_DESC_TV);
 		}
 
 		return components;
 	}
 
-	private ComponentsDto evaluateInternetFields(Provision provision) {
+	private void evaluateInternetFields(Provision provision) {
 		Internet internet = provision.getInternetDetail();
 		ComponentsDto components = null;
 
@@ -217,30 +249,57 @@ public class ProvisionServiceImpl implements ProvisionService {
 				|| internet.getSmartWifi() != null || internet.getSpeed() != null || internet.getSvaInternet() != null
 				|| internet.getTechnology() != null || internet.getTimePromoSpeed() != null) {
 
-			components = new ComponentsDto();
-			components.setTitle(Constants.COMPONENTS_TITLE_INTERNET);
-			components.setName(Constants.COMPONENTS_NAME_INTERNET);
+			components = addInternetComponent(internet);
+		}
+
+		if (components != null) {
+			provision.getComponents().add(components);
+		}
+	}
+
+	private ComponentsDto addInternetComponent(Internet internet) {
+		ComponentsDto components = new ComponentsDto();
+		components = new ComponentsDto();
+		components.setTitle(Constants.COMPONENTS_TITLE_INTERNET);
+		components.setName(Constants.COMPONENTS_NAME_INTERNET);
+
+		if (internet != null) {
 			components.setDescription((internet.getDescription() != null && !internet.getDescription().isEmpty())
 					? internet.getDescription()
 					: Constants.COMPONENTS_DESC_INTERNET);
+		} else {
+			components.setDescription(Constants.COMPONENTS_DESC_INTERNET);
 		}
 
 		return components;
 	}
 
-	private ComponentsDto evaluateLineFields(Provision provision) {
+	private void evaluateLineFields(Provision provision) {
 		HomePhone line = provision.getHomePhoneDetail();
 		ComponentsDto components = null;
 
 		if (line.getDescription() != null || line.getEquipmenstNumber() != null || line.getEquipment() != null
 				|| line.getSvaLine() != null || line.getType() != null) {
 
-			components = new ComponentsDto();
-			components.setTitle(Constants.COMPONENTS_TITLE_LINE);
-			components.setName(Constants.COMPONENTS_NAME_LINE);
+			components = addLineComponent(line);
+		}
+
+		if (components != null) {
+			provision.getComponents().add(components);
+		}
+	}
+
+	private ComponentsDto addLineComponent(HomePhone line) {
+		ComponentsDto components = new ComponentsDto();
+		components.setTitle(Constants.COMPONENTS_TITLE_LINE);
+		components.setName(Constants.COMPONENTS_NAME_LINE);
+
+		if (line != null) {
 			components.setDescription(
 					(line.getDescription() != null && !line.getDescription().isEmpty()) ? line.getDescription()
 							: Constants.COMPONENTS_DESC_LINE);
+		} else {
+			components.setDescription(Constants.COMPONENTS_DESC_LINE);
 		}
 
 		return components;
@@ -1965,7 +2024,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				update.set("show_location", false);
 				update.set("send_notify", false);
-				
+
 				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();

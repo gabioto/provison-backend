@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
+import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
@@ -26,7 +27,7 @@ public interface ProvisionService {
 
 	ProvisionResponse<String> getStatus(String provisionId);
 	
-	ProvisionResponse<List<Contacts>> getContactList(String provisionId);
+	ApiResponse<List<Contacts>> getContactList(String provisionId);
 
 	List<Provision> insertProvisionList(List<Provision> provisionList);
 

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.controller.common.ResponseHeader;
 import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.controller.request.ContactRequest;
@@ -71,6 +72,7 @@ import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ConstantsMessageKey;
+import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 
 @Service("provisionService")
@@ -143,7 +145,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
 				provisionRequest.getBody().getDocumentNumber());
-		List<Provision> provisionList = null;
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("CE")) {
 			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentNumber());
@@ -153,42 +154,62 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentNumber());
 		}
 
-		if (provisions.isPresent() && provisions.get().size() != 0) {
-			provisionList = provisions.get();
-
-			for (Provision provision : provisionList) {
-				if (provision.getTvDetail() != null) {
-					ComponentsDto tv = evaluateTvFields(provision);
-
-					if (tv != null) {
-						provision.getComponents().add(tv);
-					}
-				}
-
-				if (provision.getInternetDetail() != null) {
-					ComponentsDto internet = evaluateInternetFields(provision);
-
-					if (internet != null) {
-						provision.getComponents().add(internet);
-					}
-				}
-
-				if (provision.getHomePhoneDetail() != null) {
-					ComponentsDto line = evaluateLineFields(provision);
-
-					if (line != null) {
-						provision.getComponents().add(line);
-					}
-				}
-			}
-
-			return provisionList;
+		if (provisions.isPresent() && provisions.get().size() > 0) {
+			return provisions.get();
 		} else {
 			return null;
 		}
 	}
 
-	private ComponentsDto evaluateTvFields(Provision provision) {
+	private Provision evaluateProvisionComponents(Provision provision) {
+		ProductType producType = null;
+		try {
+
+			for (ProductType prod : ProductType.values()) {
+				if (provision.getProductType().toUpperCase().equals(prod.getTypeName()))
+					producType = prod;
+			}
+
+			if (provision.getTvDetail() != null) {
+				// ComponentsDto tv =
+				evaluateTvFields(provision);
+
+				/*
+				 * if (tv != null) { provision.getComponents().add(tv); }
+				 */
+			} else if (producType != null && producType.isTv()) {
+				provision.getComponents().add(addTvComponent(null));
+			}
+
+			if (provision.getInternetDetail() != null) {
+				// ComponentsDto internet =
+				evaluateInternetFields(provision);
+
+				/*
+				 * if (internet != null) { provision.getComponents().add(internet); }
+				 */
+			} else if (producType != null && producType.isInternet()) {
+				provision.getComponents().add(addTvComponent(null));
+			}
+
+			if (provision.getHomePhoneDetail() != null) {
+				// ComponentsDto line =
+				evaluateLineFields(provision);
+
+				/*
+				 * if (line != null) { provision.getComponents().add(line); }
+				 */
+			} else if (producType != null && producType.isInternet()) {
+				provision.getComponents().add(addLineComponent(null));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return provision;
+	}
+
+	private void evaluateTvFields(Provision provision) {
 		Television television = provision.getTvDetail();
 		ComponentsDto components = null;
 
@@ -197,18 +218,30 @@ public class ProvisionServiceImpl implements ProvisionService {
 				|| television.getEquipment() != null || television.getDescription() != null
 				|| television.getAdditionalSmartHd() != null || television.getAdditionalHd() != null) {
 
-			components = new ComponentsDto();
-			components.setTitle(Constants.COMPONENTS_TITLE_TV);
-			components.setName(Constants.COMPONENTS_NAME_TV);
+			components = addTvComponent(television);
+		}
+
+		if (components != null) {
+			provision.getComponents().add(components);
+		}
+	}
+
+	private ComponentsDto addTvComponent(Television television) {
+		ComponentsDto components = new ComponentsDto();
+		components.setTitle(Constants.COMPONENTS_TITLE_TV);
+		components.setName(Constants.COMPONENTS_NAME_TV);
+		if (television != null) {
 			components.setDescription((television.getDescription() != null && !television.getDescription().isEmpty())
 					? television.getDescription()
 					: Constants.COMPONENTS_DESC_TV);
+		} else {
+			components.setDescription(Constants.COMPONENTS_DESC_TV);
 		}
 
 		return components;
 	}
 
-	private ComponentsDto evaluateInternetFields(Provision provision) {
+	private void evaluateInternetFields(Provision provision) {
 		Internet internet = provision.getInternetDetail();
 		ComponentsDto components = null;
 
@@ -216,30 +249,57 @@ public class ProvisionServiceImpl implements ProvisionService {
 				|| internet.getSmartWifi() != null || internet.getSpeed() != null || internet.getSvaInternet() != null
 				|| internet.getTechnology() != null || internet.getTimePromoSpeed() != null) {
 
-			components = new ComponentsDto();
-			components.setTitle(Constants.COMPONENTS_TITLE_INTERNET);
-			components.setName(Constants.COMPONENTS_NAME_INTERNET);
+			components = addInternetComponent(internet);
+		}
+
+		if (components != null) {
+			provision.getComponents().add(components);
+		}
+	}
+
+	private ComponentsDto addInternetComponent(Internet internet) {
+		ComponentsDto components = new ComponentsDto();
+		components = new ComponentsDto();
+		components.setTitle(Constants.COMPONENTS_TITLE_INTERNET);
+		components.setName(Constants.COMPONENTS_NAME_INTERNET);
+
+		if (internet != null) {
 			components.setDescription((internet.getDescription() != null && !internet.getDescription().isEmpty())
 					? internet.getDescription()
 					: Constants.COMPONENTS_DESC_INTERNET);
+		} else {
+			components.setDescription(Constants.COMPONENTS_DESC_INTERNET);
 		}
 
 		return components;
 	}
 
-	private ComponentsDto evaluateLineFields(Provision provision) {
+	private void evaluateLineFields(Provision provision) {
 		HomePhone line = provision.getHomePhoneDetail();
 		ComponentsDto components = null;
 
 		if (line.getDescription() != null || line.getEquipmenstNumber() != null || line.getEquipment() != null
 				|| line.getSvaLine() != null || line.getType() != null) {
 
-			components = new ComponentsDto();
-			components.setTitle(Constants.COMPONENTS_TITLE_LINE);
-			components.setName(Constants.COMPONENTS_NAME_LINE);
+			components = addLineComponent(line);
+		}
+
+		if (components != null) {
+			provision.getComponents().add(components);
+		}
+	}
+
+	private ComponentsDto addLineComponent(HomePhone line) {
+		ComponentsDto components = new ComponentsDto();
+		components.setTitle(Constants.COMPONENTS_TITLE_LINE);
+		components.setName(Constants.COMPONENTS_NAME_LINE);
+
+		if (line != null) {
 			components.setDescription(
 					(line.getDescription() != null && !line.getDescription().isEmpty()) ? line.getDescription()
 							: Constants.COMPONENTS_DESC_LINE);
+		} else {
+			components.setDescription(Constants.COMPONENTS_DESC_LINE);
 		}
 
 		return components;
@@ -573,6 +633,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		// String getData[] = data.split("\\|");
 		String getData[] = request.getData().split("\\|");
 		Provision provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
+
 		if (provisionx != null) {
 
 			Update update = fillProvisionUpdate(request);
@@ -616,6 +677,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			update.set("active_status", status);
 			update.set("status_toa", status);
+			update.set("send_notify", false);
+			update.set("show_location", false);
 
 			update.set("last_tracking_status", request.getStatus());
 
@@ -624,11 +687,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			// provisionx.setLogStatus(listLog);
 			// Actualiza provision
+			
+			//Provision provision = fillProvisionInsert(request);
+			provisionx=evaluateProvisionComponents(provisionx);
+			
 			provisionRepository.updateProvision(provisionx, update);
 
 		} else {
 
-			provisionRepository.insertProvision(fillProvisionInsert(request));
+			Provision provision = fillProvisionInsert(request);
+			provision=evaluateProvisionComponents(provision);
+			provisionRepository.insertProvision(provision);
 
 		}
 		return true;
@@ -851,7 +920,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public Provision orderCancellation(String provisionId, String cause, String detail) {
 		boolean sentBOCancellation;
-		boolean messageSent;
 		boolean provisionUpdated;
 		boolean scheduleUpdated;
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
@@ -1314,8 +1382,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	private void sendInfoUpdateSMS(Provision provision) {
-		ProvisionResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
-		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getData());
+		ApiResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
+		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getBody());
 
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
 	}
@@ -1567,7 +1635,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
-					
+
 					update.set("show_location", false);
 
 					provisionRepository.updateProvision(provision, update);
@@ -1596,7 +1664,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
-					
+
 					update.set("show_location", false);
 
 					provisionRepository.updateProvision(provision, update);
@@ -1634,9 +1702,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-					
+
 					update.set("show_location", false);
-					
+
 					listLog.add(statusLog);
 
 					// Regularizar Agenda Ficticia
@@ -1718,7 +1786,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woPreStart.setNameResource(getData[3]);
 				woPreStart.setDate(getData[4]);
 				update.set("wo_prestart", woPreStart);
-				
+
 				update.set("show_location", false);
 
 				StatusLog statusLog = new StatusLog();
@@ -1785,7 +1853,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("wo_completed", woCompleted);
 
 				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
-				
+
 				update.set("show_location", false);
 
 				StatusLog statusLog = new StatusLog();
@@ -1822,9 +1890,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_cancel_reason", getData[16]);
 				update.set("user_cancel", getData[15]);
 				update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
-				
+
 				update.set("show_location", false);
-				
+
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1889,11 +1957,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("date", getData[16]);
+				update.set("send_notify", false);
 				update.set("time_slot", range);
 				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-				
+
 				update.set("show_location", false);
 
 				// Actualizar provision
@@ -1962,7 +2031,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				update.set("show_location", false);
-				
+				update.set("send_notify", false);
+
 				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
@@ -2086,10 +2156,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionResponse<List<Contacts>> getContactList(String provisionId) {
+	public ApiResponse<List<Contacts>> getContactList(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getStatus(provisionId);
-		ProvisionResponse<List<Contacts>> response = new ProvisionResponse<List<Contacts>>();
-		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+		ApiResponse<List<Contacts>> response = new ApiResponse<List<Contacts>>();
+		ResponseHeader header = new ResponseHeader();
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
@@ -2118,10 +2188,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provision.setContacts(lContacts);
 			}
 
-			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(provision.getContacts());
+			header.setResultCode(HttpStatus.OK.name());
+			response.setHeader(header);
+			response.setBody(provision.getContacts());
 		} else {
-			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+			header.setResultCode(HttpStatus.OK.name());
 			response.setHeader(header);
 		}
 
@@ -2134,26 +2205,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optional.isPresent()) {
 			// Insertar lógica para wo_cancel
 			List<Provision> listita = new ArrayList<Provision>();
-			List<Provision> listitaUpdate = new ArrayList<Provision>();
 			listita = optional.get();
 			// Actualiza Flag de envio Notify en BD
 			provisionRepository.updateFlagNotify(optional.get());
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& Constants.FICTICIOUS_SCHEDULED.equalsIgnoreCase(list.get(list.size()-2).getStatus())) {
+						&& (!Status.FICTICIOUS_SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()) && !Status.SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()))) {
 					listita.remove(i);
 					i--;
 				}
 			}
-			
 			return listita;
 		}
+
 		return null;
 	}
 
 	@Override
-	public boolean updateShowLocation(Provision provision){
+	public boolean updateShowLocation(Provision provision) {
 		return provisionRepository.updateShowLocation(provision);
 	}
 }

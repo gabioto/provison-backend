@@ -1552,7 +1552,7 @@ public class ProvisionController {
 	}
 
 	@RequestMapping(value = "/getContacts", method = RequestMethod.GET)
-	public ResponseEntity<ProvisionResponse<List<Contacts>>> getContacts(
+	public ResponseEntity<ApiResponse<List<Contacts>>> getContacts(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		return ResponseEntity.ok(provisionService.getContactList(provisionId));
 	}
@@ -1691,7 +1691,7 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+						ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
 			} else {
 
 				status = HttpStatus.OK;
@@ -1703,7 +1703,7 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
 			}
 
 		} catch (Exception ex) {
@@ -1714,7 +1714,7 @@ public class ProvisionController {
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+					ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);

@@ -686,11 +686,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			// provisionx.setLogStatus(listLog);
 			// Actualiza provision
+			
+			//Provision provision = fillProvisionInsert(request);
+			provisionx=evaluateProvisionComponents(provisionx);
+			
 			provisionRepository.updateProvision(provisionx, update);
 
 		} else {
 
-			provisionRepository.insertProvision(fillProvisionInsert(request));
+			Provision provision = fillProvisionInsert(request);
+			provision=evaluateProvisionComponents(provision);
+			provisionRepository.insertProvision(provision);
 
 		}
 		return true;

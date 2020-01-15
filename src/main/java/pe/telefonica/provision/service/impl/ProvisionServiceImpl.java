@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.controller.common.ResponseHeader;
 import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.CancelRequest;
 import pe.telefonica.provision.controller.request.ContactRequest;
@@ -853,7 +854,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public Provision orderCancellation(String provisionId, String cause, String detail) {
 		boolean sentBOCancellation;
-		boolean messageSent;
 		boolean provisionUpdated;
 		boolean scheduleUpdated;
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
@@ -1316,8 +1316,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	private void sendInfoUpdateSMS(Provision provision) {
-		ProvisionResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
-		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getData());
+		ApiResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
+		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getBody());
 
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
 	}
@@ -1569,7 +1569,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
-					
+
 					update.set("show_location", false);
 
 					provisionRepository.updateProvision(provision, update);
@@ -1598,7 +1598,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
-					
+
 					update.set("show_location", false);
 
 					provisionRepository.updateProvision(provision, update);
@@ -1636,9 +1636,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-					
+
 					update.set("show_location", false);
-					
+
 					listLog.add(statusLog);
 
 					// Regularizar Agenda Ficticia
@@ -1720,7 +1720,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woPreStart.setNameResource(getData[3]);
 				woPreStart.setDate(getData[4]);
 				update.set("wo_prestart", woPreStart);
-				
+
 				update.set("show_location", false);
 
 				StatusLog statusLog = new StatusLog();
@@ -1787,7 +1787,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("wo_completed", woCompleted);
 
 				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
-				
+
 				update.set("show_location", false);
 
 				StatusLog statusLog = new StatusLog();
@@ -1824,9 +1824,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_cancel_reason", getData[16]);
 				update.set("user_cancel", getData[15]);
 				update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
-				
+
 				update.set("show_location", false);
-				
+
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1896,7 +1896,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-				
+
 				update.set("show_location", false);
 
 				// Actualizar provision
@@ -2090,10 +2090,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionResponse<List<Contacts>> getContactList(String provisionId) {
+	public ApiResponse<List<Contacts>> getContactList(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getStatus(provisionId);
-		ProvisionResponse<List<Contacts>> response = new ProvisionResponse<List<Contacts>>();
-		ProvisionHeaderResponse header = new ProvisionHeaderResponse();
+		ApiResponse<List<Contacts>> response = new ApiResponse<List<Contacts>>();
+		ResponseHeader header = new ResponseHeader();
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
@@ -2122,10 +2122,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provision.setContacts(lContacts);
 			}
 
-			header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
-			response.setHeader(header).setData(provision.getContacts());
+			header.setResultCode(HttpStatus.OK.name());
+			response.setHeader(header);
+			response.setBody(provision.getContacts());
 		} else {
-			header.setCode(HttpStatus.OK.value()).setMessage("No se encontraron provisiones");
+			header.setResultCode(HttpStatus.OK.name());
 			response.setHeader(header);
 		}
 
@@ -2151,11 +2152,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 			return listita;
 		}
+
 		return null;
 	}
 
 	@Override
-	public boolean updateShowLocation(Provision provision){
+	public boolean updateShowLocation(Provision provision) {
 		return provisionRepository.updateShowLocation(provision);
 	}
 }

@@ -1552,7 +1552,7 @@ public class ProvisionController {
 	}
 
 	@RequestMapping(value = "/getContacts", method = RequestMethod.GET)
-	public ResponseEntity<ProvisionResponse<List<Contacts>>> getContacts(
+	public ResponseEntity<ApiResponse<List<Contacts>>> getContacts(
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		return ResponseEntity.ok(provisionService.getContactList(provisionId));
 	}
@@ -1653,19 +1653,70 @@ public class ProvisionController {
 	}
 	
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
-	public ResponseEntity<ApiResponse<GetAllInTimeRangeResponse>> getOrderToNotify() {
+	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
 		log.info("ProvisionController.getOrderToNotify()");
-		ApiResponse<GetAllInTimeRangeResponse> apiResponse;
+		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 		
 		List<Provision> provisions = provisionService.getOrderToNotify();
-		GetAllInTimeRangeResponse response = new GetAllInTimeRangeResponse();
-		response.setProvisions(provisions);
+
 		status = HttpStatus.OK;
-		apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
+		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 				Constants.OPER_GET_ORDER_TO_NOTIFY, String.valueOf(status.value()), status.getReasonPhrase(),
-				response);
+				provisions);
 		
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+
+	@RequestMapping(value = "/updateShowLocation", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<String>> updateShowLocation(
+			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
+
+		Provision provision = new Provision();
+		provision.setIdProvision(request.getBody().getIdProvision());
+		
+		ApiResponse<String> apiResponse;
+		HttpStatus status;
+
+		try {
+			boolean estado = provisionService.updateShowLocation(provision);
+			
+			if (estado) {
+
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody("OK");
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
+			} else {
+
+				status = HttpStatus.OK;
+
+				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
+						String.valueOf(status.value()), "No se encontraron datos del cliente", null);
+				apiResponse.setBody(null);
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
+			}
+
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
+					String.valueOf(status.value()), ex.getMessage(), null);
+
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
+		}
+
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 	

@@ -268,6 +268,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		ArrayList<String> status = new ArrayList<String>();
 		status.add(Status.IN_TOA.getStatusName());
 		status.add(Status.WO_CANCEL.getStatusName());
+		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDO.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
 		List<Provision> provision = this.mongoOperations
@@ -276,10 +277,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
-
+	
 	@Override
 	public void updateFlagNotify(List<Provision> listProvision) {
-		
 		Update update = new Update();
 		update.set("send_notify", true);
 		for (int i = 0; i < listProvision.size(); i++) {
@@ -287,7 +287,16 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))), update,
 					Provision.class);
 		}
-
+	}
+	
+	@Override
+	public boolean updateShowLocation(Provision provision) {
+		Update update = new Update();
+		update.set("show_location", true);
+		UpdateResult result = this.mongoOperations.updateFirst(
+				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
+				Provision.class);
+		return result.getMatchedCount() > 0;
 	}
 	
 }

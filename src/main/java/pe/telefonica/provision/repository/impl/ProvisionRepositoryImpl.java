@@ -60,7 +60,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
 				Provision.class);
 
 		return Optional.ofNullable(provisions);
@@ -88,7 +89,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 								.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
 										Criteria.where("active_status")
-												.is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
+												.is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
 						Provision.class);
 
 		return Optional.ofNullable(provision);

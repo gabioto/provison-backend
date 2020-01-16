@@ -150,7 +150,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
-		
+
 		Optional<List<Provision>> provisions;
 
 		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
@@ -228,9 +228,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Television television = provision.getTvDetail();
 		ComponentsDto components = null;
 
-		if (television.getType() != null || television.getTvSignal() != null || television.getTvBlocks() != null
-				|| television.getTechnology() != null || television.getEquipmentsNumber() != null
-				|| television.getEquipment() != null || television.getDescription() != null
+		if ((television.getType() != null && !television.getType().isEmpty())
+				|| (television.getTvSignal() != null && !television.getTvSignal().isEmpty())
+				|| television.getTvBlocks() != null
+				|| (television.getTechnology() != null && !television.getTechnology().isEmpty())
+				|| television.getEquipmentsNumber() != null
+				|| (television.getEquipment() != null && !television.getEquipment().isEmpty())
+				|| (television.getDescription() != null && !television.getDescription().isEmpty())
 				|| television.getAdditionalSmartHd() != null || television.getAdditionalHd() != null) {
 
 			components = addTvComponent(television);
@@ -260,9 +264,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Internet internet = provision.getInternetDetail();
 		ComponentsDto components = null;
 
-		if (internet.getDescription() != null || internet.getEquipment() != null || internet.getPromoSpeed() != null
-				|| internet.getSmartWifi() != null || internet.getSpeed() != null || internet.getSvaInternet() != null
-				|| internet.getTechnology() != null || internet.getTimePromoSpeed() != null) {
+		if ((internet.getDescription() != null && !internet.getDescription().isEmpty())
+				|| (internet.getEquipment() != null && !internet.getEquipment().isEmpty())
+				|| (internet.getPromoSpeed() != null && !internet.getPromoSpeed().isEmpty())
+				|| (internet.getSmartWifi() != null && !internet.getSmartWifi().isEmpty())
+				|| (internet.getSpeed() != null && !internet.getSpeed().isEmpty())
+				|| (internet.getSvaInternet() != null && !internet.getSvaInternet().isEmpty())
+				|| (internet.getTechnology() != null && !internet.getTechnology().isEmpty())
+				|| (internet.getTimePromoSpeed() != null && !internet.getTimePromoSpeed().isEmpty())) {
 
 			components = addInternetComponent(internet);
 		}
@@ -293,8 +302,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		HomePhone line = provision.getHomePhoneDetail();
 		ComponentsDto components = null;
 
-		if (line.getDescription() != null || line.getEquipmenstNumber() != null || line.getEquipment() != null
-				|| line.getSvaLine() != null || line.getType() != null) {
+		if ((line.getDescription() != null && !line.getDescription().isEmpty()) || line.getEquipmenstNumber() != null
+				|| (line.getEquipment() != null && !line.getEquipment().isEmpty())
+				|| (line.getSvaLine() != null && !line.getSvaLine().isEmpty())
+				|| (line.getType() != null && !line.getType().isEmpty())) {
 
 			components = addLineComponent(line);
 		}
@@ -1894,7 +1905,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woCancel.setUserCancel(getData[15]);
 				woCancel.setXaCancelReason(getData[16]);
 				update.set("wo_cancel", woCancel);
-				// update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
+				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_CANCEL.getStatusName());

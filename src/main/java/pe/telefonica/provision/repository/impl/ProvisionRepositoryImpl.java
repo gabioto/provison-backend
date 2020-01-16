@@ -2,7 +2,6 @@ package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,22 +9,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 
 import com.mongodb.client.result.UpdateResult;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
-import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Provision.StatusLog;
+import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.Status;
@@ -43,6 +42,19 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
+
+		List<Provision> provisions = this.mongoOperations.find(
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
+						.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""))),
+				Provision.class);
+		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
+	}
+
+	@Override
+	public Optional<List<Provision>> findAllTraza(String documentType, String documentNumber) {
+
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
 						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
@@ -50,12 +62,25 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 				Provision.class);
-		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
-		return optionalProvisions;
+
+		return Optional.ofNullable(provisions);
 	}
 
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
+
+		Provision provision = this.mongoOperations.findOne(
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(documentNumber)
+						.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""))),
+				Provision.class);
+		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
+		return optionalOrder;
+	}
+
+	@Override
+	public Optional<Provision> getOrderTraza(String documentType, String documentNumber) {
+
 		Provision provision = this.mongoOperations
 				.findOne(
 						new Query(Criteria.where("customer.document_type").is(documentType)
@@ -65,8 +90,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 										Criteria.where("active_status")
 												.is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 						Provision.class);
-		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
-		return optionalOrder;
+
+		return Optional.ofNullable(provision);
 	}
 
 	@Override
@@ -260,7 +285,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		return provision;
 	}
-	
+
 	@Override
 	public Optional<List<Provision>> getOrderToNotify() {
 		Update update = new Update();
@@ -271,24 +296,25 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDO.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
-		List<Provision> provision = this.mongoOperations
-				.find(new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)).limit(5), Provision.class);
-				//new Query(Criteria.where("xaRequest").is(xaRequest).and("xaIdSt").is(xaIdSt))
+		List<Provision> provision = this.mongoOperations.find(
+				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)).limit(5),
+				Provision.class);
+		// new Query(Criteria.where("xaRequest").is(xaRequest).and("xaIdSt").is(xaIdSt))
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
-	
+
 	@Override
 	public void updateFlagNotify(List<Provision> listProvision) {
 		Update update = new Update();
 		update.set("send_notify", true);
 		for (int i = 0; i < listProvision.size(); i++) {
 			UpdateResult result = this.mongoOperations.updateFirst(
-					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))), update,
-					Provision.class);
+					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+					update, Provision.class);
 		}
 	}
-	
+
 	@Override
 	public boolean updateShowLocation(Provision provision) {
 		Update update = new Update();
@@ -298,5 +324,4 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Provision.class);
 		return result.getMatchedCount() > 0;
 	}
-	
 }

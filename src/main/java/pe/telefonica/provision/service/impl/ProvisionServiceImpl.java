@@ -104,8 +104,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
-		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
-				provisionRequest.getBody().getDocumentNumber());
+
+		Optional<Provision> provision;
+
+		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+			provision = provisionRepository.getOrderTraza(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		} else {
+			provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		}
 
 		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equals("CE")) {
 			provision = provisionRepository.getOrder("CEX", provisionRequest.getBody().getDocumentNumber());
@@ -143,8 +151,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
 
-		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
-				provisionRequest.getBody().getDocumentNumber());
+		Optional<List<Provision>> provisions;
+
+		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		} else {
+			provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		}
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("CE")) {
 			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentNumber());
@@ -213,9 +228,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Television television = provision.getTvDetail();
 		ComponentsDto components = null;
 
-		if (television.getType() != null || television.getTvSignal() != null || television.getTvBlocks() != null
-				|| television.getTechnology() != null || television.getEquipmentsNumber() != null
-				|| television.getEquipment() != null || television.getDescription() != null
+		if ((television.getType() != null && !television.getType().isEmpty())
+				|| (television.getTvSignal() != null && !television.getTvSignal().isEmpty())
+				|| television.getTvBlocks() != null
+				|| (television.getTechnology() != null && !television.getTechnology().isEmpty())
+				|| television.getEquipmentsNumber() != null
+				|| (television.getEquipment() != null && !television.getEquipment().isEmpty())
+				|| (television.getDescription() != null && !television.getDescription().isEmpty())
 				|| television.getAdditionalSmartHd() != null || television.getAdditionalHd() != null) {
 
 			components = addTvComponent(television);
@@ -245,9 +264,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Internet internet = provision.getInternetDetail();
 		ComponentsDto components = null;
 
-		if (internet.getDescription() != null || internet.getEquipment() != null || internet.getPromoSpeed() != null
-				|| internet.getSmartWifi() != null || internet.getSpeed() != null || internet.getSvaInternet() != null
-				|| internet.getTechnology() != null || internet.getTimePromoSpeed() != null) {
+		if ((internet.getDescription() != null && !internet.getDescription().isEmpty())
+				|| (internet.getEquipment() != null && !internet.getEquipment().isEmpty())
+				|| (internet.getPromoSpeed() != null && !internet.getPromoSpeed().isEmpty())
+				|| (internet.getSmartWifi() != null && !internet.getSmartWifi().isEmpty())
+				|| (internet.getSpeed() != null && !internet.getSpeed().isEmpty())
+				|| (internet.getSvaInternet() != null && !internet.getSvaInternet().isEmpty())
+				|| (internet.getTechnology() != null && !internet.getTechnology().isEmpty())
+				|| (internet.getTimePromoSpeed() != null && !internet.getTimePromoSpeed().isEmpty())) {
 
 			components = addInternetComponent(internet);
 		}
@@ -278,8 +302,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		HomePhone line = provision.getHomePhoneDetail();
 		ComponentsDto components = null;
 
-		if (line.getDescription() != null || line.getEquipmenstNumber() != null || line.getEquipment() != null
-				|| line.getSvaLine() != null || line.getType() != null) {
+		if ((line.getDescription() != null && !line.getDescription().isEmpty()) || line.getEquipmenstNumber() != null
+				|| (line.getEquipment() != null && !line.getEquipment().isEmpty())
+				|| (line.getSvaLine() != null && !line.getSvaLine().isEmpty())
+				|| (line.getType() != null && !line.getType().isEmpty())) {
 
 			components = addLineComponent(line);
 		}
@@ -686,16 +712,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			// provisionx.setLogStatus(listLog);
 			// Actualiza provision
-			
-			//Provision provision = fillProvisionInsert(request);
-			provisionx=evaluateProvisionComponents(provisionx);
-			
+
+			// Provision provision = fillProvisionInsert(request);
+			provisionx = evaluateProvisionComponents(provisionx);
+
 			provisionRepository.updateProvision(provisionx, update);
 
 		} else {
 
 			Provision provision = fillProvisionInsert(request);
-			provision=evaluateProvisionComponents(provision);
+			provision = evaluateProvisionComponents(provision);
 			provisionRepository.insertProvision(provision);
 
 		}
@@ -1892,7 +1918,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woCancel.setUserCancel(getData[15]);
 				woCancel.setXaCancelReason(getData[16]);
 				update.set("wo_cancel", woCancel);
-				// update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
+				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_CANCEL.getStatusName());
@@ -2236,7 +2262,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& (!Status.FICTICIOUS_SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()) && !Status.SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()))) {
+						&& (!Status.FICTICIOUS_SCHEDULED.getStatusName()
+								.equalsIgnoreCase(list.get(list.size() - 2).getStatus())
+								&& !Status.SCHEDULED.getStatusName()
+										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
 					listita.remove(i);
 					i--;
 				}

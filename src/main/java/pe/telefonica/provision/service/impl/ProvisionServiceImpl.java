@@ -104,8 +104,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
-		Optional<Provision> provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
-				provisionRequest.getBody().getDocumentNumber());
+
+		Optional<Provision> provision;
+
+		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+			provision = provisionRepository.getOrderTraza(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		} else {
+			provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		}
 
 		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equals("CE")) {
 			provision = provisionRepository.getOrder("CEX", provisionRequest.getBody().getDocumentNumber());
@@ -142,9 +150,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
+		
+		Optional<List<Provision>> provisions;
 
-		Optional<List<Provision>> provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
-				provisionRequest.getBody().getDocumentNumber());
+		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		} else {
+			provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
+					provisionRequest.getBody().getDocumentNumber());
+		}
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("CE")) {
 			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentNumber());
@@ -687,16 +702,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			// provisionx.setLogStatus(listLog);
 			// Actualiza provision
-			
-			//Provision provision = fillProvisionInsert(request);
-			provisionx=evaluateProvisionComponents(provisionx);
-			
+
+			// Provision provision = fillProvisionInsert(request);
+			provisionx = evaluateProvisionComponents(provisionx);
+
 			provisionRepository.updateProvision(provisionx, update);
 
 		} else {
 
 			Provision provision = fillProvisionInsert(request);
-			provision=evaluateProvisionComponents(provision);
+			provision = evaluateProvisionComponents(provision);
 			provisionRepository.insertProvision(provision);
 
 		}
@@ -2211,7 +2226,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& (!Status.FICTICIOUS_SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()) && !Status.SCHEDULED.getStatusName().equalsIgnoreCase(list.get(list.size()-2).getStatus()))) {
+						&& (!Status.FICTICIOUS_SCHEDULED.getStatusName()
+								.equalsIgnoreCase(list.get(list.size() - 2).getStatus())
+								&& !Status.SCHEDULED.getStatusName()
+										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
 					listita.remove(i);
 					i--;
 				}

@@ -192,23 +192,33 @@ public class ProvisionServiceImpl implements ProvisionService {
 					producType = prod;
 			}
 
-			if (producType != null && producType.isTv()) {
-				provision.getComponents().add(addTvComponent(provision.getTvDetail()));
-			} else if (provision.getTvDetail() != null) {
-				evaluateTvFields(provision);
+			if (producType != null) {
+				if (producType.isTv()) {
+					provision.getComponents().add(addTvComponent(provision.getTvDetail()));
+				} 
+
+				if (producType.isInternet()) {
+					provision.getComponents().add(addInternetComponent(provision.getInternetDetail()));
+				} 
+
+				if (producType.isLine()) {
+					provision.getComponents().add(addLineComponent(provision.getHomePhoneDetail()));
+				} 
+			} else {
+				if (provision.getTvDetail() != null) {
+					evaluateTvFields(provision);
+				}
+				
+				if (provision.getInternetDetail() != null) {
+					evaluateInternetFields(provision);
+				}
+				
+				if (provision.getHomePhoneDetail() != null) {
+					evaluateLineFields(provision);
+				}
 			}
 
-			if (producType != null && producType.isInternet()) {
-				provision.getComponents().add(addInternetComponent(provision.getInternetDetail()));
-			} else if (provision.getInternetDetail() != null) {
-				evaluateInternetFields(provision);
-			}
-
-			if (producType != null && producType.isLine()) {
-				provision.getComponents().add(addLineComponent(provision.getHomePhoneDetail()));
-			} else if (provision.getHomePhoneDetail() != null) {
-				evaluateLineFields(provision);
-			}
+			
 		} catch (
 
 		Exception e) {

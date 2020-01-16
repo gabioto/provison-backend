@@ -1904,7 +1904,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woCancel.setUserCancel(getData[15]);
 				woCancel.setXaCancelReason(getData[16]);
 				update.set("wo_cancel", woCancel);
-				// update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
+				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_CANCEL.getStatusName());

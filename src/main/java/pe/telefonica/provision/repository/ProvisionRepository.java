@@ -15,8 +15,12 @@ import pe.telefonica.provision.model.Queue;
 public interface ProvisionRepository {
 
 	Optional<List<Provision>> findAll(String documentType, String documentNumber);
+	
+	Optional<List<Provision>> findAllTraza(String documentType, String documentNumber);
 
 	Optional<Provision> getOrder(String documentType, String documentNumber);
+	
+	Optional<Provision> getOrderTraza(String documentType, String documentNumber);
 
 	Optional<Provision> getProvisionByXaRequest(String xaRequest);
 	

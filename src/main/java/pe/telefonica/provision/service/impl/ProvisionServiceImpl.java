@@ -152,6 +152,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
 
 		Optional<List<Provision>> provisions;
+		// List<Provision> provisionList;
 
 		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
@@ -170,6 +171,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		if (provisions.isPresent() && provisions.get().size() > 0) {
+			/*
+			 * provisionList = provisions.get();
+			 * 
+			 * for (Provision provision : provisionList) {
+			 * evaluateProvisionComponents(provision); } return provisionList;
+			 */
 			return provisions.get();
 		} else {
 			return null;
@@ -186,35 +193,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provision.getTvDetail() != null) {
-				// ComponentsDto tv =
 				evaluateTvFields(provision);
+			}
 
-				/*
-				 * if (tv != null) { provision.getComponents().add(tv); }
-				 */
-			} else if (producType != null && producType.isTv()) {
+			if (producType != null && producType.isTv()) {
 				provision.getComponents().add(addTvComponent(null));
 			}
 
 			if (provision.getInternetDetail() != null) {
-				// ComponentsDto internet =
 				evaluateInternetFields(provision);
+			}
 
-				/*
-				 * if (internet != null) { provision.getComponents().add(internet); }
-				 */
-			} else if (producType != null && producType.isInternet()) {
-				provision.getComponents().add(addTvComponent(null));
+			if (producType != null && producType.isInternet()) {
+				provision.getComponents().add(addInternetComponent(null));
 			}
 
 			if (provision.getHomePhoneDetail() != null) {
-				// ComponentsDto line =
 				evaluateLineFields(provision);
+			}
 
-				/*
-				 * if (line != null) { provision.getComponents().add(line); }
-				 */
-			} else if (producType != null && producType.isInternet()) {
+			if (producType != null && producType.isLine()) {
 				provision.getComponents().add(addLineComponent(null));
 			}
 		} catch (Exception e) {

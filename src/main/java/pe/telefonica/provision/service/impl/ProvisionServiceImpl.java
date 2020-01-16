@@ -192,30 +192,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 					producType = prod;
 			}
 
-			if (provision.getTvDetail() != null) {
+			if (producType != null && producType.isTv()) {
+				provision.getComponents().add(addTvComponent(provision.getTvDetail()));
+			} else if (provision.getTvDetail() != null) {
 				evaluateTvFields(provision);
 			}
 
-			if (producType != null && producType.isTv()) {
-				provision.getComponents().add(addTvComponent(null));
-			}
-
-			if (provision.getInternetDetail() != null) {
+			if (producType != null && producType.isInternet()) {
+				provision.getComponents().add(addInternetComponent(provision.getInternetDetail()));
+			} else if (provision.getInternetDetail() != null) {
 				evaluateInternetFields(provision);
 			}
 
-			if (producType != null && producType.isInternet()) {
-				provision.getComponents().add(addInternetComponent(null));
-			}
-
-			if (provision.getHomePhoneDetail() != null) {
+			if (producType != null && producType.isLine()) {
+				provision.getComponents().add(addLineComponent(provision.getHomePhoneDetail()));
+			} else if (provision.getHomePhoneDetail() != null) {
 				evaluateLineFields(provision);
 			}
+		} catch (
 
-			if (producType != null && producType.isLine()) {
-				provision.getComponents().add(addLineComponent(null));
-			}
-		} catch (Exception e) {
+		Exception e) {
 			e.printStackTrace();
 		}
 
@@ -1697,7 +1693,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					Update update = new Update();
 					// update.set("xa_creation_date", getData[3]);
 					// SI SMS
-					//update.set("xa_request", getData[2]);
+					// update.set("xa_request", getData[2]);
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
@@ -1802,7 +1798,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
-				//update.set("xa_request", getData[2]);
+				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
@@ -1819,10 +1815,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setDescription(Status.WO_PRESTART.getDescription());
 				statusLog.setXaidst(provision.getXaIdSt());
-				
+
 				update.set("customer.latitude", getData[14]);
 				update.set("customer.longitude", getData[13]);
-				
+
 				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
@@ -1852,7 +1848,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("appt_number", getData[9]);
 				update.set("activity_type", getData[14].toLowerCase());
 
-				//update.set("xa_request", getData[5]);
+				// update.set("xa_request", getData[5]);
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(Status.WO_INIT.getStatusName());
@@ -1995,7 +1991,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_requirement_number", getData[5]);
 				update.set("appt_number", getData[6]);
 				update.set("activity_type", getData[8].toLowerCase());
-				
+
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());

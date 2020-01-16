@@ -5,7 +5,7 @@ public enum ProductType {
 	DUO_BA("DUO BA", true, true, false),
 	MOVISTAR_UNO("MOVISTAR UNO", true, true, true),
 	MONO_BA("MONO BA", true, false, false),
-	LINEA("MOVISTAR UNO", false, true, false),
+	LINEA("LINEA", false, true, false),
 	INGRESADO("INGRESADO", false, false, false),
 	MONO_TV("MONO TV", false, false, true),
 	DUO_TV("DUO TV", false, true, true),

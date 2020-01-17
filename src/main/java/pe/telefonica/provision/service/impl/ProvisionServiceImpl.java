@@ -1614,6 +1614,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
 			throws Exception {
 		boolean bool = false;
+		log.info("ProvisionServiceImpl.provisionUpdateFromTOA()");
 		String[] getData = request.getData().split("\\|", -1);
 		Provision provision = new Provision();
 		// validar si es vf o mt
@@ -1624,15 +1625,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision = provisionRepository.getByOrderCodeForUpdateFicticious(xaRequirementNumber);
 		}
 
+		log.info("Antes de update provision");
 		bool = updateProvision(provision, getData, request);
+		log.info("Depues de update provision");
 		return bool;
 	}
 
 	private boolean updateProvision(Provision provision, String[] getData, UpdateFromToaRequest request)
 			throws Exception {
-
+		log.info("ProvisionServiceImpl.updateProvision()");
 		if (provision != null) {
-
+			log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
 			/*
 			 * // valida Bucket x Producto boolean boolBucket =
@@ -1646,6 +1649,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				String origin = getData[6].toString().substring(0, 2);
 				if (getData[2].toString().equals("0")
 						&& (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
+					
+					log.info("IF 1");
 					// IN_TO fictitious
 					Update update = new Update();
 					// NO SMS
@@ -1673,6 +1678,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				} else if (getData[2].toString().equals("0")
 						&& (!origin.equalsIgnoreCase("VF") && !origin.equalsIgnoreCase("MT"))) {
 
+					log.info("IF 2");
 					// IN_TOA Monoproducto
 					Update update = new Update();
 					// SI SMS
@@ -1699,6 +1705,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					provisionRepository.updateProvision(provision, update);
 					return true;
 				} else {
+					log.info("IF 3");
 					Update update = new Update();
 					// update.set("xa_creation_date", getData[3]);
 					// SI SMS
@@ -1714,6 +1721,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("has_schedule", false);
 					}
 
+					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
 					inToa.setXaNote(getData[9]);
@@ -1735,6 +1743,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					listLog.add(statusLog);
 
+					log.info("JEAN 2");
 					// Regularizar Agenda Ficticia
 
 					if (provision.getXaIdSt() == null) {
@@ -1791,11 +1800,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 						}
 					}
 
+					log.info("UPDATE PSICODEREAL");
 					// update psiCode by schedule
-
 					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
 							getData[4], getData[8].toLowerCase());
 
+					log.info("UPDATE PROVISION");
 					provisionRepository.updateProvision(provision, update);
 
 					return true;

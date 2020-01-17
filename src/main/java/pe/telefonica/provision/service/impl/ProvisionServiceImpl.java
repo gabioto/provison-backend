@@ -862,7 +862,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				try {
 					// provisionRepository.sendCancelledMail(provision, name, "179824",
 					// Constants.ADDRESS_UNREACHABLE);
-					sendCancelledMail(provision, name, "179824");
+					sendCancelledMail(provision, name, "192909");
 				} catch (Exception e) {
 					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 				}
@@ -1052,22 +1052,63 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter2.setParamValue(provision.getCustomer().getMail());
 		mailParameters.add(mailParameter2);
 
-		MailParameter mailParameter3 = new MailParameter();
-		mailParameter3.setParamKey("CONTACTFULLNAME");
-		mailParameter3.setParamValue("contact name");
-		mailParameters.add(mailParameter3);
+		for (int a = 0; a < provision.getContacts().size(); a++) {
+			if (a == 0) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
 
-		MailParameter mailParameter4 = new MailParameter();
-		mailParameter4.setParamKey("CONTACTID");
-		mailParameter4.setParamValue("123456789");
-		mailParameters.add(mailParameter4);
+			if (a == 1) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE_2");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO_2");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
+
+			if (a == 2) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE_3");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO_3");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
+
+			if (a == 3) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE_4");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO_4");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
+
+		}
 
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("FOLLOWORDER");
 		mailParameter5.setParamValue(provisionTexts.getWebUrl());
 		mailParameters.add(mailParameter5);
 
-		return trazabilidadSecurityApi.sendMail("186162", mailParameters.toArray(new MailParameter[0]));
+		return trazabilidadSecurityApi.sendMail("192911", mailParameters.toArray(new MailParameter[0]));
 
 		// return sendMail("179833", mailParameters.toArray(new MailParameter[0]));
 	}
@@ -1136,9 +1177,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter6.setParamKey("PROVISIONNAME");
 		mailParameter6.setParamValue(provision.getProductName());
 		mailParameters.add(mailParameter6);
-
-		// return sendMail("179829", mailParameters.toArray(new MailParameter[0]));
-		return trazabilidadSecurityApi.sendMail("179829", mailParameters.toArray(new MailParameter[0]));
+		
+		return trazabilidadSecurityApi.sendMail("192828", mailParameters.toArray(new MailParameter[0]));
 	}
 
 	@Override
@@ -1395,6 +1435,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
 
 					sendInfoUpdateSMS(provision);
+					sendContactInfoChangedMail(provision);
 
 				} else {
 					throw new Exception();

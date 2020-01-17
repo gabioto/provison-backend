@@ -20,7 +20,7 @@ public final class Constants {
 	public static final String COMPONENTS_NAME_TV = "TV";
 	public static final String COMPONENTS_NAME_INTERNET = "INTERNET";
 	public static final String COMPONENTS_NAME_LINE = "LINEA";
-	public static final String COMPONENTS_TITLE_TV = "Television HD";
+	public static final String COMPONENTS_TITLE_TV = "Televisión HD";
 	public static final String COMPONENTS_TITLE_INTERNET = "Internet Ilimitado";
 	public static final String COMPONENTS_TITLE_LINE = "Línea Fija";
 	public static final String COMPONENTS_DESC_TV = "Canales exclusivos Movistar";

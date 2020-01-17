@@ -150,8 +150,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
-		
+
 		Optional<List<Provision>> provisions;
+		// List<Provision> provisionList;
 
 		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
@@ -170,6 +171,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		if (provisions.isPresent() && provisions.get().size() > 0) {
+			/*
+			 * provisionList = provisions.get();
+			 * 
+			 * for (Provision provision : provisionList) {
+			 * evaluateProvisionComponents(provision); } return provisionList;
+			 */
 			return provisions.get();
 		} else {
 			return null;
@@ -185,39 +192,36 @@ public class ProvisionServiceImpl implements ProvisionService {
 					producType = prod;
 			}
 
-			if (provision.getTvDetail() != null) {
-				// ComponentsDto tv =
-				evaluateTvFields(provision);
+			if (producType != null) {
+				if (producType.isTv()) {
+					provision.getComponents().add(addTvComponent(provision.getTvDetail()));
+				} 
 
-				/*
-				 * if (tv != null) { provision.getComponents().add(tv); }
-				 */
-			} else if (producType != null && producType.isTv()) {
-				provision.getComponents().add(addTvComponent(null));
+				if (producType.isInternet()) {
+					provision.getComponents().add(addInternetComponent(provision.getInternetDetail()));
+				} 
+
+				if (producType.isLine()) {
+					provision.getComponents().add(addLineComponent(provision.getHomePhoneDetail()));
+				} 
+			} else {
+				if (provision.getTvDetail() != null) {
+					evaluateTvFields(provision);
+				}
+				
+				if (provision.getInternetDetail() != null) {
+					evaluateInternetFields(provision);
+				}
+				
+				if (provision.getHomePhoneDetail() != null) {
+					evaluateLineFields(provision);
+				}
 			}
 
-			if (provision.getInternetDetail() != null) {
-				// ComponentsDto internet =
-				evaluateInternetFields(provision);
+			
+		} catch (
 
-				/*
-				 * if (internet != null) { provision.getComponents().add(internet); }
-				 */
-			} else if (producType != null && producType.isInternet()) {
-				provision.getComponents().add(addTvComponent(null));
-			}
-
-			if (provision.getHomePhoneDetail() != null) {
-				// ComponentsDto line =
-				evaluateLineFields(provision);
-
-				/*
-				 * if (line != null) { provision.getComponents().add(line); }
-				 */
-			} else if (producType != null && producType.isInternet()) {
-				provision.getComponents().add(addLineComponent(null));
-			}
-		} catch (Exception e) {
+		Exception e) {
 			e.printStackTrace();
 		}
 
@@ -228,9 +232,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Television television = provision.getTvDetail();
 		ComponentsDto components = null;
 
-		if (television.getType() != null || television.getTvSignal() != null || television.getTvBlocks() != null
-				|| television.getTechnology() != null || television.getEquipmentsNumber() != null
-				|| television.getEquipment() != null || television.getDescription() != null
+		if ((television.getType() != null && !television.getType().isEmpty())
+				|| (television.getTvSignal() != null && !television.getTvSignal().isEmpty())
+				|| television.getTvBlocks() != null
+				|| (television.getTechnology() != null && !television.getTechnology().isEmpty())
+				|| television.getEquipmentsNumber() != null
+				|| (television.getEquipment() != null && !television.getEquipment().isEmpty())
+				|| (television.getDescription() != null && !television.getDescription().isEmpty())
 				|| television.getAdditionalSmartHd() != null || television.getAdditionalHd() != null) {
 
 			components = addTvComponent(television);
@@ -260,9 +268,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Internet internet = provision.getInternetDetail();
 		ComponentsDto components = null;
 
-		if (internet.getDescription() != null || internet.getEquipment() != null || internet.getPromoSpeed() != null
-				|| internet.getSmartWifi() != null || internet.getSpeed() != null || internet.getSvaInternet() != null
-				|| internet.getTechnology() != null || internet.getTimePromoSpeed() != null) {
+		if ((internet.getDescription() != null && !internet.getDescription().isEmpty())
+				|| (internet.getEquipment() != null && !internet.getEquipment().isEmpty())
+				|| (internet.getPromoSpeed() != null && !internet.getPromoSpeed().isEmpty())
+				|| (internet.getSmartWifi() != null && !internet.getSmartWifi().isEmpty())
+				|| (internet.getSpeed() != null && !internet.getSpeed().isEmpty())
+				|| (internet.getSvaInternet() != null && !internet.getSvaInternet().isEmpty())
+				|| (internet.getTechnology() != null && !internet.getTechnology().isEmpty())
+				|| (internet.getTimePromoSpeed() != null && !internet.getTimePromoSpeed().isEmpty())) {
 
 			components = addInternetComponent(internet);
 		}
@@ -293,8 +306,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 		HomePhone line = provision.getHomePhoneDetail();
 		ComponentsDto components = null;
 
-		if (line.getDescription() != null || line.getEquipmenstNumber() != null || line.getEquipment() != null
-				|| line.getSvaLine() != null || line.getType() != null) {
+		if ((line.getDescription() != null && !line.getDescription().isEmpty()) || line.getEquipmenstNumber() != null
+				|| (line.getEquipment() != null && !line.getEquipment().isEmpty())
+				|| (line.getSvaLine() != null && !line.getSvaLine().isEmpty())
+				|| (line.getType() != null && !line.getType().isEmpty())) {
 
 			components = addLineComponent(line);
 		}
@@ -1646,7 +1661,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
-					update.set("work_zone", getData[16]);
+					update.set("work_zone", getData[17]);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
@@ -1666,12 +1681,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
 					statusLog.setDescription(Status.DUMMY_IN_TOA.getDescription());
-					update.set("xa_request", getData[5]);
+					update.set("xa_request", getData[2]);
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
-					update.set("work_zone", getData[16]);
+					update.set("work_zone", getData[17]);
 					update.set("send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
@@ -1688,12 +1703,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					Update update = new Update();
 					// update.set("xa_creation_date", getData[3]);
 					// SI SMS
+					// update.set("xa_request", getData[2]);
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
-					update.set("work_zone", getData[16]);
+					update.set("work_zone", getData[17]);
 					update.set("send_notify", false);
+					update.set("show_location", false);
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);
 					}
@@ -1717,9 +1734,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-
-					update.set("show_location", false);
-
 					listLog.add(statusLog);
 
 					// Regularizar Agenda Ficticia
@@ -1794,6 +1808,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
+				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
@@ -1801,6 +1816,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woPreStart.setNameResource(getData[3]);
 				woPreStart.setDate(getData[4]);
 				update.set("wo_prestart", woPreStart);
+				update.set("activity_type", getData[5].toLowerCase());
+				update.set("xa_id_st", getData[6]);
 
 				update.set("show_location", false);
 
@@ -1808,6 +1825,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setDescription(Status.WO_PRESTART.getDescription());
 				statusLog.setXaidst(provision.getXaIdSt());
+
+				update.set("customer.latitude", getData[14]);
+				update.set("customer.longitude", getData[13]);
 
 				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
 				listLog.add(statusLog);
@@ -1826,14 +1846,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 				WoInit woInit = new WoInit();
 
 				woInit.setNameResource(getData[2]);
-				woInit.setEtaStartTime(getData[10]);
-				woInit.setEtaEndTime(getData[2]);
+				woInit.setEtaStartTime(getData[3]);
+				woInit.setEtaEndTime(getData[10]);
 				woInit.setXaCreationDate(getData[6]);
 				woInit.setDate(getData[23]);
 				woInit.setXaNote(getData[15]);
 				update.set("wo_init", woInit);
 				update.set("show_location", false);
+				update.set("xa_id_st", getData[7]);
+				update.set("xa_requirement_number", getData[8]);
+				update.set("appt_number", getData[9]);
+				update.set("activity_type", getData[14].toLowerCase());
 
+				// update.set("xa_request", getData[5]);
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(Status.WO_INIT.getStatusName());
@@ -1870,6 +1895,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
 
 				update.set("show_location", false);
+				update.set("xa_id_st", getData[8]);
+				update.set("xa_requirement_number", getData[9]);
+				update.set("appt_number", getData[10]);
+				update.set("activity_type", getData[13].toLowerCase());
 
 				StatusLog statusLog = new StatusLog();
 
@@ -1905,6 +1934,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_cancel_reason", getData[16]);
 				update.set("user_cancel", getData[15]);
 				update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
+				update.set("xa_id_st", getData[4]);
+				update.set("xa_requirement_number", getData[5]);
+				update.set("appt_number", getData[6]);
 
 				update.set("show_location", false);
 
@@ -1964,6 +1996,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woReshedule.setTimeSlot(range);
 				update.set("wo_schedule", woReshedule);
 				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+
+				update.set("xa_id_st", getData[4]);
+				update.set("xa_requirement_number", getData[5]);
+				update.set("appt_number", getData[6]);
+				update.set("activity_type", getData[8].toLowerCase());
 
 				StatusLog statusLog = new StatusLog();
 
@@ -2030,6 +2067,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woNotdone.setUserNotdone(getData[28]);
 
 				update.set("wo_notdone", woNotdone);
+				update.set("xa_id_st", getData[9]);
+				update.set("xa_requirement_number", getData[10]);
+				update.set("appt_number", getData[11]);
+				update.set("activity_type", getData[14].toLowerCase());
 
 				update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
 

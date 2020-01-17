@@ -152,6 +152,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
 
 		Optional<List<Provision>> provisions;
+		// List<Provision> provisionList;
 
 		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
@@ -170,6 +171,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		if (provisions.isPresent() && provisions.get().size() > 0) {
+			/*
+			 * provisionList = provisions.get();
+			 * 
+			 * for (Provision provision : provisionList) {
+			 * evaluateProvisionComponents(provision); } return provisionList;
+			 */
 			return provisions.get();
 		} else {
 			return null;
@@ -185,39 +192,36 @@ public class ProvisionServiceImpl implements ProvisionService {
 					producType = prod;
 			}
 
-			if (provision.getTvDetail() != null) {
-				// ComponentsDto tv =
-				evaluateTvFields(provision);
+			if (producType != null) {
+				if (producType.isTv()) {
+					provision.getComponents().add(addTvComponent(provision.getTvDetail()));
+				} 
 
-				/*
-				 * if (tv != null) { provision.getComponents().add(tv); }
-				 */
-			} else if (producType != null && producType.isTv()) {
-				provision.getComponents().add(addTvComponent(null));
+				if (producType.isInternet()) {
+					provision.getComponents().add(addInternetComponent(provision.getInternetDetail()));
+				} 
+
+				if (producType.isLine()) {
+					provision.getComponents().add(addLineComponent(provision.getHomePhoneDetail()));
+				} 
+			} else {
+				if (provision.getTvDetail() != null) {
+					evaluateTvFields(provision);
+				}
+				
+				if (provision.getInternetDetail() != null) {
+					evaluateInternetFields(provision);
+				}
+				
+				if (provision.getHomePhoneDetail() != null) {
+					evaluateLineFields(provision);
+				}
 			}
 
-			if (provision.getInternetDetail() != null) {
-				// ComponentsDto internet =
-				evaluateInternetFields(provision);
+			
+		} catch (
 
-				/*
-				 * if (internet != null) { provision.getComponents().add(internet); }
-				 */
-			} else if (producType != null && producType.isInternet()) {
-				provision.getComponents().add(addTvComponent(null));
-			}
-
-			if (provision.getHomePhoneDetail() != null) {
-				// ComponentsDto line =
-				evaluateLineFields(provision);
-
-				/*
-				 * if (line != null) { provision.getComponents().add(line); }
-				 */
-			} else if (producType != null && producType.isInternet()) {
-				provision.getComponents().add(addLineComponent(null));
-			}
-		} catch (Exception e) {
+		Exception e) {
 			e.printStackTrace();
 		}
 
@@ -1611,6 +1615,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
 			throws Exception {
 		boolean bool = false;
+		log.info("ProvisionServiceImpl.provisionUpdateFromTOA()");
 		String[] getData = request.getData().split("\\|", -1);
 		Provision provision = new Provision();
 		// validar si es vf o mt
@@ -1621,15 +1626,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision = provisionRepository.getByOrderCodeForUpdateFicticious(xaRequirementNumber);
 		}
 
+		log.info("Antes de update provision");
 		bool = updateProvision(provision, getData, request);
+		log.info("Depues de update provision");
 		return bool;
 	}
 
 	private boolean updateProvision(Provision provision, String[] getData, UpdateFromToaRequest request)
 			throws Exception {
-
+		log.info("ProvisionServiceImpl.updateProvision()");
 		if (provision != null) {
-
+			log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
 			/*
 			 * // valida Bucket x Producto boolean boolBucket =
@@ -1643,6 +1650,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				String origin = getData[6].toString().substring(0, 2);
 				if (getData[2].toString().equals("0")
 						&& (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
+					
+					log.info("IF 1");
 					// IN_TO fictitious
 					Update update = new Update();
 					// NO SMS
@@ -1670,6 +1679,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				} else if (getData[2].toString().equals("0")
 						&& (!origin.equalsIgnoreCase("VF") && !origin.equalsIgnoreCase("MT"))) {
 
+					log.info("IF 2");
 					// IN_TOA Monoproducto
 					Update update = new Update();
 					// SI SMS
@@ -1696,10 +1706,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 					provisionRepository.updateProvision(provision, update);
 					return true;
 				} else {
+					log.info("IF 3");
 					Update update = new Update();
 					// update.set("xa_creation_date", getData[3]);
 					// SI SMS
-					//update.set("xa_request", getData[2]);
+					// update.set("xa_request", getData[2]);
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
@@ -1711,6 +1722,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("has_schedule", false);
 					}
 
+					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
 					inToa.setXaNote(getData[9]);
@@ -1732,6 +1744,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					listLog.add(statusLog);
 
+					log.info("JEAN 2");
 					// Regularizar Agenda Ficticia
 
 					if (provision.getXaIdSt() == null) {
@@ -1788,11 +1801,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 						}
 					}
 
+					log.info("UPDATE PSICODEREAL");
 					// update psiCode by schedule
-
 					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
 							getData[4], getData[8].toLowerCase());
 
+					log.info("UPDATE PROVISION");
 					provisionRepository.updateProvision(provision, update);
 
 					return true;
@@ -1804,7 +1818,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Update update = new Update();
 				update.set("external_id", getData[1]);
-				//update.set("xa_request", getData[2]);
+				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
@@ -1821,10 +1835,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setDescription(Status.WO_PRESTART.getDescription());
 				statusLog.setXaidst(provision.getXaIdSt());
-				
+
 				update.set("customer.latitude", getData[14]);
 				update.set("customer.longitude", getData[13]);
-				
+
 				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
@@ -1854,7 +1868,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("appt_number", getData[9]);
 				update.set("activity_type", getData[14].toLowerCase());
 
-				//update.set("xa_request", getData[5]);
+				// update.set("xa_request", getData[5]);
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(Status.WO_INIT.getStatusName());
@@ -1997,7 +2011,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_requirement_number", getData[5]);
 				update.set("appt_number", getData[6]);
 				update.set("activity_type", getData[8].toLowerCase());
-				
+
 				StatusLog statusLog = new StatusLog();
 
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());

@@ -380,13 +380,16 @@ public class ProvisionController {
 				// Averia
 			}
 
+			
 			if (provisions) {
+				log.info("provision fin");
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()),
 						status.getReasonPhrase(), null);
 				apiResponse.setBody(null);
 			} else {
+				log.info("provision jean");
 				status = HttpStatus.NOT_FOUND;
 
 				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
@@ -396,6 +399,7 @@ public class ProvisionController {
 			}
 		} catch (Exception ex) {
 
+			log.info("provision catch");
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()),

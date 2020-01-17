@@ -1747,7 +1747,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					// Regularizar Agenda Ficticia
 
 					if (provision.getXaIdSt() == null) {
-						if (!provision.getDummyStPsiCode().isEmpty()) {
+						if (provision.getDummyStPsiCode() != null) {
 							List<StatusLog> listLogx = listLog.stream()
 									.filter(x -> "FICTICIOUS_SCHEDULED".equals(x.getStatus()))
 									.collect(Collectors.toList());

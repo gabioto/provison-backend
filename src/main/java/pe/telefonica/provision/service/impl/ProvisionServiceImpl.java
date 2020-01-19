@@ -863,7 +863,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				try {
 					// provisionRepository.sendCancelledMail(provision, name, "179824",
 					// Constants.ADDRESS_UNREACHABLE);
-					sendCancelledMail(provision, name, "179824");
+					sendCancelledMail(provision, name, "192909");
 				} catch (Exception e) {
 					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 				}
@@ -1053,22 +1053,63 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter2.setParamValue(provision.getCustomer().getMail());
 		mailParameters.add(mailParameter2);
 
-		MailParameter mailParameter3 = new MailParameter();
-		mailParameter3.setParamKey("CONTACTFULLNAME");
-		mailParameter3.setParamValue("contact name");
-		mailParameters.add(mailParameter3);
+		for (int a = 0; a < provision.getContacts().size(); a++) {
+			if (a == 0) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
 
-		MailParameter mailParameter4 = new MailParameter();
-		mailParameter4.setParamKey("CONTACTID");
-		mailParameter4.setParamValue("123456789");
-		mailParameters.add(mailParameter4);
+			if (a == 1) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE_2");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO_2");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
+
+			if (a == 2) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE_3");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO_3");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
+
+			if (a == 3) {
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("NOMBRE_4");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
+				mailParameters.add(mailParameter2);
+				
+				mailParameter2 = new MailParameter();
+				mailParameter2.setParamKey("TELEFONO_4");
+				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
+				mailParameters.add(mailParameter2);
+			}
+
+		}
 
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("FOLLOWORDER");
 		mailParameter5.setParamValue(provisionTexts.getWebUrl());
 		mailParameters.add(mailParameter5);
 
-		return trazabilidadSecurityApi.sendMail("186162", mailParameters.toArray(new MailParameter[0]));
+		return trazabilidadSecurityApi.sendMail("192911", mailParameters.toArray(new MailParameter[0]));
 
 		// return sendMail("179833", mailParameters.toArray(new MailParameter[0]));
 	}
@@ -1137,9 +1178,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter6.setParamKey("PROVISIONNAME");
 		mailParameter6.setParamValue(provision.getProductName());
 		mailParameters.add(mailParameter6);
-
-		// return sendMail("179829", mailParameters.toArray(new MailParameter[0]));
-		return trazabilidadSecurityApi.sendMail("179829", mailParameters.toArray(new MailParameter[0]));
+		
+		return trazabilidadSecurityApi.sendMail("192828", mailParameters.toArray(new MailParameter[0]));
 	}
 
 	@Override
@@ -1396,6 +1436,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
 
 					sendInfoUpdateSMS(provision);
+					sendContactInfoChangedMail(provision);
 
 				} else {
 					throw new Exception();
@@ -1748,7 +1789,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					// Regularizar Agenda Ficticia
 
 					if (provision.getXaIdSt() == null) {
-						if (!provision.getDummyStPsiCode().isEmpty()) {
+						if (provision.getDummyStPsiCode() != null) {
 							List<StatusLog> listLogx = listLog.stream()
 									.filter(x -> "FICTICIOUS_SCHEDULED".equals(x.getStatus()))
 									.collect(Collectors.toList());
@@ -1792,14 +1833,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-					if (provision.getDummyStPsiCode() != null) {
-						if (!provision.getDummyStPsiCode().isEmpty()) {
-							provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
-
-						} else {
-							provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true : false);
-						}
-					}
 
 					log.info("UPDATE PSICODEREAL");
 					// update psiCode by schedule
@@ -1978,14 +2011,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					range = "PM";
 				}
 				String rangeFinal = range;
-				// el que parsea
-				SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yy");
-				// el que formatea
-				SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
-
-				Date date = parseador.parse(getData[16]);// ("31-03-2016");
-				System.out.println("Fecha de reschedule => " + formateador.format(date));
-				String dateString = formateador.format(date);
+				
+				
+				String dateString = getData[16];//formateador.format(date);
 
 				if ((identificadorSt == null || identificadorSt.isEmpty())
 						&& (rangeFinal == null || rangeFinal.isEmpty())
@@ -2016,6 +2044,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());
 				statusLog.setDescription(Status.SCHEDULED.getDescription());
+				statusLog.setScheduledRange(rangeFinal);
+				statusLog.setScheduledDate(dateString);
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("date", getData[16]);
@@ -2115,50 +2145,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 		}
 		return false;
-	}
-
-	private boolean sendedSMSInvitationNotSchedule(Provision provision) {
-
-		List<MsgParameter> msgParameters = new ArrayList<>();
-
-		List<Contact> contacts = new ArrayList<>();
-
-		Contact contactCustomer = new Contact();
-		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-		contacts.add(contactCustomer);
-
-		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-				ConstantsMessageKey.MSG_NOT_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
-				provisionTexts.getWebUrl());
-
-		if (apiResponse != null) {
-			return true;
-		}
-		return false;
-
-	}
-
-	private boolean sendedSMSInvitationHasSchedule(Provision provision) {
-
-		List<MsgParameter> msgParameters = new ArrayList<>();
-
-		List<Contact> contacts = new ArrayList<>();
-
-		Contact contactCustomer = new Contact();
-		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-		contacts.add(contactCustomer);
-
-		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-				ConstantsMessageKey.MSG_HAS_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
-				provisionTexts.getWebUrl());
-		if (apiResponse != null) {
-			return true;
-		}
-
-		return false;
-
 	}
 
 	private boolean getCarrier(String phoneNumber) {

@@ -185,8 +185,7 @@ public class Provision implements Serializable {
 	@Field("registro_actualizado")
 	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
-	@Field("has_sended_sms")
-	private boolean hasSendedSMS;
+
 
 	@Field("date_sended_sms")
 	private LocalDateTime dateSendedSMS;
@@ -643,14 +642,6 @@ public class Provision implements Serializable {
 
 	public void setUpdatedDate(LocalDateTime updatedDate) {
 		this.updatedDate = updatedDate;
-	}
-
-	public boolean isHasSendedSMS() {
-		return hasSendedSMS;
-	}
-
-	public void setHasSendedSMS(boolean hasSendedSMS) {
-		this.hasSendedSMS = hasSendedSMS;
 	}
 
 	public LocalDateTime getDateSendedSMS() {

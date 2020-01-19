@@ -1832,8 +1832,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-					
-					
 
 					log.info("UPDATE PSICODEREAL");
 					// update psiCode by schedule
@@ -2045,6 +2043,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());
 				statusLog.setDescription(Status.SCHEDULED.getDescription());
+				statusLog.setScheduledRange(rangeFinal);
+				statusLog.setScheduledDate(dateString);
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("date", getData[16]);
@@ -2145,10 +2145,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 		return false;
 	}
-
-	
-
-	
 
 	private boolean getCarrier(String phoneNumber) {
 		return restPSI.getCarrier(phoneNumber);

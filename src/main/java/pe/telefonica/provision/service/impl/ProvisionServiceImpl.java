@@ -1791,14 +1791,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-					if (provision.getDummyStPsiCode() != null) {
-						if (!provision.getDummyStPsiCode().isEmpty()) {
-							provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
-
-						} else {
-							provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true : false);
-						}
-					}
+					
+					
 
 					log.info("UPDATE PSICODEREAL");
 					// update psiCode by schedule
@@ -1977,14 +1971,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					range = "PM";
 				}
 				String rangeFinal = range;
-				// el que parsea
-				SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yy");
-				// el que formatea
-				SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
-
-				Date date = parseador.parse(getData[16]);// ("31-03-2016");
-				System.out.println("Fecha de reschedule => " + formateador.format(date));
-				String dateString = formateador.format(date);
+				
+				
+				String dateString = getData[16];//formateador.format(date);
 
 				if ((identificadorSt == null || identificadorSt.isEmpty())
 						&& (rangeFinal == null || rangeFinal.isEmpty())
@@ -2116,49 +2105,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return false;
 	}
 
-	private boolean sendedSMSInvitationNotSchedule(Provision provision) {
+	
 
-		List<MsgParameter> msgParameters = new ArrayList<>();
-
-		List<Contact> contacts = new ArrayList<>();
-
-		Contact contactCustomer = new Contact();
-		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-		contacts.add(contactCustomer);
-
-		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-				ConstantsMessageKey.MSG_NOT_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
-				provisionTexts.getWebUrl());
-
-		if (apiResponse != null) {
-			return true;
-		}
-		return false;
-
-	}
-
-	private boolean sendedSMSInvitationHasSchedule(Provision provision) {
-
-		List<MsgParameter> msgParameters = new ArrayList<>();
-
-		List<Contact> contacts = new ArrayList<>();
-
-		Contact contactCustomer = new Contact();
-		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-		contacts.add(contactCustomer);
-
-		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-				ConstantsMessageKey.MSG_HAS_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
-				provisionTexts.getWebUrl());
-		if (apiResponse != null) {
-			return true;
-		}
-
-		return false;
-
-	}
+	
 
 	private boolean getCarrier(String phoneNumber) {
 		return restPSI.getCarrier(phoneNumber);

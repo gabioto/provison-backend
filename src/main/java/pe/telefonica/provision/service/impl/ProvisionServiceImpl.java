@@ -2021,14 +2021,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return false;
 				}
 
-				List<StatusLog> listLogx = listLog.stream()
+				/*List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst())
 								&& rangeFinal.equals(x.getScheduledRange()) && dateString.equals(x.getScheduledDate()))
-						.collect(Collectors.toList());
+						.collect(Collectors.toList());*/
 
+				List<StatusLog> listLogx = listLog.stream()
+						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()))
+						.collect(Collectors.toList());
+				
 				if (listLogx.size() > 0) {
-					return true;
+					if(listLogx.get(listLogx.size()-1).getScheduledDate().contentEquals(dateString) && 
+							listLogx.get(listLogx.size()-1).getScheduledRange().contentEquals(rangeFinal)	) {
+						return true;
+					}
+					
 				}
+				
+//				if (listLogx.size() > 0) {
+//					return true;
+//				}
 
 				woReshedule.setXaAppointmentScheduler(getData[23]);
 				woReshedule.setTimeSlot(range);

@@ -2098,6 +2098,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleRequest.setStpsiCode(getData[4]);
 				scheduleRequest.setCustomer(customer);
 
+				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+				scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
+				scheduleRequest.setOrderCode(provision.getXaRequest());
+				scheduleRequest.setBucket(provision.getWorkZone());
+
+				
 				// Actualiza el agendamiento
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
 

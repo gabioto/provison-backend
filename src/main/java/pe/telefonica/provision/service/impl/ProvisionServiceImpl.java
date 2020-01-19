@@ -2104,6 +2104,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleRequest.setBucket(provision.getWorkZone());
 
 				
+				
 				// Actualiza el agendamiento
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
 

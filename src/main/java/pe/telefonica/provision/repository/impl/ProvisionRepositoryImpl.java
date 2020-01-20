@@ -1,9 +1,13 @@
 package pe.telefonica.provision.repository.impl;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -307,13 +311,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public void updateFlagNotify(List<Provision> listProvision) {
+	public void updateFlagDateNotify(List<Provision> listProvision) {
+		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
 		update.set("send_notify", true);
+		UpdateResult result = null;
 		for (int i = 0; i < listProvision.size(); i++) {
-			UpdateResult result = this.mongoOperations.updateFirst(
-					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
-					update, Provision.class);
+			if(Status.IN_TOA.equals(listProvision.get(i).getLastTrackingStatus())) {
+				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				result = this.mongoOperations.updateFirst(
+						new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+						update, Provision.class);
+			}else {
+				result = this.mongoOperations.updateFirst(
+						new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+						update, Provision.class);
+			}
 		}
 	}
 

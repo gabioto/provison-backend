@@ -686,10 +686,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
 					updateFicRequest.setRequestName(provisionx.getProductName());
 					updateFicRequest.setRequestId(provisionx.getIdProvision());
-
+					
 					// Actualiza agenda
-					boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
-					update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+					if(!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
+						
+						boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+						update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+					}
+					
 
 				}
 
@@ -1790,9 +1794,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (provision.getXaIdSt() == null) {
 						if (provision.getDummyStPsiCode() != null) {
 							List<StatusLog> listLogx = listLog.stream()
-									.filter(x -> "FICTICIOUS_SCHEDULED".equals(x.getStatus()))
+									.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
 									.collect(Collectors.toList());
-							if (listLogx.size() > 0) {
+							
+							List<StatusLog> listLogCancelled = listLog.stream()
+									.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
+									.collect(Collectors.toList());
+							
+							if (listLogx.size() > 0 && listLogCancelled.size() == 0) {
 								StatusLog statusSchedule = new StatusLog();
 								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
 								statusSchedule.setDescription(Status.SCHEDULED.getDescription());

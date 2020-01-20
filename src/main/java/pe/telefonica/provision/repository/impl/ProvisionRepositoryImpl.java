@@ -65,6 +65,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
 				Provision.class);
 
@@ -92,8 +93,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 								.and("customer.document_number").is(documentNumber)
 								.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
-										Criteria.where("active_status")
-												.is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
 						Provision.class);
 
@@ -279,7 +280,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Provision getByOrderCodeForUpdateFicticious(String xaRequirementNumber) {
 		Provision provision = this.mongoOperations
-				.findOne(new Query(Criteria.where("saleCode").is(xaRequirementNumber)), Provision.class);
+				.findOne(new Query(Criteria.where("dummyStPsiCode").is(xaRequirementNumber)), Provision.class);
 		return provision;
 	}
 

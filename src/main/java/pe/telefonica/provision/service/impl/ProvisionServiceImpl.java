@@ -686,10 +686,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
 					updateFicRequest.setRequestName(provisionx.getProductName());
 					updateFicRequest.setRequestId(provisionx.getIdProvision());
-
+					
 					// Actualiza agenda
-					boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
-					update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+					if(!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
+						
+						boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+						update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+					}
+					
 
 				}
 
@@ -1703,7 +1707,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						&& (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
 
 					log.info("IF 1");
-					// IN_TO fictitious
+					// IN_TOA fictitious
 					Update update = new Update();
 					// NO SMS
 					StatusLog statusLog = new StatusLog();
@@ -1712,17 +1716,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					listLog.add(statusLog);
 
 					update.set("log_status", listLog);
-					update.set("xa_request", getData[2]);
-					update.set("xa_id_st", getData[4]);
-					update.set("xa_requirement_number", getData[5]);
-					update.set("appt_number", getData[6]);
-					update.set("activity_type", getData[8].toLowerCase());
-					update.set("work_zone", getData[17]);
-					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
-					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
-
-					update.set("show_location", false);
+					update.set("last_tracking_status", Status.DUMMY_IN_TOA.getStatusName());
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
@@ -1801,9 +1795,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (provision.getXaIdSt() == null) {
 						if (provision.getDummyStPsiCode() != null) {
 							List<StatusLog> listLogx = listLog.stream()
-									.filter(x -> "FICTICIOUS_SCHEDULED".equals(x.getStatus()))
+									.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
 									.collect(Collectors.toList());
-							if (listLogx.size() > 0) {
+							
+							List<StatusLog> listLogCancelled = listLog.stream()
+									.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
+									.collect(Collectors.toList());
+							
+							if (listLogx.size() > 0 && listLogCancelled.size() == 0) {
 								StatusLog statusSchedule = new StatusLog();
 								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
 								statusSchedule.setDescription(Status.SCHEDULED.getDescription());

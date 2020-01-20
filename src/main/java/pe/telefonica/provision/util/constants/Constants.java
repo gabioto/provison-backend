@@ -16,6 +16,7 @@ public final class Constants {
 	public static final String PROVISION_STATUS_DONE = "done";
 	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
 	public static final String PROVISION_STATUS_NOTDONE = "notDone";
+	public static final String PROVISION_STATUS_WOINIT = "init";
 	
 	public static final String COMPONENTS_NAME_TV = "TV";
 	public static final String COMPONENTS_NAME_INTERNET = "INTERNET";

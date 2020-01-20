@@ -65,7 +65,7 @@ public interface ProvisionRepository {
 
 	Optional<List<Provision>> getOrderToNotify();
 
-	void updateFlagNotify(List<Provision> listProvision);
+	void updateFlagDateNotify(List<Provision> listProvision);
 	
 	boolean updateShowLocation(Provision provision);
 	

@@ -1900,6 +1900,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_requirement_number", getData[8]);
 				update.set("appt_number", getData[9]);
 				update.set("activity_type", getData[14].toLowerCase());
+				update.set("active_status", Constants.PROVISION_STATUS_WOINIT);
 
 				// update.set("xa_request", getData[5]);
 				StatusLog statusLog = new StatusLog();
@@ -2277,8 +2278,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			// Insertar lógica para wo_cancel
 			List<Provision> listita = new ArrayList<Provision>();
 			listita = optional.get();
-			// Actualiza Flag de envio Notify en BD
-			provisionRepository.updateFlagNotify(optional.get());
+			// Actualiza Flag y Date de envio Notify en BD
+			provisionRepository.updateFlagDateNotify(optional.get());
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())

@@ -280,7 +280,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Provision getByOrderCodeForUpdateFicticious(String xaRequirementNumber) {
 		Provision provision = this.mongoOperations
-				.findOne(new Query(Criteria.where("saleCode").is(xaRequirementNumber)), Provision.class);
+				.findOne(new Query(Criteria.where("dummyStPsiCode").is(xaRequirementNumber)), Provision.class);
 		return provision;
 	}
 

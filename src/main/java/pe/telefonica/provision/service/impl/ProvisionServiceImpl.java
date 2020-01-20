@@ -808,11 +808,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					Contact contactCustomer = new Contact();
 					contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
 					contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+					contactCustomer.setFullName(provision.getCustomer().getName());
+					contactCustomer.setHolder(true);
 					contacts.add(contactCustomer);
 
-//					ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-//							Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new MsgParameter[0]),
-//							"");
+					trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY,
+							msgParameters.toArray(new MsgParameter[0]), "");
 					// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 					// Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
 					// MsgParameter[0]), "");
@@ -820,8 +821,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					try {
 						// provisionRepository.sendCancelledMail(provision, name, "179829",
 						// Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+						sendCancelledMail(provision, name, "192828");
 
-						sendCancelledMail(provision, name, "179829");
 					} catch (Exception e) {
 						log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 					}

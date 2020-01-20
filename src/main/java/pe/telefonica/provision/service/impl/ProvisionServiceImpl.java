@@ -42,7 +42,6 @@ import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
-import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
@@ -71,7 +70,6 @@ import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
-import pe.telefonica.provision.util.constants.ConstantsMessageKey;
 import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 
@@ -1456,8 +1454,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	private void sendInfoUpdateSMS(Provision provision) {
-		ApiResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
-		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getBody());
+		// ApiResponse<List<Contacts>> contactsResponse =
+		// getContactList(provision.getIdProvision());
+		List<Contact> contacts = new ArrayList<>();
+		Contact holder = new Contact();
+		holder.setIsMovistar(provision.getCustomer().getCarrier());
+		holder.setFullName(provision.getCustomer().getName());
+		holder.setHolder(true);
+		holder.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contacts.add(holder);
+		contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
 
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
 	}

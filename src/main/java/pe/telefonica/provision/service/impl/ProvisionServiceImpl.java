@@ -42,7 +42,6 @@ import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
-import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
@@ -71,7 +70,6 @@ import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
-import pe.telefonica.provision.util.constants.ConstantsMessageKey;
 import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 
@@ -1431,12 +1429,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
 					provisionRepository.updateProvision(provision, update);
 
-					provision.getContacts().clear();
+					if (provision.getContacts() != null) {
+						provision.getContacts().clear();
+					}
+
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
 
-					sendInfoUpdateSMS(provision);
-
-					if (request.isHolderWillReceive()) {
+					if (!request.isHolderWillReceive()) {
+						sendInfoUpdateSMS(provision);
 						sendContactInfoChangedMail(provision);
 					}
 				} else {
@@ -1454,8 +1454,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	private void sendInfoUpdateSMS(Provision provision) {
-		ApiResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
-		List<Contact> contacts = SMSByIdRequest.mapContacts(contactsResponse.getBody());
+		// ApiResponse<List<Contacts>> contactsResponse =
+		// getContactList(provision.getIdProvision());
+		List<Contact> contacts = new ArrayList<>();
+		Contact holder = new Contact();
+		holder.setIsMovistar(provision.getCustomer().getCarrier());
+		holder.setFullName(provision.getCustomer().getName());
+		holder.setHolder(true);
+		holder.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contacts.add(holder);
+		contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
 
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
 	}
@@ -1796,9 +1804,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
-								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
-										getData[4], getData[8].toLowerCase());
-								
+								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
+										provision.getXaRequest(), getData[4], getData[8].toLowerCase());
+
 							}
 						}
 
@@ -2003,9 +2011,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					range = "PM";
 				}
 				String rangeFinal = range;
-				
-				
-				String dateString = getData[16];//formateador.format(date);
+
+				String dateString = getData[16];// formateador.format(date);
 
 				if ((identificadorSt == null || identificadorSt.isEmpty())
 						&& (rangeFinal == null || rangeFinal.isEmpty())
@@ -2013,23 +2020,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return false;
 				}
 
-				/*List<StatusLog> listLogx = listLog.stream()
-						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst())
-								&& rangeFinal.equals(x.getScheduledRange()) && dateString.equals(x.getScheduledDate()))
-						.collect(Collectors.toList());*/
+				/*
+				 * List<StatusLog> listLogx = listLog.stream() .filter(x ->
+				 * "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()) &&
+				 * rangeFinal.equals(x.getScheduledRange()) &&
+				 * dateString.equals(x.getScheduledDate())) .collect(Collectors.toList());
+				 */
 
 				List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()))
 						.collect(Collectors.toList());
-				
+
 				if (listLogx.size() > 0) {
-					if(listLogx.get(listLogx.size()-1).getScheduledDate().contentEquals(dateString) && 
-							listLogx.get(listLogx.size()-1).getScheduledRange().contentEquals(rangeFinal)	) {
+					if (listLogx.get(listLogx.size() - 1).getScheduledDate().contentEquals(dateString)
+							&& listLogx.get(listLogx.size() - 1).getScheduledRange().contentEquals(rangeFinal)) {
 						return true;
 					}
-					
+
 				}
-				
+
 //				if (listLogx.size() > 0) {
 //					return true;
 //				}
@@ -2095,8 +2104,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleRequest.setOrderCode(provision.getXaRequest());
 				scheduleRequest.setBucket(provision.getWorkZone());
 
-				
-				
 				// Actualiza el agendamiento
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
 

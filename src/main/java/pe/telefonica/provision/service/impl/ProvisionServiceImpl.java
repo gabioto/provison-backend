@@ -1803,6 +1803,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 								listLog.add(statusSchedule);
 								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 
+								log.info("UPDATE PSICODEREAL");
+								// update psiCode by schedule
+								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
+										getData[4], getData[8].toLowerCase());
+								
 							}
 						}
 
@@ -1833,11 +1838,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-
-					log.info("UPDATE PSICODEREAL");
-					// update psiCode by schedule
-					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
-							getData[4], getData[8].toLowerCase());
 
 					log.info("UPDATE PROVISION");
 					provisionRepository.updateProvision(provision, update);

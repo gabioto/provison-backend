@@ -694,6 +694,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
 
 				}
+
 			}
 
 			// status_toa
@@ -1803,6 +1804,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 								listLog.add(statusSchedule);
 								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 
+								log.info("UPDATE PSICODEREAL");
+								// update psiCode by schedule
+								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
+										getData[4], getData[8].toLowerCase());
+								
 							}
 						}
 
@@ -1833,19 +1839,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-					if (provision.getDummyStPsiCode() != null) {
-						if (!provision.getDummyStPsiCode().isEmpty()) {
-							provision.setHasSendedSMS(sendedSMSInvitationHasSchedule(provision) ? true : false);
-
-						} else {
-							provision.setHasSendedSMS(sendedSMSInvitationNotSchedule(provision) ? true : false);
-						}
-					}
-
-					log.info("UPDATE PSICODEREAL");
-					// update psiCode by schedule
-					trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(), provision.getXaRequest(),
-							getData[4], getData[8].toLowerCase());
 
 					log.info("UPDATE PROVISION");
 					provisionRepository.updateProvision(provision, update);
@@ -2019,14 +2012,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					range = "PM";
 				}
 				String rangeFinal = range;
-				// el que parsea
-				SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yy");
-				// el que formatea
-				SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
-
-				Date date = parseador.parse(getData[16]);// ("31-03-2016");
-				System.out.println("Fecha de reschedule => " + formateador.format(date));
-				String dateString = formateador.format(date);
+				
+				
+				String dateString = getData[16];//formateador.format(date);
 
 				if ((identificadorSt == null || identificadorSt.isEmpty())
 						&& (rangeFinal == null || rangeFinal.isEmpty())
@@ -2034,14 +2022,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return false;
 				}
 
-				List<StatusLog> listLogx = listLog.stream()
+				/*List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst())
 								&& rangeFinal.equals(x.getScheduledRange()) && dateString.equals(x.getScheduledDate()))
-						.collect(Collectors.toList());
+						.collect(Collectors.toList());*/
 
+				List<StatusLog> listLogx = listLog.stream()
+						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()))
+						.collect(Collectors.toList());
+				
 				if (listLogx.size() > 0) {
-					return true;
+					if(listLogx.get(listLogx.size()-1).getScheduledDate().contentEquals(dateString) && 
+							listLogx.get(listLogx.size()-1).getScheduledRange().contentEquals(rangeFinal)	) {
+						return true;
+					}
+					
 				}
+				
+//				if (listLogx.size() > 0) {
+//					return true;
+//				}
 
 				woReshedule.setXaAppointmentScheduler(getData[23]);
 				woReshedule.setTimeSlot(range);
@@ -2057,6 +2057,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());
 				statusLog.setDescription(Status.SCHEDULED.getDescription());
+				statusLog.setScheduledRange(rangeFinal);
+				statusLog.setScheduledDate(dateString);
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("date", getData[16]);
@@ -2097,6 +2099,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleRequest.setStpsiCode(getData[4]);
 				scheduleRequest.setCustomer(customer);
 
+				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+				scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
+				scheduleRequest.setOrderCode(provision.getXaRequest());
+				scheduleRequest.setBucket(provision.getWorkZone());
+
+				
+				
 				// Actualiza el agendamiento
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
 
@@ -2156,50 +2165,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 		}
 		return false;
-	}
-
-	private boolean sendedSMSInvitationNotSchedule(Provision provision) {
-
-		List<MsgParameter> msgParameters = new ArrayList<>();
-
-		List<Contact> contacts = new ArrayList<>();
-
-		Contact contactCustomer = new Contact();
-		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-		contacts.add(contactCustomer);
-
-		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-				ConstantsMessageKey.MSG_NOT_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
-				provisionTexts.getWebUrl());
-
-		if (apiResponse != null) {
-			return true;
-		}
-		return false;
-
-	}
-
-	private boolean sendedSMSInvitationHasSchedule(Provision provision) {
-
-		List<MsgParameter> msgParameters = new ArrayList<>();
-
-		List<Contact> contacts = new ArrayList<>();
-
-		Contact contactCustomer = new Contact();
-		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-		contacts.add(contactCustomer);
-
-		ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-				ConstantsMessageKey.MSG_HAS_SCHEDUEL_TEST_KEY, msgParameters.toArray(new MsgParameter[0]),
-				provisionTexts.getWebUrl());
-		if (apiResponse != null) {
-			return true;
-		}
-
-		return false;
-
 	}
 
 	private boolean getCarrier(String phoneNumber) {

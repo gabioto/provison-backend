@@ -1794,11 +1794,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (provision.getXaIdSt() == null) {
 						if (provision.getDummyStPsiCode() != null) {
 							List<StatusLog> listLogx = listLog.stream()
-									.filter(x -> "FICTICIOUS_SCHEDULED".equals(x.getStatus()))
+									.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
 									.collect(Collectors.toList());
 							
 							List<StatusLog> listLogCancelled = listLog.stream()
-									.filter(x -> Status.SCHEDULED.getStatusName().equals(x.getStatus()))
+									.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
 									.collect(Collectors.toList());
 							
 							if (listLogx.size() > 0 && listLogCancelled.size() == 0) {

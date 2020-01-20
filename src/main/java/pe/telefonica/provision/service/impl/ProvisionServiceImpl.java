@@ -1702,7 +1702,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						&& (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
 
 					log.info("IF 1");
-					// IN_TO fictitious
+					// IN_TOA fictitious
 					Update update = new Update();
 					// NO SMS
 					StatusLog statusLog = new StatusLog();
@@ -1711,17 +1711,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					listLog.add(statusLog);
 
 					update.set("log_status", listLog);
-					update.set("xa_request", getData[2]);
-					update.set("xa_id_st", getData[4]);
-					update.set("xa_requirement_number", getData[5]);
-					update.set("appt_number", getData[6]);
-					update.set("activity_type", getData[8].toLowerCase());
-					update.set("work_zone", getData[17]);
-					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
-					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
-
-					update.set("show_location", false);
+					update.set("last_tracking_status", Status.DUMMY_IN_TOA.getStatusName());
 
 					provisionRepository.updateProvision(provision, update);
 					return true;

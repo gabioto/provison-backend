@@ -195,30 +195,29 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (producType != null) {
 				if (producType.isTv()) {
 					provision.getComponents().add(addTvComponent(provision.getTvDetail()));
-				} 
+				}
 
 				if (producType.isInternet()) {
 					provision.getComponents().add(addInternetComponent(provision.getInternetDetail()));
-				} 
+				}
 
 				if (producType.isLine()) {
 					provision.getComponents().add(addLineComponent(provision.getHomePhoneDetail()));
-				} 
+				}
 			} else {
 				if (provision.getTvDetail() != null) {
 					evaluateTvFields(provision);
 				}
-				
+
 				if (provision.getInternetDetail() != null) {
 					evaluateInternetFields(provision);
 				}
-				
+
 				if (provision.getHomePhoneDetail() != null) {
 					evaluateLineFields(provision);
 				}
 			}
 
-			
 		} catch (
 
 		Exception e) {
@@ -1059,7 +1058,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				mailParameter2.setParamKey("NOMBRE");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
 				mailParameters.add(mailParameter2);
-				
+
 				mailParameter2 = new MailParameter();
 				mailParameter2.setParamKey("TELEFONO");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
@@ -1071,7 +1070,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				mailParameter2.setParamKey("NOMBRE_2");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
 				mailParameters.add(mailParameter2);
-				
+
 				mailParameter2 = new MailParameter();
 				mailParameter2.setParamKey("TELEFONO_2");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
@@ -1083,7 +1082,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				mailParameter2.setParamKey("NOMBRE_3");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
 				mailParameters.add(mailParameter2);
-				
+
 				mailParameter2 = new MailParameter();
 				mailParameter2.setParamKey("TELEFONO_3");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
@@ -1095,7 +1094,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				mailParameter2.setParamKey("NOMBRE_4");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getFullName());
 				mailParameters.add(mailParameter2);
-				
+
 				mailParameter2 = new MailParameter();
 				mailParameter2.setParamKey("TELEFONO_4");
 				mailParameter2.setParamValue(provision.getContacts().get(a).getPhoneNumber());
@@ -1109,7 +1108,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter5.setParamValue(provisionTexts.getWebUrl());
 		mailParameters.add(mailParameter5);
 
-		return trazabilidadSecurityApi.sendMail("192911", mailParameters.toArray(new MailParameter[0]));
+		return trazabilidadSecurityApi.sendMail("193087", mailParameters.toArray(new MailParameter[0]));
 
 		// return sendMail("179833", mailParameters.toArray(new MailParameter[0]));
 	}
@@ -1178,7 +1177,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameter6.setParamKey("PROVISIONNAME");
 		mailParameter6.setParamValue(provision.getProductName());
 		mailParameters.add(mailParameter6);
-		
+
 		return trazabilidadSecurityApi.sendMail("192828", mailParameters.toArray(new MailParameter[0]));
 	}
 
@@ -1436,8 +1435,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
 
 					sendInfoUpdateSMS(provision);
-					sendContactInfoChangedMail(provision);
 
+					if (request.isHolderWillReceive()) {
+						sendContactInfoChangedMail(provision);
+					}
 				} else {
 					throw new Exception();
 				}
@@ -1691,7 +1692,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				String origin = getData[6].toString().substring(0, 2);
 				if (getData[2].toString().equals("0")
 						&& (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
-					
+
 					log.info("IF 1");
 					// IN_TO fictitious
 					Update update = new Update();

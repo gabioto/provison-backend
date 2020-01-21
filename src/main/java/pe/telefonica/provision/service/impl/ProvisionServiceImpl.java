@@ -2164,7 +2164,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// Llamar al método de augusto.
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
-				scheduleNotDoneRequest.setStPsiCode(getData[9]);
+				scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
 
 				// Cancela agenda sin ir a PSI
 				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);

@@ -229,6 +229,7 @@ public class TrazabilidadScheduleApi {
 
 		ScheduleUpdatePSICodeRealRequest updateStPsiCodeRequest = new ScheduleUpdatePSICodeRealRequest();
 		updateStPsiCodeRequest.setOrderCode(orderCode);
+		updateStPsiCodeRequest.setXaOrderCode(orderCode);
 		updateStPsiCodeRequest.setStPsiCode(stPsiCode);
 		updateStPsiCodeRequest.setRequestId(idProvision);
 		updateStPsiCodeRequest.setRequestType(requestType);

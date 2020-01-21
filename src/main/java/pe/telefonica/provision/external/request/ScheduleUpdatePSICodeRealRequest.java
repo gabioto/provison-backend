@@ -2,6 +2,7 @@ package pe.telefonica.provision.external.request;
 
 public class ScheduleUpdatePSICodeRealRequest {
 	private String orderCode;
+	private String xaOrderCode;
 	private String stPsiCode;
 	private String requestId;
 	private String requestType;
@@ -12,6 +13,14 @@ public class ScheduleUpdatePSICodeRealRequest {
 
 	public void setOrderCode(String orderCode) {
 		this.orderCode = orderCode;
+	}
+
+	public String getXaOrderCode() {
+		return xaOrderCode;
+	}
+
+	public void setXaOrderCode(String xaOrderCode) {
+		this.xaOrderCode = xaOrderCode;
 	}
 
 	public String getStPsiCode() {
@@ -37,7 +46,5 @@ public class ScheduleUpdatePSICodeRealRequest {
 	public void setRequestType(String requestType) {
 		this.requestType = requestType;
 	}
-	
-	
 
 }

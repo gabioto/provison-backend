@@ -40,6 +40,7 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
 import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
+import pe.telefonica.provision.controller.request.WoCancelRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
@@ -1999,9 +2000,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// Actualiza estado en provision
 				provisionRepository.updateProvision(provision, update);
 
+				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
+				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
+				scheduleNotDoneRequest.setStPsiCode(getData[4]);
+				
+
+				if(getData[4].toString().equals(getData[5].toString()) && getData[5].toString().equals(getData[6].toString())){
+					scheduleNotDoneRequest.setFlgFicticious(true);
+				}else {
+					scheduleNotDoneRequest.setFlgFicticious(false);
+				}
+				
 				// Cancela agenda
-				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provision.getIdProvision(),
-						provision.getActivityType().toLowerCase(), provision.getXaIdSt()));
+				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
+//				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provision.getIdProvision(),
+//						provision.getActivityType().toLowerCase(), provision.getXaIdSt()));
 
 				return true;
 			}
@@ -2165,6 +2179,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
 				scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
+				scheduleNotDoneRequest.setFlgFicticious(false);
 
 				// Cancela agenda sin ir a PSI
 				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);

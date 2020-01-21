@@ -1,6 +1,6 @@
 package pe.telefonica.provision.controller.request;
 
-public class ScheduleNotDoneRequest extends LogDataFrontendRequest {
+public class WoCancelRequest extends LogDataFrontendRequest {
 
 	private String requestId;
 	private String requestType;

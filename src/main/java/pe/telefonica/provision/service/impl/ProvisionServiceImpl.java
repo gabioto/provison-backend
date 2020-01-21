@@ -1968,8 +1968,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
-					&& !provision.getXaIdSt().isEmpty()) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())) {
+					//&& !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
 
 				WoCancel woCancel = new WoCancel();

@@ -62,10 +62,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
 						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
-						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
+						.orOperator(
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_DONE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
 				Provision.class);
 
@@ -91,10 +94,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				.findOne(
 						new Query(Criteria.where("customer.document_type").is(documentType)
 								.and("customer.document_number").is(documentNumber)
-								.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
+								.orOperator(
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_DONE),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
 						Provision.class);
 

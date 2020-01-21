@@ -857,7 +857,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				contacts.add(contactCustomer);
 
 				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY,
-						msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
+						msgParameters.toArray(new MsgParameter[0]), "");
 
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 				// Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new

@@ -2307,7 +2307,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& (!Status.FICTICIOUS_SCHEDULED.getStatusName()
+						&& (!Status.DUMMY_IN_TOA.getStatusName()
 								.equalsIgnoreCase(list.get(list.size() - 2).getStatus())
 								&& !Status.SCHEDULED.getStatusName()
 										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {

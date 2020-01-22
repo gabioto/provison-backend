@@ -857,7 +857,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				contacts.add(contactCustomer);
 
 				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY,
-						msgParameters.toArray(new MsgParameter[0]), provisionTexts.getWebUrl());
+						msgParameters.toArray(new MsgParameter[0]), "");
 
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 				// Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new
@@ -1816,7 +1816,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
 								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getData[4], getData[8].toLowerCase());
+										provision.getXaRequest(), getData[4], getData[8].toLowerCase(), provision.getCustomer());
 
 							}
 						}
@@ -2179,8 +2179,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// Llamar al método de augusto.
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
-				scheduleNotDoneRequest.setStPsiCode(getData[9]);
+				scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
 				scheduleNotDoneRequest.setFlgFicticious(false);
+
 				// Cancela agenda sin ir a PSI
 				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
 

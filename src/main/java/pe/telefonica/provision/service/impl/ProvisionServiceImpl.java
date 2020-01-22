@@ -1816,7 +1816,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
 								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getData[4], getData[8].toLowerCase());
+										provision.getXaRequest(), getData[4], getData[8].toLowerCase(), provision.getCustomer());
 
 							}
 						}

@@ -2008,6 +2008,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				if(getData[4].toString().equals(getData[5].toString()) && getData[5].toString().equals(getData[6].toString())){
 					scheduleNotDoneRequest.setFlgFicticious(true);
+					scheduleNotDoneRequest.setRequestType(Constants.ACTIVITY_TYPE_PROVISION.toLowerCase());
 				}else {
 					scheduleNotDoneRequest.setFlgFicticious(false);
 				}

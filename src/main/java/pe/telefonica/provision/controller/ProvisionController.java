@@ -1636,7 +1636,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
 				provision = true;
 				xaRequirementNumber = parts[5].trim();
 			} else {

@@ -24,6 +24,7 @@ import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
 import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
+import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
@@ -213,7 +214,7 @@ public class TrazabilidadScheduleApi {
 		}
 	}
 
-	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode, String requestType) {
+	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode, String requestType, Customer customer) {
 
 		log.info("updatePSICodeReal");
 		RestTemplate restTemplate = new RestTemplate();
@@ -229,9 +230,11 @@ public class TrazabilidadScheduleApi {
 
 		ScheduleUpdatePSICodeRealRequest updateStPsiCodeRequest = new ScheduleUpdatePSICodeRealRequest();
 		updateStPsiCodeRequest.setOrderCode(orderCode);
+		updateStPsiCodeRequest.setXaOrderCode(orderCode);
 		updateStPsiCodeRequest.setStPsiCode(stPsiCode);
 		updateStPsiCodeRequest.setRequestId(idProvision);
 		updateStPsiCodeRequest.setRequestType(requestType);
+		updateStPsiCodeRequest.setCustomer(customer);
 
 		ApiRequest<ScheduleUpdatePSICodeRealRequest> apiRequest = new ApiRequest<ScheduleUpdatePSICodeRealRequest>(
 				Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_SCHEDULE_UPDATE_CODE_FICT,

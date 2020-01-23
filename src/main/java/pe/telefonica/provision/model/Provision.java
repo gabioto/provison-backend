@@ -217,6 +217,9 @@ public class Provision implements Serializable {
 	@Field("show_location")
 	private String showLocation;
 	
+	@Field("send_notify")
+	private String sendNotify;
+	
 	@Field("components")
 	private List<ComponentsDto> components = new ArrayList<>();
 
@@ -817,6 +820,14 @@ public class Provision implements Serializable {
 
 	public void setShowLocation(String showLocation) {
 		this.showLocation = showLocation;
+	}
+
+	public String getSendNotify() {
+		return sendNotify;
+	}
+
+	public void setSendNotify(String sendNotify) {
+		this.sendNotify = sendNotify;
 	}
 
 }

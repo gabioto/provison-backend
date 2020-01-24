@@ -2324,6 +2324,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			listita = optional.get();
 			// Actualiza Flag y Date de envio Notify en BD
 			provisionRepository.updateFlagDateNotify(optional.get());
+			
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 
@@ -2347,13 +2348,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				
 				
 
-				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
+				/*if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
 						&& (!Status.DUMMY_IN_TOA.getStatusName().equalsIgnoreCase(list.get(list.size() - 2).getStatus())
 								&& !Status.SCHEDULED.getStatusName()
 										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
 					listita.remove(i);
 					i--;
-				}
+				}*/
 			}
 			return listita;
 		}

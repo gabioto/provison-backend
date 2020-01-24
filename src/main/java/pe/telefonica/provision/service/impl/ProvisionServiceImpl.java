@@ -964,6 +964,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provision.getLogStatus().add(statusLog);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
+			provision.setLastTrackingStatus(Status.CANCEL.getDescription());
 			provision.setCancellationCause(cause);
 			provision.setCancellationDetail(detail);
 
@@ -972,6 +973,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("cancellation_cause", cause);
 			update.set("cancellation_detail", detail);
 			update.set("log_status", provision.getLogStatus());
+			update.set("last_tracking_status", Status.CANCEL.getDescription());
 
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 

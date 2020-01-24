@@ -710,8 +710,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
 				scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
-				scheduleNotDoneRequest.setRequestType(provisionx.getActivityType());
-				scheduleNotDoneRequest.setStPsiCode(getData[4]);
+				scheduleNotDoneRequest.setRequestType("provision");
+				scheduleNotDoneRequest.setStPsiCode(provisionx.getDummyStPsiCode());
 				scheduleNotDoneRequest.setFlgFicticious(true);
 
 				// Cancela agenda

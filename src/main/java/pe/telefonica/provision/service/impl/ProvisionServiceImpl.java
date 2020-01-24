@@ -40,7 +40,6 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
 import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
-import pe.telefonica.provision.controller.request.WoCancelRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
@@ -959,14 +958,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optional.isPresent()) {
 
 			Provision provision = optional.get();
+
+			StatusLog statusLog = new StatusLog();
+			statusLog.setStatus(Status.CANCEL.getDescription());
+
+			provision.getLogStatus().add(statusLog);
+			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
+			provision.setCancellationCause(cause);
+			provision.setCancellationDetail(detail);
+
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 			update.set("cancellation_cause", cause);
 			update.set("cancellation_detail", detail);
-
-			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
-			provision.setCancellationCause(cause);
-			provision.setCancellationDetail(detail);
+			update.set("log_status", provision.getLogStatus());
 
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 
@@ -1815,7 +1820,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
 								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getData[4], getData[8].toLowerCase(), provision.getCustomer());
+										provision.getXaRequest(), getData[4], getData[8].toLowerCase(),
+										provision.getCustomer());
 
 							}
 						}
@@ -2003,15 +2009,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
 				scheduleNotDoneRequest.setStPsiCode(getData[4]);
-				
 
-				if(getData[4].toString().equals(getData[5].toString()) && getData[5].toString().equals(getData[6].toString())){
+				if (getData[4].toString().equals(getData[5].toString())
+						&& getData[5].toString().equals(getData[6].toString())) {
 					scheduleNotDoneRequest.setFlgFicticious(true);
 					scheduleNotDoneRequest.setRequestType(Constants.ACTIVITY_TYPE_PROVISION.toLowerCase());
-				}else {
+				} else {
 					scheduleNotDoneRequest.setFlgFicticious(false);
 				}
-				
+
 				// Cancela agenda
 				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
 //				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provision.getIdProvision(),
@@ -2306,8 +2312,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& (!Status.DUMMY_IN_TOA.getStatusName()
-								.equalsIgnoreCase(list.get(list.size() - 2).getStatus())
+						&& (!Status.DUMMY_IN_TOA.getStatusName().equalsIgnoreCase(list.get(list.size() - 2).getStatus())
 								&& !Status.SCHEDULED.getStatusName()
 										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
 					listita.remove(i);

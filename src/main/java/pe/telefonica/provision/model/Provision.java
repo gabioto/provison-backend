@@ -185,8 +185,6 @@ public class Provision implements Serializable {
 	@Field("registro_actualizado")
 	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
-
-
 	@Field("date_sended_sms")
 	private LocalDateTime dateSendedSMS;
 
@@ -216,10 +214,10 @@ public class Provision implements Serializable {
 
 	@Field("show_location")
 	private String showLocation;
-	
+
 	@Field("send_notify")
 	private String sendNotify;
-	
+
 	@Field("components")
 	private List<ComponentsDto> components = new ArrayList<>();
 

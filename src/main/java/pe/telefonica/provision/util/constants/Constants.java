@@ -17,7 +17,7 @@ public final class Constants {
 	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
 	public static final String PROVISION_STATUS_NOTDONE = "notDone";
 	public static final String PROVISION_STATUS_WOINIT = "init";
-	
+
 	public static final String COMPONENTS_NAME_TV = "TV";
 	public static final String COMPONENTS_NAME_INTERNET = "INTERNET";
 	public static final String COMPONENTS_NAME_LINE = "LINEA";
@@ -76,7 +76,7 @@ public final class Constants {
 	public static final String PSI_CODE_UPDATE_CONTACT = "204";
 
 	public static final String GET_ORDERS = "205";
-	
+
 	public static final String OPER_SEND_SMS_BY_ID = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID = "OPER_SEND_MAIL_BY_ID";
 
@@ -95,26 +95,25 @@ public final class Constants {
 	public static final String OPER_UPDATE_RESCHEDULE = "OPER_UPDATE_RESCHEDULE";
 	public static final String OPER_NOTDONE_SCHEDULE = "OPER_NOTDONE_SCHEDULE";
 	public static final String OPER_SHOW_LOCATION = "OPER_UPDATE_SHOW_LOCATION";
-	
+
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
 	public static final String OPER_GET_PROVISION_BY_SALE_CODE = "OPER_GET_PROVISION_BY_SALE_CODE";
-	
-	public static final String STATUS_IN_TOA = "IN_TOA";
+
 	public static final String TIPO_RUC = "ruc";
 	public static final String RUC_NATURAL = "10";
-	
-	public static final String STATUS_WO_PRESTART="WO_PRESTART";
-	public static final String STATUS_WO_INIT="WO_INIT";
-	public static final String STATUS_WO_COMPLETED="WO_COMPLETED";
-	public static final String STATUS_WO_PRE_NOTDONE="WO_PRE_NOTDONE";
-	public static final String STATUS_WO_NOTDONE="WO_NOTDONE";
-	public static final String STATUS_WO_CANCEL="WO_CANCEL";
-	public static final String STATUS_WO_RESCHEDULE="WO_RESCHEDULE";
 
-	public static final String ACTIVITY_TYPE_PROVISION="PROVISION";
-	public static final String BARRA_VERTICAL = "|";
-	
+	public static final String STATUS_IN_TOA = "IN_TOA";
+	public static final String STATUS_WO_PRESTART = "WO_PRESTART";
+	public static final String STATUS_WO_INIT = "WO_INIT";
+	public static final String STATUS_WO_COMPLETED = "WO_COMPLETED";
+	public static final String STATUS_WO_PRE_NOTDONE = "WO_PRE_NOTDONE";
+	public static final String STATUS_WO_NOTDONE = "WO_NOTDONE";
+	public static final String STATUS_WO_CANCEL = "WO_CANCEL";
+	public static final String STATUS_WO_RESCHEDULE = "WO_RESCHEDULE";
 	public static final String FICTICIOUS_SCHEDULED = "FICTICIOUS_SCHEDULED";
-	
+
+	public static final String ACTIVITY_TYPE_PROVISION = "PROVISION";
+	public static final String BARRA_VERTICAL = "|";
+
 }

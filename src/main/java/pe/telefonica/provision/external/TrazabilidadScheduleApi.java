@@ -39,7 +39,7 @@ public class TrazabilidadScheduleApi {
 	@Autowired
 	private ExternalApi api;
 
-	public boolean cancelSchedule(ScheduleNotDoneRequest scheduleNotDoneRequest) {
+	public boolean cancelLocalSchedule(ScheduleNotDoneRequest scheduleNotDoneRequest) {
 		log.info("updateSchedule");
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getCancelLocalSchedule();

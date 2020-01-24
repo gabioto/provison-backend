@@ -706,6 +706,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 							? Status.INGRESADO.getStatusName().toLowerCase()
 							: Constants.PROVISION_STATUS_CANCELLED;
 
+			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CANCELLED)
+					&& provisionx.getDummyStPsiCode() != null) {
+
+				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
+				scheduleNotDoneRequest.setRequestType(provisionx.getActivityType());
+				scheduleNotDoneRequest.setStPsiCode(getData[4]);
+				scheduleNotDoneRequest.setFlgFicticious(true);
+
+				// Cancela agenda
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+
+			}
 			update.set("active_status", status);
 			update.set("status_toa", status);
 			update.set("send_notify", false);
@@ -1815,7 +1828,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
 								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getData[4], getData[8].toLowerCase(), provision.getCustomer());
+										provision.getXaRequest(), getData[4], getData[8].toLowerCase(),
+										provision.getCustomer());
 
 							}
 						}
@@ -2003,17 +2017,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
 				scheduleNotDoneRequest.setStPsiCode(getData[4]);
-				
 
-				if(getData[4].toString().equals(getData[5].toString()) && getData[5].toString().equals(getData[6].toString())){
+				if (getData[4].toString().equals(getData[5].toString())
+						&& getData[5].toString().equals(getData[6].toString())) {
 					scheduleNotDoneRequest.setFlgFicticious(true);
 					scheduleNotDoneRequest.setRequestType(Constants.ACTIVITY_TYPE_PROVISION.toLowerCase());
-				}else {
+				} else {
 					scheduleNotDoneRequest.setFlgFicticious(false);
 				}
-				
+
 				// Cancela agenda
-				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
 //				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provision.getIdProvision(),
 //						provision.getActivityType().toLowerCase(), provision.getXaIdSt()));
 
@@ -2182,7 +2196,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setFlgFicticious(false);
 
 				// Cancela agenda sin ir a PSI
-				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
 
 				return true;
 			}
@@ -2305,9 +2319,29 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionRepository.updateFlagDateNotify(optional.get());
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
+
+				// remove provision by status cancelled
+				List<StatusLog> listCacelled = list.stream()
+						.filter(x -> Status.CANCEL.getStatusName().equals(x.getStatus()))
+						.collect(Collectors.toList());
+
+				if (listCacelled.size() > 0) {
+					listita.remove(i);
+				}
+
+				// remove provision by status caido
+				List<StatusLog> listCaido = list.stream().filter(x -> Status.CAIDO.getStatusName().equals(x.getStatus())
+						&& Status.WO_CANCEL.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
+
+				if (listCaido.size() > 0) {
+					listita.remove(i);
+				}
+				
+				
+				
+
 				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& (!Status.DUMMY_IN_TOA.getStatusName()
-								.equalsIgnoreCase(list.get(list.size() - 2).getStatus())
+						&& (!Status.DUMMY_IN_TOA.getStatusName().equalsIgnoreCase(list.get(list.size() - 2).getStatus())
 								&& !Status.SCHEDULED.getStatusName()
 										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
 					listita.remove(i);

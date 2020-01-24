@@ -40,7 +40,6 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
 import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
-import pe.telefonica.provision.controller.request.WoCancelRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
@@ -972,14 +971,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optional.isPresent()) {
 
 			Provision provision = optional.get();
+
+			StatusLog statusLog = new StatusLog();
+			statusLog.setStatus(Status.CANCEL.getDescription());
+
+			provision.getLogStatus().add(statusLog);
+			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
+			provision.setLastTrackingStatus(Status.CANCEL.getDescription());
+			provision.setCancellationCause(cause);
+			provision.setCancellationDetail(detail);
+
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 			update.set("cancellation_cause", cause);
 			update.set("cancellation_detail", detail);
-
-			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
-			provision.setCancellationCause(cause);
-			provision.setCancellationDetail(detail);
+			update.set("log_status", provision.getLogStatus());
+			update.set("last_tracking_status", Status.CANCEL.getDescription());
 
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 

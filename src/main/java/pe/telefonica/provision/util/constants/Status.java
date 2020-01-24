@@ -17,7 +17,8 @@ public enum Status {
 	
 	WO_CANCEL("WO_CANCEL", 11, "WO_CANCEL"),
 	WO_RESCHEDULE("WO_RESCHEDULE", 12, "WO_RESCHEDULE"),
-	WO_NOTDONE("WO_NOTDONE", 13, "WO_NOTDONE");
+	WO_NOTDONE("WO_NOTDONE", 13, "WO_NOTDONE"),
+	CANCEL("CANCEL", 14, "CANCEL");
 	
 	private String statusName;
 	private int statusId;

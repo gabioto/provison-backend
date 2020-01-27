@@ -684,7 +684,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					updateFicRequest.setOriginCode(provisionx.getOriginCode());
 					updateFicRequest.setSaleCode(provisionx.getSaleCode());
 					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
-					updateFicRequest.setRequestName(provisionx.getProductName());
+					updateFicRequest.setRequestName(getData[10]);
 					updateFicRequest.setRequestId(provisionx.getIdProvision());
 
 					// Actualiza agenda
@@ -705,6 +705,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 							? Status.INGRESADO.getStatusName().toLowerCase()
 							: Constants.PROVISION_STATUS_CANCELLED;
 
+			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CANCELLED)
+					&& provisionx.getDummyStPsiCode() != null) {
+
+				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
+				scheduleNotDoneRequest.setRequestType("provision");
+				scheduleNotDoneRequest.setStPsiCode(provisionx.getDummyStPsiCode());
+				scheduleNotDoneRequest.setFlgFicticious(true);
+
+				// Cancela agenda
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+
+			}
 			update.set("active_status", status);
 			update.set("status_toa", status);
 			update.set("send_notify", false);
@@ -2021,7 +2034,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 
 				// Cancela agenda
-				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
 //				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provision.getIdProvision(),
 //						provision.getActivityType().toLowerCase(), provision.getXaIdSt()));
 
@@ -2190,7 +2203,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setFlgFicticious(false);
 
 				// Cancela agenda sin ir a PSI
-				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
 
 				return true;
 			}
@@ -2311,15 +2324,37 @@ public class ProvisionServiceImpl implements ProvisionService {
 			listita = optional.get();
 			// Actualiza Flag y Date de envio Notify en BD
 			provisionRepository.updateFlagDateNotify(optional.get());
+			
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
-				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
+
+				// remove provision by status cancelled
+				List<StatusLog> listCacelled = list.stream()
+						.filter(x -> Status.CANCEL.getStatusName().equals(x.getStatus()))
+						.collect(Collectors.toList());
+
+				if (listCacelled.size() > 0) {
+					listita.remove(i);
+				}
+
+				// remove provision by status caido
+				List<StatusLog> listCaido = list.stream().filter(x -> Status.CAIDO.getStatusName().equals(x.getStatus())
+						&& Status.WO_CANCEL.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
+
+				if (listCaido.size() > 0) {
+					listita.remove(i);
+				}
+				
+				
+				
+
+				/*if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
 						&& (!Status.DUMMY_IN_TOA.getStatusName().equalsIgnoreCase(list.get(list.size() - 2).getStatus())
 								&& !Status.SCHEDULED.getStatusName()
 										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
 					listita.remove(i);
 					i--;
-				}
+				}*/
 			}
 			return listita;
 		}

@@ -684,7 +684,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					updateFicRequest.setOriginCode(provisionx.getOriginCode());
 					updateFicRequest.setSaleCode(provisionx.getSaleCode());
 					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
-					updateFicRequest.setRequestName(provisionx.getProductName());
+					updateFicRequest.setRequestName(getData[10]);
 					updateFicRequest.setRequestId(provisionx.getIdProvision());
 
 					// Actualiza agenda

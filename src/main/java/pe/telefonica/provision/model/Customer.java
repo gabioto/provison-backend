@@ -4,64 +4,56 @@ import java.io.Serializable;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class Customer implements Serializable{
-	
+public class Customer implements Serializable {
+
 	private static final long serialVersionUID = 3275714898258466530L;
-	
+
 	@Field("document_type")
 	private String documentType;
-	
+
 	@Field("document_number")
 	private String documentNumber;
-	
+
 	@Field("name")
 	private String name;
-	
-	@Field("pat_surname")
-	private String patSurname;
-	
-	@Field("mat_surname")
-	private String matSurname;
-	
+
 	@Field("carrier")
-	private String carrier;
-	
+	private boolean carrier;
+
 	@Field("contact_carrier")
 	private String contactCarrier;
-	
+
 	@Field("mail")
 	private String mail;
-	
+
 	@Field("phone_number")
-	private Integer phoneNumber;
-	
+	private String phoneNumber;
+
 	@Field("district")
 	private String district;
-	
+
 	@Field("province")
 	private String province;
-	
+
 	@Field("department")
 	private String department;
-	
+
 	@Field("address")
 	private String address;
-	
+
 	@Field("reference")
 	private String reference;
-	
-	@Field("contact_name")
-	private String contactName;
-	
-	@Field("contact_phone_number")
-	private Integer contactPhoneNumber;
-	
+
+
 	@Field("latitude")
-	private Double latitude;
-	
+	private String latitude;
+
 	@Field("longitude")
-	private Double longitude;
-	
+	private String longitude;
+
+	@Field("origin_data")
+	private String originData;
+
 	private String productName;
 
 	public String getDocumentType() {
@@ -88,27 +80,11 @@ public class Customer implements Serializable{
 		this.name = name;
 	}
 
-	public String getPatSurname() {
-		return patSurname;
-	}
-
-	public void setPatSurname(String patSurname) {
-		this.patSurname = patSurname;
-	}
-
-	public String getMatSurname() {
-		return matSurname;
-	}
-
-	public void setMatSurname(String matSurname) {
-		this.matSurname = matSurname;
-	}
-
-	public String getCarrier() {
+	public boolean getCarrier() {
 		return carrier;
 	}
 
-	public void setCarrier(String carrier) {
+	public void setCarrier(boolean carrier) {
 		this.carrier = carrier;
 	}
 
@@ -128,11 +104,11 @@ public class Customer implements Serializable{
 		this.mail = mail;
 	}
 
-	public Integer getPhoneNumber() {
+	public String getPhoneNumber() {
 		return phoneNumber;
 	}
 
-	public void setPhoneNumber(Integer phoneNumber) {
+	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
 
@@ -175,37 +151,30 @@ public class Customer implements Serializable{
 	public void setReference(String reference) {
 		this.reference = reference;
 	}
+	
 
-	public String getContactName() {
-		return contactName;
-	}
-
-	public void setContactName(String contactName) {
-		this.contactName = contactName;
-	}
-
-	public Integer getContactPhoneNumber() {
-		return contactPhoneNumber;
-	}
-
-	public void setContactPhoneNumber(Integer contactPhoneNumber) {
-		this.contactPhoneNumber = contactPhoneNumber;
-	}
-
-	public Double getLatitude() {
+	public String getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(Double latitude) {
+	public void setLatitude(String latitude) {
 		this.latitude = latitude;
 	}
 
-	public Double getLongitude() {
+	public String getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(Double longitude) {
+	public void setLongitude(String longitude) {
 		this.longitude = longitude;
+	}
+
+	public String getOriginData() {
+		return originData;
+	}
+
+	public void setOriginData(String originData) {
+		this.originData = originData;
 	}
 
 	public String getProductName() {
@@ -215,4 +184,5 @@ public class Customer implements Serializable{
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
+
 }

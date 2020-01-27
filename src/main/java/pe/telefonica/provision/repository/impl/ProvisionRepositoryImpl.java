@@ -1,6 +1,7 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,22 +10,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 
 import com.mongodb.client.result.UpdateResult;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
-import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Provision.StatusLog;
+import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.Status;
@@ -42,29 +43,65 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
+
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber)
-						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
+						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
+						.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""))),
 				Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
 
 	@Override
+	public Optional<List<Provision>> findAllTraza(String documentType, String documentNumber) {
+
+		List<Provision> provisions = this.mongoOperations.find(
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
+						.orOperator(
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_NOTDONE),
+								Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
+				Provision.class);
+
+		return Optional.ofNullable(provisions);
+	}
+
+	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
-		Provision provision = this.mongoOperations
-				.findOne(
-						new Query(
-								Criteria.where("customer.document_type").is(documentType)
-										.and("customer.document_number").is(documentNumber).orOperator(
-												Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-												Criteria.where("active_status")
-														.is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
-						Provision.class);
+
+		Provision provision = this.mongoOperations.findOne(
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(documentNumber)
+						.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""))),
+				Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
+	}
+
+	@Override
+	public Optional<Provision> getOrderTraza(String documentType, String documentNumber) {
+
+		Provision provision = this.mongoOperations
+				.findOne(
+						new Query(Criteria.where("customer.document_type").is(documentType)
+								.and("customer.document_number").is(documentNumber)
+								.orOperator(
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_NOTDONE),
+										Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
+						Provision.class);
+
+		return Optional.ofNullable(provision);
 	}
 
 	@Override
@@ -89,7 +126,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			provision = this.mongoOperations.findOne(
 					new Query(Criteria.where("idProvision").is(new ObjectId(provisionId)).orOperator(
 							Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-							Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED))),
+							Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
+							Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 					Provision.class);
 		} catch (Exception e) {
 			log.info(e.getMessage());
@@ -214,5 +252,92 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		// Sort.Direction.DESC, "sortField"))), Provision.class);
 
 		return null;
+	}
+
+	@Override
+	public Provision getProvisionByXaIdSt(String xaIdSt) {
+
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaIdSt").is(xaIdSt)),
+				Provision.class);
+
+		return provision;
+	}
+
+	@Override
+	public Provision getProvisionBySaleCode(String saleCode) {
+
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("sale_code").is(saleCode)),
+				Provision.class);
+
+		return provision;
+	}
+
+	@Override
+	public Provision getByOrderCodeForUpdate(String orderCode) {
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(orderCode)),
+				Provision.class);
+
+		return provision;
+	}
+
+	@Override
+	public Provision getByOrderCodeForUpdateFicticious(String xaRequirementNumber) {
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("dummyStPsiCode").is(xaRequirementNumber)), Provision.class);
+		return provision;
+	}
+
+	@Override
+	public Provision getProvisionByDummyStPsiCode(String dummyStPsiCode) {
+
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("dummy_st_psi_code").is(dummyStPsiCode)), Provision.class);
+
+		return provision;
+	}
+
+	@Override
+	public Optional<List<Provision>> getOrderToNotify() {
+		ArrayList<String> status = new ArrayList<String>();
+		status.add(Status.IN_TOA.getStatusName());
+		status.add(Status.WO_CANCEL.getStatusName());
+		status.add(Status.SCHEDULED.getStatusName());
+		status.add(Status.CAIDO.getStatusName());
+		status.add(Status.WO_NOTDONE.getStatusName());
+		List<Provision> provision = this.mongoOperations.find(
+				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)).limit(5),
+				Provision.class);
+		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
+		return optionalOrder;
+	}
+
+	@Override
+	public void updateFlagDateNotify(List<Provision> listProvision) {
+		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
+		Update update = new Update();
+		update.set("send_notify", true);
+		UpdateResult result = null;
+		for (int i = 0; i < listProvision.size(); i++) {
+			if(Status.IN_TOA.equals(listProvision.get(i).getLastTrackingStatus())) {
+				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				result = this.mongoOperations.updateFirst(
+						new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+						update, Provision.class);
+			}else {
+				result = this.mongoOperations.updateFirst(
+						new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+						update, Provision.class);
+			}
+		}
+	}
+
+	@Override
+	public boolean updateShowLocation(Provision provision) {
+		Update update = new Update();
+		update.set("show_location", true);
+		UpdateResult result = this.mongoOperations.updateFirst(
+				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
+				Provision.class);
+		return result.getMatchedCount() > 0;
 	}
 }

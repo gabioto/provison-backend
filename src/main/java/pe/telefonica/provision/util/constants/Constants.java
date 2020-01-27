@@ -9,8 +9,24 @@ public final class Constants {
 
 	public static final String PROVISION_STATUS_INCOMPLETE = "incomplete";
 	public static final String PROVISION_STATUS_ACTIVE = "active";
+	public static final String PROVISION_STATUS_SCHEDULE_IN_PROGRESS = "scheduleInProgress";
 	public static final String PROVISION_STATUS_ADDRESS_CHANGED = "addressChanged";
 	public static final String PROVISION_STATUS_CANCELLED = "cancelled";
+	public static final String PROVISION_STATUS_COMPLETED = "completed";
+	public static final String PROVISION_STATUS_DONE = "done";
+	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
+	public static final String PROVISION_STATUS_NOTDONE = "notDone";
+	public static final String PROVISION_STATUS_WOINIT = "init";
+
+	public static final String COMPONENTS_NAME_TV = "TV";
+	public static final String COMPONENTS_NAME_INTERNET = "INTERNET";
+	public static final String COMPONENTS_NAME_LINE = "LINEA";
+	public static final String COMPONENTS_TITLE_TV = "Televisión HD";
+	public static final String COMPONENTS_TITLE_INTERNET = "Internet Ilimitado";
+	public static final String COMPONENTS_TITLE_LINE = "Línea Fija";
+	public static final String COMPONENTS_DESC_TV = "Canales exclusivos Movistar";
+	public static final String COMPONENTS_DESC_INTERNET = "Incluye Movistar Play Full";
+	public static final String COMPONENTS_DESC_LINE = "Llamadas ilimitadas a fijos Movistar";
 
 	public static final String DATE_FORMAT_WS = "dd/MM/yyyy";
 	public static final String DATE_FORMAT_BO = "yyyy-MM-dd";
@@ -27,6 +43,7 @@ public final class Constants {
 
 	public static final String OPER_GET_OAUTH_TOKEN = "OPER_GET_OAUTH_TOKEN";
 	public static final String OPER_GET_ALL_IN_TIME_RANGE = "OPER_GET_ALL_IN_TIME_RANGE";
+	public static final String OPER_GET_ORDER_TO_NOTIFY = "OPER_GET_ORDER_TO_NOTIFY";
 
 	public static final String APP_NAME_FRONT_END = "APP_FRONT_END";
 	public static final String APP_NAME_PROVISION = "APP_PROVISION";
@@ -58,6 +75,8 @@ public final class Constants {
 	public static final String PSI_CODE_CANCEL = "203";
 	public static final String PSI_CODE_UPDATE_CONTACT = "204";
 
+	public static final String GET_ORDERS = "205";
+
 	public static final String OPER_SEND_SMS_BY_ID = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID = "OPER_SEND_MAIL_BY_ID";
 
@@ -68,8 +87,33 @@ public final class Constants {
 	public static final String OPER_VALIDATE_USER = "OPER_VALIDATE_USER";
 	public static final String OPER_GET_PROVISION_ALL = "OPER_GET_PROVISION_ALL";
 	public static final String OPER_INSERT_PROVISION = "OPER_INSERT_PROVISION";
+	public static final String OPER_PROVISION_UPDATE_FROM_TOA = "OPER_PROVISION_UPDATE_FROM_TOA";
+	public static final String OPER_INSERT_PROVISION_CODE_FICT = "OPER_INSERT_PROVISION_CODE_FICT";
 	public static final String OPER_ORDER_CANCELLATION = "OPER_ORDER_CANCELLATION";
 	public static final String OPER_CANCEL_SCHEDULE = "OPER_CANCEL_SCHEDULE";
+	public static final String OPER_SCHEDULE_UPDATE_CODE_FICT = "OPER_SCHEDULE_UPDATE_CODE_FICT";
+	public static final String OPER_UPDATE_RESCHEDULE = "OPER_UPDATE_RESCHEDULE";
+	public static final String OPER_NOTDONE_SCHEDULE = "OPER_NOTDONE_SCHEDULE";
+	public static final String OPER_SHOW_LOCATION = "OPER_UPDATE_SHOW_LOCATION";
+
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
+	public static final String OPER_GET_PROVISION_BY_SALE_CODE = "OPER_GET_PROVISION_BY_SALE_CODE";
+
+	public static final String TIPO_RUC = "ruc";
+	public static final String RUC_NATURAL = "10";
+
+	public static final String STATUS_IN_TOA = "IN_TOA";
+	public static final String STATUS_WO_PRESTART = "WO_PRESTART";
+	public static final String STATUS_WO_INIT = "WO_INIT";
+	public static final String STATUS_WO_COMPLETED = "WO_COMPLETED";
+	public static final String STATUS_WO_PRE_NOTDONE = "WO_PRE_NOTDONE";
+	public static final String STATUS_WO_NOTDONE = "WO_NOTDONE";
+	public static final String STATUS_WO_CANCEL = "WO_CANCEL";
+	public static final String STATUS_WO_RESCHEDULE = "WO_RESCHEDULE";
+	public static final String FICTICIOUS_SCHEDULED = "FICTICIOUS_SCHEDULED";
+
+	public static final String ACTIVITY_TYPE_PROVISION = "PROVISION";
+	public static final String BARRA_VERTICAL = "|";
+
 }

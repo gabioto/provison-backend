@@ -48,7 +48,8 @@ import pe.telefonica.provision.util.exception.FunctionalErrorException;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @Component
-public class PSIApi extends ConfigRestTemplate {
+public class PSIApi extends pe.telefonica.provision.controller.common.RestTemplate  {
+//public class PSIApi extends ConfigRestTemplate  {
 	private static final Log log = LogFactory.getLog(PSIApi.class);
 
 	final Gson gson = new Gson();
@@ -70,13 +71,10 @@ public class PSIApi extends ConfigRestTemplate {
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 
-		RestTemplate restTemplate = new RestTemplate(
-				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-		/* RestTemplate restTemplate = new RestTemplate(); */
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
-		// RestTemplate test = new RestTemplate(this.getClientHttpRequestFactory());
+		//RestTemplate restTemplate = new RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		
+		//restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		//restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
 		log.info("updatePSIClient - URL: " + requestUrl);
@@ -166,7 +164,7 @@ public class PSIApi extends ConfigRestTemplate {
 		System.out.println(entity);
 		try {
 
-			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
+			ResponseEntity<PSIUpdateClientResponse> responseEntity = initClientRestTemplate().postForEntity(requestUrl, entity,
 					PSIUpdateClientResponse.class);
 
 			/*

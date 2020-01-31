@@ -2,10 +2,10 @@ package pe.telefonica.provision.model;
 
 public class StatusProvision {
 
-	public String label;
-	public String xaRequest;
-	public String xaIdSt;
-	public String externalId;
+	protected String label;
+	protected String xaRequest;
+	protected String xaIdSt;
+	protected String externalId;
 
 	public String getLabel() {
 		return label;

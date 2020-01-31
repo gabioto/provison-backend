@@ -40,7 +40,6 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
 import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
-import pe.telefonica.provision.controller.request.WoCancelRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
@@ -685,16 +684,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 					updateFicRequest.setOriginCode(provisionx.getOriginCode());
 					updateFicRequest.setSaleCode(provisionx.getSaleCode());
 					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
-					updateFicRequest.setRequestName(provisionx.getProductName());
+					updateFicRequest.setRequestName(getData[10]);
 					updateFicRequest.setRequestId(provisionx.getIdProvision());
-					
+
 					// Actualiza agenda
-					if(!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
-						
+					if (!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
+
 						boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
 						update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
 					}
-					
 
 				}
 
@@ -707,6 +705,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 							? Status.INGRESADO.getStatusName().toLowerCase()
 							: Constants.PROVISION_STATUS_CANCELLED;
 
+			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CANCELLED)
+					&& provisionx.getDummyStPsiCode() != null) {
+
+				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
+				scheduleNotDoneRequest.setRequestType("provision");
+				scheduleNotDoneRequest.setStPsiCode(provisionx.getDummyStPsiCode());
+				scheduleNotDoneRequest.setFlgFicticious(true);
+
+				// Cancela agenda
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+
+			}
 			update.set("active_status", status);
 			update.set("status_toa", status);
 			update.set("send_notify", false);
@@ -960,14 +971,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optional.isPresent()) {
 
 			Provision provision = optional.get();
+
+			StatusLog statusLog = new StatusLog();
+			statusLog.setStatus(Status.CANCEL.getDescription());
+
+			provision.getLogStatus().add(statusLog);
+			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
+			provision.setLastTrackingStatus(Status.CANCEL.getDescription());
+			provision.setCancellationCause(cause);
+			provision.setCancellationDetail(detail);
+
 			Update update = new Update();
 			update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 			update.set("cancellation_cause", cause);
 			update.set("cancellation_detail", detail);
-
-			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
-			provision.setCancellationCause(cause);
-			provision.setCancellationDetail(detail);
+			update.set("log_status", provision.getLogStatus());
+			update.set("last_tracking_status", Status.CANCEL.getDescription());
 
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 
@@ -991,7 +1010,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			try {
 				sendCancelBySMS(provision);
-				sendCancelledMailByUser(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
+				// sendCancelledMailByUser(provision, Constants.ADDRESS_CANCELLED_BY_CUSTOMER);
 			} catch (Exception e) {
 				log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 			}
@@ -1443,7 +1462,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					if (!request.isHolderWillReceive()) {
 						sendInfoUpdateSMS(provision);
-						sendContactInfoChangedMail(provision);
+						// sendContactInfoChangedMail(provision);
 					}
 				} else {
 					throw new Exception();
@@ -1798,11 +1817,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 							List<StatusLog> listLogx = listLog.stream()
 									.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
 									.collect(Collectors.toList());
-							
+
 							List<StatusLog> listLogCancelled = listLog.stream()
 									.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
 									.collect(Collectors.toList());
-							
+
 							if (listLogx.size() > 0 && listLogCancelled.size() == 0) {
 								StatusLog statusSchedule = new StatusLog();
 								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
@@ -1816,7 +1835,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
 								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getData[4], getData[8].toLowerCase(), provision.getCustomer());
+										provision.getXaRequest(), getData[4], getData[8].toLowerCase(),
+										provision.getCustomer());
 
 							}
 						}
@@ -1970,7 +1990,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())) {
-					//&& !provision.getXaIdSt().isEmpty()) {
+				// && !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
 
 				WoCancel woCancel = new WoCancel();
@@ -2004,17 +2024,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
 				scheduleNotDoneRequest.setStPsiCode(getData[4]);
-				
 
-				if(getData[4].toString().equals(getData[5].toString()) && getData[5].toString().equals(getData[6].toString())){
+				if (getData[4].toString().equals(getData[5].toString())
+						&& getData[5].toString().equals(getData[6].toString())) {
 					scheduleNotDoneRequest.setFlgFicticious(true);
 					scheduleNotDoneRequest.setRequestType(Constants.ACTIVITY_TYPE_PROVISION.toLowerCase());
-				}else {
+				} else {
 					scheduleNotDoneRequest.setFlgFicticious(false);
 				}
-				
+
 				// Cancela agenda
-				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
 //				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provision.getIdProvision(),
 //						provision.getActivityType().toLowerCase(), provision.getXaIdSt()));
 
@@ -2183,7 +2203,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setFlgFicticious(false);
 
 				// Cancela agenda sin ir a PSI
-				trazabilidadScheduleApi.cancelSchedule(scheduleNotDoneRequest);
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
 
 				return true;
 			}
@@ -2304,16 +2324,37 @@ public class ProvisionServiceImpl implements ProvisionService {
 			listita = optional.get();
 			// Actualiza Flag y Date de envio Notify en BD
 			provisionRepository.updateFlagDateNotify(optional.get());
+			
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
-				if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& (!Status.DUMMY_IN_TOA.getStatusName()
-								.equalsIgnoreCase(list.get(list.size() - 2).getStatus())
+
+				// remove provision by status cancelled
+				List<StatusLog> listCacelled = list.stream()
+						.filter(x -> Status.CANCEL.getStatusName().equals(x.getStatus()))
+						.collect(Collectors.toList());
+
+				if (listCacelled.size() > 0) {
+					listita.remove(i);
+				}
+
+				// remove provision by status caido
+				List<StatusLog> listCaido = list.stream().filter(x -> Status.CAIDO.getStatusName().equals(x.getStatus())
+						&& Status.WO_CANCEL.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
+
+				if (listCaido.size() > 0) {
+					listita.remove(i);
+				}
+				
+				
+				
+
+				/*if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
+						&& (!Status.DUMMY_IN_TOA.getStatusName().equalsIgnoreCase(list.get(list.size() - 2).getStatus())
 								&& !Status.SCHEDULED.getStatusName()
 										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
 					listita.remove(i);
 					i--;
-				}
+				}*/
 			}
 			return listita;
 		}

@@ -1,13 +1,10 @@
 package pe.telefonica.provision.repository.impl;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -301,8 +298,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getOrderToNotify() {
-		Update update = new Update();
-		update.set("send_notify", true);
 		ArrayList<String> status = new ArrayList<String>();
 		status.add(Status.IN_TOA.getStatusName());
 		status.add(Status.WO_CANCEL.getStatusName());
@@ -312,7 +307,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		List<Provision> provision = this.mongoOperations.find(
 				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)).limit(5),
 				Provision.class);
-		// new Query(Criteria.where("xaRequest").is(xaRequest).and("xaIdSt").is(xaIdSt))
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}

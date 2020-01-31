@@ -46,32 +46,16 @@ public enum ProductType {
 		return typeName;
 	}
 
-	public void setTypeName(String typeName) {
-		this.typeName = typeName;
-	}
-
 	public boolean isInternet() {
 		return internet;
-	}
-
-	public void setInternet(boolean internet) {
-		this.internet = internet;
 	}
 
 	public boolean isLine() {
 		return line;
 	}
 
-	public void setLine(boolean line) {
-		this.line = line;
-	}
-
 	public boolean isTv() {
 		return tv;
-	}
-
-	public void setTv(boolean tv) {
-		this.tv = tv;
 	}
 
 }

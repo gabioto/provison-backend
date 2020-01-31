@@ -642,7 +642,6 @@ public class ProvisionController {
 
 			ApiTrazaSetContactInfoUpdateRequest requestBody = request.getBody();
 
-			
 			// Validate PSICode
 			if (requestBody.getPsiCode() == null || requestBody.getPsiCode().equals("")) {
 

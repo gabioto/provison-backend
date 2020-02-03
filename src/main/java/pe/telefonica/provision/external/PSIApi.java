@@ -48,8 +48,8 @@ import pe.telefonica.provision.util.exception.FunctionalErrorException;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @Component
-public class PSIApi extends pe.telefonica.provision.controller.common.RestTemplate  {
-//public class PSIApi extends ConfigRestTemplate  {
+//public class PSIApi extends pe.telefonica.provision.controller.common.RestTemplate  {
+public class PSIApi extends ConfigRestTemplate  {
 	private static final Log log = LogFactory.getLog(PSIApi.class);
 
 	final Gson gson = new Gson();
@@ -164,14 +164,14 @@ public class PSIApi extends pe.telefonica.provision.controller.common.RestTempla
 		System.out.println(entity);
 		try {
 
-			ResponseEntity<PSIUpdateClientResponse> responseEntity = initClientRestTemplate().postForEntity(requestUrl, entity,
-					PSIUpdateClientResponse.class);
+//			ResponseEntity<PSIUpdateClientResponse> responseEntity = initClientRestTemplate().postForEntity(requestUrl, entity,
+//					PSIUpdateClientResponse.class);
 
-			/*
-			 * ResponseEntity<PSIUpdateClientResponse> responseEntity =
-			 * getRestTemplate().postForEntity(requestUrl, entity,
-			 * PSIUpdateClientResponse.class);
-			 */
+			
+			ResponseEntity<PSIUpdateClientResponse> responseEntity =
+			getRestTemplate().postForEntity(requestUrl, entity,
+			PSIUpdateClientResponse.class);
+			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request),
 					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour, endHour);

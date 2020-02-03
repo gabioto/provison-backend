@@ -1639,9 +1639,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
-			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
-			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
-
+			provisionAdd.setCommercialOp(request.getCommercialOp());
+			provisionAdd.setProductType(request.getProductType());
+			
+			Customer customer = new Customer();
+			
+			customer.setDocumentType(request.getCustomer().getDocumentType());
+			customer.setDocumentNumber(request.getCustomer().getDocumentNumber());
+			customer.setName(request.getCustomer().getName());
+			customer.setLatitude(request.getCustomer().getLatitude());
+			customer.setLongitude(request.getCustomer().getLongitude());
+		
+			provisionAdd.setCustomer(customer);
+			
+			
+			
 			List<StatusLog> listLog = new ArrayList<>();
 
 			StatusLog statusPendiente = new StatusLog();
@@ -1660,7 +1672,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
-
+			
+			provisionAdd = evaluateProvisionComponents(provisionAdd);
+			
 			provisionRepository.insertProvision(provisionAdd);
 
 		}

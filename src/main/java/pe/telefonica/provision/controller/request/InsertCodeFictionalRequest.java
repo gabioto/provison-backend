@@ -2,6 +2,8 @@ package pe.telefonica.provision.controller.request;
 
 import java.time.LocalDate;
 
+import pe.telefonica.provision.model.Customer;
+
 public class InsertCodeFictionalRequest {
 	private String saleCode;
 	private Integer dummyXaRequest;
@@ -11,6 +13,9 @@ public class InsertCodeFictionalRequest {
 	private String bucket;
 	private String originCode;
 	private boolean isUpdatedummyStPsiCode;
+	private Customer customer;
+	private String commercialOp;
+	private String productType;
 
 	public String getSaleCode() {
 		return saleCode;
@@ -74,6 +79,30 @@ public class InsertCodeFictionalRequest {
 
 	public void setUpdatedummyStPsiCode(boolean isUpdatedummyStPsiCode) {
 		this.isUpdatedummyStPsiCode = isUpdatedummyStPsiCode;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
+
+	public String getCommercialOp() {
+		return commercialOp;
+	}
+
+	public void setCommercialOp(String commercialOp) {
+		this.commercialOp = commercialOp;
+	}
+
+	public String getProductType() {
+		return productType;
+	}
+
+	public void setProductType(String productType) {
+		this.productType = productType;
 	}
 
 }

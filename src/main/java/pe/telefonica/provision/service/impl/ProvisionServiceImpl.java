@@ -34,7 +34,6 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
-import pe.telefonica.provision.controller.request.SMSByIdRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
@@ -828,7 +827,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					contactCustomer.setHolder(true);
 					contacts.add(contactCustomer);
 
-					trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY,
+					trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_BO_KEY,
 							msgParameters.toArray(new MsgParameter[0]), "");
 					// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 					// Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
@@ -1460,10 +1459,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
 
-					if (!request.isHolderWillReceive()) {
-						sendInfoUpdateSMS(provision);
-						// sendContactInfoChangedMail(provision);
-					}
+					// if (!request.isHolderWillReceive()) {
+					// sendInfoUpdateSMS(provision);
+					// sendContactInfoChangedMail(provision);
+					// }
 				} else {
 					throw new Exception();
 				}
@@ -1488,7 +1487,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		holder.setHolder(true);
 		holder.setPhoneNumber(provision.getCustomer().getPhoneNumber());
 		contacts.add(holder);
-		contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
+		// contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
 
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
 	}
@@ -2324,14 +2323,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			listita = optional.get();
 			// Actualiza Flag y Date de envio Notify en BD
 			provisionRepository.updateFlagDateNotify(optional.get());
-			
+
 			for (int i = 0; i < listita.size(); i++) {
 				List<StatusLog> list = listita.get(i).getLogStatus();
 
 				// remove provision by status cancelled
 				List<StatusLog> listCacelled = list.stream()
-						.filter(x -> Status.CANCEL.getStatusName().equals(x.getStatus()))
-						.collect(Collectors.toList());
+						.filter(x -> Status.CANCEL.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
 
 				if (listCacelled.size() > 0) {
 					listita.remove(i);
@@ -2344,17 +2342,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 				if (listCaido.size() > 0) {
 					listita.remove(i);
 				}
-				
-				
-				
 
-				/*if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).getLastTrackingStatus())
-						&& (!Status.DUMMY_IN_TOA.getStatusName().equalsIgnoreCase(list.get(list.size() - 2).getStatus())
-								&& !Status.SCHEDULED.getStatusName()
-										.equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
-					listita.remove(i);
-					i--;
-				}*/
+				/*
+				 * if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(listita.get(i).
+				 * getLastTrackingStatus()) &&
+				 * (!Status.DUMMY_IN_TOA.getStatusName().equalsIgnoreCase(list.get(list.size() -
+				 * 2).getStatus()) && !Status.SCHEDULED.getStatusName()
+				 * .equalsIgnoreCase(list.get(list.size() - 2).getStatus()))) {
+				 * listita.remove(i); i--; }
+				 */
 			}
 			return listita;
 		}

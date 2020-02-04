@@ -13,9 +13,12 @@ public class InsertCodeFictionalRequest {
 	private String bucket;
 	private String originCode;
 	private boolean isUpdatedummyStPsiCode;
-	private Customer customer;
 	private String commercialOp;
-	private String productType;
+	private String customerName;
+	private String customerDocumentType;
+	private String customerDocumentNumber;
+	private String customerLatitude;
+	private String customerLongitude;
 
 	public String getSaleCode() {
 		return saleCode;
@@ -81,14 +84,6 @@ public class InsertCodeFictionalRequest {
 		this.isUpdatedummyStPsiCode = isUpdatedummyStPsiCode;
 	}
 
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
-
 	public String getCommercialOp() {
 		return commercialOp;
 	}
@@ -97,12 +92,44 @@ public class InsertCodeFictionalRequest {
 		this.commercialOp = commercialOp;
 	}
 
-	public String getProductType() {
-		return productType;
+	public String getCustomerName() {
+		return customerName;
 	}
 
-	public void setProductType(String productType) {
-		this.productType = productType;
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getCustomerDocumentType() {
+		return customerDocumentType;
+	}
+
+	public void setCustomerDocumentType(String customerDocumentType) {
+		this.customerDocumentType = customerDocumentType;
+	}
+
+	public String getCustomerDocumentNumber() {
+		return customerDocumentNumber;
+	}
+
+	public void setCustomerDocumentNumber(String customerDocumentNumber) {
+		this.customerDocumentNumber = customerDocumentNumber;
+	}
+
+	public String getCustomerLatitude() {
+		return customerLatitude;
+	}
+
+	public void setCustomerLatitude(String customerLatitude) {
+		this.customerLatitude = customerLatitude;
+	}
+
+	public String getCustomerLongitude() {
+		return customerLongitude;
+	}
+
+	public void setCustomerLongitude(String customerLongitude) {
+		this.customerLongitude = customerLongitude;
 	}
 
 }

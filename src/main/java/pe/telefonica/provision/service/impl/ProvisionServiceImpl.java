@@ -1639,16 +1639,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
+			provisionAdd.setProductName("Pedido hogar movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
-			provisionAdd.setProductType(request.getProductType());
+			
 			
 			Customer customer = new Customer();
 			
-			customer.setDocumentType(request.getCustomer().getDocumentType());
-			customer.setDocumentNumber(request.getCustomer().getDocumentNumber());
-			customer.setName(request.getCustomer().getName());
-			customer.setLatitude(request.getCustomer().getLatitude());
-			customer.setLongitude(request.getCustomer().getLongitude());
+			customer.setDocumentType(request.getCustomerDocumentType());
+			customer.setDocumentNumber(request.getCustomerDocumentNumber());
+			customer.setName(request.getCustomerName());
+			customer.setLatitude(request.getCustomerLatitude());
+			customer.setLongitude(request.getCustomerLongitude());
 		
 			provisionAdd.setCustomer(customer);
 			
@@ -1673,7 +1674,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			
-			provisionAdd = evaluateProvisionComponents(provisionAdd);
+			provisionAdd.setComponents(new ArrayList<>());
+			
 			
 			provisionRepository.insertProvision(provisionAdd);
 

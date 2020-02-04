@@ -105,7 +105,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Optional<Provision> provision;
 
-		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+		/*if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provision = provisionRepository.getOrderTraza(provisionRequest.getBody().getDocumentType(),
 					provisionRequest.getBody().getDocumentNumber());
 		} else {
@@ -119,8 +119,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equalsIgnoreCase("PASAPORTE")) {
 			provision = provisionRepository.getOrder("PAS", provisionRequest.getBody().getDocumentNumber());
-		}
-
+		}*/
+		
+		provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
+				provisionRequest.getBody().getDocumentNumber());
+		
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
 
 			Provision prov = provision.get();
@@ -703,9 +706,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					? Status.PENDIENTE.getStatusName().toLowerCase()
 					: request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 							? Status.INGRESADO.getStatusName().toLowerCase()
-							: Constants.PROVISION_STATUS_CANCELLED;
+							: Constants.PROVISION_STATUS_CAIDA;
 
-			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CANCELLED)
+			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA)
 					&& provisionx.getDummyStPsiCode() != null) {
 
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();

@@ -702,9 +702,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					? Status.PENDIENTE.getStatusName().toLowerCase()
 					: request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 							? Status.INGRESADO.getStatusName().toLowerCase()
-							: Constants.PROVISION_STATUS_CANCELLED;
+							: Constants.PROVISION_STATUS_CAIDA;
 
-			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CANCELLED)
+			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA)
 					&& provisionx.getDummyStPsiCode() != null) {
 
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
@@ -1612,7 +1612,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			update.set("dummy_st_psi_code", request.getDummyStPsiCode());
 			update.set("dummy_xa_request", request.getDummyXaRequest());
-			update.set("is_update_dummy_st_psi_code", request.isUpdatedummyStPsiCode());
+			update.set("is_update_dummy_st_psi_code", request.getIsUpdatedummyStPsiCode());
 			update.set("has_schedule", true);
 
 			StatusLog statusLog = new StatusLog();

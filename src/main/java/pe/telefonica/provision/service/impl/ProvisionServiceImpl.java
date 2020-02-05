@@ -1612,6 +1612,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			update.set("dummy_st_psi_code", request.getDummyStPsiCode());
 			update.set("dummy_xa_request", request.getDummyXaRequest());
+			update.set("is_update_dummy_st_psi_code", request.isUpdatedummyStPsiCode());
 			update.set("has_schedule", true);
 
 			StatusLog statusLog = new StatusLog();

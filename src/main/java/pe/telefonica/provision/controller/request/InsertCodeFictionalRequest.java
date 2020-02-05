@@ -68,7 +68,7 @@ public class InsertCodeFictionalRequest {
 		this.originCode = originCode;
 	}
 
-	public boolean isUpdatedummyStPsiCode() {
+	public boolean getIsUpdatedummyStPsiCode() {
 		return isUpdatedummyStPsiCode;
 	}
 

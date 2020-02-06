@@ -154,7 +154,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Optional<List<Provision>> provisions;
 		// List<Provision> provisionList;
 
-		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+		/*if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
 					provisionRequest.getBody().getDocumentNumber());
 		} else {
@@ -168,8 +168,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
 			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentNumber());
-		}
-
+		}*/
+		
+		provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
+				provisionRequest.getBody().getDocumentNumber());
+		
 		if (provisions.isPresent() && provisions.get().size() > 0) {
 			/*
 			 * provisionList = provisions.get();

@@ -750,6 +750,12 @@ public class Provision implements Serializable {
 		@Field("description")
 		private String description;
 
+		@Field("generic_speech")
+		private String genericSpeech;
+
+		@Field("speech_without_schedule")
+		private String speechWithoutSchedule;
+
 		@Field("inserted_date")
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
@@ -808,6 +814,22 @@ public class Provision implements Serializable {
 
 		public void setXaidst(String xaidst) {
 			this.xaidst = xaidst;
+		}
+
+		public String getGenericSpeech() {
+			return genericSpeech;
+		}
+
+		public void setGenericSpeech(String genericSpeech) {
+			this.genericSpeech = genericSpeech;
+		}
+
+		public String getSpeechWithoutSchedule() {
+			return speechWithoutSchedule;
+		}
+
+		public void setSpeechWithoutSchedule(String speechWithoutSchedule) {
+			this.speechWithoutSchedule = speechWithoutSchedule;
 		}
 
 	}

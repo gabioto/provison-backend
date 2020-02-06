@@ -512,11 +512,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provision.setActiveStatus(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 					? Status.INGRESADO.getStatusName().toLowerCase()
-					: Constants.PROVISION_STATUS_CANCELLED);
+					: Constants.PROVISION_STATUS_CAIDA);
 
 			provision.setStatusToa(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 					? Status.INGRESADO.getStatusName().toLowerCase()
-					: Constants.PROVISION_STATUS_CANCELLED);
+					: Constants.PROVISION_STATUS_CAIDA);
 		}
 
 		provision.setLogStatus(listLog);

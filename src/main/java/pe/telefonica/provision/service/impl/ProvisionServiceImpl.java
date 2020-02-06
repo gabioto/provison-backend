@@ -1642,7 +1642,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
-			provisionAdd.setProductName("Pedido hogar movistar");
+			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
 			
 			

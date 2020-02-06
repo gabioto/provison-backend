@@ -302,7 +302,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.IN_TOA.getStatusName());
 		status.add(Status.WO_CANCEL.getStatusName());
 		status.add(Status.SCHEDULED.getStatusName());
-		status.add(Status.CAIDO.getStatusName());
+		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
 		List<Provision> provision = this.mongoOperations.find(
 				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status)).limit(5),

@@ -13,7 +13,6 @@ public final class Constants {
 	public static final String PROVISION_STATUS_ADDRESS_CHANGED = "addressChanged";
 	public static final String PROVISION_STATUS_CAIDA = "caida";
 	public static final String PROVISION_STATUS_CANCELLED = "cancelled";
-	public static final String PROVISION_STATUS_CAIDA = "caida";
 	
 	public static final String PROVISION_STATUS_COMPLETED = "completed";
 	public static final String PROVISION_STATUS_DONE = "done";

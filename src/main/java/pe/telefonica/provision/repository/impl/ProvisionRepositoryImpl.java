@@ -46,7 +46,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
+						.is(documentNumber)
 						.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""))),
 				Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
@@ -59,8 +59,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
 						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
-						.orOperator(
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
+						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
@@ -91,11 +90,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				.findOne(
 						new Query(Criteria.where("customer.document_type").is(documentType)
 								.and("customer.document_number").is(documentNumber)
-								.orOperator(
-										Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
+								.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
-										Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
+										Criteria.where("active_status")
+												.is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_NOTDONE),
 										Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
@@ -318,14 +317,16 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		update.set("send_notify", true);
 		UpdateResult result = null;
 		for (int i = 0; i < listProvision.size(); i++) {
-			if(Status.IN_TOA.equals(listProvision.get(i).getLastTrackingStatus())) {
+			if (Status.IN_TOA.equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				result = this.mongoOperations.updateFirst(
-						new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+						new Query(
+								Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
 						update, Provision.class);
-			}else {
+			} else {
 				result = this.mongoOperations.updateFirst(
-						new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+						new Query(
+								Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
 						update, Provision.class);
 			}
 		}

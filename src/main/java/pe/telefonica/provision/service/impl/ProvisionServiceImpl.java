@@ -104,7 +104,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Optional<Provision> provision;
 
-		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+		/*if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provision = provisionRepository.getOrderTraza(provisionRequest.getBody().getDocumentType(),
 					provisionRequest.getBody().getDocumentNumber());
 		} else {
@@ -118,8 +118,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equalsIgnoreCase("PASAPORTE")) {
 			provision = provisionRepository.getOrder("PAS", provisionRequest.getBody().getDocumentNumber());
-		}
-
+		}*/
+		
+		provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
+				provisionRequest.getBody().getDocumentNumber());
+		
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
 
 			Provision prov = provision.get();
@@ -151,7 +154,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Optional<List<Provision>> provisions;
 		// List<Provision> provisionList;
 
-		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+		/*if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
 					provisionRequest.getBody().getDocumentNumber());
 		} else {
@@ -165,8 +168,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
 			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentNumber());
-		}
-
+		}*/
+		
+		provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
+				provisionRequest.getBody().getDocumentNumber());
+		
 		if (provisions.isPresent() && provisions.get().size() > 0) {
 			/*
 			 * provisionList = provisions.get();
@@ -712,9 +718,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					? Status.PENDIENTE.getStatusName().toLowerCase()
 					: request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 							? Status.INGRESADO.getStatusName().toLowerCase()
-							: Constants.PROVISION_STATUS_CANCELLED;
+							: Constants.PROVISION_STATUS_CAIDA;
 
-			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CANCELLED)
+			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA)
 					&& provisionx.getDummyStPsiCode() != null) {
 
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
@@ -1622,6 +1628,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			update.set("dummy_st_psi_code", request.getDummyStPsiCode());
 			update.set("dummy_xa_request", request.getDummyXaRequest());
+			update.set("is_update_dummy_st_psi_code", request.getIsUpdatedummyStPsiCode());
 			update.set("has_schedule", true);
 
 			StatusLog statusLog = new StatusLog();
@@ -1650,9 +1657,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
-			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
-			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
-
+			provisionAdd.setProductName("Pedido Movistar");
+			provisionAdd.setCommercialOp(request.getCommercialOp());
+			
+			
+			Customer customer = new Customer();
+			
+			customer.setDocumentType(request.getCustomerDocumentType());
+			customer.setDocumentNumber(request.getCustomerDocumentNumber());
+			customer.setName(request.getCustomerName());
+			customer.setLatitude(request.getCustomerLatitude());
+			customer.setLongitude(request.getCustomerLongitude());
+		
+			provisionAdd.setCustomer(customer);
+			
+			
+			
 			List<StatusLog> listLog = new ArrayList<>();
 
 			StatusLog statusPendiente = new StatusLog();
@@ -1675,7 +1695,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
-
+			
+			provisionAdd.setComponents(new ArrayList<>());
+			
+			
 			provisionRepository.insertProvision(provisionAdd);
 
 		}

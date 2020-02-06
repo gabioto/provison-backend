@@ -104,7 +104,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Optional<Provision> provision;
 
-		if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
+		/*if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
 			provision = provisionRepository.getOrderTraza(provisionRequest.getBody().getDocumentType(),
 					provisionRequest.getBody().getDocumentNumber());
 		} else {
@@ -118,8 +118,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equalsIgnoreCase("PASAPORTE")) {
 			provision = provisionRepository.getOrder("PAS", provisionRequest.getBody().getDocumentNumber());
-		}
-
+		}*/
+		
+		provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
+				provisionRequest.getBody().getDocumentNumber());
+		
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
 
 			Provision prov = provision.get();
@@ -1639,9 +1642,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
-			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
-			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
-
+			provisionAdd.setProductName("Pedido hogar movistar");
+			provisionAdd.setCommercialOp(request.getCommercialOp());
+			
+			
+			Customer customer = new Customer();
+			
+			customer.setDocumentType(request.getCustomerDocumentType());
+			customer.setDocumentNumber(request.getCustomerDocumentNumber());
+			customer.setName(request.getCustomerName());
+			customer.setLatitude(request.getCustomerLatitude());
+			customer.setLongitude(request.getCustomerLongitude());
+		
+			provisionAdd.setCustomer(customer);
+			
+			
+			
 			List<StatusLog> listLog = new ArrayList<>();
 
 			StatusLog statusPendiente = new StatusLog();
@@ -1660,7 +1676,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
-
+			
+			provisionAdd.setComponents(new ArrayList<>());
+			
+			
 			provisionRepository.insertProvision(provisionAdd);
 
 		}

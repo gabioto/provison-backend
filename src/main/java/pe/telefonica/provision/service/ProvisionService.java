@@ -20,13 +20,13 @@ import pe.telefonica.provision.model.Provision;
 public interface ProvisionService {
 
 	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
-	
+
 	Provision getProvisionBySaleCode(String saleCode);
 
 	List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 
 	ProvisionResponse<String> getStatus(String provisionId);
-	
+
 	ApiResponse<List<Contacts>> getContactList(String provisionId);
 
 	List<Provision> insertProvisionList(List<Provision> provisionList);
@@ -35,13 +35,14 @@ public interface ProvisionService {
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber) throws Exception;
+	boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
+			throws Exception;
 
 	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
 			Boolean contactCellphoneIsMovistar);
 
 	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
-	
+
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);
 
 	public Provision setProvisionIsValidated(String provisionId);
@@ -61,14 +62,14 @@ public interface ProvisionService {
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 
 	Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,
-			LocalDate scheduledDate, String scheduledRange, Integer scheduleType,String description);
+			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description, String speech);
 
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 
 	boolean getBucketByProduct(String channel, String product, String bucket) throws Exception;
 
 	List<Provision> getOrderToNotify();
-	
+
 	public boolean updateShowLocation(Provision provision);
-	
+
 }

@@ -20,9 +20,14 @@ public class RestTemplate {
 
 	public RestTemplate(HttpComponentsClientHttpRequestFactory clientHttpRequestFactory) {
 		// TODO Auto-generated constructor stub
+		
 	}
 
-	public static RestTemplate initClientRestTemplate() {
+	public RestTemplate() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public static org.springframework.web.client.RestTemplate initClientRestTemplate() {
 
 		char[] password = KEY_JKS.toCharArray();
 
@@ -41,7 +46,7 @@ public class RestTemplate {
 
 		clientHttpRequestFactory.setHttpClient(client);
 
-		return new RestTemplate(clientHttpRequestFactory);
+		return new org.springframework.web.client.RestTemplate(clientHttpRequestFactory);
 
 	}
 

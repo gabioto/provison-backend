@@ -37,9 +37,6 @@ public interface ProvisionService {
 
 	boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber) throws Exception;
 
-	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
-			Boolean contactCellphoneIsMovistar);
-
 	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
 	
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);

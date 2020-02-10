@@ -1219,63 +1219,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return trazabilidadSecurityApi.sendMail("192828", mailParameters.toArray(new MailParameter[0]));
 	}
 
-	@Override
-	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
-			Boolean contactCellphoneIsMovistar) {
-
-		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
-		boolean updated = false;
-
-		if (optional.isPresent()) {
-			Provision provision = optional.get();
-			// provision.getCustomer().setContactName(contactFullname);
-			// provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
-			provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());
-
-			// boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-			// boolean contactUpdated = restPSI.updatePSIClient(provision);
-			boolean contactUpdated = true;
-			if (contactUpdated) {
-				Update update = new Update();
-				update.set("customer.contact_name", contactFullname);
-				update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
-				update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
-				updated = provisionRepository.updateProvision(provision, update);
-			}
-
-			if (updated) {
-				try {
-					sendContactInfoChangedMail(provision);
-				} catch (Exception e) {
-					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
-					return provision;
-				}
-
-//				List<MsgParameter> msgParameters = new ArrayList<>();
-				// Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no
-				// se valida la respuesta
-				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
-				// Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new
-				// MsgParameter[0]), provisionTexts.getWebUrl());
-				List<Contact> contacts = new ArrayList<>();
-
-				Contact contactCustomer = new Contact();
-				contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-				contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-				contacts.add(contactCustomer);
-
-//				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-//						Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
-//						provisionTexts.getWebUrl());
-
-				return provision;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
+	
 
 	@Override
 	public ProvisionResponse<String> getStatus(String provisionId) {

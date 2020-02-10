@@ -994,6 +994,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(Status.CANCEL.getDescription());
+			statusLog.setGenericSpeech(Status.CANCEL.getGenericSpeech());
+			statusLog.setSpeechWithoutSchedule(Status.CANCEL.getSpeechWithoutSchedule());
 
 			provision.getLogStatus().add(statusLog);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
@@ -1223,8 +1225,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return trazabilidadSecurityApi.sendMail("192828", mailParameters.toArray(new MailParameter[0]));
 	}
-
-	
 
 	@Override
 	public ProvisionResponse<String> getStatus(String provisionId) {

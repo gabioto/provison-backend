@@ -1330,6 +1330,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(status);
 			statusLog.setDescription(description);
+			statusLog.setGenericSpeech(speech);
 
 			if (scheduledDate != null)
 				statusLog.setScheduledDate(scheduledDate.toString());

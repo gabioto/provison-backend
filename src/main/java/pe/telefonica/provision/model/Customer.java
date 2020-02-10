@@ -20,8 +20,7 @@ public class Customer implements Serializable {
 	@Field("carrier")
 	private boolean carrier;
 
-	@Field("contact_carrier")
-	private String contactCarrier;
+	
 
 	@Field("mail")
 	private String mail;
@@ -88,13 +87,7 @@ public class Customer implements Serializable {
 		this.carrier = carrier;
 	}
 
-	public String getContactCarrier() {
-		return contactCarrier;
-	}
-
-	public void setContactCarrier(String contactCarrier) {
-		this.contactCarrier = contactCarrier;
-	}
+	
 
 	public String getMail() {
 		return mail;

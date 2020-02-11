@@ -216,7 +216,7 @@ public class Provision implements Serializable {
 	private String showLocation;
 
 	@Field("send_notify")
-	private String sendNotify;
+	private Boolean sendNotify;
 
 	@Field("components")
 	private List<ComponentsDto> components = new ArrayList<>();
@@ -842,11 +842,11 @@ public class Provision implements Serializable {
 		this.showLocation = showLocation;
 	}
 
-	public String getSendNotify() {
+	public Boolean getSendNotify() {
 		return sendNotify;
 	}
 
-	public void setSendNotify(String sendNotify) {
+	public void setSendNotify(Boolean sendNotify) {
 		this.sendNotify = sendNotify;
 	}
 

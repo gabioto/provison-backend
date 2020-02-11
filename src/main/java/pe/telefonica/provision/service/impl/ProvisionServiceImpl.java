@@ -104,25 +104,28 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Optional<Provision> provision;
 
-		/*if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
-			provision = provisionRepository.getOrderTraza(provisionRequest.getBody().getDocumentType(),
-					provisionRequest.getBody().getDocumentNumber());
-		} else {
-			provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
-					provisionRequest.getBody().getDocumentNumber());
-		}
+		/*
+		 * if (provisionRequest.getHeader().getAppName().equals(
+		 * "APP_WEB_FRONT_TRAZABILIDAD")) { provision =
+		 * provisionRepository.getOrderTraza(provisionRequest.getBody().getDocumentType(
+		 * ), provisionRequest.getBody().getDocumentNumber()); } else { provision =
+		 * provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
+		 * provisionRequest.getBody().getDocumentNumber()); }
+		 * 
+		 * if (!provision.isPresent() &&
+		 * provisionRequest.getBody().getDocumentType().equals("CE")) { provision =
+		 * provisionRepository.getOrder("CEX",
+		 * provisionRequest.getBody().getDocumentNumber()); }
+		 * 
+		 * if (!provision.isPresent() &&
+		 * provisionRequest.getBody().getDocumentType().equalsIgnoreCase("PASAPORTE")) {
+		 * provision = provisionRepository.getOrder("PAS",
+		 * provisionRequest.getBody().getDocumentNumber()); }
+		 */
 
-		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equals("CE")) {
-			provision = provisionRepository.getOrder("CEX", provisionRequest.getBody().getDocumentNumber());
-		}
-
-		if (!provision.isPresent() && provisionRequest.getBody().getDocumentType().equalsIgnoreCase("PASAPORTE")) {
-			provision = provisionRepository.getOrder("PAS", provisionRequest.getBody().getDocumentNumber());
-		}*/
-		
 		provision = provisionRepository.getOrder(provisionRequest.getBody().getDocumentType(),
 				provisionRequest.getBody().getDocumentNumber());
-		
+
 		if (provision.isPresent() && provision.get().getCustomer() != null) {
 
 			Provision prov = provision.get();
@@ -154,25 +157,28 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Optional<List<Provision>> provisions;
 		// List<Provision> provisionList;
 
-		/*if (provisionRequest.getHeader().getAppName().equals("APP_WEB_FRONT_TRAZABILIDAD")) {
-			provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(),
-					provisionRequest.getBody().getDocumentNumber());
-		} else {
-			provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
-					provisionRequest.getBody().getDocumentNumber());
-		}
+		/*
+		 * if (provisionRequest.getHeader().getAppName().equals(
+		 * "APP_WEB_FRONT_TRAZABILIDAD")) { provisions =
+		 * provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType()
+		 * , provisionRequest.getBody().getDocumentNumber()); } else { provisions =
+		 * provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
+		 * provisionRequest.getBody().getDocumentNumber()); }
+		 * 
+		 * if (provisions.get().size() == 0 &&
+		 * provisionRequest.getBody().getDocumentType().equals("CE")) { provisions =
+		 * provisionRepository.findAll("CEX",
+		 * provisionRequest.getBody().getDocumentNumber()); }
+		 * 
+		 * if (provisions.get().size() == 0 &&
+		 * provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
+		 * provisions = provisionRepository.findAll("PAS",
+		 * provisionRequest.getBody().getDocumentNumber()); }
+		 */
 
-		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("CE")) {
-			provisions = provisionRepository.findAll("CEX", provisionRequest.getBody().getDocumentNumber());
-		}
-
-		if (provisions.get().size() == 0 && provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
-			provisions = provisionRepository.findAll("PAS", provisionRequest.getBody().getDocumentNumber());
-		}*/
-		
 		provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
 				provisionRequest.getBody().getDocumentNumber());
-		
+
 		if (provisions.isPresent() && provisions.get().size() > 0) {
 			/*
 			 * provisionList = provisions.get();
@@ -720,8 +726,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 							? Status.INGRESADO.getStatusName().toLowerCase()
 							: Constants.PROVISION_STATUS_CAIDA;
 
-			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA)
-					&& provisionx.getDummyStPsiCode() != null) {
+			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA) && provisionx.getDummyStPsiCode() != null) {
 
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
 				scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
@@ -989,6 +994,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(Status.CANCEL.getDescription());
+			statusLog.setGenericSpeech(Status.CANCEL.getGenericSpeech());
+			statusLog.setSpeechWithoutSchedule(Status.CANCEL.getSpeechWithoutSchedule());
 
 			provision.getLogStatus().add(statusLog);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
@@ -1220,64 +1227,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision setContactInfoUpdate(String provisionId, String contactFullname, String contactCellphone,
-			Boolean contactCellphoneIsMovistar) {
-
-		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
-		boolean updated = false;
-
-		if (optional.isPresent()) {
-			Provision provision = optional.get();
-			// provision.getCustomer().setContactName(contactFullname);
-			// provision.getCustomer().setContactPhoneNumber(Integer.valueOf(contactCellphone));
-			provision.getCustomer().setContactCarrier(contactCellphoneIsMovistar.toString());
-
-			// boolean contactUpdated = provisionRepository.updateContactInfoPsi(provision);
-			// boolean contactUpdated = restPSI.updatePSIClient(provision);
-			boolean contactUpdated = true;
-			if (contactUpdated) {
-				Update update = new Update();
-				update.set("customer.contact_name", contactFullname);
-				update.set("customer.contact_phone_number", Integer.valueOf(contactCellphone));
-				update.set("customer.contact_carrier", contactCellphoneIsMovistar.toString());
-				updated = provisionRepository.updateProvision(provision, update);
-			}
-
-			if (updated) {
-				try {
-					sendContactInfoChangedMail(provision);
-				} catch (Exception e) {
-					log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
-					return provision;
-				}
-
-//				List<MsgParameter> msgParameters = new ArrayList<>();
-				// Nota: si falla el envio de SMS, no impacta al resto del flujo, por lo que no
-				// se valida la respuesta
-				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
-				// Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new
-				// MsgParameter[0]), provisionTexts.getWebUrl());
-				List<Contact> contacts = new ArrayList<>();
-
-				Contact contactCustomer = new Contact();
-				contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-				contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
-				contacts.add(contactCustomer);
-
-//				ApiResponse<SMSByIdResponse> apiResponse = trazabilidadSecurityApi.sendSMS(contacts,
-//						Constants.MSG_CONTACT_UPDATED_KEY, msgParameters.toArray(new MsgParameter[0]),
-//						provisionTexts.getWebUrl());
-
-				return provision;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	@Override
 	public ProvisionResponse<String> getStatus(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getStatus(provisionId);
 		ProvisionResponse<String> response = new ProvisionResponse<String>();
@@ -1322,17 +1271,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Provision provision = optional.get();
 				String nomEstado = "";
 				String description = "";
+				String speech = "";
 
 				if (scheduledType == 2) {
 					nomEstado = Status.FICTICIOUS_SCHEDULED.getStatusName();
 					description = Status.FICTICIOUS_SCHEDULED.getDescription();
+					speech = Status.FICTICIOUS_SCHEDULED.getGenericSpeech();
 				} else {
 					nomEstado = Status.SCHEDULED.getStatusName();
 					description = Status.SCHEDULED.getDescription();
+					speech = Status.SCHEDULED.getGenericSpeech();
 				}
 
 				boolean updated = updateTrackingStatus(provision.getXaRequest(), provision.getXaIdSt(), nomEstado, true,
-						scheduledDate, scheduledRange, scheduledType, description);
+						scheduledDate, scheduledRange, scheduledType, description, speech);
 
 				if (updated) {
 					header.setCode(HttpStatus.OK.value()).setMessage(HttpStatus.OK.name());
@@ -1365,7 +1317,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,
-			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description) {
+			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description, String speech) {
 		boolean updated = false;
 		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
 		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
@@ -1378,6 +1330,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(status);
 			statusLog.setDescription(description);
+			statusLog.setGenericSpeech(speech);
 
 			if (scheduledDate != null)
 				statusLog.setScheduledDate(scheduledDate.toString());
@@ -1659,20 +1612,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setOriginCode(request.getOriginCode());
 			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
-			
-			
+
 			Customer customer = new Customer();
-			
+
 			customer.setDocumentType(request.getCustomerDocumentType());
 			customer.setDocumentNumber(request.getCustomerDocumentNumber());
 			customer.setName(request.getCustomerName());
 			customer.setLatitude(request.getCustomerLatitude());
 			customer.setLongitude(request.getCustomerLongitude());
-		
+
 			provisionAdd.setCustomer(customer);
-			
-			
-			
+
 			List<StatusLog> listLog = new ArrayList<>();
 
 			StatusLog statusPendiente = new StatusLog();
@@ -1695,10 +1645,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
-			
+
 			provisionAdd.setComponents(new ArrayList<>());
-			
-			
+
 			provisionRepository.insertProvision(provisionAdd);
 
 		}

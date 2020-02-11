@@ -216,7 +216,7 @@ public class Provision implements Serializable {
 	private String showLocation;
 
 	@Field("send_notify")
-	private Boolean sendNotify;
+	private Boolean sendNotify = false;
 
 	@Field("components")
 	private List<ComponentsDto> components = new ArrayList<>();

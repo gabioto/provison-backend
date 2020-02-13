@@ -192,10 +192,10 @@ public class Provision implements Serializable {
 	private String lastTrackingStatus;
 
 	@Field("description_status")
-	private String descriptionStatus;
+	private String descriptionStatus = "";
 
 	@Field("generic_speech")
-	private String genericSpeech;
+	private String genericSpeech = "";
 
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();

@@ -191,6 +191,12 @@ public class Provision implements Serializable {
 	@Field("last_tracking_status")
 	private String lastTrackingStatus;
 
+	@Field("description_status")
+	private String descriptionStatus;
+
+	@Field("generic_speech")
+	private String genericSpeech;
+
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
 
@@ -732,29 +738,39 @@ public class Provision implements Serializable {
 	@Override
 	public String toString() {
 		return "Provision [idProvision=" + idProvision + ", externalId=" + externalId + ", xaRequest=" + xaRequest
-				+ ", xaIdSt=" + xaIdSt + ", xaRequirementNumber=" + xaRequirementNumber + ", apptNumber=" + apptNumber
-				+ ", productName=" + productName + ", commercialOp=" + commercialOp + ", paymentMethod=" + paymentMethod
-				+ ", regularPrice=" + regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice
-				+ ", currency=" + currency + ", installPrice=" + installPrice + ", activeStatus=" + activeStatus
+				+ ", dummyXaRequest=" + dummyXaRequest + ", xaRequirementNumber=" + xaRequirementNumber
+				+ ", apptNumber=" + apptNumber + ", xaNumberServiceOrder=" + xaNumberServiceOrder
+				+ ", xaNumberWorkOrder=" + xaNumberWorkOrder + ", activityType=" + activityType + ", xaIdSt=" + xaIdSt
+				+ ", dummyStPsiCode=" + dummyStPsiCode + ", isUpdatedummyStPsiCode=" + isUpdatedummyStPsiCode
+				+ ", back=" + back + ", saleSource=" + saleSource + ", saleCode=" + saleCode + ", originCode="
+				+ originCode + ", saleRequestDate=" + saleRequestDate + ", saleRegisterDate=" + saleRegisterDate
+				+ ", channelEntered=" + channelEntered + ", protectedData=" + protectedData + ", codePsCode="
+				+ codePsCode + ", kafkaDateSend=" + kafkaDateSend + ", productName=" + productName
+				+ ", productNameSource=" + productNameSource + ", productType=" + productType + ", productSub="
+				+ productSub + ", productInternalEquipment=" + productInternalEquipment + ", productSignal="
+				+ productSignal + ", productPsAdmin=" + productPsAdmin + ", svaCode=" + svaCode + ", legacies="
+				+ legacies + ", commercialOp=" + commercialOp + ", productCode=" + productCode + ", paymentMethod="
+				+ paymentMethod + ", campaign=" + campaign + ", regularPrice=" + regularPrice + ", promoPrice="
+				+ promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency=" + currency + ", installPrice="
+				+ installPrice + ", installPriceMonth=" + installPriceMonth + ", activeStatus=" + activeStatus
 				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
 				+ registerDate + ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail="
-				+ tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", workZone="
-				+ workZone + "]";
+				+ tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", contacts="
+				+ contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate + ", dateSendedSMS="
+				+ dateSendedSMS + ", lastTrackingStatus=" + lastTrackingStatus + ", logStatus=" + logStatus + ", inToa="
+				+ inToa + ", woPreStart=" + woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted
+				+ ", cancellationCause=" + cancellationCause + ", cancellationDetail=" + cancellationDetail
+				+ ", showLocation=" + showLocation + ", sendNotify=" + sendNotify + ", genericSpeech=" + genericSpeech
+				+ ", descriptionStatus=" + descriptionStatus + ", components=" + components + "]";
 	}
 
 	public static class StatusLog {
 
 		@Field("status")
 		private String status;
-
-		@Field("description")
-		private String description;
-
-		@Field("generic_speech")
-		private String genericSpeech;
-
-		@Field("speech_without_schedule")
-		private String speechWithoutSchedule;
+//
+//		@Field("description")
+//		private String description;
 
 		@Field("inserted_date")
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -772,13 +788,13 @@ public class Provision implements Serializable {
 			return status;
 		}
 
-		public String getDescription() {
-			return description;
-		}
-
-		public void setDescription(String description) {
-			this.description = description;
-		}
+//		public String getDescription() {
+//			return description;
+//		}
+//
+//		public void setDescription(String description) {
+//			this.description = description;
+//		}
 
 		public void setStatus(String status) {
 			this.status = status;
@@ -815,23 +831,6 @@ public class Provision implements Serializable {
 		public void setXaidst(String xaidst) {
 			this.xaidst = xaidst;
 		}
-
-		public String getGenericSpeech() {
-			return genericSpeech;
-		}
-
-		public void setGenericSpeech(String genericSpeech) {
-			this.genericSpeech = genericSpeech;
-		}
-
-		public String getSpeechWithoutSchedule() {
-			return speechWithoutSchedule;
-		}
-
-		public void setSpeechWithoutSchedule(String speechWithoutSchedule) {
-			this.speechWithoutSchedule = speechWithoutSchedule;
-		}
-
 	}
 
 	public String getShowLocation() {
@@ -848,6 +847,22 @@ public class Provision implements Serializable {
 
 	public void setSendNotify(Boolean sendNotify) {
 		this.sendNotify = sendNotify;
+	}
+
+	public String getGenericSpeech() {
+		return genericSpeech;
+	}
+
+	public void setGenericSpeech(String genericSpeech) {
+		this.genericSpeech = genericSpeech;
+	}
+
+	public String getDescriptionStatus() {
+		return descriptionStatus;
+	}
+
+	public void setDescriptionStatus(String descriptionStatus) {
+		this.descriptionStatus = descriptionStatus;
 	}
 
 }

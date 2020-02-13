@@ -487,14 +487,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setCustomer(customer);
 
 		provision.setLastTrackingStatus(Status.PENDIENTE.getStatusName());
+		provision.setGenericSpeech(Status.PENDIENTE.getGenericSpeech());
+		provision.setDescriptionStatus(Status.PENDIENTE.getDescription());
 
 		List<StatusLog> listLog = new ArrayList<>();
-
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.PENDIENTE.getStatusName());
-		statusLog.setDescription(Status.PENDIENTE.getDescription());
-		statusLog.setGenericSpeech(Status.PENDIENTE.getGenericSpeech());
-		statusLog.setSpeechWithoutSchedule(Status.PENDIENTE.getSpeechWithoutSchedule());
 
 		listLog.add(statusLog);
 
@@ -503,13 +501,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLogCurrent.setStatus(request.getStatus());
 
 			if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
-				statusLogCurrent.setDescription(Status.INGRESADO.getDescription());
-				statusLogCurrent.setGenericSpeech(Status.INGRESADO.getGenericSpeech());
-				statusLogCurrent.setSpeechWithoutSchedule(Status.INGRESADO.getSpeechWithoutSchedule());
+				provision.setDescriptionStatus(Status.INGRESADO.getDescription());
+				provision.setGenericSpeech(Status.INGRESADO.getGenericSpeech());
 			} else {
-				statusLogCurrent.setDescription(Status.CAIDA.getDescription());
-				statusLogCurrent.setGenericSpeech(Status.CAIDA.getGenericSpeech());
-				statusLogCurrent.setSpeechWithoutSchedule(Status.CAIDA.getSpeechWithoutSchedule());
+				provision.setDescriptionStatus(Status.CAIDA.getDescription());
+				provision.setGenericSpeech(Status.CAIDA.getGenericSpeech());
 			}
 
 			listLog.add(statusLogCurrent);
@@ -684,17 +680,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 			statusLog.setStatus(request.getStatus());
 
 			if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
-				statusLog.setDescription(Status.PENDIENTE.getDescription());
-				statusLog.setGenericSpeech(Status.PENDIENTE.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.PENDIENTE.getSpeechWithoutSchedule());
+				provisionx.setDescriptionStatus(Status.PENDIENTE.getDescription());
+				provisionx.setGenericSpeech(Status.PENDIENTE.getGenericSpeech());
 			} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
-				statusLog.setDescription(Status.INGRESADO.getDescription());
-				statusLog.setGenericSpeech(Status.INGRESADO.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.INGRESADO.getSpeechWithoutSchedule());
+				provisionx.setDescriptionStatus(Status.INGRESADO.getDescription());
+				provisionx.setGenericSpeech(Status.INGRESADO.getGenericSpeech());
 			} else {
-				statusLog.setDescription(Status.CAIDA.getDescription());
-				statusLog.setGenericSpeech(Status.CAIDA.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.CAIDA.getSpeechWithoutSchedule());
+				provisionx.setDescriptionStatus(Status.CAIDA.getDescription());
+				provisionx.setGenericSpeech(Status.CAIDA.getGenericSpeech());
 			}
 
 			if (provisionx.getDummyStPsiCode() != null) {
@@ -993,13 +986,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provision = optional.get();
 
 			StatusLog statusLog = new StatusLog();
-			statusLog.setStatus(Status.CANCEL.getDescription());
-			statusLog.setGenericSpeech(Status.CANCEL.getGenericSpeech());
-			statusLog.setSpeechWithoutSchedule(Status.CANCEL.getSpeechWithoutSchedule());
+			statusLog.setStatus(Status.CANCEL.getStatusName());
 
 			provision.getLogStatus().add(statusLog);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
-			provision.setLastTrackingStatus(Status.CANCEL.getDescription());
+			provision.setLastTrackingStatus(Status.CANCEL.getStatusName());
+			provision.setGenericSpeech(Status.CANCEL.getGenericSpeech());
+			provision.setDescriptionStatus(Status.CANCEL.getDescription());
 			provision.setCancellationCause(cause);
 			provision.setCancellationDetail(detail);
 
@@ -1008,7 +1001,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("cancellation_cause", cause);
 			update.set("cancellation_detail", detail);
 			update.set("log_status", provision.getLogStatus());
-			update.set("last_tracking_status", Status.CANCEL.getDescription());
+			update.set("last_tracking_status", Status.CANCEL.getStatusName());
 
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 
@@ -1329,8 +1322,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(status);
-			statusLog.setDescription(description);
-			statusLog.setGenericSpeech(speech);
 
 			if (scheduledDate != null)
 				statusLog.setScheduledDate(scheduledDate.toString());
@@ -1344,6 +1335,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			logStatus.add(statusLog);
 
 			provision.setLastTrackingStatus(status);
+			provision.setGenericSpeech(speech);
+			provision.setDescriptionStatus(description);
 
 			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, comesFromSchedule);
 			log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
@@ -1586,16 +1579,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
-			statusLog.setDescription(Status.FICTICIOUS_SCHEDULED.getDescription());
-			statusLog.setGenericSpeech(Status.FICTICIOUS_SCHEDULED.getGenericSpeech());
-			statusLog.setSpeechWithoutSchedule(Status.FICTICIOUS_SCHEDULED.getSpeechWithoutSchedule());
-
 			statusLog.setScheduledDate(request.getScheduleDate().toString());
 			statusLog.setScheduledRange(request.getScheduleRange());
 
 			update.set("work_zone", request.getBucket());
 			update.set("origin_code", request.getOriginCode());
 			update.set("last_tracking_status", Status.FICTICIOUS_SCHEDULED.getStatusName());
+			update.set("generic_speech", Status.FICTICIOUS_SCHEDULED.getGenericSpeech());
+			update.set("description_status", Status.FICTICIOUS_SCHEDULED.getDescription());
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
 
@@ -1628,15 +1619,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			StatusLog statusPendiente = new StatusLog();
 			StatusLog statusLogDummy = new StatusLog();
 			statusPendiente.setStatus(Status.PENDIENTE.getStatusName());
-			statusPendiente.setDescription(Status.PENDIENTE.getDescription());
-			statusPendiente.setGenericSpeech(Status.PENDIENTE.getGenericSpeech());
-			statusPendiente.setSpeechWithoutSchedule(Status.PENDIENTE.getSpeechWithoutSchedule());
 
 			statusLogDummy.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
-			statusLogDummy.setDescription(Status.FICTICIOUS_SCHEDULED.getDescription());
-			statusLogDummy.setGenericSpeech(Status.FICTICIOUS_SCHEDULED.getGenericSpeech());
-			statusLogDummy.setSpeechWithoutSchedule(Status.FICTICIOUS_SCHEDULED.getSpeechWithoutSchedule());
-
 			statusLogDummy.setScheduledDate(request.getScheduleDate().toString());
 			statusLogDummy.setScheduledRange(request.getScheduleRange());
 
@@ -1645,6 +1629,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
+			provisionAdd.setGenericSpeech(Status.FICTICIOUS_SCHEDULED.getGenericSpeech());
+			provisionAdd.setStatusToa(Status.FICTICIOUS_SCHEDULED.getDescription());
 
 			provisionAdd.setComponents(new ArrayList<>());
 
@@ -1719,13 +1705,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					// NO SMS
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
-					statusLog.setDescription(Status.DUMMY_IN_TOA.getDescription());
-					statusLog.setGenericSpeech(Status.DUMMY_IN_TOA.getGenericSpeech());
-					statusLog.setSpeechWithoutSchedule(Status.DUMMY_IN_TOA.getSpeechWithoutSchedule());
 					listLog.add(statusLog);
 
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.DUMMY_IN_TOA.getStatusName());
+					update.set("generic_speech", Status.DUMMY_IN_TOA.getGenericSpeech());
+					update.set("description_status", Status.DUMMY_IN_TOA.getDescription());
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
@@ -1740,9 +1725,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
-					statusLog.setDescription(Status.DUMMY_IN_TOA.getDescription());
-					statusLog.setGenericSpeech(Status.DUMMY_IN_TOA.getGenericSpeech());
-					statusLog.setSpeechWithoutSchedule(Status.DUMMY_IN_TOA.getSpeechWithoutSchedule());
 
 					update.set("xa_request", getData[2]);
 					update.set("xa_id_st", getData[4]);
@@ -1753,8 +1735,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-
+					update.set("last_tracking_status", Status.DUMMY_IN_TOA.getStatusName());
+					update.set("generic_speech", Status.DUMMY_IN_TOA.getGenericSpeech());
+					update.set("description_status", Status.DUMMY_IN_TOA.getDescription());
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
@@ -1795,12 +1778,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.IN_TOA.getStatusName());
-					statusLog.setDescription(Status.IN_TOA.getDescription());
-					statusLog.setGenericSpeech(Status.IN_TOA.getGenericSpeech());
-					statusLog.setSpeechWithoutSchedule(Status.IN_TOA.getSpeechWithoutSchedule());
 					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+					update.set("generic_speech", Status.IN_TOA.getGenericSpeech());
+					update.set("description_status", Status.IN_TOA.getDescription());
 					listLog.add(statusLog);
 
 					log.info("JEAN 2");
@@ -1819,14 +1801,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 							if (listLogx.size() > 0 && listLogCancelled.size() == 0) {
 								StatusLog statusSchedule = new StatusLog();
 								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
-								statusSchedule.setDescription(Status.SCHEDULED.getDescription());
-								statusSchedule.setGenericSpeech(Status.SCHEDULED.getGenericSpeech());
-								statusSchedule.setSpeechWithoutSchedule(Status.SCHEDULED.getSpeechWithoutSchedule());
 								statusSchedule.setXaidst(getData[4]);
 								statusSchedule.setScheduledDate(listLogx.get(0).getScheduledDate());
 								statusSchedule.setScheduledRange(listLogx.get(0).getScheduledRange());
 								listLog.add(statusSchedule);
+
 								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
+								update.set("generic_speech", Status.SCHEDULED.getGenericSpeech());
+								update.set("speech_without_schedule", Status.SCHEDULED.getSpeechWithoutSchedule());
 
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
@@ -1891,14 +1873,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
-				statusLog.setDescription(Status.WO_PRESTART.getDescription());
-				statusLog.setGenericSpeech(Status.WO_PRESTART.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.WO_PRESTART.getSpeechWithoutSchedule());
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("customer.latitude", getData[14]);
 				update.set("customer.longitude", getData[13]);
 				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
+				update.set("generic_speech", Status.WO_PRESTART.getGenericSpeech());
+				update.set("description_status", Status.WO_PRESTART.getDescription());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1931,12 +1912,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("xa_request", getData[5]);
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_INIT.getStatusName());
-				statusLog.setDescription(Status.WO_INIT.getDescription());
-				statusLog.setGenericSpeech(Status.WO_INIT.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.WO_INIT.getSpeechWithoutSchedule());
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("last_tracking_status", Status.WO_INIT.getStatusName());
+				update.set("generic_speech", Status.WO_INIT.getGenericSpeech());
+				update.set("description_status", Status.WO_INIT.getDescription());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1973,12 +1953,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
-				statusLog.setDescription(Status.WO_COMPLETED.getDescription());
-				statusLog.setGenericSpeech(Status.WO_COMPLETED.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.WO_COMPLETED.getSpeechWithoutSchedule());
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
+				update.set("generic_speech", Status.WO_COMPLETED.getGenericSpeech());
+				update.set("description_status", Status.WO_COMPLETED.getDescription());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -1999,15 +1978,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_CANCEL.getStatusName());
-				statusLog.setDescription(Status.WO_CANCEL.getDescription());
-				statusLog.setGenericSpeech(Status.WO_CANCEL.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.WO_CANCEL.getSpeechWithoutSchedule());
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("send_notify", false);
 				update.set("xa_cancel_reason", getData[16]);
 				update.set("user_cancel", getData[15]);
 				update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
+				update.set("generic_speech", Status.WO_CANCEL.getGenericSpeech());
+				update.set("description_status", Status.WO_CANCEL.getDescription());
 				update.set("xa_id_st", getData[4]);
 				update.set("xa_requirement_number", getData[5]);
 				update.set("appt_number", getData[6]);
@@ -2100,9 +2078,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());
-				statusLog.setDescription(Status.SCHEDULED.getDescription());
-				statusLog.setGenericSpeech(Status.SCHEDULED.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.SCHEDULED.getSpeechWithoutSchedule());
 				statusLog.setScheduledRange(rangeFinal);
 				statusLog.setScheduledDate(dateString);
 				statusLog.setXaidst(provision.getXaIdSt());
@@ -2111,6 +2086,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("send_notify", false);
 				update.set("time_slot", range);
 				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
+				update.set("generic_speech", Status.SCHEDULED.getGenericSpeech());
+				update.set("description_status", Status.SCHEDULED.getDescription());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 
@@ -2180,14 +2157,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_NOTDONE.getStatusName());
-				statusLog.setDescription(Status.WO_NOTDONE.getDescription());
-				statusLog.setGenericSpeech(Status.WO_NOTDONE.getGenericSpeech());
-				statusLog.setSpeechWithoutSchedule(Status.WO_NOTDONE.getSpeechWithoutSchedule());
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("a_observation", getData[27]);
 				update.set("user_notdone", getData[28]);
 				update.set("last_tracking_status", Status.WO_NOTDONE.getStatusName());
+				update.set("generic_speech", Status.WO_NOTDONE.getGenericSpeech());
+				update.set("description_status", Status.WO_NOTDONE.getDescription());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 

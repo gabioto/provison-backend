@@ -304,8 +304,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
 		List<Provision> provision = this.mongoOperations.find(
-				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer")
-						.andOperator(Criteria.where("customer").ne(null), Criteria.where("customer").ne(""))).limit(5),
+				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).
+						and("customer").ne(null)
+						).limit(5),
 				Provision.class);
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;

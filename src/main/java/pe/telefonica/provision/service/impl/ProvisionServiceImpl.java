@@ -383,9 +383,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private Provision fillProvisionInsert(InsertOrderRequest request) {
 
-		// String separador = Pattern.quote("|");
-		// tring[] getData = request.getData().split(separador);
-
 		String[] getData = request.getData().split("\\|", -1);
 
 		Provision provision = new Provision();
@@ -675,16 +672,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Update update = fillProvisionUpdate(request);
 
 			List<StatusLog> listLog = provisionx.getLogStatus();
+			boolean hasFictitious = validateFictitiousSchedule(listLog);
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(request.getStatus());
 
 			if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
 				provisionx.setDescriptionStatus(Status.PENDIENTE.getDescription());
-				provisionx.setGenericSpeech(Status.PENDIENTE.getGenericSpeech());
+				provisionx.setGenericSpeech(hasFictitious ? Status.PENDIENTE.getGenericSpeech()
+						: Status.PENDIENTE.getSpeechWithoutSchedule());
 			} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
 				provisionx.setDescriptionStatus(Status.INGRESADO.getDescription());
-				provisionx.setGenericSpeech(Status.INGRESADO.getGenericSpeech());
+				provisionx.setGenericSpeech(hasFictitious ? Status.INGRESADO.getGenericSpeech()
+						: Status.INGRESADO.getSpeechWithoutSchedule());
 			} else {
 				provisionx.setDescriptionStatus(Status.CAIDA.getDescription());
 				provisionx.setGenericSpeech(Status.CAIDA.getGenericSpeech());
@@ -2340,5 +2340,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public boolean updateShowLocation(Provision provision) {
 		return provisionRepository.updateShowLocation(provision);
+	}
+
+	private boolean validateFictitiousSchedule(List<StatusLog> listStatus) {
+
+		for (StatusLog statusLog : listStatus) {
+			if (statusLog.getStatus().equalsIgnoreCase(Status.FICTICIOUS_SCHEDULED.getStatusName())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

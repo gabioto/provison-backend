@@ -751,16 +751,18 @@ public class ProvisionServiceImpl implements ProvisionService {
 			// Provision provision = fillProvisionInsert(request);
 			provisionx = evaluateProvisionComponents(provisionx);
 
-			provisionRepository.updateProvision(provisionx, update);
+			Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
+			return isUpdate ?  true: false;
+		
 
 		} else {
 
 			Provision provision = fillProvisionInsert(request);
 			provision = evaluateProvisionComponents(provision);
 			provisionRepository.insertProvision(provision);
-
+			return true;
 		}
-		return true;
+		//return true;
 	}
 
 	@Override

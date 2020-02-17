@@ -1,37 +1,42 @@
 package pe.telefonica.provision.model.provision;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class WoNotdone implements Serializable {
-	
+
 	private static final long serialVersionUID = 3775714898258466530L;
-	
+
 	@Field("a_not_done_type_install")
 	private String aNotDoneTypeInstall;
-	
+
 	@Field("a_not_done_reason_install")
 	private String aNotDoneReasonInstall;
 
 	@Field("a_not_done_sub_reason_install")
 	private String aNotDoneSubReasonInstall;
-	
+
 	@Field("a_not_done_type_repair")
 	private String aNotDoneTypeRepair;
-	
+
 	@Field("a_not_done_area")
 	private String aNotDoneArea;
-	
+
 	@Field("a_not_done_reason_repair")
 	private String aNotDoneReasonRepair;
-	
+
 	@Field("a_observation")
 	private String aObservation;
-	
+
 	@Field("user_notdone")
 	private String userNotdone;
-	
+
+	@Field("register_date")
+	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+
 	public String getaNotDoneReasonInstall() {
 		return aNotDoneReasonInstall;
 	}
@@ -88,16 +93,20 @@ public class WoNotdone implements Serializable {
 		this.userNotdone = userNotdone;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	public String getaNotDoneTypeInstall() {
 		return aNotDoneTypeInstall;
 	}
 
 	public void setaNotDoneTypeInstall(String aNotDoneTypeInstall) {
 		this.aNotDoneTypeInstall = aNotDoneTypeInstall;
+	}
+
+	public LocalDateTime getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(LocalDateTime registerDate) {
+		this.registerDate = registerDate;
 	}
 
 }

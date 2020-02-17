@@ -507,6 +507,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			listLog.add(statusLogCurrent);
 
+			provision.setRegisterDateUpdate(LocalDateTime.now(ZoneOffset.of("-05:00")));
 			provision.setLastTrackingStatus(request.getStatus());
 
 			provision.setActiveStatus(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
@@ -531,7 +532,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Update update = new Update();
 
-		// provision.setSaleSource(getData[0]);
+		update.set("register_date_update", LocalDateTime.now(ZoneOffset.of("-05:00")));
+
 		update.set("sale_source", getData[0]);
 		// provision.setBack(getData[1]);
 		update.set("back", getData[1]);
@@ -749,16 +751,18 @@ public class ProvisionServiceImpl implements ProvisionService {
 			// Provision provision = fillProvisionInsert(request);
 			provisionx = evaluateProvisionComponents(provisionx);
 
-			provisionRepository.updateProvision(provisionx, update);
+			Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
+			return isUpdate ?  true: false;
+		
 
 		} else {
 
 			Provision provision = fillProvisionInsert(request);
 			provision = evaluateProvisionComponents(provision);
 			provisionRepository.insertProvision(provision);
-
+			return true;
 		}
-		return true;
+		//return true;
 	}
 
 	@Override
@@ -1340,7 +1344,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision.setGenericSpeech(speech);
 			provision.setDescriptionStatus(description);
 
-			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, comesFromSchedule);
+			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, description, speech,
+					comesFromSchedule);
 			log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
 		}
 
@@ -1603,6 +1608,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
+
+			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
+			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
+
 			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
 
@@ -1632,7 +1641,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			provisionAdd.setGenericSpeech(Status.FICTICIOUS_SCHEDULED.getGenericSpeech());
-			provisionAdd.setStatusToa(Status.FICTICIOUS_SCHEDULED.getDescription());
+			provisionAdd.setDescriptionStatus(Status.FICTICIOUS_SCHEDULED.getDescription());
+			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 
 			provisionAdd.setComponents(new ArrayList<>());
 
@@ -1783,7 +1793,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-					update.set("generic_speech", Status.IN_TOA.getGenericSpeech());
+					update.set("generic_speech", Status.IN_TOA.getSpeechWithoutSchedule());
 					update.set("description_status", Status.IN_TOA.getDescription());
 					listLog.add(statusLog);
 
@@ -1810,7 +1820,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 								update.set("generic_speech", Status.SCHEDULED.getGenericSpeech());
-								update.set("speech_without_schedule", Status.SCHEDULED.getSpeechWithoutSchedule());
+								update.set("description_status", Status.SCHEDULED.getDescription());
 
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule

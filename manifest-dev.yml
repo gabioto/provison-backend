@@ -2,8 +2,8 @@
 applications:
   - name: PROVISION-TRAZABILIDAD
     random-route: true
-    memory: 2GB
+    memory: 3GB
     path: target/tdp-provision-1.0.2-SNAPSHOT.jar
     buildpack: liberty-for-java
     disk_quota: 2GB
-    instances: 1
+    instances: 2

@@ -161,6 +161,9 @@ public class Provision implements Serializable {
 	@Field("register_date")
 	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
+	@Field("register_date_update")
+	private LocalDateTime registerDateUpdate;
+
 	@Field("has_schedule")
 	private Boolean hasSchedule = false;
 
@@ -585,6 +588,14 @@ public class Provision implements Serializable {
 
 	public void setRegisterDate(LocalDateTime registerDate) {
 		this.registerDate = registerDate;
+	}
+
+	public LocalDateTime getRegisterDateUpdate() {
+		return registerDateUpdate;
+	}
+
+	public void setRegisterDateUpdate(LocalDateTime registerDateUpdate) {
+		this.registerDateUpdate = registerDateUpdate;
 	}
 
 	public Boolean getHasSchedule() {

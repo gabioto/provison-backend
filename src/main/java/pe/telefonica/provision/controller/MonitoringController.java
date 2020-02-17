@@ -45,7 +45,7 @@ public class MonitoringController {
 			GetProvisionByStatusResponse response = monitoringService.GetProvisionByStatus(request.getBody());
 
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<GetProvisionByStatusResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
+				apiResponse = new ApiResponse<GetProvisionByStatusResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_MONITORING_PROVISION,
 						String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(response);
 
@@ -55,7 +55,7 @@ public class MonitoringController {
 		} catch (Exception ex) {
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<GetProvisionByStatusResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
+			apiResponse = new ApiResponse<GetProvisionByStatusResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_MONITORING_PROVISION,
 					String.valueOf(status.value()), status.getReasonPhrase(), null);
 			apiResponse.setBody(null);
 

@@ -22,7 +22,7 @@ public class MonitoringServiceImpl implements MonitoringService {
 		for (String item : request.getStatus()) {
 			long quantity = monitoringRepository.getQuantityRegisterByStatus(request.getStartDate(),
 					request.getEndDate(), item);
-			mesague += quantity + " " + item + " ";
+			mesague += quantity + " " + " " + item + "; ";
 		}
 
 		response.setQuantity(mesague);

@@ -1,6 +1,8 @@
 package pe.telefonica.provision.model.provision;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -24,6 +26,9 @@ public class InToa implements Serializable {
 
 	@Field("latitude")
 	private String latitude;
+
+	@Field("register_date")
+	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 	public String getXaNote() {
 		return xaNote;
@@ -71,6 +76,14 @@ public class InToa implements Serializable {
 
 	public void setLatitude(String latitude) {
 		this.latitude = latitude;
+	}
+
+	public LocalDateTime getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(LocalDateTime registerDate) {
+		this.registerDate = registerDate;
 	}
 
 }

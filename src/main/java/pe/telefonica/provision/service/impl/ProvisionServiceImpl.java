@@ -513,7 +513,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			listLog.add(statusLogCurrent);
-
+			
+			provision.setRegisterDateUpdate(LocalDateTime.now(ZoneOffset.of("-05:00")));
 			provision.setLastTrackingStatus(request.getStatus());
 
 			provision.setActiveStatus(request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
@@ -538,7 +539,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Update update = new Update();
 
-		// provision.setSaleSource(getData[0]);
+		update.set("register_date_update", LocalDateTime.now(ZoneOffset.of("-05:00")));
+		
 		update.set("sale_source", getData[0]);
 		// provision.setBack(getData[1]);
 		update.set("back", getData[1]);

@@ -1810,7 +1810,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 								update.set("generic_speech", Status.SCHEDULED.getGenericSpeech());
-								update.set("speech_without_schedule", Status.SCHEDULED.getSpeechWithoutSchedule());
+								update.set("description_status", Status.SCHEDULED.getDescription());
 
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule

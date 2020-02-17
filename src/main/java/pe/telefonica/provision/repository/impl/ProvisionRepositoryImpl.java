@@ -217,10 +217,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, boolean comesFromSchedule) {
+	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, String description,
+			String speech, boolean comesFromSchedule) {
 		Update update = new Update();
 		update.set("last_tracking_status", provision.getLastTrackingStatus());
 		update.set("log_status", logStatus);
+		update.set("description_status", description);
+		update.set("generic_speech", speech);
 
 		if (comesFromSchedule) {
 			update.set("has_schedule", true);

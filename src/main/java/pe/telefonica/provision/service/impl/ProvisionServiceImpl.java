@@ -1783,7 +1783,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setXaidst(getData[4]);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-					update.set("generic_speech", Status.IN_TOA.getGenericSpeech());
+					update.set("generic_speech", Status.IN_TOA.getSpeechWithoutSchedule());
 					update.set("description_status", Status.IN_TOA.getDescription());
 					listLog.add(statusLog);
 
@@ -1810,7 +1810,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 								update.set("generic_speech", Status.SCHEDULED.getGenericSpeech());
-								update.set("speech_without_schedule", Status.SCHEDULED.getSpeechWithoutSchedule());
+								update.set("description_status", Status.SCHEDULED.getDescription());
 
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule

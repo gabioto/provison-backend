@@ -1344,7 +1344,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision.setGenericSpeech(speech);
 			provision.setDescriptionStatus(description);
 
-			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, comesFromSchedule);
+			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, description, speech,
+					comesFromSchedule);
 			log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
 		}
 

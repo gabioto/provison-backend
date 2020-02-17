@@ -484,7 +484,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setCustomer(customer);
 
 		provision.setLastTrackingStatus(Status.PENDIENTE.getStatusName());
-		provision.setGenericSpeech(Status.PENDIENTE.getGenericSpeech());
+		provision.setGenericSpeech(Status.PENDIENTE.getSpeechWithoutSchedule());
 		provision.setDescriptionStatus(Status.PENDIENTE.getDescription());
 
 		List<StatusLog> listLog = new ArrayList<>();
@@ -499,7 +499,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
 				provision.setDescriptionStatus(Status.INGRESADO.getDescription());
-				provision.setGenericSpeech(Status.INGRESADO.getGenericSpeech());
+				provision.setGenericSpeech(Status.INGRESADO.getSpeechWithoutSchedule());
 			} else {
 				provision.setDescriptionStatus(Status.CAIDA.getDescription());
 				provision.setGenericSpeech(Status.CAIDA.getGenericSpeech());
@@ -737,6 +737,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("show_location", false);
 
 			update.set("last_tracking_status", request.getStatus());
+			update.set("description_status", provisionx.getDescriptionStatus());
+			update.set("generic_speech", provisionx.getGenericSpeech());
 
 			listLog.add(statusLog);
 			update.set("log_status", listLog);

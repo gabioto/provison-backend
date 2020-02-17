@@ -506,7 +506,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			listLog.add(statusLogCurrent);
-			
+
 			provision.setRegisterDateUpdate(LocalDateTime.now(ZoneOffset.of("-05:00")));
 			provision.setLastTrackingStatus(request.getStatus());
 
@@ -533,7 +533,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Update update = new Update();
 
 		update.set("register_date_update", LocalDateTime.now(ZoneOffset.of("-05:00")));
-		
+
 		update.set("sale_source", getData[0]);
 		// provision.setBack(getData[1]);
 		update.set("back", getData[1]);
@@ -1609,7 +1609,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
 			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
-			
+
 			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
 
@@ -1639,7 +1639,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setLogStatus(listLog);
 			provisionAdd.setLastTrackingStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			provisionAdd.setGenericSpeech(Status.FICTICIOUS_SCHEDULED.getGenericSpeech());
-			provisionAdd.setStatusToa(Status.FICTICIOUS_SCHEDULED.getDescription());
+			provisionAdd.setDescriptionStatus(Status.FICTICIOUS_SCHEDULED.getDescription());
+			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 
 			provisionAdd.setComponents(new ArrayList<>());
 

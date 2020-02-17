@@ -1,6 +1,8 @@
 package pe.telefonica.provision.model.provision;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -63,6 +65,9 @@ public class WoCompleted implements Serializable {
 
 	@Field("complete_rep_cbl")
 	private String completeRepCbl;
+
+	@Field("register_date")
+	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 	public String getXaCreationDate() {
 		return xaCreationDate;
@@ -214,6 +219,14 @@ public class WoCompleted implements Serializable {
 
 	public void setCompleteRepCbl(String completeRepCbl) {
 		this.completeRepCbl = completeRepCbl;
+	}
+
+	public LocalDateTime getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(LocalDateTime registerDate) {
+		this.registerDate = registerDate;
 	}
 
 }

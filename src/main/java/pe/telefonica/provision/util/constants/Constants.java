@@ -87,6 +87,7 @@ public final class Constants {
 	public static final String OPER_UPDATE_ADDRESSBO = "OPER_UPDATE_ADDRESSBO";
 	public static final String OPER_VALIDATE_DATA = "OPER_VALIDATE_DATA";
 	public static final String OPER_VALIDATE_USER = "OPER_VALIDATE_USER";
+	public static final String OPER_MONITORING_PROVISION = "OPER_MONITORING_PROVISION";
 	public static final String OPER_GET_PROVISION_ALL = "OPER_GET_PROVISION_ALL";
 	public static final String OPER_INSERT_PROVISION = "OPER_INSERT_PROVISION";
 	public static final String OPER_PROVISION_UPDATE_FROM_TOA = "OPER_PROVISION_UPDATE_FROM_TOA";

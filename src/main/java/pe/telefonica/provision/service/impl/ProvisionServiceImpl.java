@@ -1610,6 +1610,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDummyStPsiCode(request.getDummyStPsiCode());
 			provisionAdd.setHasSchedule(true);
 			provisionAdd.setOriginCode(request.getOriginCode());
+			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
+			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
 

@@ -1008,6 +1008,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("cancellation_detail", detail);
 			update.set("log_status", provision.getLogStatus());
 			update.set("last_tracking_status", Status.CANCEL.getStatusName());
+			
+			update.set("description_status", Status.CANCEL.getDescription());
+			update.set("generic_speech", Status.CANCEL.getGenericSpeech());
+			
 
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 

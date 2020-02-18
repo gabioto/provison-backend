@@ -1612,6 +1612,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setOriginCode(request.getOriginCode());
 			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
+			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
+			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 
 			Customer customer = new Customer();
 

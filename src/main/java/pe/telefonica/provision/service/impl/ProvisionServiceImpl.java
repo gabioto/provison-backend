@@ -1868,8 +1868,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					update.set("log_status", listLog);
 
-					LocalDateTime dateSendedSMS = LocalDateTime.now(ZoneOffset.of("-05:00"));
-					provision.setDateSendedSMS(dateSendedSMS);
 
 					// carrier titular
 					boolean carrierTitular = getCarrier(provision.getCustomer().getPhoneNumber());

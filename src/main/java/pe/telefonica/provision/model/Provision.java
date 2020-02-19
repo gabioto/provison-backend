@@ -187,9 +187,10 @@ public class Provision implements Serializable {
 
 	@Field("registro_actualizado")
 	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-
-	@Field("date_sended_sms")
-	private LocalDateTime dateSendedSMS;
+	
+	@Field("invite_message_date")
+	private LocalDateTime inviteMessageDate;
+	
 
 	@Field("last_tracking_status")
 	private String lastTrackingStatus;
@@ -662,12 +663,14 @@ public class Provision implements Serializable {
 		this.updatedDate = updatedDate;
 	}
 
-	public LocalDateTime getDateSendedSMS() {
-		return dateSendedSMS;
+	
+
+	public LocalDateTime getInviteMessageDate() {
+		return inviteMessageDate;
 	}
 
-	public void setDateSendedSMS(LocalDateTime dateSendedSMS) {
-		this.dateSendedSMS = dateSendedSMS;
+	public void setInviteMessageDate(LocalDateTime inviteMessageDate) {
+		this.inviteMessageDate = inviteMessageDate;
 	}
 
 	public String getLastTrackingStatus() {
@@ -767,8 +770,7 @@ public class Provision implements Serializable {
 				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
 				+ registerDate + ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail="
 				+ tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", contacts="
-				+ contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate + ", dateSendedSMS="
-				+ dateSendedSMS + ", lastTrackingStatus=" + lastTrackingStatus + ", logStatus=" + logStatus + ", inToa="
+				+ contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate + ", lastTrackingStatus=" + lastTrackingStatus + ", logStatus=" + logStatus + ", inToa="
 				+ inToa + ", woPreStart=" + woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted
 				+ ", cancellationCause=" + cancellationCause + ", cancellationDetail=" + cancellationDetail
 				+ ", showLocation=" + showLocation + ", sendNotify=" + sendNotify + ", genericSpeech=" + genericSpeech

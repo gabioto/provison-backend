@@ -993,13 +993,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			Provision provision = optional.get();
 
 			StatusLog statusLog = new StatusLog();
-			statusLog.setStatus(Status.CANCEL.getDescription());
+			statusLog.setStatus(Status.CANCEL.getStatusName());
 			statusLog.setGenericSpeech(Status.CANCEL.getGenericSpeech());
 			statusLog.setSpeechWithoutSchedule(Status.CANCEL.getSpeechWithoutSchedule());
 
 			provision.getLogStatus().add(statusLog);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
-			provision.setLastTrackingStatus(Status.CANCEL.getDescription());
+			provision.setLastTrackingStatus(Status.CANCEL.getStatusName());
 			provision.setCancellationCause(cause);
 			provision.setCancellationDetail(detail);
 
@@ -1008,7 +1008,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("cancellation_cause", cause);
 			update.set("cancellation_detail", detail);
 			update.set("log_status", provision.getLogStatus());
-			update.set("last_tracking_status", Status.CANCEL.getDescription());
+			update.set("last_tracking_status", Status.CANCEL.getStatusName());
 
 			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
 

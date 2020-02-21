@@ -670,10 +670,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Provision provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
 
 		if (provisionx != null) {
-
+			
+			
+			List<StatusLog> listLog = provisionx.getLogStatus();
+			
+			List<StatusLog> listIngresado = listLog.stream().filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()) ).collect(Collectors.toList());
+			List<StatusLog> listCaida = listLog.stream().filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()) ).collect(Collectors.toList());
+			if(listIngresado.size() > 0) {
+				return false;
+			}
+			
+			if(listCaida.size() > 0) {
+				return false;
+			}
+			
+			
 			Update update = fillProvisionUpdate(request);
 
-			List<StatusLog> listLog = provisionx.getLogStatus();
 			boolean hasFictitious = validateFictitiousSchedule(listLog);
 
 			StatusLog statusLog = new StatusLog();
@@ -693,6 +706,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provisionx.getDummyStPsiCode() != null) {
+				
 				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 						&& !provisionx.getDummyStPsiCode().isEmpty()) {
 					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
@@ -811,7 +825,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired) {
-		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
+		
+		Optional<Provision> optional = provisionRepository.getProvisionByIdAndActiveStatus(provisionId, Constants.PROVISION_STATUS_ADDRESS_CHANGED);
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();

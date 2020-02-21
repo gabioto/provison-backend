@@ -217,10 +217,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, boolean comesFromSchedule) {
+	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, String description,
+			String speech, boolean comesFromSchedule) {
 		Update update = new Update();
 		update.set("last_tracking_status", provision.getLastTrackingStatus());
 		update.set("log_status", logStatus);
+		update.set("description_status", description);
+		update.set("generic_speech", speech);
 
 		if (comesFromSchedule) {
 			update.set("has_schedule", true);
@@ -303,9 +306,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
-		List<Provision> provision = this.mongoOperations.find(new Query(
-				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))
-						.limit(5),
+
+		List<Provision> provision = this.mongoOperations.find(
+				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).
+						and("customer").ne(null)
+						).limit(5),
+				
 				Provision.class);
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
@@ -341,5 +347,20 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
 				Provision.class);
 		return result.getMatchedCount() > 0;
+	}
+
+	@Override
+	public Optional<Provision> getProvisionByIdAndActiveStatus(String provisionId, String activeStatus) {
+		
+		Provision	provision = this.mongoOperations.findOne(
+					new Query(Criteria.where("idProvision").is(new ObjectId(provisionId)).andOperator(
+							Criteria.where("active_status").is(activeStatus))),
+					Provision.class);
+		Optional<Provision> optionalProvision = Optional.ofNullable(provision);
+
+		return optionalProvision;
+		
+		
+
 	}
 }

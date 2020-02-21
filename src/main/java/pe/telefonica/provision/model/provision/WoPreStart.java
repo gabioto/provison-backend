@@ -1,6 +1,8 @@
 package pe.telefonica.provision.model.provision;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -13,6 +15,9 @@ public class WoPreStart implements Serializable {
 
 	@Field("date")
 	private String date;
+
+	@Field("register_date")
+	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 	public String getNameResource() {
 		return nameResource;
@@ -28,6 +33,14 @@ public class WoPreStart implements Serializable {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public LocalDateTime getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(LocalDateTime registerDate) {
+		this.registerDate = registerDate;
 	}
 
 }

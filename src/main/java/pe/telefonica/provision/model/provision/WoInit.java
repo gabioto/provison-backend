@@ -1,33 +1,38 @@
 package pe.telefonica.provision.model.provision;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class WoInit implements Serializable {
-	
+
 	private static final long serialVersionUID = 3775714898258466530L;
-	
+
 	@Field("nameResource")
 	private String nameResource;
-	
+
 	@Field("xa_creation_date")
 	private String xaCreationDate;
-	
+
 	@Field("eta_start_time")
 	private String etaStartTime;
-	
+
 	@Field("eta_end_time")
 	private String etaEndTime;
-	
+
 	@Field("xa_note")
 	private String xaNote;
-	
+
 	@Field("date")
 	private String date;
-	
+
 	@Field("comment_Technician")
 	private String commentTechnician;
+
+	@Field("register_date")
+	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 	public String getNameResource() {
 		return nameResource;
@@ -84,8 +89,13 @@ public class WoInit implements Serializable {
 	public void setCommentTechnician(String commentTechnician) {
 		this.commentTechnician = commentTechnician;
 	}
-	
-	
-	
-	
+
+	public LocalDateTime getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(LocalDateTime registerDate) {
+		this.registerDate = registerDate;
+	}
+
 }

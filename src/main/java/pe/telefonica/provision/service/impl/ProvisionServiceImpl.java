@@ -1980,7 +1980,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName()) && "0".equals(getData[16].toString())){
 				// && !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
 

@@ -43,11 +43,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
+		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
 
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber)
-						.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""))),
+						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
+								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
 				Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
@@ -74,10 +75,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
 
-		Provision provision = this.mongoOperations.findOne(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber)
-						.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""))),
+		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("customer.document_type")
+				.is(documentType).and("customer.document_number").is(documentNumber)
+				.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""),
+
+						Criteria.where("register_date").gte(dateStart))),
 				Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
@@ -162,8 +166,16 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-		Query query = new Query(Criteria.where("productName").ne(null)
-				.andOperator(Criteria.where("updatedDate").gte(startDate), Criteria.where("updatedDate").lt(endDate)));
+		/*
+		 * Query query = new Query(Criteria.where("productName").ne(null)
+		 * .andOperator(Criteria.where("updatedDate").gte(startDate),
+		 * Criteria.where("updatedDate").lt(endDate))); List<Provision> provisions =
+		 * this.mongoOperations.find(query, Provision.class);
+		 */
+
+		Query query = new Query(
+				Criteria.where("productName").ne(null).andOperator(Criteria.where("invite_message_date").gte(startDate),
+						Criteria.where("invite_message_date").lt(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
@@ -308,10 +320,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.WO_NOTDONE.getStatusName());
 
 		List<Provision> provision = this.mongoOperations.find(
-				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).
-						and("customer").ne(null)
+				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null)
 						).limit(5),
-				
+			
 				Provision.class);
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
@@ -324,7 +335,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		update.set("send_notify", true);
 		UpdateResult result = null;
 		for (int i = 0; i < listProvision.size(); i++) {
-			if (Status.IN_TOA.equals(listProvision.get(i).getLastTrackingStatus())) {
+			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				result = this.mongoOperations.updateFirst(
 						new Query(
@@ -351,16 +362,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<Provision> getProvisionByIdAndActiveStatus(String provisionId, String activeStatus) {
-		
-		Provision	provision = this.mongoOperations.findOne(
-					new Query(Criteria.where("idProvision").is(new ObjectId(provisionId)).andOperator(
-							Criteria.where("active_status").is(activeStatus))),
-					Provision.class);
+
+		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("idProvision")
+				.is(new ObjectId(provisionId)).andOperator(Criteria.where("active_status").is(activeStatus))),
+				Provision.class);
 		Optional<Provision> optionalProvision = Optional.ofNullable(provision);
 
 		return optionalProvision;
-		
-		
 
 	}
 }

@@ -1023,12 +1023,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(Status.CANCEL.getStatusName());
+			
 
 			provision.getLogStatus().add(statusLog);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
 			provision.setLastTrackingStatus(Status.CANCEL.getStatusName());
+
 			provision.setGenericSpeech(Status.CANCEL.getGenericSpeech());
 			provision.setDescriptionStatus(Status.CANCEL.getDescription());
+
 			provision.setCancellationCause(cause);
 			provision.setCancellationDetail(detail);
 
@@ -1657,6 +1660,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
+			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
+			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 
 			Customer customer = new Customer();
 
@@ -1701,23 +1706,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return true;
 	}
 
-	/*
-	 * private boolean validateBuckectProduct(String[] getData, Provision provision)
-	 * throws Exception { boolean errorBucket = false; // validar IN_TOA if
-	 * (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" :
-	 * getData[0])) { // validate bucket and name product errorBucket =
-	 * getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(),
-	 * getData[17]); if (errorBucket) { // valida DNI if
-	 * (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().
-	 * toLowerCase()) &&
-	 * !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL
-	 * )) { errorBucket = false; log.info("No es persona natural. Documento: " +
-	 * provision.getCustomer().getDocumentType() + " NumDoc: " +
-	 * provision.getCustomer().getDocumentNumber()); } else {
-	 * log.info("Es persona natural. Documento: " +
-	 * provision.getCustomer().getDocumentType() + " NumDoc: " +
-	 * provision.getCustomer().getDocumentNumber()); } } } return true; }
-	 */
+	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
+		boolean errorBucket = false; // validar IN_TOA
+
+		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) { // validate bucket and
+																								// name product
+			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
+			if (errorBucket) { // valida DNI
+				if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
+						&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
+					errorBucket = false;
+					log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType()
+							+ " NumDoc: " + provision.getCustomer().getDocumentNumber());
+				} else {
+					log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
+							+ provision.getCustomer().getDocumentNumber());
+				}
+			}
+		}
+		return true;
+	}
 
 	@Override
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
@@ -1748,6 +1756,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (provision != null) {
 			log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
+
+			// valida Bucket x Producto boolean boolBucket =
+			boolean boolBucket = validateBuckectProduct(getData, provision);
+
+			if (!boolBucket) {
+				return false;
+			}
 
 			speech = hasCustomerInfo(provision.getCustomer()) ? Status.DUMMY_IN_TOA.getGenericSpeech()
 					.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
@@ -1882,7 +1897,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 
 					update.set("log_status", listLog);
-
 
 					// carrier titular
 					boolean carrierTitular = getCarrier(provision.getCustomer().getPhoneNumber());
@@ -2024,7 +2038,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName()) && "0".equals(getData[16].toString())){
 				// && !provision.getXaIdSt().isEmpty()) {
 				Update update = new Update();
 

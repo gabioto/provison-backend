@@ -44,11 +44,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
 		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
-		
-		List<Provision> provisions = this.mongoOperations.find(new Query(Criteria.where("customer.document_type")
-				.is(documentType).and("customer.document_number").is(documentNumber)
-				.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""),
-						Criteria.where("register_date").gte(dateStart))),
+
+		List<Provision> provisions = this.mongoOperations.find(
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
+								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
 				Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
@@ -166,12 +166,16 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-		/*Query query = new Query(Criteria.where("productName").ne(null)
-				.andOperator(Criteria.where("updatedDate").gte(startDate), Criteria.where("updatedDate").lt(endDate)));
-		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);*/
-		
-		Query query = new Query(Criteria.where("productName").ne(null)
-				.andOperator(Criteria.where("invite_message_date").gte(startDate), Criteria.where("invite_message_date").lt(endDate)));
+		/*
+		 * Query query = new Query(Criteria.where("productName").ne(null)
+		 * .andOperator(Criteria.where("updatedDate").gte(startDate),
+		 * Criteria.where("updatedDate").lt(endDate))); List<Provision> provisions =
+		 * this.mongoOperations.find(query, Provision.class);
+		 */
+
+		Query query = new Query(
+				Criteria.where("productName").ne(null).andOperator(Criteria.where("invite_message_date").gte(startDate),
+						Criteria.where("invite_message_date").lt(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
@@ -314,9 +318,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
-		List<Provision> provision = this.mongoOperations.find(new Query(
-				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))
-						.limit(5),
+
+		List<Provision> provision = this.mongoOperations.find(
+				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null)
+						).limit(5),
+			
 				Provision.class);
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;

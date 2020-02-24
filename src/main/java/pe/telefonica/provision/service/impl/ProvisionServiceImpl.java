@@ -1707,25 +1707,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
-		boolean errorBucket = true; // validar IN_TOA
-
+		boolean errorBucket = false; // validar IN_TOA
+		//Valida DNI
+		if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
+				&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
+			errorBucket = true;
+			log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType()
+					+ " NumDoc: " + provision.getCustomer().getDocumentNumber());
+			return errorBucket;
+		} else {
+			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
+					+ provision.getCustomer().getDocumentNumber());
+		}
 		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) { // validate bucket and
-			
-			//Valida DNI
-			if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
-					&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
-				errorBucket = true;
-				log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType()
-						+ " NumDoc: " + provision.getCustomer().getDocumentNumber());
-				return errorBucket;
-			} else {
-				log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
-						+ provision.getCustomer().getDocumentNumber());
-			}
-			
-			// name product
 			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
 		}
+		
 		return errorBucket;
 	}
 
@@ -1759,7 +1756,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
 
-			// valida Bucket x Producto boolean boolBucket =
+			// valida Bucket x Producto
 			boolean boolBucket = validateBuckectProduct(getData, provision);
 
 			if (boolBucket) {

@@ -1708,23 +1708,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
 		boolean errorBucket = false; // validar IN_TOA
-
-		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) { // validate bucket and
-																								// name product
-			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
-			if (errorBucket) { // valida DNI
-				if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
-						&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
-					errorBucket = false;
-					log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType()
-							+ " NumDoc: " + provision.getCustomer().getDocumentNumber());
-				} else {
-					log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
-							+ provision.getCustomer().getDocumentNumber());
-				}
-			}
+		//Valida DNI
+		if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
+				&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
+			errorBucket = true;
+			log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType()
+					+ " NumDoc: " + provision.getCustomer().getDocumentNumber());
+			return errorBucket;
+		} else {
+			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
+					+ provision.getCustomer().getDocumentNumber());
 		}
-		return true;
+		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) { // validate bucket and
+			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
+		}
+		
+		return errorBucket;
 	}
 
 	@Override
@@ -1757,10 +1756,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
 
-			// valida Bucket x Producto boolean boolBucket =
+			// valida Bucket x Producto
 			boolean boolBucket = validateBuckectProduct(getData, provision);
 
-			if (!boolBucket) {
+			if (boolBucket) {
 				return false;
 			}
 
@@ -2283,7 +2282,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public boolean getBucketByProduct(String channel, String product, String bucket) throws Exception {
-		Boolean errorValidate = false;
+		Boolean errorValidate = true;
 
 		log.info("ScheduleServiceImpl.getBucketByProduct()");
 
@@ -2301,15 +2300,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 										&& entry.getValue().get(i).getProduct().trim().equalsIgnoreCase(product)) {
 									System.out.println("bucket => " + entry.getValue().get(i).getBuckets().get(j)
 											+ ", product => " + entry.getValue().get(i).getProduct());
-									errorValidate = true;
+									//errorValidate = true;
+									errorValidate = false;
 									break;
 								}
 							}
-							if (errorValidate) {
+							if (!errorValidate) {
 								break;
 							}
 						}
-						if (errorValidate) {
+						if (!errorValidate) {
 							break;
 						}
 					}

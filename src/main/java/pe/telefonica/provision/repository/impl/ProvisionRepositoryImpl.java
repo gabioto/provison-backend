@@ -346,4 +346,19 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Provision.class);
 		return result.getMatchedCount() > 0;
 	}
+
+	@Override
+	public Optional<Provision> getProvisionByIdAndActiveStatus(String provisionId, String activeStatus) {
+		
+		Provision	provision = this.mongoOperations.findOne(
+					new Query(Criteria.where("idProvision").is(new ObjectId(provisionId)).andOperator(
+							Criteria.where("active_status").is(activeStatus))),
+					Provision.class);
+		Optional<Provision> optionalProvision = Optional.ofNullable(provision);
+
+		return optionalProvision;
+		
+		
+
+	}
 }

@@ -8,4 +8,4 @@ applications:
     buildpack: liberty-for-java
     health-check-type: process
     disk_quota: 2GB
-    instances: 1
+    instances: 2

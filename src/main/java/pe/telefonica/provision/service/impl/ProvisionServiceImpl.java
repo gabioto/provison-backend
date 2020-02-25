@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -47,8 +46,6 @@ import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
-import pe.telefonica.provision.external.response.BucketBodyResponse.OrigenBean;
-import pe.telefonica.provision.external.response.ResponseBucket;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.HomePhone;
@@ -2282,14 +2279,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public boolean getBucketByProduct(String channel, String product, String bucket) throws Exception {
-		Boolean errorValidate = true;
-
+		
 		log.info("ScheduleServiceImpl.getBucketByProduct()");
 
 		try {
-			ResponseBucket responseBucket = restPSI.getBucketByProduct();
+			boolean responseBucket = restPSI.getBucketByProduct(bucket, product, channel);
 
-			if (responseBucket != null) {
+			/*if (responseBucket != null) {
 				// HACER MATCH BUCKET POR PRODUCTO - GENESIS
 
 				for (Map.Entry<String, List<OrigenBean>> entry : responseBucket.getBody().getContent().entrySet()) {
@@ -2318,7 +2314,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return errorValidate;
 			} else {
 				throw new Exception();
-			}
+			}*/
+			
+			return responseBucket;
 
 		} catch (Exception e) {
 			throw e;

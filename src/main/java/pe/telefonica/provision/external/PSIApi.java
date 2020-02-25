@@ -37,6 +37,7 @@ import pe.telefonica.provision.conf.SSLClientFactory;
 import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.external.request.BucketRequest;
 import pe.telefonica.provision.external.response.ResponseBucket;
 import pe.telefonica.provision.model.OAuthToken;
 import pe.telefonica.provision.repository.OAuthTokenRepository;
@@ -364,25 +365,43 @@ public class PSIApi extends ConfigRestTemplate {
 		}
 	}
 
-	public ResponseBucket getBucketByProduct() {
+	public boolean getBucketByProduct(String bucket, String product, String channel) {
 		log.info("PSIApi.getBucketByProduct()");
-		Client client = Client.create();
-		WebResource webResource = client.resource(api.getSecurityUrl() + api.getBucketsByProduct());
+		
+		RestTemplate restTemplate = new RestTemplate();
+		BucketRequest bucketRequest = new BucketRequest();
 
-		ClientResponse clientResponse = webResource.accept(new String[] { "application/json" })
-				.header("Content-type", "application/json").header("Authorization", security.getAuth())
-				.header("X-IBM-Client-Id", security.getClientId())
-				.header("X-IBM-Client-Secret", security.getClientSecret()).get(ClientResponse.class);
-		/*
-		 * headersMap.add("Authorization", security.getAuth());
-		 * headersMap.add("X-IBM-Client-Id", security.getClientId());
-		 * headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
-		 */
-		String output = (String) clientResponse.getEntity(String.class);
+		bucketRequest.setBucket(bucket);
+		bucketRequest.setChannel(product);
+		bucketRequest.setProduct(channel);
 
-		log.info("output ==> " + output);
-		return gson.fromJson(output, ResponseBucket.class);
+		String bucketUrl = api.getSecurityUrl() + api.getBucketsByProduct();
 
+		System.out.println(bucketUrl);
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", security.getAuth());
+		headersMap.add("X-IBM-Client-Id", security.getClientId());
+		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
+
+		HttpEntity<BucketRequest> entity = new HttpEntity<>(bucketRequest, headersMap);
+
+		try {
+			ResponseEntity<ResponseBucket> responseEntity = restTemplate.postForEntity(bucketUrl, entity,
+					ResponseBucket.class);
+			
+			if (responseEntity.getStatusCode() == HttpStatus.OK) {
+				if (responseEntity.getBody() != null && responseEntity.getBody().getBody() != null) {
+					return responseEntity.getBody().getBody().isContent();
+				}
+			}
+			
+			return false;
+		} catch (Exception ex) {
+			log.error(ex.getMessage());
+			throw ex;
+		}
 	}
 
 }

@@ -1935,7 +1935,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> Status.WO_PRESTART.getStatusName().equals(x.getStatus())
-								&& getData[4].equals(x.getXaidst()))
+								&& getData[6].equals(x.getXaidst()))
 						.collect(Collectors.toList());
 
 				boolean alreadyExist = listLogx.size() > 0;
@@ -1968,16 +1968,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("log_status", listLog);
 
 					provisionRepository.updateProvision(provision, update);
+					return true;
+				} else {
+					return false;
 				}
-
-				return true;
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_INIT.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
 				List<StatusLog> listLogx = listLog.stream().filter(
-						x -> Status.WO_INIT.getStatusName().equals(x.getStatus()) && getData[4].equals(x.getXaidst()))
+						x -> Status.WO_INIT.getStatusName().equals(x.getStatus()) && getData[7].equals(x.getXaidst()))
 						.collect(Collectors.toList());
 
 				boolean alreadyExist = listLogx.size() > 0;
@@ -2012,10 +2013,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("log_status", listLog);
 
 					provisionRepository.updateProvision(provision, update);
+					return true;
+				} else {
+					return false;
 				}
-
-				return true;
-
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_COMPLETED.getStatusName())
@@ -2023,7 +2024,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> Status.WO_COMPLETED.getStatusName().equals(x.getStatus())
-								&& getData[4].equals(x.getXaidst()))
+								&& getData[8].equals(x.getXaidst()))
 						.collect(Collectors.toList());
 
 				boolean alreadyExist = listLogx.size() > 0;
@@ -2063,9 +2064,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("log_status", listLog);
 
 					provisionRepository.updateProvision(provision, update);
+					return true;
+				} else {
+					return false;
 				}
-
-				return true;
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())

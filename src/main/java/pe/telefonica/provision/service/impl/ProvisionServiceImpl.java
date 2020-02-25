@@ -1709,6 +1709,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
 		boolean errorBucket = false; // validar IN_TOA
 		//Valida DNI
+		log.info("validateBuckectProduct");
 		if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
 				&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
 			errorBucket = true;
@@ -1755,7 +1756,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (provision != null) {
 			log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
-
+			log.info("Provision statuslog");
 			// valida Bucket x Producto
 			boolean boolBucket = validateBuckectProduct(getData, provision);
 
@@ -1763,6 +1764,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return false;
 			}
 
+			log.info("Provision boolBucket");
 			speech = hasCustomerInfo(provision.getCustomer()) ? Status.DUMMY_IN_TOA.getGenericSpeech()
 					.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
 					: Status.DUMMY_IN_TOA.getGenericSpeech();

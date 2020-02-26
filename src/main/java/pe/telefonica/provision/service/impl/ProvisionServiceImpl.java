@@ -2071,8 +2071,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
-					&& "0".equals(getData[16].toString())) {
-				// && !provision.getXaIdSt().isEmpty()) {
+					&& !provision.getXaIdSt().isEmpty()) {
+				// && "0".equals(getData[16].toString())) {
+
 				Update update = new Update();
 
 				WoCancel woCancel = new WoCancel();

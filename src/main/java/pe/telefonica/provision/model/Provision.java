@@ -319,11 +319,11 @@ public class Provision implements Serializable {
 		this.dummyStPsiCode = dummyStPsiCode;
 	}
 
-	public boolean isUpdatedummyStPsiCode() {
+	public boolean getIsUpdatedummyStPsiCode() {
 		return isUpdatedummyStPsiCode;
 	}
 
-	public void setUpdatedummyStPsiCode(boolean isUpdatedummyStPsiCode) {
+	public void setIsUpdatedummyStPsiCode(boolean isUpdatedummyStPsiCode) {
 		this.isUpdatedummyStPsiCode = isUpdatedummyStPsiCode;
 	}
 

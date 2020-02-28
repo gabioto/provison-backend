@@ -686,7 +686,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			
 			List<StatusLog> listLog = provisionx.getLogStatus();
 			
-			List<StatusLog> listIngresado = listLog.stream()
+			/*List<StatusLog> listIngresado = listLog.stream()
 					.filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()))
 					.collect(Collectors.toList());
 			List<StatusLog> listCaida = listLog.stream()
@@ -700,7 +700,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (listCaida.size() > 0) {
 				System.out.println("CAIDA REPETIDO ==>");
 				return false;
-			}
+			}*/
 
 			Update update = fillProvisionUpdate(request);
 
@@ -730,10 +730,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setGenericSpeech(Status.CAIDA.getGenericSpeech());
 			}
 
-			if (provisionx.getDummyStPsiCode() != null) {
+			if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
 
 				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 						&& !provisionx.getDummyStPsiCode().isEmpty()) {
+					
+					
 					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
 					updateFicRequest.setOrderCode(getData[11]);
 					updateFicRequest.setOriginCode(provisionx.getOriginCode());
@@ -741,7 +743,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
 					updateFicRequest.setRequestName(getData[10]);
 					updateFicRequest.setRequestId(provisionx.getIdProvision());
-
+					System.out.println("UPDATE SCHEDULE FICTITIOUS ==>");
 					// Actualiza agenda
 					if (!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
 

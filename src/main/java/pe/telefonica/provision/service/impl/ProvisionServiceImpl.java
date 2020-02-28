@@ -1933,14 +1933,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				List<StatusLog> listLogx = listLog.stream()
+				/*List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> Status.WO_PRESTART.getStatusName().equals(x.getStatus())
 								&& getData[6].equals(x.getXaidst()))
 						.collect(Collectors.toList());
 
 				boolean alreadyExist = listLogx.size() > 0;
 
-				if (!alreadyExist) {
+				if (!alreadyExist) {*/
 					Update update = new Update();
 					update.set("external_id", getData[1]);
 					// update.set("xa_request", getData[2]);
@@ -1969,21 +1969,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
-				} else {
+				/*} else {
 					return false;
-				}
+				}*/
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_INIT.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				List<StatusLog> listLogx = listLog.stream().filter(
-						x -> Status.WO_INIT.getStatusName().equals(x.getStatus()) && getData[7].equals(x.getXaidst()))
-						.collect(Collectors.toList());
-
-				boolean alreadyExist = listLogx.size() > 0;
-
-				if (!alreadyExist) {
+				/*
+				 * List<StatusLog> listLogx = listLog.stream().filter( x ->
+				 * Status.WO_INIT.getStatusName().equals(x.getStatus()) &&
+				 * getData[7].equals(x.getXaidst())) .collect(Collectors.toList());
+				 * 
+				 * boolean alreadyExist = listLogx.size() > 0;
+				 * 
+				 * if (!alreadyExist) {
+				 */
 					Update update = new Update();
 					WoInit woInit = new WoInit();
 
@@ -2014,22 +2016,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
-				} else {
+				/*} else {
 					return false;
-				}
+				}*/
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_COMPLETED.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				List<StatusLog> listLogx = listLog.stream()
+				/*List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> Status.WO_COMPLETED.getStatusName().equals(x.getStatus())
 								&& getData[8].equals(x.getXaidst()))
 						.collect(Collectors.toList());
 
 				boolean alreadyExist = listLogx.size() > 0;
 
-				if (!alreadyExist) {
+				if (!alreadyExist) {*/
 					Update update = new Update();
 					WoCompleted woCompleted = new WoCompleted();
 
@@ -2065,9 +2067,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					provisionRepository.updateProvision(provision, update);
 					return true;
-				} else {
+				/*} else {
 					return false;
-				}
+				}*/
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())

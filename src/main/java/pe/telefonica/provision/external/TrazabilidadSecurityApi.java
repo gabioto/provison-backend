@@ -168,7 +168,7 @@ public class TrazabilidadSecurityApi {
 		}
 
 	}
-
+	
 	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
 			LocalDateTime startHour, LocalDateTime endHour) {
 		log.info(this.getClass().getName() + " - " + "logEvent");
@@ -207,6 +207,47 @@ public class TrazabilidadSecurityApi {
 			log.info(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
 		}
 	}
+	
+	@Async
+	public void thirdLogEventAsync(String third, String operation, String request, String response, String serviceUrl,
+			LocalDateTime startHour, LocalDateTime endHour) {
+		log.info(this.getClass().getName() + " - " + "logEvent");
+
+		String url = api.getSecurityUrl() + api.getSaveThirdLogData();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headers.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
+		headers.add("Authorization", ibmSecuritySeguridad.getAuth());
+
+		LogDataRequest logRequest = new LogDataRequest();
+		logRequest.setThird(third);
+		logRequest.setOperation(operation);
+		logRequest.setRequest(request);
+		logRequest.setResponse(response);
+		logRequest.setUrl(serviceUrl);
+		logRequest.setStartHour(startHour);
+		logRequest.setEndHour(endHour);
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logRequest, headers);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
+
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				log.info(this.getClass().getName() + " - " + "logEvent - OK");
+			} else {
+				log.info(this.getClass().getName() + " - " + "logEvent - ERR");
+			}
+		} catch (Exception e) {
+			log.info(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
+		}
+	}
+
 
 	public Boolean sendMail(String templateId, MailParameter[] mailParameters) {
 		RestTemplate restTemplate = new RestTemplate();

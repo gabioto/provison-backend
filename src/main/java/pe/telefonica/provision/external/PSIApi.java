@@ -176,7 +176,7 @@ public class PSIApi extends ConfigRestTemplate {
 			 * PSIUpdateClientResponse.class);
 			 */
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request),
+			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request),
 					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour, endHour);
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
@@ -188,7 +188,7 @@ public class PSIApi extends ConfigRestTemplate {
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getResponseBodyAsString(),
+			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getResponseBodyAsString(),
 					requestUrl, startHour, endHour);
 
 			// JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
@@ -206,7 +206,7 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl,
+			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl,
 					startHour, endHour);
 			throw new ServerNotFoundException(ex.getMessage());
 		}

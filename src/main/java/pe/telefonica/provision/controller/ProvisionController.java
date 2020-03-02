@@ -1096,7 +1096,7 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				timestamp = getTimestamp();
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "OK",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
@@ -1114,7 +1114,7 @@ public class ProvisionController {
 				log.info("timestamp => " + timestamp);
 				log.info("MessageId => " + request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
@@ -1130,7 +1130,7 @@ public class ProvisionController {
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-			restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+			restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 					new Gson().toJson(request), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 					request.getHeader().getTimestamp(), timestamp);
@@ -1160,7 +1160,7 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
@@ -1173,16 +1173,16 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
 			}
 		}
 
-		restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
+		/*restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
 				new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);
+				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);*/
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}

@@ -678,18 +678,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		if (provisionx != null) {
 			List<StatusLog> listLog = provisionx.getLogStatus();
-			
-			List<StatusLog> listIngresado = listLog.stream().filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()) ).collect(Collectors.toList());
-			List<StatusLog> listCaida = listLog.stream().filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()) ).collect(Collectors.toList());
-			if(listIngresado.size() > 0) {
+
+			List<StatusLog> listIngresado = listLog.stream()
+					.filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()))
+					.collect(Collectors.toList());
+			List<StatusLog> listCaida = listLog.stream()
+					.filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
+					.collect(Collectors.toList());
+			if (listIngresado.size() > 0) {
 				return false;
 			}
-			
-			if(listCaida.size() > 0) {
+
+			if (listCaida.size() > 0) {
 				return false;
 			}
-			
-			
+
 			Update update = fillProvisionUpdate(request);
 
 			boolean hasFictitious = validateFictitiousSchedule(listLog);
@@ -719,7 +722,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 
 			if (provisionx.getDummyStPsiCode() != null) {
-				
+
 				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 						&& !provisionx.getDummyStPsiCode().isEmpty()) {
 					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
@@ -837,8 +840,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired) {
-		
-		Optional<Provision> optional = provisionRepository.getProvisionByIdAndActiveStatus(provisionId, Constants.PROVISION_STATUS_ADDRESS_CHANGED);
+
+		Optional<Provision> optional = provisionRepository.getProvisionByIdAndActiveStatus(provisionId,
+				Constants.PROVISION_STATUS_ADDRESS_CHANGED);
 
 		if (optional.isPresent()) {
 			Provision provision = optional.get();
@@ -1020,7 +1024,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(Status.CANCEL.getStatusName());
-			
 
 			provision.getLogStatus().add(statusLog);
 			provision.setActiveStatus(Constants.PROVISION_STATUS_CANCELLED);
@@ -1705,12 +1708,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
 		boolean errorBucket = false; // validar IN_TOA
-		//Valida DNI
+		// Valida DNI
+		log.info("validateBuckectProduct");
 		if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
 				&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
 			errorBucket = true;
-			log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType()
-					+ " NumDoc: " + provision.getCustomer().getDocumentNumber());
+			log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
+					+ provision.getCustomer().getDocumentNumber());
 			return errorBucket;
 		} else {
 			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
@@ -1719,7 +1723,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) { // validate bucket and
 			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
 		}
-		
+
 		return errorBucket;
 	}
 
@@ -1752,7 +1756,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (provision != null) {
 			log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
-
+			log.info("Provision statuslog");
 			// valida Bucket x Producto
 			boolean boolBucket = validateBuckectProduct(getData, provision);
 
@@ -1760,6 +1764,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return false;
 			}
 
+			log.info("Provision boolBucket");
 			speech = hasCustomerInfo(provision.getCustomer()) ? Status.DUMMY_IN_TOA.getGenericSpeech()
 					.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
 					: Status.DUMMY_IN_TOA.getGenericSpeech();
@@ -1925,117 +1930,147 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				Update update = new Update();
-				update.set("external_id", getData[1]);
-				// update.set("xa_request", getData[2]);
-				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
+				List<StatusLog> listLogx = listLog.stream()
+						.filter(x -> Status.WO_PRESTART.getStatusName().equals(x.getStatus())
+								&& getData[6].equals(x.getXaidst()))
+						.collect(Collectors.toList());
 
-				WoPreStart woPreStart = new WoPreStart();
+				boolean alreadyExist = listLogx.size() > 0;
 
-				woPreStart.setNameResource(getData[3]);
-				woPreStart.setDate(getData[4]);
-				update.set("wo_prestart", woPreStart);
-				update.set("activity_type", getData[5].toLowerCase());
-				update.set("xa_id_st", getData[6]);
-				update.set("show_location", false);
+				if (!alreadyExist) {
+					Update update = new Update();
+					update.set("external_id", getData[1]);
+					// update.set("xa_request", getData[2]);
+					update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
-				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
-				statusLog.setXaidst(provision.getXaIdSt());
+					WoPreStart woPreStart = new WoPreStart();
 
-				update.set("customer.latitude", getData[14]);
-				update.set("customer.longitude", getData[13]);
-				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
-				update.set("generic_speech", Status.WO_PRESTART.getGenericSpeech());
-				update.set("description_status", Status.WO_PRESTART.getDescription());
-				listLog.add(statusLog);
-				update.set("log_status", listLog);
+					woPreStart.setNameResource(getData[3]);
+					woPreStart.setDate(getData[4]);
+					update.set("wo_prestart", woPreStart);
+					update.set("activity_type", getData[5].toLowerCase());
+					update.set("xa_id_st", getData[6]);
+					update.set("show_location", false);
 
-				provisionRepository.updateProvision(provision, update);
-				return true;
+					StatusLog statusLog = new StatusLog();
+					statusLog.setStatus(Status.WO_PRESTART.getStatusName());
+					statusLog.setXaidst(provision.getXaIdSt());
 
+					update.set("customer.latitude", getData[14]);
+					update.set("customer.longitude", getData[13]);
+					update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
+					update.set("generic_speech", Status.WO_PRESTART.getGenericSpeech());
+					update.set("description_status", Status.WO_PRESTART.getDescription());
+					listLog.add(statusLog);
+					update.set("log_status", listLog);
+
+					provisionRepository.updateProvision(provision, update);
+					return true;
+				} else {
+					return false;
+				}
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_INIT.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				Update update = new Update();
+				List<StatusLog> listLogx = listLog.stream().filter(
+						x -> Status.WO_INIT.getStatusName().equals(x.getStatus()) && getData[7].equals(x.getXaidst()))
+						.collect(Collectors.toList());
 
-				WoInit woInit = new WoInit();
+				boolean alreadyExist = listLogx.size() > 0;
 
-				woInit.setNameResource(getData[2]);
-				woInit.setEtaStartTime(getData[3]);
-				woInit.setEtaEndTime(getData[10]);
-				woInit.setXaCreationDate(getData[6]);
-				woInit.setDate(getData[23]);
-				woInit.setXaNote(getData[15]);
-				update.set("wo_init", woInit);
-				update.set("show_location", false);
-				update.set("xa_id_st", getData[7]);
-				update.set("xa_requirement_number", getData[8]);
-				update.set("appt_number", getData[9]);
-				update.set("activity_type", getData[14].toLowerCase());
-				update.set("active_status", Constants.PROVISION_STATUS_WOINIT);
+				if (!alreadyExist) {
+					Update update = new Update();
+					WoInit woInit = new WoInit();
 
-				// update.set("xa_request", getData[5]);
-				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(Status.WO_INIT.getStatusName());
-				statusLog.setXaidst(provision.getXaIdSt());
+					woInit.setNameResource(getData[2]);
+					woInit.setEtaStartTime(getData[3]);
+					woInit.setEtaEndTime(getData[10]);
+					woInit.setXaCreationDate(getData[6]);
+					woInit.setDate(getData[23]);
+					woInit.setXaNote(getData[15]);
+					update.set("wo_init", woInit);
+					update.set("show_location", false);
+					update.set("xa_id_st", getData[7]);
+					update.set("xa_requirement_number", getData[8]);
+					update.set("appt_number", getData[9]);
+					update.set("activity_type", getData[14].toLowerCase());
+					update.set("active_status", Constants.PROVISION_STATUS_WOINIT);
 
-				update.set("last_tracking_status", Status.WO_INIT.getStatusName());
-				update.set("generic_speech", Status.WO_INIT.getGenericSpeech());
-				update.set("description_status", Status.WO_INIT.getDescription());
-				listLog.add(statusLog);
-				update.set("log_status", listLog);
+					// update.set("xa_request", getData[5]);
+					StatusLog statusLog = new StatusLog();
+					statusLog.setStatus(Status.WO_INIT.getStatusName());
+					statusLog.setXaidst(provision.getXaIdSt());
 
-				provisionRepository.updateProvision(provision, update);
-				return true;
+					update.set("last_tracking_status", Status.WO_INIT.getStatusName());
+					update.set("generic_speech", Status.WO_INIT.getGenericSpeech());
+					update.set("description_status", Status.WO_INIT.getDescription());
+					listLog.add(statusLog);
+					update.set("log_status", listLog);
 
+					provisionRepository.updateProvision(provision, update);
+					return true;
+				} else {
+					return false;
+				}
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_COMPLETED.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
-				Update update = new Update();
 
-				WoCompleted woCompleted = new WoCompleted();
+				List<StatusLog> listLogx = listLog.stream()
+						.filter(x -> Status.WO_COMPLETED.getStatusName().equals(x.getStatus())
+								&& getData[8].equals(x.getXaidst()))
+						.collect(Collectors.toList());
 
-				woCompleted.setXaCreationDate(getData[7]);
-				woCompleted.setDate(getData[4]);
-				woCompleted.setXaNote(getData[14]);
-				woCompleted.setEtaStartTime(getData[2]);
-				woCompleted.setEtaEndTime(getData[3]);
+				boolean alreadyExist = listLogx.size() > 0;
 
-				woCompleted.setObservation(getData[22]);
-				woCompleted.setReceivePersonName(getData[23]);
-				woCompleted.setReceivePersonId(getData[24]);
-				woCompleted.setRelationship(getData[25]);
-				update.set("wo_completed", woCompleted);
+				if (!alreadyExist) {
+					Update update = new Update();
+					WoCompleted woCompleted = new WoCompleted();
 
-				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
+					woCompleted.setXaCreationDate(getData[7]);
+					woCompleted.setDate(getData[4]);
+					woCompleted.setXaNote(getData[14]);
+					woCompleted.setEtaStartTime(getData[2]);
+					woCompleted.setEtaEndTime(getData[3]);
 
-				update.set("show_location", false);
-				update.set("xa_id_st", getData[8]);
-				update.set("xa_requirement_number", getData[9]);
-				update.set("appt_number", getData[10]);
-				update.set("activity_type", getData[13].toLowerCase());
+					woCompleted.setObservation(getData[22]);
+					woCompleted.setReceivePersonName(getData[23]);
+					woCompleted.setReceivePersonId(getData[24]);
+					woCompleted.setRelationship(getData[25]);
+					update.set("wo_completed", woCompleted);
 
-				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
-				statusLog.setXaidst(provision.getXaIdSt());
+					update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
 
-				update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
-				update.set("generic_speech", Status.WO_COMPLETED.getGenericSpeech());
-				update.set("description_status", Status.WO_COMPLETED.getDescription());
-				listLog.add(statusLog);
-				update.set("log_status", listLog);
+					update.set("show_location", false);
+					update.set("xa_id_st", getData[8]);
+					update.set("xa_requirement_number", getData[9]);
+					update.set("appt_number", getData[10]);
+					update.set("activity_type", getData[13].toLowerCase());
 
-				provisionRepository.updateProvision(provision, update);
-				return true;
+					StatusLog statusLog = new StatusLog();
+					statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
+					statusLog.setXaidst(provision.getXaIdSt());
 
+					update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
+					update.set("generic_speech", Status.WO_COMPLETED.getGenericSpeech());
+					update.set("description_status", Status.WO_COMPLETED.getDescription());
+					listLog.add(statusLog);
+					update.set("log_status", listLog);
+
+					provisionRepository.updateProvision(provision, update);
+					return true;
+				} else {
+					return false;
+				}
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName()) && "0".equals(getData[16].toString())){
-				// && !provision.getXaIdSt().isEmpty()) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
+					&& !provision.getXaIdSt().isEmpty()) {
+				// && "0".equals(getData[16].toString())) {
+
 				Update update = new Update();
 
 				WoCancel woCancel = new WoCancel();
@@ -2296,7 +2331,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 										&& entry.getValue().get(i).getProduct().trim().equalsIgnoreCase(product)) {
 									System.out.println("bucket => " + entry.getValue().get(i).getBuckets().get(j)
 											+ ", product => " + entry.getValue().get(i).getProduct());
-									//errorValidate = true;
+									// errorValidate = true;
 									errorValidate = false;
 									break;
 								}

@@ -412,7 +412,7 @@ public class ProvisionController {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()),
-					ex.getMessage().toString(), null);
+					ex.getMessage(), null);
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);

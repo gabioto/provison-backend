@@ -421,6 +421,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setProductSignal(getData[43]);
 		provision.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
 		provision.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
+		provision.setSendNotify(
+				(Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
 
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
@@ -681,26 +683,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 		String speech = "";
 
 		if (provisionx != null) {
-			System.out.println("SALE CODE ==>" + getData[2] );
+			System.out.println("SALE CODE ==>" + getData[2]);
 			System.out.println("STATUS ==> " + request.getStatus());
-			
-			List<StatusLog> listLog = provisionx.getLogStatus();
-			
-			/*List<StatusLog> listIngresado = listLog.stream()
-					.filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()))
-					.collect(Collectors.toList());
-			List<StatusLog> listCaida = listLog.stream()
-					.filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
-					.collect(Collectors.toList());
-			if (listIngresado.size() > 0) {
-				System.out.println("INGRESADO REPETIDO");
-				return false;
-			}
 
-			if (listCaida.size() > 0) {
-				System.out.println("CAIDA REPETIDO ==>");
-				return false;
-			}*/
+			List<StatusLog> listLog = provisionx.getLogStatus();
+
+			/*
+			 * List<StatusLog> listIngresado = listLog.stream() .filter(items ->
+			 * Status.INGRESADO.getStatusName().equals(items.getStatus()))
+			 * .collect(Collectors.toList()); List<StatusLog> listCaida = listLog.stream()
+			 * .filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
+			 * .collect(Collectors.toList()); if (listIngresado.size() > 0) {
+			 * System.out.println("INGRESADO REPETIDO"); return false; }
+			 * 
+			 * if (listCaida.size() > 0) { System.out.println("CAIDA REPETIDO ==>"); return
+			 * false; }
+			 */
 
 			Update update = fillProvisionUpdate(request);
 
@@ -734,8 +732,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 						&& !provisionx.getDummyStPsiCode().isEmpty()) {
-					
-					
+
 					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
 					updateFicRequest.setOrderCode(getData[11]);
 					updateFicRequest.setOriginCode(provisionx.getOriginCode());

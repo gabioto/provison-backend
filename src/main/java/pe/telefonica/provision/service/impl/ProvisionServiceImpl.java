@@ -383,7 +383,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		String[] getData = request.getData().split("\\|", -1);
 		Provision provision = new Provision();
 		String speech = "";
-		System.out.println(getData[3]);
+		System.out.println("INSERT NEW PROVISION");
+		System.out.println(getData[4]);
 
 		provision.setSaleSource(getData[0]);
 		provision.setBack(getData[1]);
@@ -417,6 +418,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setProductSignal(getData[43]);
 		provision.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
 		provision.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
+		provision.setSendNotify(
+				(Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
 
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
@@ -677,21 +680,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 		String speech = "";
 
 		if (provisionx != null) {
+			System.out.println("SALE CODE ==>" + getData[2]);
+			System.out.println("STATUS ==> " + request.getStatus());
+
 			List<StatusLog> listLog = provisionx.getLogStatus();
 
-			List<StatusLog> listIngresado = listLog.stream()
-					.filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()))
-					.collect(Collectors.toList());
-			List<StatusLog> listCaida = listLog.stream()
-					.filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
-					.collect(Collectors.toList());
-			if (listIngresado.size() > 0) {
-				return false;
-			}
-
-			if (listCaida.size() > 0) {
-				return false;
-			}
+			/*
+			 * List<StatusLog> listIngresado = listLog.stream() .filter(items ->
+			 * Status.INGRESADO.getStatusName().equals(items.getStatus()))
+			 * .collect(Collectors.toList()); List<StatusLog> listCaida = listLog.stream()
+			 * .filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
+			 * .collect(Collectors.toList()); if (listIngresado.size() > 0) {
+			 * System.out.println("INGRESADO REPETIDO"); return false; }
+			 * 
+			 * if (listCaida.size() > 0) { System.out.println("CAIDA REPETIDO ==>"); return
+			 * false; }
+			 */
 
 			Update update = fillProvisionUpdate(request);
 
@@ -721,10 +725,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setGenericSpeech(Status.CAIDA.getGenericSpeech());
 			}
 
-			if (provisionx.getDummyStPsiCode() != null) {
+			if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
 
 				if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 						&& !provisionx.getDummyStPsiCode().isEmpty()) {
+
 					ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
 					updateFicRequest.setOrderCode(getData[11]);
 					updateFicRequest.setOriginCode(provisionx.getOriginCode());
@@ -732,16 +737,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					updateFicRequest.setFictitiousCode(provisionx.getDummyXaRequest());
 					updateFicRequest.setRequestName(getData[10]);
 					updateFicRequest.setRequestId(provisionx.getIdProvision());
-
+					System.out.println("UPDATE SCHEDULE FICTITIOUS ==>");
 					// Actualiza agenda
 					if (!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
 
 						boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
 						update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
 					}
-
 				}
-
 			}
 
 			// status_toa
@@ -765,9 +768,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			update.set("active_status", status);
 			update.set("status_toa", status);
-			update.set("send_notify", false);
+			update.set("send_notify",
+					(Constants.TIPO_RUC.equals(provisionx.getCustomer().getDocumentType().toLowerCase())
+							&& !provisionx.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)));
 			update.set("show_location", false);
-
 			update.set("last_tracking_status", request.getStatus());
 			update.set("description_status", provisionx.getDescriptionStatus());
 			update.set("generic_speech", provisionx.getGenericSpeech());
@@ -1930,141 +1934,145 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (request.getStatus().equalsIgnoreCase(Status.WO_PRESTART.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				List<StatusLog> listLogx = listLog.stream()
-						.filter(x -> Status.WO_PRESTART.getStatusName().equals(x.getStatus())
-								&& getData[6].equals(x.getXaidst()))
-						.collect(Collectors.toList());
+				/*
+				 * List<StatusLog> listLogx = listLog.stream() .filter(x ->
+				 * Status.WO_PRESTART.getStatusName().equals(x.getStatus()) &&
+				 * getData[6].equals(x.getXaidst())) .collect(Collectors.toList());
+				 * 
+				 * boolean alreadyExist = listLogx.size() > 0;
+				 * 
+				 * if (!alreadyExist) {
+				 */
+				Update update = new Update();
+				update.set("external_id", getData[1]);
+				// update.set("xa_request", getData[2]);
+				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
-				boolean alreadyExist = listLogx.size() > 0;
+				WoPreStart woPreStart = new WoPreStart();
 
-				if (!alreadyExist) {
-					Update update = new Update();
-					update.set("external_id", getData[1]);
-					// update.set("xa_request", getData[2]);
-					update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
+				woPreStart.setNameResource(getData[3]);
+				woPreStart.setDate(getData[4]);
+				update.set("wo_prestart", woPreStart);
+				update.set("activity_type", getData[5].toLowerCase());
+				update.set("xa_id_st", getData[6]);
+				update.set("show_location", false);
 
-					WoPreStart woPreStart = new WoPreStart();
+				StatusLog statusLog = new StatusLog();
+				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
+				statusLog.setXaidst(provision.getXaIdSt());
 
-					woPreStart.setNameResource(getData[3]);
-					woPreStart.setDate(getData[4]);
-					update.set("wo_prestart", woPreStart);
-					update.set("activity_type", getData[5].toLowerCase());
-					update.set("xa_id_st", getData[6]);
-					update.set("show_location", false);
+				update.set("customer.latitude", getData[14]);
+				update.set("customer.longitude", getData[13]);
+				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
+				update.set("generic_speech", Status.WO_PRESTART.getGenericSpeech());
+				update.set("description_status", Status.WO_PRESTART.getDescription());
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
 
-					StatusLog statusLog = new StatusLog();
-					statusLog.setStatus(Status.WO_PRESTART.getStatusName());
-					statusLog.setXaidst(provision.getXaIdSt());
-
-					update.set("customer.latitude", getData[14]);
-					update.set("customer.longitude", getData[13]);
-					update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
-					update.set("generic_speech", Status.WO_PRESTART.getGenericSpeech());
-					update.set("description_status", Status.WO_PRESTART.getDescription());
-					listLog.add(statusLog);
-					update.set("log_status", listLog);
-
-					provisionRepository.updateProvision(provision, update);
-					return true;
-				} else {
-					return false;
-				}
+				provisionRepository.updateProvision(provision, update);
+				return true;
+				/*
+				 * } else { return false; }
+				 */
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_INIT.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				List<StatusLog> listLogx = listLog.stream().filter(
-						x -> Status.WO_INIT.getStatusName().equals(x.getStatus()) && getData[7].equals(x.getXaidst()))
-						.collect(Collectors.toList());
+				/*
+				 * List<StatusLog> listLogx = listLog.stream().filter( x ->
+				 * Status.WO_INIT.getStatusName().equals(x.getStatus()) &&
+				 * getData[7].equals(x.getXaidst())) .collect(Collectors.toList());
+				 * 
+				 * boolean alreadyExist = listLogx.size() > 0;
+				 * 
+				 * if (!alreadyExist) {
+				 */
+				Update update = new Update();
+				WoInit woInit = new WoInit();
 
-				boolean alreadyExist = listLogx.size() > 0;
+				woInit.setNameResource(getData[2]);
+				woInit.setEtaStartTime(getData[3]);
+				woInit.setEtaEndTime(getData[10]);
+				woInit.setXaCreationDate(getData[6]);
+				woInit.setDate(getData[23]);
+				woInit.setXaNote(getData[15]);
+				update.set("wo_init", woInit);
+				update.set("show_location", false);
+				update.set("xa_id_st", getData[7]);
+				update.set("xa_requirement_number", getData[8]);
+				update.set("appt_number", getData[9]);
+				update.set("activity_type", getData[14].toLowerCase());
+				update.set("active_status", Constants.PROVISION_STATUS_WOINIT);
 
-				if (!alreadyExist) {
-					Update update = new Update();
-					WoInit woInit = new WoInit();
+				// update.set("xa_request", getData[5]);
+				StatusLog statusLog = new StatusLog();
+				statusLog.setStatus(Status.WO_INIT.getStatusName());
+				statusLog.setXaidst(provision.getXaIdSt());
 
-					woInit.setNameResource(getData[2]);
-					woInit.setEtaStartTime(getData[3]);
-					woInit.setEtaEndTime(getData[10]);
-					woInit.setXaCreationDate(getData[6]);
-					woInit.setDate(getData[23]);
-					woInit.setXaNote(getData[15]);
-					update.set("wo_init", woInit);
-					update.set("show_location", false);
-					update.set("xa_id_st", getData[7]);
-					update.set("xa_requirement_number", getData[8]);
-					update.set("appt_number", getData[9]);
-					update.set("activity_type", getData[14].toLowerCase());
-					update.set("active_status", Constants.PROVISION_STATUS_WOINIT);
+				update.set("last_tracking_status", Status.WO_INIT.getStatusName());
+				update.set("generic_speech", Status.WO_INIT.getGenericSpeech());
+				update.set("description_status", Status.WO_INIT.getDescription());
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
 
-					// update.set("xa_request", getData[5]);
-					StatusLog statusLog = new StatusLog();
-					statusLog.setStatus(Status.WO_INIT.getStatusName());
-					statusLog.setXaidst(provision.getXaIdSt());
-
-					update.set("last_tracking_status", Status.WO_INIT.getStatusName());
-					update.set("generic_speech", Status.WO_INIT.getGenericSpeech());
-					update.set("description_status", Status.WO_INIT.getDescription());
-					listLog.add(statusLog);
-					update.set("log_status", listLog);
-
-					provisionRepository.updateProvision(provision, update);
-					return true;
-				} else {
-					return false;
-				}
+				provisionRepository.updateProvision(provision, update);
+				return true;
+				/*
+				 * } else { return false; }
+				 */
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_COMPLETED.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 
-				List<StatusLog> listLogx = listLog.stream()
-						.filter(x -> Status.WO_COMPLETED.getStatusName().equals(x.getStatus())
-								&& getData[8].equals(x.getXaidst()))
-						.collect(Collectors.toList());
+				/*
+				 * List<StatusLog> listLogx = listLog.stream() .filter(x ->
+				 * Status.WO_COMPLETED.getStatusName().equals(x.getStatus()) &&
+				 * getData[8].equals(x.getXaidst())) .collect(Collectors.toList());
+				 * 
+				 * boolean alreadyExist = listLogx.size() > 0;
+				 * 
+				 * if (!alreadyExist) {
+				 */
+				Update update = new Update();
+				WoCompleted woCompleted = new WoCompleted();
 
-				boolean alreadyExist = listLogx.size() > 0;
+				woCompleted.setXaCreationDate(getData[7]);
+				woCompleted.setDate(getData[4]);
+				woCompleted.setXaNote(getData[14]);
+				woCompleted.setEtaStartTime(getData[2]);
+				woCompleted.setEtaEndTime(getData[3]);
 
-				if (!alreadyExist) {
-					Update update = new Update();
-					WoCompleted woCompleted = new WoCompleted();
+				woCompleted.setObservation(getData[22]);
+				woCompleted.setReceivePersonName(getData[23]);
+				woCompleted.setReceivePersonId(getData[24]);
+				woCompleted.setRelationship(getData[25]);
+				update.set("wo_completed", woCompleted);
 
-					woCompleted.setXaCreationDate(getData[7]);
-					woCompleted.setDate(getData[4]);
-					woCompleted.setXaNote(getData[14]);
-					woCompleted.setEtaStartTime(getData[2]);
-					woCompleted.setEtaEndTime(getData[3]);
+				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
 
-					woCompleted.setObservation(getData[22]);
-					woCompleted.setReceivePersonName(getData[23]);
-					woCompleted.setReceivePersonId(getData[24]);
-					woCompleted.setRelationship(getData[25]);
-					update.set("wo_completed", woCompleted);
+				update.set("show_location", false);
+				update.set("xa_id_st", getData[8]);
+				update.set("xa_requirement_number", getData[9]);
+				update.set("appt_number", getData[10]);
+				update.set("activity_type", getData[13].toLowerCase());
 
-					update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
+				StatusLog statusLog = new StatusLog();
+				statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
+				statusLog.setXaidst(provision.getXaIdSt());
 
-					update.set("show_location", false);
-					update.set("xa_id_st", getData[8]);
-					update.set("xa_requirement_number", getData[9]);
-					update.set("appt_number", getData[10]);
-					update.set("activity_type", getData[13].toLowerCase());
+				update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
+				update.set("generic_speech", Status.WO_COMPLETED.getGenericSpeech());
+				update.set("description_status", Status.WO_COMPLETED.getDescription());
+				listLog.add(statusLog);
+				update.set("log_status", listLog);
 
-					StatusLog statusLog = new StatusLog();
-					statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
-					statusLog.setXaidst(provision.getXaIdSt());
-
-					update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
-					update.set("generic_speech", Status.WO_COMPLETED.getGenericSpeech());
-					update.set("description_status", Status.WO_COMPLETED.getDescription());
-					listLog.add(statusLog);
-					update.set("log_status", listLog);
-
-					provisionRepository.updateProvision(provision, update);
-					return true;
-				} else {
-					return false;
-				}
+				provisionRepository.updateProvision(provision, update);
+				return true;
+				/*
+				 * } else { return false; }
+				 */
 			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())

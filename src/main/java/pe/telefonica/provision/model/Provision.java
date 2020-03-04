@@ -18,6 +18,7 @@ import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
+import pe.telefonica.provision.model.rating.Rating;
 
 @Document(collection = "collProvision")
 @JsonPropertyOrder({ "idProvision" })
@@ -187,10 +188,9 @@ public class Provision implements Serializable {
 
 	@Field("registro_actualizado")
 	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-	
+
 	@Field("invite_message_date")
 	private LocalDateTime inviteMessageDate;
-	
 
 	@Field("last_tracking_status")
 	private String lastTrackingStatus;
@@ -230,6 +230,9 @@ public class Provision implements Serializable {
 
 	@Field("components")
 	private List<ComponentsDto> components = new ArrayList<>();
+
+	@Field("rating")
+	private List<Rating> rating = new ArrayList<>();
 
 	public String getIdProvision() {
 		return idProvision;
@@ -663,8 +666,6 @@ public class Provision implements Serializable {
 		this.updatedDate = updatedDate;
 	}
 
-	
-
 	public LocalDateTime getInviteMessageDate() {
 		return inviteMessageDate;
 	}
@@ -745,6 +746,14 @@ public class Provision implements Serializable {
 		this.components = components;
 	}
 
+	public List<Rating> getRating() {
+		return rating;
+	}
+
+	public void setRating(List<Rating> rating) {
+		this.rating = rating;
+	}
+
 	public Provision() {
 
 	}
@@ -770,11 +779,12 @@ public class Provision implements Serializable {
 				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
 				+ registerDate + ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail="
 				+ tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", contacts="
-				+ contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate + ", lastTrackingStatus=" + lastTrackingStatus + ", logStatus=" + logStatus + ", inToa="
-				+ inToa + ", woPreStart=" + woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted
-				+ ", cancellationCause=" + cancellationCause + ", cancellationDetail=" + cancellationDetail
-				+ ", showLocation=" + showLocation + ", sendNotify=" + sendNotify + ", genericSpeech=" + genericSpeech
-				+ ", descriptionStatus=" + descriptionStatus + ", components=" + components + "]";
+				+ contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate + ", lastTrackingStatus="
+				+ lastTrackingStatus + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart=" + woPreStart
+				+ ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause=" + cancellationCause
+				+ ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation + ", sendNotify="
+				+ sendNotify + ", genericSpeech=" + genericSpeech + ", descriptionStatus=" + descriptionStatus
+				+ ", components=" + components + "]";
 	}
 
 	public static class StatusLog {

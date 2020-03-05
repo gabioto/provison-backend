@@ -2070,7 +2070,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 				// && "0".equals(getData[16].toString())) {
-
+				
+				//se cancela por que se regulariza la ficticia en una real
+				if(getData[16].toString().equals("2")) {
+					return false;
+				}
+				
+				
 				Update update = new Update();
 
 				WoCancel woCancel = new WoCancel();

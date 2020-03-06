@@ -753,14 +753,18 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA) && provisionx.getDummyStPsiCode() != null) {
 
-				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				/*ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
 				scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
-				scheduleNotDoneRequest.setRequestType("provision");
+				scheduleNotDoneRequest.setRequestType(Constants.ACTIVITY_TYPE_PROVISION.toLowerCase());
 				scheduleNotDoneRequest.setStPsiCode(provisionx.getDummyStPsiCode());
 				scheduleNotDoneRequest.setFlgFicticious(true);
 
-				// Cancela agenda
-				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+				
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);*/
+
+				// Cancel schedule fictitious
+				trazabilidadScheduleApi.updateCancelSchedule(
+						new CancelRequest(provisionx.getIdProvision(), Constants.ACTIVITY_TYPE_PROVISION.toLowerCase(), provisionx.getDummyStPsiCode(), true));
 			}
 
 			update.set("active_status", status);
@@ -1053,7 +1057,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (provision.getHasSchedule()) {
 				scheduleUpdated = trazabilidadScheduleApi.updateCancelSchedule(
-						new CancelRequest(provision.getIdProvision(), "provision", provision.getXaIdSt()));
+						new CancelRequest(provision.getIdProvision(), "provision", provision.getXaIdSt(), false));
 				if (!scheduleUpdated) {
 					return null;
 				}
@@ -2070,13 +2074,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 				// && "0".equals(getData[16].toString())) {
-				
-				//se cancela por que se regulariza la ficticia en una real
-				if(getData[16].toString().equals("2")) {
+
+				// se cancela por que se regulariza la ficticia en una real
+				if (getData[16].toString().equals("2")) {
 					return false;
 				}
-				
-				
+
 				Update update = new Update();
 
 				WoCancel woCancel = new WoCancel();
@@ -2320,43 +2323,31 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public boolean getBucketByProduct(String channel, String product, String bucket) throws Exception {
-		
+
 		log.info("ScheduleServiceImpl.getBucketByProduct()");
 
 		try {
 			boolean responseBucket = restPSI.getBucketByProduct(bucket, product, channel);
 
-			/*if (responseBucket != null) {
-				// HACER MATCH BUCKET POR PRODUCTO - GENESIS
+			/*
+			 * if (responseBucket != null) { // HACER MATCH BUCKET POR PRODUCTO - GENESIS
+			 * 
+			 * for (Map.Entry<String, List<OrigenBean>> entry :
+			 * responseBucket.getBody().getContent().entrySet()) { if
+			 * (channel.trim().equalsIgnoreCase(entry.getKey())) { for (int i = 0; i <
+			 * entry.getValue().size(); i++) { for (int j = 0; j <
+			 * entry.getValue().get(i).getBuckets().size(); j++) { if
+			 * (entry.getValue().get(i).getBuckets().get(j).trim().equalsIgnoreCase(bucket.
+			 * trim()) &&
+			 * entry.getValue().get(i).getProduct().trim().equalsIgnoreCase(product)) {
+			 * System.out.println("bucket => " + entry.getValue().get(i).getBuckets().get(j)
+			 * + ", product => " + entry.getValue().get(i).getProduct()); // errorValidate =
+			 * true; errorValidate = false; break; } } if (!errorValidate) { break; } } if
+			 * (!errorValidate) { break; } } }
+			 * 
+			 * return errorValidate; } else { throw new Exception(); }
+			 */
 
-				for (Map.Entry<String, List<OrigenBean>> entry : responseBucket.getBody().getContent().entrySet()) {
-					if (channel.trim().equalsIgnoreCase(entry.getKey())) {
-						for (int i = 0; i < entry.getValue().size(); i++) {
-							for (int j = 0; j < entry.getValue().get(i).getBuckets().size(); j++) {
-								if (entry.getValue().get(i).getBuckets().get(j).trim().equalsIgnoreCase(bucket.trim())
-										&& entry.getValue().get(i).getProduct().trim().equalsIgnoreCase(product)) {
-									System.out.println("bucket => " + entry.getValue().get(i).getBuckets().get(j)
-											+ ", product => " + entry.getValue().get(i).getProduct());
-									// errorValidate = true;
-									errorValidate = false;
-									break;
-								}
-							}
-							if (!errorValidate) {
-								break;
-							}
-						}
-						if (!errorValidate) {
-							break;
-						}
-					}
-				}
-
-				return errorValidate;
-			} else {
-				throw new Exception();
-			}*/
-			
 			return responseBucket;
 
 		} catch (Exception e) {

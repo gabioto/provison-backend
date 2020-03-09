@@ -187,10 +187,9 @@ public class Provision implements Serializable {
 
 	@Field("registro_actualizado")
 	private LocalDateTime updatedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-	
+
 	@Field("invite_message_date")
 	private LocalDateTime inviteMessageDate;
-	
 
 	@Field("last_tracking_status")
 	private String lastTrackingStatus;
@@ -200,6 +199,9 @@ public class Provision implements Serializable {
 
 	@Field("generic_speech")
 	private String genericSpeech = "";
+
+	@Field("front_speech")
+	private String frontSpeech = "";
 
 	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
@@ -663,8 +665,6 @@ public class Provision implements Serializable {
 		this.updatedDate = updatedDate;
 	}
 
-	
-
 	public LocalDateTime getInviteMessageDate() {
 		return inviteMessageDate;
 	}
@@ -745,6 +745,18 @@ public class Provision implements Serializable {
 		this.components = components;
 	}
 
+	public String getFrontSpeech() {
+		return frontSpeech;
+	}
+
+	public void setFrontSpeech(String frontSpeech) {
+		this.frontSpeech = frontSpeech;
+	}
+
+	public void setUpdatedummyStPsiCode(boolean isUpdatedummyStPsiCode) {
+		this.isUpdatedummyStPsiCode = isUpdatedummyStPsiCode;
+	}
+
 	public Provision() {
 
 	}
@@ -768,13 +780,15 @@ public class Provision implements Serializable {
 				+ promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency=" + currency + ", installPrice="
 				+ installPrice + ", installPriceMonth=" + installPriceMonth + ", activeStatus=" + activeStatus
 				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
-				+ registerDate + ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail + ", tvDetail="
-				+ tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer + ", contacts="
-				+ contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate + ", lastTrackingStatus=" + lastTrackingStatus + ", logStatus=" + logStatus + ", inToa="
-				+ inToa + ", woPreStart=" + woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted
-				+ ", cancellationCause=" + cancellationCause + ", cancellationDetail=" + cancellationDetail
-				+ ", showLocation=" + showLocation + ", sendNotify=" + sendNotify + ", genericSpeech=" + genericSpeech
-				+ ", descriptionStatus=" + descriptionStatus + ", components=" + components + "]";
+				+ registerDate + ", registerDateUpdate=" + registerDateUpdate + ", hasSchedule=" + hasSchedule
+				+ ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail + ", homePhoneDetail="
+				+ homePhoneDetail + ", customer=" + customer + ", contacts=" + contacts + ", workZone=" + workZone
+				+ ", updatedDate=" + updatedDate + ", inviteMessageDate=" + inviteMessageDate + ", lastTrackingStatus="
+				+ lastTrackingStatus + ", descriptionStatus=" + descriptionStatus + ", genericSpeech=" + genericSpeech
+				+ ", frontSpeech=" + frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart="
+				+ woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause="
+				+ cancellationCause + ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation
+				+ ", sendNotify=" + sendNotify + ", components=" + components + "]";
 	}
 
 	public static class StatusLog {

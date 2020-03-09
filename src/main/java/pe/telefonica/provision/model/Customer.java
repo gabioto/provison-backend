@@ -20,8 +20,6 @@ public class Customer implements Serializable {
 	@Field("carrier")
 	private boolean carrier;
 
-	
-
 	@Field("mail")
 	private String mail;
 
@@ -42,7 +40,6 @@ public class Customer implements Serializable {
 
 	@Field("reference")
 	private String reference;
-
 
 	@Field("latitude")
 	private String latitude;
@@ -86,8 +83,6 @@ public class Customer implements Serializable {
 	public void setCarrier(boolean carrier) {
 		this.carrier = carrier;
 	}
-
-	
 
 	public String getMail() {
 		return mail;
@@ -144,7 +139,6 @@ public class Customer implements Serializable {
 	public void setReference(String reference) {
 		this.reference = reference;
 	}
-	
 
 	public String getLatitude() {
 		return latitude;

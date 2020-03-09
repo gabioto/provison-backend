@@ -11,6 +11,7 @@ import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
+import pe.telefonica.provision.model.Status;
 
 public interface ProvisionRepository {
 
@@ -35,7 +36,7 @@ public interface ProvisionRepository {
 	Optional<Provision> getStatus(String provisionId);
 
 	boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, String description, String speech,
-			boolean comesFromSchedule);
+			String frontSpeech, boolean comesFromSchedule);
 
 	Optional<List<Provision>> insertProvisionList(List<Provision> provisionRequestList);
 
@@ -71,4 +72,7 @@ public interface ProvisionRepository {
 
 	boolean updateShowLocation(Provision provision);
 
+	Optional<Status> getInfoStatus(String statusName);
+
+	Optional<List<Status>> getAllInfoStatus();
 }

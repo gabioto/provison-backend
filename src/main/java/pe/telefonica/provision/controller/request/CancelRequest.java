@@ -5,6 +5,7 @@ public class CancelRequest extends LogDataFrontendRequest {
 	private String requestId;
 	private String requestType;
 	private String stPsiCode;
+	private boolean flgFicticious;
 
 	public String getRequestId() {
 		return requestId;
@@ -29,12 +30,22 @@ public class CancelRequest extends LogDataFrontendRequest {
 	public void setStPsiCode(String stPsiCode) {
 		this.stPsiCode = stPsiCode;
 	}
+	
+	
+	public boolean isFlgFicticious() {
+		return flgFicticious;
+	}
 
-	public CancelRequest(String requestId, String requestType, String stPsiCode) {
+	public void setFlgFicticious(boolean flgFicticious) {
+		this.flgFicticious = flgFicticious;
+	}
+
+	public CancelRequest(String requestId, String requestType, String stPsiCode, boolean flgFicticious ) {
 		super();
 		this.requestId = requestId;
 		this.requestType = requestType;
 		this.stPsiCode = stPsiCode;
+		this.flgFicticious = flgFicticious;
 	}
 
 }

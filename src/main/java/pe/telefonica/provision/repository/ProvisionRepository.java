@@ -45,6 +45,8 @@ public interface ProvisionRepository {
 	Boolean resetProvision(Provision provisionRequest);
 
 	Optional<Provision> getProvisionById(String provisionId);
+	
+	Provision getProvisionByIdNotFilter(String provisionId);
 
 	Optional<Provision> getProvisionByIdAndActiveStatus(String provisionId, String activeStatus);
 	// boolean updateContactInfoPsi(Provision provision);

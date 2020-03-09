@@ -790,14 +790,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA) && provisionx.getDummyStPsiCode() != null) {
 
-				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
-				scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
-				scheduleNotDoneRequest.setRequestType("provision");
-				scheduleNotDoneRequest.setStPsiCode(provisionx.getDummyStPsiCode());
-				scheduleNotDoneRequest.setFlgFicticious(true);
+				/*
+				 * ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				 * scheduleNotDoneRequest.setRequestId(provisionx.getIdProvision());
+				 * scheduleNotDoneRequest.setRequestType(Constants.ACTIVITY_TYPE_PROVISION.
+				 * toLowerCase());
+				 * scheduleNotDoneRequest.setStPsiCode(provisionx.getDummyStPsiCode());
+				 * scheduleNotDoneRequest.setFlgFicticious(true);
+				 * 
+				 * 
+				 * trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+				 */
 
-				// Cancela agenda
-				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+				// Cancel schedule fictitious
+				trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provisionx.getIdProvision(),
+						Constants.ACTIVITY_TYPE_PROVISION.toLowerCase(), provisionx.getDummyStPsiCode(), true));
 			}
 
 			update.set("active_status", status);
@@ -1092,7 +1099,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			if (provision.getHasSchedule()) {
 				scheduleUpdated = trazabilidadScheduleApi.updateCancelSchedule(
-						new CancelRequest(provision.getIdProvision(), "provision", provision.getXaIdSt()));
+						new CancelRequest(provision.getIdProvision(), "provision", provision.getXaIdSt(), false));
 				if (!scheduleUpdated) {
 					return null;
 				}
@@ -2160,6 +2167,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 				// && "0".equals(getData[16].toString())) {
+
+				// se cancela por que se regulariza la ficticia en una real
+				if (getData[16].toString().equals("2")) {
+					return false;
+				}
 
 				pe.telefonica.provision.model.Status cancelStatus = getInfoStatus(Status.WO_CANCEL.getStatusName(),
 						statusList);

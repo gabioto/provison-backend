@@ -18,6 +18,7 @@ import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
+import pe.telefonica.provision.model.rating.Rating;
 
 @Document(collection = "collProvision")
 @JsonPropertyOrder({ "idProvision" })
@@ -232,6 +233,9 @@ public class Provision implements Serializable {
 
 	@Field("components")
 	private List<ComponentsDto> components = new ArrayList<>();
+
+	@Field("rating")
+	private List<Rating> rating = new ArrayList<>();
 
 	public String getIdProvision() {
 		return idProvision;
@@ -757,6 +761,14 @@ public class Provision implements Serializable {
 		this.isUpdatedummyStPsiCode = isUpdatedummyStPsiCode;
 	}
 
+	public List<Rating> getRating() {
+		return rating;
+	}
+
+	public void setRating(List<Rating> rating) {
+		this.rating = rating;
+	}
+
 	public Provision() {
 
 	}
@@ -788,7 +800,7 @@ public class Provision implements Serializable {
 				+ ", frontSpeech=" + frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart="
 				+ woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause="
 				+ cancellationCause + ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation
-				+ ", sendNotify=" + sendNotify + ", components=" + components + "]";
+				+ ", sendNotify=" + sendNotify + ", components=" + components + ", rating=" + rating + "]";
 	}
 
 	public static class StatusLog {

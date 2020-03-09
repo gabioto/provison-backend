@@ -390,4 +390,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		return optionalStatus;
 	}
+
+	public Provision getProvisionByIdNotFilter(String provisionId) {
+
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("idProvision").is(new ObjectId(provisionId))), Provision.class);
+
+		return provision;
+	}
 }

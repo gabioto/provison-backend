@@ -230,12 +230,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, String description,
-			String speech, boolean comesFromSchedule) {
+			String speech, String frontSpeech, boolean comesFromSchedule) {
 		Update update = new Update();
 		update.set("last_tracking_status", provision.getLastTrackingStatus());
 		update.set("log_status", logStatus);
 		update.set("description_status", description);
 		update.set("generic_speech", speech);
+		update.set("front_speech", frontSpeech);
 
 		if (comesFromSchedule) {
 			update.set("has_schedule", true);
@@ -384,6 +385,23 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
+	public Optional<pe.telefonica.provision.model.Status> getInfoStatus(String statusName) {
+		pe.telefonica.provision.model.Status status = this.mongoOperations.findOne(
+				new Query(Criteria.where("status_name").is(statusName)), pe.telefonica.provision.model.Status.class);
+		Optional<pe.telefonica.provision.model.Status> optionalStatus = Optional.ofNullable(status);
+
+		return optionalStatus;
+	}
+
+	@Override
+	public Optional<List<pe.telefonica.provision.model.Status>> getAllInfoStatus() {
+		List<pe.telefonica.provision.model.Status> statusList = this.mongoOperations
+				.findAll(pe.telefonica.provision.model.Status.class);
+		Optional<List<pe.telefonica.provision.model.Status>> optionalStatus = Optional.ofNullable(statusList);
+
+		return optionalStatus;
+	}
+
 	public Provision getProvisionByIdNotFilter(String provisionId) {
 
 		Provision provision = this.mongoOperations

@@ -1807,9 +1807,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					// SI SMS
 
 					StatusLog statusLog = new StatusLog();
-					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
+					statusLog.setStatus(Status.IN_TOA.getStatusName());
 
-					update.set("xa_request", getData[2]);
+					update.set("xa_request", getData[5]);
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
@@ -1818,9 +1818,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-					update.set("last_tracking_status", Status.DUMMY_IN_TOA.getStatusName());
-					update.set("generic_speech", speech);
-					update.set("description_status", Status.DUMMY_IN_TOA.getDescription());
+					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+					update.set("generic_speech", Status.IN_TOA.getSpeechWithoutSchedule());
+					update.set("description_status", Status.IN_TOA.getDescription());
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 

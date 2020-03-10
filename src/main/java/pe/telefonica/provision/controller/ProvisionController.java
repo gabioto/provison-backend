@@ -1576,7 +1576,7 @@ public class ProvisionController {
 		boolean provision = false;
 		if (Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[5].trim() == "0" ? parts[8].trim() : parts[5].trim();
+				xaRequest = parts[5].trim().equals("0") ? parts[8].trim() : parts[5].trim();
 				provision = true;
 				xaRequirementNumber = parts[8].trim();
 			} else {
@@ -1586,7 +1586,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
-				xaRequest = parts[6].trim() == "0" ? parts[9].trim() : parts[6].trim();
+				xaRequest = parts[6].trim().equals("0") ? parts[9].trim() : parts[6].trim();
 				provision = true;
 				xaRequirementNumber = parts[9].trim();
 			} else {
@@ -1596,7 +1596,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[7].trim() == "0" ? parts[10].trim() : parts[7].trim();
+				xaRequest = parts[7].trim().equals("0") ? parts[10].trim() : parts[7].trim();
 				provision = true;
 				xaRequirementNumber = parts[10].trim();
 			} else {
@@ -1606,7 +1606,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
-				xaRequest = parts[2].trim() == "0" ? parts[7].trim() : parts[2].trim();
+				xaRequest = parts[2].trim().equals("0") ? parts[7].trim() : parts[2].trim();
 				provision = true;
 				xaRequirementNumber = parts[7].trim();
 			} else {
@@ -1616,7 +1616,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
 				provision = true;
 				xaRequirementNumber = parts[5].trim();
 			} else {
@@ -1626,7 +1626,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
 				provision = true;
 				xaRequirementNumber = parts[5].trim();
 			} else {

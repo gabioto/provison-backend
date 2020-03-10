@@ -230,12 +230,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public boolean updateTrackingStatus(Provision provision, List<StatusLog> logStatus, String description,
-			String speech, boolean comesFromSchedule) {
+			String speech, String frontSpeech, boolean comesFromSchedule) {
 		Update update = new Update();
 		update.set("last_tracking_status", provision.getLastTrackingStatus());
 		update.set("log_status", logStatus);
 		update.set("description_status", description);
 		update.set("generic_speech", speech);
+		update.set("front_speech", frontSpeech);
 
 		if (comesFromSchedule) {
 			update.set("has_schedule", true);
@@ -250,6 +251,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
+		
 		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode())
 				.andOperator(Criteria.where("status_toa").is("done")));
 
@@ -318,12 +320,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
+		
+		Query query = new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer")
+				.ne(null)).limit(5);
+		
 
-		List<Provision> provision = this.mongoOperations.find(
+		query.with(new Sort(new Order(Direction.ASC, "_id")));
+		
+		
+		/*List<Provision> provision = this.mongoOperations.find(
 				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer")
 						.ne(null)).limit(5),
 
-				Provision.class);
+				Provision.class);*/
+		List<Provision> provision = this.mongoOperations.find(query, Provision.class);
+		
+		
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
@@ -373,6 +385,23 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
+	public Optional<pe.telefonica.provision.model.Status> getInfoStatus(String statusName) {
+		pe.telefonica.provision.model.Status status = this.mongoOperations.findOne(
+				new Query(Criteria.where("status_name").is(statusName)), pe.telefonica.provision.model.Status.class);
+		Optional<pe.telefonica.provision.model.Status> optionalStatus = Optional.ofNullable(status);
+
+		return optionalStatus;
+	}
+
+	@Override
+	public Optional<List<pe.telefonica.provision.model.Status>> getAllInfoStatus() {
+		List<pe.telefonica.provision.model.Status> statusList = this.mongoOperations
+				.findAll(pe.telefonica.provision.model.Status.class);
+		Optional<List<pe.telefonica.provision.model.Status>> optionalStatus = Optional.ofNullable(statusList);
+
+		return optionalStatus;
+	}
+
 	public Provision getProvisionByIdNotFilter(String provisionId) {
 
 		Provision provision = this.mongoOperations

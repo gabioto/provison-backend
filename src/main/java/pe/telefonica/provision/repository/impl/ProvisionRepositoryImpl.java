@@ -250,6 +250,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
+		
 		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode())
 				.andOperator(Criteria.where("status_toa").is("done")));
 
@@ -318,12 +319,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
+		
+		Query query = new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer")
+				.ne(null)).limit(5);
+		
 
-		List<Provision> provision = this.mongoOperations.find(
+		query.with(new Sort(new Order(Direction.ASC, "_id")));
+		
+		
+		/*List<Provision> provision = this.mongoOperations.find(
 				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer")
 						.ne(null)).limit(5),
 
-				Provision.class);
+				Provision.class);*/
+		List<Provision> provision = this.mongoOperations.find(query, Provision.class);
+		
+		
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}

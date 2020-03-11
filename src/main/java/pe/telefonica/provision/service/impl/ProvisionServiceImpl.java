@@ -510,9 +510,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 						statusList);
 				speech = ingresado != null ? ingresado.getSpeechWithoutSchedule()
 						: Status.INGRESADO.getSpeechWithoutSchedule();
-				speech = hasCustomerInfo(customer) ? ingresado.getSpeechWithoutSchedule()
-						.replace(Constants.TEXT_NAME_REPLACE, customer.getName().split(" ")[0])
-						: ingresado.getSpeechWithoutSchedule();
+				speech = hasCustomerInfo(customer)
+						? speech.replace(Constants.TEXT_NAME_REPLACE, customer.getName().split(" ")[0])
+						: speech;
 				provision.setDescriptionStatus(
 						ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
 				provision.setGenericSpeech(speech);

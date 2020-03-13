@@ -2085,13 +2085,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 				 */
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
-					&& !provision.getXaIdSt().isEmpty()) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())) {
 				// && "0".equals(getData[16].toString())) {
+				String xaIdSt = "";
 
 				// se cancela por que se regulariza la ficticia en una real
 				if (getData[16].toString().equals("2")) {
 					return false;
+				}
+
+				if (provision.getXaIdSt() != null && !provision.getXaIdSt().isEmpty()) {
+					xaIdSt = provision.getXaIdSt();
+				} else {
+					if (provision.getDummyStPsiCode() != null && !provision.getDummyStPsiCode().isEmpty()) {
+						xaIdSt = provision.getDummyStPsiCode();
+					} else {
+						return false;
+					}
 				}
 
 				Update update = new Update();
@@ -2104,7 +2114,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_CANCEL.getStatusName());
-				statusLog.setXaidst(provision.getXaIdSt());
+				statusLog.setXaidst(xaIdSt);
 
 				update.set("send_notify", false);
 				update.set("xa_cancel_reason", getData[16]);
@@ -2127,7 +2137,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
-				scheduleNotDoneRequest.setStPsiCode(getData[4]);
+				scheduleNotDoneRequest.setStPsiCode(xaIdSt);
 
 				if (getData[4].toString().equals(getData[5].toString())
 						&& getData[5].toString().equals(getData[6].toString())) {

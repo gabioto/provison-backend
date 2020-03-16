@@ -1855,13 +1855,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					log.info("IF 2");
 					// IN_TOA Monoproducto
+					pe.telefonica.provision.model.Status inToa = getInfoStatus(Status.IN_TOA.getStatusName(),
+							statusList);
+
+					String speechInToa = inToa != null ? inToa.getGenericSpeech() : Status.IN_TOA.getGenericSpeech();
+					speechInToa = hasCustomerInfo(provision.getCustomer())
+							? speechInToa.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
+							: speechInToa;
+							
 					Update update = new Update();
 					// SI SMS
-
 					StatusLog statusLog = new StatusLog();
-					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
+					statusLog.setStatus(Status.IN_TOA.getStatusName());
 
-					update.set("xa_request", getData[2]);
+					update.set("xa_request", getData[5]);
 					update.set("xa_id_st", getData[4]);
 					update.set("xa_requirement_number", getData[5]);
 					update.set("appt_number", getData[6]);
@@ -1870,11 +1877,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-					update.set("last_tracking_status", Status.DUMMY_IN_TOA.getStatusName());
-					update.set("generic_speech", speech);
+					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+					update.set("generic_speech", speechInToa);
 					update.set("description_status",
-							dummyInToa != null ? dummyInToa.getDescription() : Status.DUMMY_IN_TOA.getDescription());
-					update.set("front_speech", dummyInToa != null ? dummyInToa.getFront() : "");
+							inToa != null ? inToa.getDescription() : Status.IN_TOA.getDescription());
+					update.set("front_speech", inToa != null ? inToa.getFront() : "");
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
@@ -2164,9 +2171,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 				 */
 			}
 
-			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())
-					&& !provision.getXaIdSt().isEmpty()) {
+			if (request.getStatus().equalsIgnoreCase(Status.WO_CANCEL.getStatusName())) {
 				// && "0".equals(getData[16].toString())) {
+				String xaIdSt = "";
+
+				// se cancela por que se regulariza la ficticia en una real
+				if (getData[16].toString().equals("2")) {
+					return false;
+				}
+
+				if (provision.getXaIdSt() != null && !provision.getXaIdSt().isEmpty()) {
+					xaIdSt = provision.getXaIdSt();
+				} else {
+					if (provision.getDummyStPsiCode() != null && !provision.getDummyStPsiCode().isEmpty()) {
+						xaIdSt = provision.getDummyStPsiCode();
+					} else {
+						return false;
+					}
+				}
 
 				// se cancela por que se regulariza la ficticia en una real
 				if (getData[16].toString().equals("2")) {
@@ -2186,7 +2208,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_CANCEL.getStatusName());
-				statusLog.setXaidst(provision.getXaIdSt());
+				statusLog.setXaidst(xaIdSt);
 
 				update.set("send_notify", false);
 				update.set("xa_cancel_reason", getData[16]);
@@ -2212,7 +2234,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
 				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
-				scheduleNotDoneRequest.setStPsiCode(getData[4]);
+				scheduleNotDoneRequest.setStPsiCode(xaIdSt);
 
 				if (getData[4].toString().equals(getData[5].toString())
 						&& getData[5].toString().equals(getData[6].toString())) {

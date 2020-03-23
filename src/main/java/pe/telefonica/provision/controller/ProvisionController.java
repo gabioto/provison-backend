@@ -7,6 +7,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,6 +63,7 @@ import pe.telefonica.provision.util.exception.FunctionalErrorException;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("provision")
+@EnableAsync
 public class ProvisionController {
 
 	private static final Log log = LogFactory.getLog(ProvisionController.class);
@@ -77,15 +80,21 @@ public class ProvisionController {
 	public ProvisionController(ProvisionService provisionService) {
 		this.provisionService = provisionService;
 	}
-
+	
+	
 	@RequestMapping(value = "/getCustomerByDocument", method = RequestMethod.POST)
+	
 	public ResponseEntity<ApiResponse<Customer>> getCustomerByDocument(
 			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
 
 		ApiResponse<Customer> apiResponse;
 		HttpStatus status;
-
+		
 		try {
+			
+			//Future<String> futures = restSecuritySaveLogData.testAsyn();
+			//restSecuritySaveLogData.testAsyn();
+			
 			Customer customer = provisionService.validateUser(request);
 
 			if (customer != null) {
@@ -95,7 +104,7 @@ public class ProvisionController {
 						String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(customer);
 
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
@@ -107,7 +116,7 @@ public class ProvisionController {
 						String.valueOf(status.value()), "No se encontraron datos del cliente", null);
 				apiResponse.setBody(null);
 
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
@@ -118,7 +127,7 @@ public class ProvisionController {
 			apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
 					String.valueOf(status.value()), ex.getMessage(), null);
 
-			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+			restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
@@ -205,7 +214,7 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
@@ -222,7 +231,7 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_PROVISION_ALL,
@@ -237,7 +246,7 @@ public class ProvisionController {
 			timestamp = getTimestamp();
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+			restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
@@ -1087,7 +1096,7 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				timestamp = getTimestamp();
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "OK",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
@@ -1105,7 +1114,7 @@ public class ProvisionController {
 				log.info("timestamp => " + timestamp);
 				log.info("MessageId => " + request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
@@ -1121,7 +1130,7 @@ public class ProvisionController {
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-			restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+			restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 					new Gson().toJson(request), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 					request.getHeader().getTimestamp(), timestamp);
@@ -1151,7 +1160,7 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
@@ -1164,16 +1173,16 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp);
 			}
 		}
 
-		restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
+		/*restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
 				new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);
+				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);*/
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}

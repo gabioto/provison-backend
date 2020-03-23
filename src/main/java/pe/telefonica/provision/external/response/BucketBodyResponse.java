@@ -1,8 +1,6 @@
 package pe.telefonica.provision.external.response;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +13,7 @@ public class BucketBodyResponse {
 	@JsonProperty("header")
 	private String header;
 	@JsonProperty("content")
-	private HashMap<String, List<OrigenBean>> content;
+	private boolean content;
 	// private ContentBean content;
 	// private ArrayList<ContentBean> content;
 
@@ -27,11 +25,11 @@ public class BucketBodyResponse {
 		this.header = header;
 	}
 
-	public HashMap<String, List<OrigenBean>> getContent() {
+	public boolean isContent() {
 		return content;
 	}
 
-	public void setContent(HashMap<String, List<OrigenBean>> content) {
+	public void setContent(boolean content) {
 		this.content = content;
 	}
 

@@ -31,8 +31,9 @@ public class CancelRequest extends LogDataFrontendRequest {
 		this.stPsiCode = stPsiCode;
 	}
 	
-	
+
 	public boolean getFlgFicticious() {
+
 		return flgFicticious;
 	}
 

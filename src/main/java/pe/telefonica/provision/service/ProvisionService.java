@@ -59,7 +59,8 @@ public interface ProvisionService {
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 
 	Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,
-			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description, String speech);
+			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description, String speech,
+			String frontSpeech);
 
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 

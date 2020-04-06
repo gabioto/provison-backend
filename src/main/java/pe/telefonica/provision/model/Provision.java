@@ -237,6 +237,12 @@ public class Provision implements Serializable {
 	@Field("rating")
 	private List<Rating> rating = new ArrayList<>();
 
+	@Field("up_front")
+	private UpFront upFront;
+
+	@Field("is_up_front")
+	private Boolean isUpFront = false;
+
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -769,6 +775,22 @@ public class Provision implements Serializable {
 		this.rating = rating;
 	}
 
+	public UpFront getUpFront() {
+		return upFront;
+	}
+
+	public void setUpFront(UpFront upFront) {
+		this.upFront = upFront;
+	}
+
+	public Boolean getIsUpFront() {
+		return isUpFront;
+	}
+
+	public void setIsUpFront(Boolean isUpFront) {
+		this.isUpFront = isUpFront;
+	}
+
 	public Provision() {
 
 	}
@@ -807,15 +829,12 @@ public class Provision implements Serializable {
 
 		@Field("status")
 		private String status;
-//
-//		@Field("description")
-//		private String description;
 
 		@Field("inserted_date")
 		private LocalDateTime insertedDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 		@Field("scheduled_date")
-		private String scheduledDate; /* = LocalDate.now(ZoneOffset.of("-05:00")); */
+		private String scheduledDate;
 
 		@Field("scheduled_range")
 		private String scheduledRange;
@@ -826,14 +845,6 @@ public class Provision implements Serializable {
 		public String getStatus() {
 			return status;
 		}
-
-//		public String getDescription() {
-//			return description;
-//		}
-//
-//		public void setDescription(String description) {
-//			this.description = description;
-//		}
 
 		public void setStatus(String status) {
 			this.status = status;

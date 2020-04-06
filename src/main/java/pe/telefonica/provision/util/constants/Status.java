@@ -38,6 +38,12 @@ public enum Status {
 			"Hola [$name], tu pedido no pudo ser instalado en la fecha indicada. Lamentamos los inconvenientes.", ""),
 	CANCEL("CANCEL", 14, "CANCELADO POR CLIENTE",
 			"Hola, la solicitud de cancelación de tu pedido Movistar se realizo con éxito. [Si el cliente menciona que él no solicitó la cancelación, sigue flujo regular de reingreso de pedido]",
+			""),
+	PENDIENTE_PAGO("PENDIENTE-PAGO", 15, "PENDIENTE DE PAGO",
+			"Hola, la solicitud de cancelación de tu pedido Movistar se realizo con éxito. [Si el cliente menciona que él no solicitó la cancelación, sigue flujo regular de reingreso de pedido]",
+			""),
+	PAGADO("PAGADO", 14, "PAGADO",
+			"Hola, la solicitud de cancelación de tu pedido Movistar se realizo con éxito. [Si el cliente menciona que él no solicitó la cancelación, sigue flujo regular de reingreso de pedido]",
 			"");
 
 	private String statusName;

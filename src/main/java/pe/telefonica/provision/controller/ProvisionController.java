@@ -1732,4 +1732,20 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 	
+	@RequestMapping(value = "/getUpFrontProvisions", method = RequestMethod.GET)
+	public ResponseEntity<ApiResponse<List<Provision>>> getUpFrontProvisions() {
+		log.info("ProvisionController.getOrderToNotify()");
+		ApiResponse<List<Provision>> apiResponse;
+		HttpStatus status;
+		
+		List<Provision> provisions = provisionService.getUpFrontProvisions();
+
+		status = HttpStatus.OK;
+		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				Constants.OPER_GET_ORDER_TO_NOTIFY, String.valueOf(status.value()), status.getReasonPhrase(),
+				provisions);
+		
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+
 }

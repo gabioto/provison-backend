@@ -2608,4 +2608,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return localStatus;
 	}
+
+	@Override
+	public List<Provision> getUpFrontProvisions() {
+		Optional<List<Provision>> optProvisiones = provisionRepository.getUpFrontProvisionsOnDay();
+		return null;
+	}
 }

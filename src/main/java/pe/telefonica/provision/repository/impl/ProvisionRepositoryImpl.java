@@ -401,4 +401,17 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		return provision;
 	}
+
+	@Override
+	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
+		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+
+		List<Provision> provisions = this.mongoOperations.find(
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
+								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
+				Provision.class);
+		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
+	}
 }

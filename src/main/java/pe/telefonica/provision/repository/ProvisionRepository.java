@@ -77,4 +77,6 @@ public interface ProvisionRepository {
 	Optional<Status> getInfoStatus(String statusName);
 
 	Optional<List<Status>> getAllInfoStatus();
+	
+	Optional<List<Provision>> getUpFrontProvisionsOnDay();
 }

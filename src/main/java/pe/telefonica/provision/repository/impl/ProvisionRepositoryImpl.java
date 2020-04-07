@@ -410,7 +410,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		List<Provision> provisions = this.mongoOperations
 				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
-						Criteria.where("register_date").gt(yesterday), Criteria.where("register_date").lt(today)))
+						Criteria.where("register_date").gt(yesterday), Criteria.where("register_date").lt(today),
+						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne("")))
 								.limit(10),
 						Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);

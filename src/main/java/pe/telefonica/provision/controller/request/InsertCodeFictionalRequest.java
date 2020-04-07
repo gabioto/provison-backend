@@ -2,8 +2,6 @@ package pe.telefonica.provision.controller.request;
 
 import java.time.LocalDate;
 
-import pe.telefonica.provision.model.Customer;
-
 public class InsertCodeFictionalRequest {
 	private String saleCode;
 	private Integer dummyXaRequest;
@@ -19,6 +17,7 @@ public class InsertCodeFictionalRequest {
 	private String customerDocumentNumber;
 	private String customerLatitude;
 	private String customerLongitude;
+	private boolean isUpFront;
 
 	public String getSaleCode() {
 		return saleCode;
@@ -130,6 +129,14 @@ public class InsertCodeFictionalRequest {
 
 	public void setCustomerLongitude(String customerLongitude) {
 		this.customerLongitude = customerLongitude;
+	}
+
+	public boolean isUpFront() {
+		return isUpFront;
+	}
+
+	public void setUpFront(boolean isUpFront) {
+		this.isUpFront = isUpFront;
 	}
 
 }

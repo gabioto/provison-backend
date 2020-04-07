@@ -1692,8 +1692,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setOriginCode(request.getOriginCode());
 			provisionAdd.setProductName("Pedido Movistar");
 			provisionAdd.setCommercialOp(request.getCommercialOp());
-			provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
-			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 
 			Customer customer = new Customer();
 
@@ -1706,11 +1704,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setCustomer(customer);
 
 			List<StatusLog> listLog = new ArrayList<>();
-
 			StatusLog statusPendiente = new StatusLog();
 			StatusLog statusLogDummy = new StatusLog();
-			statusPendiente.setStatus(Status.PENDIENTE.getStatusName());
 
+			if (request.isUpFront()) {
+				provisionAdd.setActiveStatus(Status.PENDIENTE_PAGO.getStatusName().toLowerCase());
+				provisionAdd.setStatusToa(Status.PENDIENTE_PAGO.getStatusName().toLowerCase());
+				statusPendiente.setStatus(Status.PENDIENTE_PAGO.getStatusName());
+			} else {
+				provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
+				provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
+				statusPendiente.setStatus(Status.PENDIENTE.getStatusName());
+			}
+			
 			statusLogDummy.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			statusLogDummy.setScheduledDate(request.getScheduleDate().toString());
 			statusLogDummy.setScheduledRange(request.getScheduleRange());
@@ -1732,7 +1738,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setDescriptionStatus(
 					fictitious != null ? fictitious.getDescription() : Status.FICTICIOUS_SCHEDULED.getDescription());
 			provisionAdd.setFrontSpeech(fictitious != null ? fictitious.getFront() : "");
-			provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 			provisionAdd.setComponents(new ArrayList<>());
 
 			provisionRepository.insertProvision(provisionAdd);

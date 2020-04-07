@@ -1,5 +1,7 @@
 package pe.telefonica.provision.model;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class UpFront {
@@ -14,7 +16,7 @@ public class UpFront {
 	private Double amount;
 
 	@Field("exp_date")
-	private String expDate;
+	private LocalDateTime expDate;
 
 	@Field("cip_url")
 	private String cipUrl;
@@ -22,8 +24,8 @@ public class UpFront {
 	@Field("status")
 	private String status;
 
-	@Field("fetch")
-	private String fetch;
+	@Field("payment_date")
+	private LocalDateTime paymentDate;
 
 	public String getCip() {
 		return cip;
@@ -49,14 +51,6 @@ public class UpFront {
 		this.amount = amount;
 	}
 
-	public String getExpDate() {
-		return expDate;
-	}
-
-	public void setExpDate(String expDate) {
-		this.expDate = expDate;
-	}
-
 	public String getCipUrl() {
 		return cipUrl;
 	}
@@ -73,18 +67,26 @@ public class UpFront {
 		this.status = status;
 	}
 
-	public String getFetch() {
-		return fetch;
+	public LocalDateTime getExpDate() {
+		return expDate;
 	}
 
-	public void setFetch(String fetch) {
-		this.fetch = fetch;
+	public void setExpDate(LocalDateTime expDate) {
+		this.expDate = expDate;
+	}
+
+	public LocalDateTime getPaymentDate() {
+		return paymentDate;
+	}
+
+	public void setPaymentDate(LocalDateTime paymentDate) {
+		this.paymentDate = paymentDate;
 	}
 
 	@Override
 	public String toString() {
 		return "UpFront [cip=" + cip + ", currency=" + currency + ", amount=" + amount + ", expDate=" + expDate
-				+ ", cipUrl=" + cipUrl + ", status=" + status + ", fetch=" + fetch + "]";
+				+ ", cipUrl=" + cipUrl + ", status=" + status + ", paymentDate=" + paymentDate + "]";
 	}
 
 }

@@ -1,5 +1,6 @@
 package pe.telefonica.provision.repository.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -404,12 +405,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
-		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
+		LocalDate yesterday = today.minusDays(1);
 
 		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
-								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
+				new Query(Criteria.where("is_up_front").is(true).andOperator(
+						Criteria.where("register_date").gt(yesterday), Criteria.where("register_date").lt(today))),
 				Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;

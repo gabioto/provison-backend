@@ -1734,7 +1734,7 @@ public class ProvisionController {
 	
 	@RequestMapping(value = "/getUpFrontProvisions", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getUpFrontProvisions() {
-		log.info("ProvisionController.getOrderToNotify()");
+		log.info("ProvisionController.getUpFrontProvisions()");
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 		

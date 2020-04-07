@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -477,14 +478,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 			upFront.setCip(upFrontArray[4]);
 			upFront.setCurrency(upFrontArray[5]);
 			upFront.setAmount(Double.valueOf(upFrontArray[6]));
-			upFront.setExpDate(upFrontArray[7]);
 			upFront.setCipUrl("");
 			upFront.setStatus(upFrontArray[8]);
-			upFront.setFetch(upFrontArray[9]);
+
+			LocalDateTime paymentDate;
+			LocalDateTime expDate;
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+			paymentDate = LocalDateTime.parse(upFrontArray[9], formatter);
+			expDate = LocalDateTime.parse(upFrontArray[7], formatter);
+			upFront.setPaymentDate(paymentDate);
+			upFront.setExpDate(expDate);
+
 			provision.setUpFront(upFront);
 			provision.setIsUpFront(true);
 		}
-		
+
 		Status pendingStatus = provision.getIsUpFront() ? Status.PENDIENTE_PAGO : Status.PENDIENTE;
 		pe.telefonica.provision.model.Status pendiente = getInfoStatus(pendingStatus.getStatusName(), statusList);
 		speech = pendiente != null ? pendiente.getSpeechWithoutSchedule() : pendingStatus.getSpeechWithoutSchedule();
@@ -496,8 +504,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setActiveStatus(pendingStatus.getStatusName().toLowerCase());
 		provision.setStatusToa(pendingStatus.getStatusName().toLowerCase());
 		provision.setGenericSpeech(speech);
-		provision.setDescriptionStatus(
-				pendiente != null ? pendiente.getDescription() : pendingStatus.getDescription());
+		provision.setDescriptionStatus(pendiente != null ? pendiente.getDescription() : pendingStatus.getDescription());
 		provision.setFrontSpeech(pendiente != null ? pendiente.getFront() : "");
 
 		List<StatusLog> listLog = new ArrayList<>();
@@ -636,10 +643,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 			upFront.setCip(upFrontArray[4]);
 			upFront.setCurrency(upFrontArray[5]);
 			upFront.setAmount(Double.valueOf(upFrontArray[6]));
-			upFront.setExpDate(upFrontArray[7]);
 			upFront.setCipUrl("");
 			upFront.setStatus(upFrontArray[8]);
-			upFront.setFetch(upFrontArray[9]);
+
+			LocalDateTime paymentDate;
+			LocalDateTime expDate;
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+			paymentDate = LocalDateTime.parse(upFrontArray[9], formatter);
+			expDate = LocalDateTime.parse(upFrontArray[7], formatter);
+			upFront.setPaymentDate(paymentDate);
+			upFront.setExpDate(expDate);
+
 			update.set("up_front", upFront);
 			update.set("is_up_front", true);
 		}
@@ -2582,7 +2596,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public List<Provision> getUpFrontProvisions() {
-		Optional<List<Provision>> optProvisiones = provisionRepository.getUpFrontProvisionsOnDay();
-		return null;
+		List<Provision> provisions = new ArrayList<>();
+		Optional<List<Provision>> optProvisions = provisionRepository.getUpFrontProvisionsOnDay();
+
+		if (optProvisions.isPresent()) {
+			provisions = optProvisions.get();
+
+			for (int i = 0; i < provisions.size(); i++) {
+				List<StatusLog> listPaid = provisions.get(i).getLogStatus().stream()
+						.filter(x -> Status.PAGADO.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
+
+				if (listPaid.size() > 0) {
+					provisions.remove(i);
+				}
+			}
+		}
+
+		return provisions;
 	}
 }

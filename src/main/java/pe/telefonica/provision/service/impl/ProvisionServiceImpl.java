@@ -1711,12 +1711,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionAdd.setActiveStatus(Status.PENDIENTE_PAGO.getStatusName().toLowerCase());
 				provisionAdd.setStatusToa(Status.PENDIENTE_PAGO.getStatusName().toLowerCase());
 				statusPendiente.setStatus(Status.PENDIENTE_PAGO.getStatusName());
+				provisionAdd.setIsUpFront(true);
 			} else {
 				provisionAdd.setActiveStatus(Status.PENDIENTE.getStatusName().toLowerCase());
 				provisionAdd.setStatusToa(Status.PENDIENTE.getStatusName().toLowerCase());
 				statusPendiente.setStatus(Status.PENDIENTE.getStatusName());
 			}
-			
+
 			statusLogDummy.setStatus(Status.FICTICIOUS_SCHEDULED.getStatusName());
 			statusLogDummy.setScheduledDate(request.getScheduleDate().toString());
 			statusLogDummy.setScheduledRange(request.getScheduleRange());

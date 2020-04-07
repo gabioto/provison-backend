@@ -1,9 +1,6 @@
 package pe.telefonica.provision.model.rating;
 
 import java.io.Serializable;
-import java.util.List;
-
-import javax.persistence.Id;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 

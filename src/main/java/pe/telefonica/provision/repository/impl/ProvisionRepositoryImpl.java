@@ -408,11 +408,26 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
 		LocalDate yesterday = today.minusDays(1);
 
-		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("is_up_front").is(true).andOperator(
-						Criteria.where("register_date").gt(yesterday), Criteria.where("register_date").lt(today))),
-				Provision.class);
+		List<Provision> provisions = this.mongoOperations
+				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
+						Criteria.where("register_date").gt(yesterday), Criteria.where("register_date").lt(today)))
+								.limit(10),
+						Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
+	}
+
+	@Override
+	public void updateUpFrontProvisionRead(List<Provision> provisions) {
+		log.info("ProvisionRepositoryImpl.updateUpFrontProvisionRead()");
+		Update update = new Update();
+		update.set("up_front_read", true);
+
+		for (int i = 0; i < provisions.size(); i++) {
+			this.mongoOperations.updateFirst(
+					new Query(Criteria.where("idProvision").is(new ObjectId(provisions.get(i).getIdProvision()))),
+					update, Provision.class);
+		}
+
 	}
 }

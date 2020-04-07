@@ -243,6 +243,9 @@ public class Provision implements Serializable {
 	@Field("is_up_front")
 	private Boolean isUpFront = false;
 
+	@Field("up_front_read")
+	private Boolean upFrontRead = false;
+
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -789,6 +792,14 @@ public class Provision implements Serializable {
 
 	public void setIsUpFront(Boolean isUpFront) {
 		this.isUpFront = isUpFront;
+	}
+
+	public Boolean getUpFrontRead() {
+		return upFrontRead;
+	}
+
+	public void setUpFrontRead(Boolean upFrontRead) {
+		this.upFrontRead = upFrontRead;
 	}
 
 	public Provision() {

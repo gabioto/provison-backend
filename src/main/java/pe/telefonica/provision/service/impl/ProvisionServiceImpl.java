@@ -1707,7 +1707,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			StatusLog statusPendiente = new StatusLog();
 			StatusLog statusLogDummy = new StatusLog();
 
-			if (request.isUpFront()) {
+			if (request.getIsUpFront()) {
 				provisionAdd.setActiveStatus(Status.PENDIENTE_PAGO.getStatusName().toLowerCase());
 				provisionAdd.setStatusToa(Status.PENDIENTE_PAGO.getStatusName().toLowerCase());
 				statusPendiente.setStatus(Status.PENDIENTE_PAGO.getStatusName());

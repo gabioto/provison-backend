@@ -131,7 +131,7 @@ public class InsertCodeFictionalRequest {
 		this.customerLongitude = customerLongitude;
 	}
 
-	public boolean isUpFront() {
+	public boolean getIsUpFront() {
 		return isUpFront;
 	}
 

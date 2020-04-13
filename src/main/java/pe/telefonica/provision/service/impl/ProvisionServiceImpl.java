@@ -653,13 +653,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 			upFront.setCipUrl("");
 			upFront.setStatus(upFrontArray[8]);
 
-			LocalDateTime paymentDate;
-			LocalDateTime expDate;
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-			paymentDate = LocalDateTime.parse(upFrontArray[9], formatter);
-			expDate = LocalDateTime.parse(upFrontArray[7], formatter);
-			upFront.setPaymentDate(paymentDate);
-			upFront.setExpDate(expDate);
+			try {
+				LocalDateTime paymentDate;
+				LocalDateTime expDate;
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+				expDate = LocalDateTime.parse(upFrontArray[7], formatter);
+				upFront.setExpDate(expDate);
+
+				if (upFrontArray.length >= 10) {
+					paymentDate = LocalDateTime.parse(upFrontArray[9], formatter);
+					upFront.setPaymentDate(paymentDate);
+				}
+			} catch (Exception e) {
+				log.info(e.getMessage());
+			}
 
 			update.set("up_front", upFront);
 			update.set("is_up_front", true);

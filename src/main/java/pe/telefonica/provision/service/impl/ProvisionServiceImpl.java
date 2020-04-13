@@ -710,6 +710,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			StatusLog statusLog = new StatusLog();
 			statusLog.setStatus(request.getStatus());
 
+			String status = "";
+
 			if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
 				pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
 						statusList);
@@ -727,6 +729,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setDescriptionStatus(
 						pendiente != null ? pendiente.getDescription() : Status.PENDIENTE.getDescription());
 				provisionx.setFrontSpeech(pendiente != null ? pendiente.getFront() : "");
+				status = Status.PENDIENTE.getStatusName().toLowerCase();
 			} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
 				pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
 						statusList);
@@ -743,11 +746,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setDescriptionStatus(
 						ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
 				provisionx.setFrontSpeech(ingresado != null ? ingresado.getFront() : "");
+				status = Status.INGRESADO.getStatusName().toLowerCase();
 			} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
 				pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(), statusList);
 				provisionx.setDescriptionStatus(caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
 				provisionx.setGenericSpeech(caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
 				provisionx.setFrontSpeech(caida != null ? caida.getFront() : "");
+				status = Constants.PROVISION_STATUS_CAIDA;
 			} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_PAGO.getStatusName())) {
 				pe.telefonica.provision.model.Status pendingPayment = getInfoStatus(
 						Status.PENDIENTE_PAGO.getStatusName(), statusList);
@@ -756,11 +761,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setGenericSpeech(pendingPayment != null ? pendingPayment.getGenericSpeech()
 						: Status.PENDIENTE_PAGO.getGenericSpeech());
 				provisionx.setFrontSpeech(pendingPayment != null ? pendingPayment.getFront() : "");
+				status = Status.PENDIENTE_PAGO.getStatusName().toLowerCase();
 			} else if (request.getStatus().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
 				pe.telefonica.provision.model.Status paid = getInfoStatus(Status.PAGADO.getStatusName(), statusList);
 				provisionx.setDescriptionStatus(paid != null ? paid.getDescription() : Status.PAGADO.getDescription());
 				provisionx.setGenericSpeech(paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
 				provisionx.setFrontSpeech(paid != null ? paid.getFront() : "");
+				status = Status.PAGADO.getStatusName().toLowerCase();
 			}
 
 			if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
@@ -784,13 +791,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 				}
 			}
-
-			// status_toa
-			String status = request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())
-					? Status.PENDIENTE.getStatusName().toLowerCase()
-					: request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
-							? Status.INGRESADO.getStatusName().toLowerCase()
-							: Constants.PROVISION_STATUS_CAIDA;
 
 			if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA) && provisionx.getDummyStPsiCode() != null) {
 

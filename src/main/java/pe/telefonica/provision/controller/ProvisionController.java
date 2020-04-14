@@ -30,6 +30,7 @@ import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
 import com.google.gson.Gson;
 
+import pe.telefonica.provision.conf.ProjectConfig;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.request.AddressUpdateRequest;
@@ -73,27 +74,25 @@ public class ProvisionController {
 	@Autowired
 	TrazabilidadSecurityApi restSecuritySaveLogData;
 
+	@Autowired
+	ProjectConfig projecConfig;
+
 	private final ProvisionService provisionService;
 
 	@Autowired
 	public ProvisionController(ProvisionService provisionService) {
 		this.provisionService = provisionService;
 	}
-	
-	
+
 	@RequestMapping(value = "/getCustomerByDocument", method = RequestMethod.POST)
-	
+
 	public ResponseEntity<ApiResponse<Customer>> getCustomerByDocument(
 			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
 
 		ApiResponse<Customer> apiResponse;
 		HttpStatus status;
-		
+
 		try {
-			
-			//Future<String> futures = restSecuritySaveLogData.testAsyn();
-			//restSecuritySaveLogData.testAsyn();
-			
 			Customer customer = provisionService.validateUser(request);
 
 			if (customer != null) {
@@ -149,6 +148,22 @@ public class ProvisionController {
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
+
+		if (!Boolean.valueOf(projecConfig.getFunctionsProvisionEnable())) {
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ06.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			timestamp = getTimestamp();
+
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, errorInternal,
+					"Servicio de provisiones no se encuentra disponible", null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+			return ResponseEntity.status(status).body(apiResponse);
+		}
 
 		// Validate documentType
 		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
@@ -388,7 +403,6 @@ public class ProvisionController {
 				// Averia
 			}
 
-			
 			if (provisions) {
 				log.info("provision fin");
 				status = HttpStatus.OK;
@@ -410,8 +424,7 @@ public class ProvisionController {
 			log.info("provision catch");
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()),
-					ex.getMessage(), null);
+					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()), ex.getMessage(), null);
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
@@ -895,7 +908,6 @@ public class ProvisionController {
 	public ResponseEntity<ApiResponse<String>> apiTrazaSetContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
-		
 
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
@@ -1179,9 +1191,13 @@ public class ProvisionController {
 			}
 		}
 
-		/*restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
-				new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);*/
+		/*
+		 * restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "",
+		 * "", "", "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+		 * ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
+		 * request.getHeader().getMessageId(), request.getHeader().getTimestamp(),
+		 * timestamp);
+		 */
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
@@ -1657,26 +1673,25 @@ public class ProvisionController {
 			xaRequest = "";
 			xaRequirementNumber = "";
 		}
-		
+
 		obj[0] = provision;
 		obj[1] = xaRequest;
 		obj[2] = xaRequirementNumber;
 		return obj;
 	}
-	
+
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
 		log.info("ProvisionController.getOrderToNotify()");
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
-		
+
 		List<Provision> provisions = provisionService.getOrderToNotify();
 
 		status = HttpStatus.OK;
-		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-				Constants.OPER_GET_ORDER_TO_NOTIFY, String.valueOf(status.value()), status.getReasonPhrase(),
-				provisions);
-		
+		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ORDER_TO_NOTIFY,
+				String.valueOf(status.value()), status.getReasonPhrase(), provisions);
+
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
@@ -1686,13 +1701,13 @@ public class ProvisionController {
 
 		Provision provision = new Provision();
 		provision.setIdProvision(request.getBody().getIdProvision());
-		
+
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
 
 		try {
 			boolean estado = provisionService.updateShowLocation(provision);
-			
+
 			if (estado) {
 
 				status = HttpStatus.OK;
@@ -1731,20 +1746,19 @@ public class ProvisionController {
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
-	
+
 	@RequestMapping(value = "/getUpFrontProvisions", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getUpFrontProvisions() {
 		log.info("ProvisionController.getUpFrontProvisions()");
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
-		
+
 		List<Provision> provisions = provisionService.getUpFrontProvisions();
 
 		status = HttpStatus.OK;
-		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-				Constants.OPER_GET_ORDER_TO_NOTIFY, String.valueOf(status.value()), status.getReasonPhrase(),
-				provisions);
-		
+		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ORDER_TO_NOTIFY,
+				String.valueOf(status.value()), status.getReasonPhrase(), provisions);
+
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 

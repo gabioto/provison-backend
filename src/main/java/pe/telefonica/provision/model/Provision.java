@@ -52,7 +52,7 @@ public class Provision implements Serializable {
 	private String xaNumberWorkOrder;
 
 	@Field("activity_type")
-	private String activityType;
+	private String activityType = "provision";
 
 	@Field("xa_id_st")
 	private String xaIdSt;

@@ -472,7 +472,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		UpFront upFront = new UpFront();
 		String upFrontFields = getData[58];
-		String[] upFrontArray = upFrontFields != null ? upFrontFields.split(",") : null;
+		String[] upFrontArray = (upFrontFields != null && !upFrontFields.isEmpty()) ? upFrontFields.split(",") : null;
 
 		if (upFrontArray != null) {
 			upFront.setCip(upFrontArray[4]);
@@ -644,7 +644,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		UpFront upFront = new UpFront();
 		String upFrontFields = getData[58];
-		String[] upFrontArray = upFrontFields != null ? upFrontFields.split(",") : null;
+		String[] upFrontArray = (upFrontFields != null && !upFrontFields.isEmpty()) ? upFrontFields.split(",") : null;
 
 		if (upFrontArray != null) {
 			upFront.setCip(upFrontArray[4]);

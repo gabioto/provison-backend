@@ -1,5 +1,6 @@
 package pe.telefonica.provision.repository.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -251,7 +252,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request) {
-		
+
 		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode())
 				.andOperator(Criteria.where("status_toa").is("done")));
 
@@ -320,22 +321,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
-		
-		Query query = new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer")
-				.ne(null)).limit(5);
-		
 
+		Query query = new Query(
+				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))
+						.limit(5);
 		query.with(new Sort(new Order(Direction.ASC, "_id")));
-		
-		
-		/*List<Provision> provision = this.mongoOperations.find(
-				new Query(Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer")
-						.ne(null)).limit(5),
 
-				Provision.class);*/
 		List<Provision> provision = this.mongoOperations.find(query, Provision.class);
-		
-		
+
 		Optional<List<Provision>> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
@@ -408,5 +401,34 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				.findOne(new Query(Criteria.where("idProvision").is(new ObjectId(provisionId))), Provision.class);
 
 		return provision;
+	}
+
+	@Override
+	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
+		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
+		LocalDate yesterday = today.minusDays(1);
+
+		List<Provision> provisions = this.mongoOperations
+				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
+						Criteria.where("register_date").gt(yesterday), Criteria.where("register_date").lt(today),
+						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne("")))
+								.limit(10),
+						Provision.class);
+		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
+	}
+
+	@Override
+	public void updateUpFrontProvisionRead(List<Provision> provisions) {
+		log.info("ProvisionRepositoryImpl.updateUpFrontProvisionRead()");
+		Update update = new Update();
+		update.set("up_front_read", true);
+
+		for (int i = 0; i < provisions.size(); i++) {
+			this.mongoOperations.updateFirst(
+					new Query(Criteria.where("idProvision").is(new ObjectId(provisions.get(i).getIdProvision()))),
+					update, Provision.class);
+		}
+
 	}
 }

@@ -7,7 +7,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +47,7 @@ import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
@@ -68,6 +68,8 @@ public class ProvisionController {
 
 	private static final Log log = LogFactory.getLog(ProvisionController.class);
 
+
+
 	@Autowired
 	ProvisionService contactService;
 
@@ -78,23 +80,19 @@ public class ProvisionController {
 
 	@Autowired
 	public ProvisionController(ProvisionService provisionService) {
+
 		this.provisionService = provisionService;
 	}
-	
-	
+
 	@RequestMapping(value = "/getCustomerByDocument", method = RequestMethod.POST)
-	
+
 	public ResponseEntity<ApiResponse<Customer>> getCustomerByDocument(
 			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
 
 		ApiResponse<Customer> apiResponse;
 		HttpStatus status;
-		
+
 		try {
-			
-			//Future<String> futures = restSecuritySaveLogData.testAsyn();
-			//restSecuritySaveLogData.testAsyn();
-			
 			Customer customer = provisionService.validateUser(request);
 
 			if (customer != null) {
@@ -143,13 +141,16 @@ public class ProvisionController {
 	 * @description get all provisions related to type and number of the document
 	 */
 
-	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> getOrders(@RequestBody ApiRequest<ProvisionRequest> request) {
 
-		ApiResponse<List<Provision>> apiResponse;
+	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<ProvisionDto>>> getOrders(
+			@RequestBody ApiRequest<ProvisionRequest> request) {
+
+		ApiResponse<List<ProvisionDto>> apiResponse;
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
+
 
 		// Validate documentType
 		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
@@ -160,7 +161,7 @@ public class ProvisionController {
 
 			timestamp = getTimestamp();
 
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento obligatorio", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -176,7 +177,7 @@ public class ProvisionController {
 			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Numero de documento obligatorio", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -191,7 +192,7 @@ public class ProvisionController {
 			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento debe ser cadena", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -200,12 +201,13 @@ public class ProvisionController {
 		}
 
 		try {
-			List<Provision> provisions = provisionService.getAll(request);
+			List<ProvisionDto> provisions = provisionService.getAll(request);
 
+			
 			if (provisions != null) {
 
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
 				apiResponse.setBody(provisions);
@@ -222,7 +224,7 @@ public class ProvisionController {
 
 			} else {
 				status = HttpStatus.NOT_FOUND;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()),
 						"No se encontraron provisiones", null);
 				apiResponse.setBody(provisions);
@@ -240,7 +242,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
 
 			timestamp = getTimestamp();
@@ -389,7 +391,6 @@ public class ProvisionController {
 				// Averia
 			}
 
-			
 			if (provisions) {
 				log.info("provision fin");
 				status = HttpStatus.OK;
@@ -411,8 +412,7 @@ public class ProvisionController {
 			log.info("provision catch");
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()),
-					ex.getMessage(), null);
+					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()), ex.getMessage(), null);
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
@@ -896,7 +896,6 @@ public class ProvisionController {
 	public ResponseEntity<ApiResponse<String>> apiTrazaSetContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
-		
 
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
@@ -1180,9 +1179,13 @@ public class ProvisionController {
 			}
 		}
 
-		/*restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
-				new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);*/
+		/*
+		 * restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "",
+		 * "", "", "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+		 * ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
+		 * request.getHeader().getMessageId(), request.getHeader().getTimestamp(),
+		 * timestamp);
+		 */
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
@@ -1585,7 +1588,7 @@ public class ProvisionController {
 		boolean provision = false;
 		if (Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[5].trim() == "0" ? parts[8].trim() : parts[5].trim();
+				xaRequest = parts[5].trim().equals("0") ? parts[8].trim() : parts[5].trim();
 				provision = true;
 				xaRequirementNumber = parts[8].trim();
 			} else {
@@ -1595,7 +1598,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
-				xaRequest = parts[6].trim() == "0" ? parts[9].trim() : parts[6].trim();
+				xaRequest = parts[6].trim().equals("0") ? parts[9].trim() : parts[6].trim();
 				provision = true;
 				xaRequirementNumber = parts[9].trim();
 			} else {
@@ -1605,7 +1608,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[7].trim() == "0" ? parts[10].trim() : parts[7].trim();
+				xaRequest = parts[7].trim().equals("0") ? parts[10].trim() : parts[7].trim();
 				provision = true;
 				xaRequirementNumber = parts[10].trim();
 			} else {
@@ -1615,7 +1618,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
-				xaRequest = parts[2].trim() == "0" ? parts[7].trim() : parts[2].trim();
+				xaRequest = parts[2].trim().equals("0") ? parts[7].trim() : parts[2].trim();
 				provision = true;
 				xaRequirementNumber = parts[7].trim();
 			} else {
@@ -1625,7 +1628,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
 				provision = true;
 				xaRequirementNumber = parts[5].trim();
 			} else {
@@ -1635,7 +1638,7 @@ public class ProvisionController {
 			}
 		} else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
 			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim() == "0" ? parts[5].trim() : parts[2].trim();
+				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
 				provision = true;
 				xaRequirementNumber = parts[5].trim();
 			} else {
@@ -1658,26 +1661,25 @@ public class ProvisionController {
 			xaRequest = "";
 			xaRequirementNumber = "";
 		}
-		
+
 		obj[0] = provision;
 		obj[1] = xaRequest;
 		obj[2] = xaRequirementNumber;
 		return obj;
 	}
-	
+
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
 		log.info("ProvisionController.getOrderToNotify()");
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
-		
+
 		List<Provision> provisions = provisionService.getOrderToNotify();
 
 		status = HttpStatus.OK;
-		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-				Constants.OPER_GET_ORDER_TO_NOTIFY, String.valueOf(status.value()), status.getReasonPhrase(),
-				provisions);
-		
+		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ORDER_TO_NOTIFY,
+				String.valueOf(status.value()), status.getReasonPhrase(), provisions);
+
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
@@ -1687,13 +1689,13 @@ public class ProvisionController {
 
 		Provision provision = new Provision();
 		provision.setIdProvision(request.getBody().getIdProvision());
-		
+
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
 
 		try {
 			boolean estado = provisionService.updateShowLocation(provision);
-			
+
 			if (estado) {
 
 				status = HttpStatus.OK;
@@ -1732,5 +1734,20 @@ public class ProvisionController {
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
-	
+
+	@RequestMapping(value = "/getUpFrontProvisions", method = RequestMethod.GET)
+	public ResponseEntity<ApiResponse<List<Provision>>> getUpFrontProvisions() {
+		log.info("ProvisionController.getUpFrontProvisions()");
+		ApiResponse<List<Provision>> apiResponse;
+		HttpStatus status;
+
+		List<Provision> provisions = provisionService.getUpFrontProvisions();
+
+		status = HttpStatus.OK;
+		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ORDER_TO_NOTIFY,
+				String.valueOf(status.value()), status.getReasonPhrase(), provisions);
+
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+
 }

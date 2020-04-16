@@ -45,7 +45,7 @@ public interface ProvisionRepository {
 	Boolean resetProvision(Provision provisionRequest);
 
 	Optional<Provision> getProvisionById(String provisionId);
-	
+
 	Provision getProvisionByIdNotFilter(String provisionId);
 
 	Optional<Provision> getProvisionByIdAndActiveStatus(String provisionId, String activeStatus);
@@ -77,4 +77,8 @@ public interface ProvisionRepository {
 	Optional<Status> getInfoStatus(String statusName);
 
 	Optional<List<Status>> getAllInfoStatus();
+
+	Optional<List<Provision>> getUpFrontProvisionsOnDay();
+
+	void updateUpFrontProvisionRead(List<Provision> provisions);
 }

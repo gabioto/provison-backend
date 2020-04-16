@@ -2647,4 +2647,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return provisions;
 	}
+
+	@Override
+	public List<Provision> getAllTraza(ProvisionRequest request) {
+		Optional<List<Provision>> provisions;
+		
+		provisions = provisionRepository.findAll(request.getDocumentType(),
+				request.getDocumentNumber());
+
+		if (provisions.isPresent() && provisions.get().size() > 0) {
+
+			return provisions.get();
+		} else {
+			return null;
+		}
+	}
 }

@@ -140,7 +140,122 @@ public class ProvisionController {
 	 * @return ProvisionResponse<Provision>
 	 * @description get all provisions related to type and number of the document
 	 */
+	@RequestMapping(value = "/getAllProvision", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<Provision>>> getAllProvision(
+			@RequestBody ApiRequest<ProvisionRequest> request) {
 
+		ApiResponse<List<Provision>> apiResponse;
+		HttpStatus status;
+		String errorInternal = "";
+		String timestamp = "";
+
+
+		// Validate documentType
+		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
+
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ06.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			timestamp = getTimestamp();
+
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento obligatorio", null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+			return ResponseEntity.status(status).body(apiResponse);
+		}
+
+		// Validate documentNumber
+		if (request.getBody().getDocumentNumber() == null || request.getBody().getDocumentNumber().equals("")) {
+
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ06.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			timestamp = getTimestamp();
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Numero de documento obligatorio", null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+			return ResponseEntity.status(status).body(apiResponse);
+		}
+
+		Boolean typedata = request.getBody().getDocumentType() instanceof String;
+		if (!typedata) {
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ07.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			timestamp = getTimestamp();
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento debe ser cadena", null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			return ResponseEntity.status(status).body(apiResponse);
+
+		}
+
+		try {
+			List<Provision> provisions = provisionService.getAllTraza(request.getBody());
+
+			
+			if (provisions != null) {
+
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp);
+
+			} else {
+				status = HttpStatus.NOT_FOUND;
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()),
+						"No se encontraron provisiones", null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_PROVISION_ALL,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);
+			}
+
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+			timestamp = getTimestamp();
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp);
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+		// return ResponseEntity.ok(provisionService.getAll(new
+		// ProvisionRequest(documentType, documentNumber)));
+	}
 
 	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<ProvisionDto>>> getOrders(

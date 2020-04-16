@@ -48,6 +48,7 @@ import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
@@ -68,6 +69,8 @@ public class ProvisionController {
 
 	private static final Log log = LogFactory.getLog(ProvisionController.class);
 
+
+
 	@Autowired
 	ProvisionService contactService;
 
@@ -81,6 +84,7 @@ public class ProvisionController {
 
 	@Autowired
 	public ProvisionController(ProvisionService provisionService) {
+
 		this.provisionService = provisionService;
 	}
 
@@ -141,10 +145,12 @@ public class ProvisionController {
 	 * @description get all provisions related to type and number of the document
 	 */
 
-	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> getOrders(@RequestBody ApiRequest<ProvisionRequest> request) {
 
-		ApiResponse<List<Provision>> apiResponse;
+	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<ProvisionDto>>> getOrders(
+			@RequestBody ApiRequest<ProvisionRequest> request) {
+
+		ApiResponse<List<ProvisionDto>> apiResponse;
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
@@ -156,7 +162,7 @@ public class ProvisionController {
 
 			timestamp = getTimestamp();
 
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal,
 					"Servicio de provisiones no se encuentra disponible", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
@@ -174,7 +180,7 @@ public class ProvisionController {
 
 			timestamp = getTimestamp();
 
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento obligatorio", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -190,7 +196,7 @@ public class ProvisionController {
 			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Numero de documento obligatorio", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -205,7 +211,7 @@ public class ProvisionController {
 			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento debe ser cadena", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -214,12 +220,13 @@ public class ProvisionController {
 		}
 
 		try {
-			List<Provision> provisions = provisionService.getAll(request);
+			List<ProvisionDto> provisions = provisionService.getAll(request);
 
+			
 			if (provisions != null) {
 
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
 				apiResponse.setBody(provisions);
@@ -236,7 +243,7 @@ public class ProvisionController {
 
 			} else {
 				status = HttpStatus.NOT_FOUND;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()),
 						"No se encontraron provisiones", null);
 				apiResponse.setBody(provisions);
@@ -254,7 +261,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
 
 			timestamp = getTimestamp();

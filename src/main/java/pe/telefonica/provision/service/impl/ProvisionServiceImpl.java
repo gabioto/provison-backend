@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -41,6 +42,7 @@ import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
+import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
@@ -151,41 +153,50 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public List<Provision> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
+	public List<ProvisionDto> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
 
 		Optional<List<Provision>> provisions;
-		// List<Provision> provisionList;
-
-		/*
-		 * if (provisionRequest.getHeader().getAppName().equals(
-		 * "APP_WEB_FRONT_TRAZABILIDAD")) { provisions =
-		 * provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType()
-		 * , provisionRequest.getBody().getDocumentNumber()); } else { provisions =
-		 * provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
-		 * provisionRequest.getBody().getDocumentNumber()); }
-		 * 
-		 * if (provisions.get().size() == 0 &&
-		 * provisionRequest.getBody().getDocumentType().equals("CE")) { provisions =
-		 * provisionRepository.findAll("CEX",
-		 * provisionRequest.getBody().getDocumentNumber()); }
-		 * 
-		 * if (provisions.get().size() == 0 &&
-		 * provisionRequest.getBody().getDocumentType().equals("PASAPORTE")) {
-		 * provisions = provisionRepository.findAll("PAS",
-		 * provisionRequest.getBody().getDocumentNumber()); }
-		 */
+		List<ProvisionDto> listProvisionDto = new ArrayList<>();
 
 		provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
 				provisionRequest.getBody().getDocumentNumber());
 
 		if (provisions.isPresent() && provisions.get().size() > 0) {
-			/*
-			 * provisionList = provisions.get();
-			 * 
-			 * for (Provision provision : provisionList) {
-			 * evaluateProvisionComponents(provision); } return provisionList;
-			 */
-			return provisions.get();
+
+			provisions.get().stream().map(item -> {
+				ProvisionDto provisionDto = new ProvisionDto();
+
+				provisionDto.setIdProvision(item.getIdProvision());
+				provisionDto.setXaRequest(item.getXaRequest());
+				provisionDto.setXaIdSt(item.getXaIdSt());
+				provisionDto.setOriginCode(item.getOriginCode());
+				provisionDto.setProductName(item.getProductName());
+				provisionDto.setActiveStatus(item.getActiveStatus());
+				Customer customer = item.getCustomer();
+				provisionDto.setCustomer(customer);
+
+				List<Contacts> contacts = item.getContacts();
+				provisionDto.setContacts(contacts);
+
+				provisionDto.setWorkZone(item.getWorkZone());
+				provisionDto.setLastTrackingStatus(item.getLastTrackingStatus());
+				provisionDto.setDescriptionStatus(item.getDescriptionStatus());
+				provisionDto.setGenericSpeech(item.getGenericSpeech());
+
+				List<StatusLog> logStatus = item.getLogStatus();
+
+				provisionDto.setLogStatus(logStatus);
+
+				UpFront upFront = item.getUpFront();
+
+				provisionDto.setUpFront(upFront);
+
+				listProvisionDto.add(provisionDto);
+
+				return true;
+			}).collect(Collectors.toList());
+
+			return listProvisionDto;
 		} else {
 			return null;
 		}

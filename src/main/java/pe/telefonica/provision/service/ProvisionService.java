@@ -26,6 +26,8 @@ public interface ProvisionService {
 
 	List<ProvisionDto> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 
+	List<Provision> getAllTraza(ProvisionRequest request);
+
 	ProvisionResponse<String> getStatus(String provisionId);
 
 	ApiResponse<List<Contacts>> getContactList(String provisionId);
@@ -70,7 +72,7 @@ public interface ProvisionService {
 	List<Provision> getOrderToNotify();
 
 	public boolean updateShowLocation(Provision provision);
-	
+
 	List<Provision> getUpFrontProvisions();
 
 }

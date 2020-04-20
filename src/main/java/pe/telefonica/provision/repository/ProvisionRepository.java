@@ -17,7 +17,7 @@ public interface ProvisionRepository {
 
 	Optional<List<Provision>> findAll(String documentType, String documentNumber);
 
-	Optional<List<Provision>> findAllTraza(String documentType, String documentNumber);
+	List<Provision> findAllTraza__tes(String documentType, String documentNumber);
 
 	Optional<Provision> getOrder(String documentType, String documentNumber);
 

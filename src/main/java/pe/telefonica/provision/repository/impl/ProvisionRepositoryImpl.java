@@ -56,7 +56,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<List<Provision>> findAllTraza(String documentType, String documentNumber) {
+	public List<Provision> findAllTraza__tes(String documentType, String documentNumber) {
 
 		List<Provision> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
@@ -70,7 +70,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 								Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
 				Provision.class);
 
-		return Optional.ofNullable(provisions);
+		return provisions;
 	}
 
 	@Override

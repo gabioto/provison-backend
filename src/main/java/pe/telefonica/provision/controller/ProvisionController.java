@@ -47,6 +47,7 @@ import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
@@ -77,6 +78,7 @@ public class ProvisionController {
 
 	@Autowired
 	public ProvisionController(ProvisionService provisionService) {
+
 		this.provisionService = provisionService;
 	}
 
@@ -85,6 +87,7 @@ public class ProvisionController {
 	public ResponseEntity<ApiResponse<Customer>> getCustomerByDocument(
 			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
 
+		String timestamp = "";
 		ApiResponse<Customer> apiResponse;
 		HttpStatus status;
 
@@ -92,39 +95,45 @@ public class ProvisionController {
 			Customer customer = provisionService.validateUser(request);
 
 			if (customer != null) {
-
+				timestamp = getTimestamp();
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
 						String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(customer);
 
-				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+						ConstantsLogData.PROVISION_VALIDATE_USER, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 			} else {
-
+				timestamp = getTimestamp();
 				status = HttpStatus.OK;
-
 				apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
 						String.valueOf(status.value()), "No se encontraron datos del cliente", null);
 				apiResponse.setBody(null);
 
-				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_USER,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 			}
 
 		} catch (Exception ex) {
+			timestamp = getTimestamp();
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
 					String.valueOf(status.value()), ex.getMessage(), null);
 
-			restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_VALIDATE_USER, "", "", "");
+					ConstantsLogData.PROVISION_VALIDATE_USER, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);
@@ -136,9 +145,9 @@ public class ProvisionController {
 	 * @return ProvisionResponse<Provision>
 	 * @description get all provisions related to type and number of the document
 	 */
-
-	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> getOrders(@RequestBody ApiRequest<ProvisionRequest> request) {
+	@RequestMapping(value = "/getAllProvision", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<Provision>>> getAllProvision(
+			@RequestBody ApiRequest<ProvisionRequest> request) {
 
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
@@ -194,7 +203,7 @@ public class ProvisionController {
 		}
 
 		try {
-			List<Provision> provisions = provisionService.getAll(request);
+			List<Provision> provisions = provisionService.getAllTraza(request.getBody());
 
 			if (provisions != null) {
 
@@ -208,11 +217,12 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
 				status = HttpStatus.NOT_FOUND;
@@ -225,11 +235,12 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_PROVISION_ALL,
-						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 			}
 
 		} catch (Exception ex) {
@@ -240,11 +251,130 @@ public class ProvisionController {
 			timestamp = getTimestamp();
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-			restSecuritySaveLogData.saveLogDataAsyn(request.getBody().getDocumentNumber(),
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
-					request.getHeader().getTimestamp(), timestamp);
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+		// return ResponseEntity.ok(provisionService.getAll(new
+		// ProvisionRequest(documentType, documentNumber)));
+	}
+
+	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<ProvisionDto>>> getOrders(
+			@RequestBody ApiRequest<ProvisionRequest> request) {
+
+		ApiResponse<List<ProvisionDto>> apiResponse;
+		HttpStatus status;
+		String errorInternal = "";
+		String timestamp = "";
+
+		// Validate documentType
+		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
+
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ06.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			timestamp = getTimestamp();
+
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento obligatorio", null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+			return ResponseEntity.status(status).body(apiResponse);
+		}
+
+		// Validate documentNumber
+		if (request.getBody().getDocumentNumber() == null || request.getBody().getDocumentNumber().equals("")) {
+
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ06.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			timestamp = getTimestamp();
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Numero de documento obligatorio", null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+			return ResponseEntity.status(status).body(apiResponse);
+		}
+
+		Boolean typedata = request.getBody().getDocumentType() instanceof String;
+		if (!typedata) {
+			status = HttpStatus.BAD_REQUEST;
+			errorInternal = InternalError.TRZ07.toString();
+			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
+
+			timestamp = getTimestamp();
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento debe ser cadena", null);
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			return ResponseEntity.status(status).body(apiResponse);
+
+		}
+
+		try {
+			List<ProvisionDto> provisions = provisionService.getAll(request);
+
+			if (provisions != null) {
+
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
+
+			} else {
+				status = HttpStatus.NOT_FOUND;
+				apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()),
+						"No se encontraron provisiones", null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_PROVISION_ALL,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
+			}
+
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+			timestamp = getTimestamp();
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_GET_PROVISION_ALL, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 		// return ResponseEntity.ok(provisionService.getAll(new
@@ -459,6 +589,7 @@ public class ProvisionController {
 			@RequestBody ApiRequest<ValidateDataRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setProvisionValidated");
 
+		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 
@@ -466,8 +597,8 @@ public class ProvisionController {
 			Provision result = provisionService.setProvisionIsValidated(request.getBody().getProvisionId());
 
 			if (result != null) {
-
 				List<Provision> provisions = new ArrayList<>();
+				timestamp = getTimestamp();
 				provisions.add(result);
 
 				status = HttpStatus.OK;
@@ -478,7 +609,9 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_VALIDATE_DATA, "", "", "");
+						ConstantsLogData.PROVISION_VALIDATE_DATA, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 				/*
 				 * List<Provision> provisions = new ArrayList<>(); provisions.add(result);
@@ -498,10 +631,14 @@ public class ProvisionController {
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_VALIDATE_DATA, String.valueOf(status.value()), status.getReasonPhrase(), null);
 
+				timestamp = getTimestamp();
+
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_DATA, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_VALIDATE_DATA,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 
 				/*
 				 * response.setHeader(new
@@ -517,15 +654,18 @@ public class ProvisionController {
 				 */
 			}
 		} catch (Exception ex) {
-
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_DATA,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 
+			timestamp = getTimestamp();
+
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_VALIDATE_DATA, "", "", "");
+					ConstantsLogData.PROVISION_VALIDATE_DATA, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 
 			/*
 			 * restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
@@ -783,7 +923,6 @@ public class ProvisionController {
 			Provision result = provisionService.setContactInfoUpdate(request.getBody());
 
 			if (result != null) {
-
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), status.getReasonPhrase(),
@@ -795,7 +934,8 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
 				status = HttpStatus.NOT_FOUND;
@@ -813,7 +953,8 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			}
 
@@ -829,7 +970,8 @@ public class ProvisionController {
 			restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 					new Gson().toJson(request), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-					request.getHeader().getTimestamp(), timestamp);
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 
 		} catch (Exception ex) {
 			if (ex instanceof FunctionalErrorException) {
@@ -859,7 +1001,8 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -873,13 +1016,15 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 			}
 		}
 
 		restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
 				new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp);
+				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+				request.getBody().getActivityType(), request.getHeader().getAppName());
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
@@ -1087,10 +1232,11 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				timestamp = getTimestamp();
-				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "OK",
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
 				status = HttpStatus.NOT_FOUND;
@@ -1105,10 +1251,11 @@ public class ProvisionController {
 				log.info("timestamp => " + timestamp);
 				log.info("MessageId => " + request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			}
 
@@ -1121,10 +1268,11 @@ public class ProvisionController {
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-			restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
+			restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 					new Gson().toJson(request), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-					request.getHeader().getTimestamp(), timestamp);
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 		}
 
 		catch (Exception ex) {
@@ -1151,10 +1299,11 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -1164,20 +1313,13 @@ public class ProvisionController {
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
-				restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "", "", "", "ERROR",
+				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
 						ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO, request.getHeader().getMessageId(),
-						request.getHeader().getTimestamp(), timestamp);
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 			}
 		}
-
-		/*
-		 * restSecuritySaveLogData.saveLogDataAsyn(request.getHeader().getUser(), "",
-		 * "", "", "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-		 * ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-		 * request.getHeader().getMessageId(), request.getHeader().getTimestamp(),
-		 * timestamp);
-		 */
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
@@ -1193,8 +1335,7 @@ public class ProvisionController {
 			@RequestBody ApiRequest<AddressUpdateRequest> request) {
 
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
-
-		// ProvisionArrayResponse<Provision> response = new ProvisionArrayResponse<>();
+		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 		try {
@@ -1211,24 +1352,30 @@ public class ProvisionController {
 						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(provisions);
 
+				timestamp = getTimestamp();
+
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_UPDATE_ADDRESS, "", "", "");
+						ConstantsLogData.PROVISION_UPDATE_ADDRESS, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
-
 				status = HttpStatus.OK;
 
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(null);
 
+				timestamp = getTimestamp();
+
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS, "", "", "");
-
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESS,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 			}
 
 		} catch (Exception ex) {
@@ -1237,10 +1384,14 @@ public class ProvisionController {
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 
+			timestamp = getTimestamp();
+
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_UPDATE_ADDRESS, "", "", "");
+					ConstantsLogData.PROVISION_UPDATE_ADDRESS, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
@@ -1258,9 +1409,7 @@ public class ProvisionController {
 		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO error 405  ");
 		log.info(this.getClass().getName() + " - " + request.toString());
 
-		// ReceiveAddressUpdateBOResponse response = new
-		// ReceiveAddressUpdateBOResponse();
-
+		String timestamp;
 		ApiResponse<Object> apiResponse;
 		HttpStatus status;
 
@@ -1277,21 +1426,26 @@ public class ProvisionController {
 						String.valueOf(status.value()), status.getReasonPhrase(), null);
 
 				apiResponse.setBody(null);
-
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_UPDATE_ADDRESSBO, "", "", "");
+						ConstantsLogData.PROVISION_UPDATE_ADDRESSBO, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
 				status = HttpStatus.BAD_REQUEST;
 				apiResponse = new ApiResponse<Object>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESSBO,
 						String.valueOf(status.value()), status.getReasonPhrase(), null);
 
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESSBO, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_ADDRESSBO,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 
 			}
 
@@ -1301,10 +1455,13 @@ public class ProvisionController {
 			apiResponse = new ApiResponse<Object>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESSBO,
 					String.valueOf(status.value()), ex.getMessage(), null);
 
+			timestamp = getTimestamp();
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_UPDATE_ADDRESSBO, "", "", "");
+					ConstantsLogData.PROVISION_UPDATE_ADDRESSBO, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
@@ -1321,6 +1478,7 @@ public class ProvisionController {
 			@RequestBody ApiRequest<CancelOrderRequest> request) {
 		log.info(this.getClass().getName() + " - " + "orderCancellation");
 
+		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 
@@ -1339,10 +1497,13 @@ public class ProvisionController {
 						null);
 				apiResponse.setBody(provisions);
 
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_CANCEL, "", "", "");
+						ConstantsLogData.PROVISION_CANCEL, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 
 			} else {
 
@@ -1351,10 +1512,13 @@ public class ProvisionController {
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
 
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 
 			}
 
@@ -1378,17 +1542,17 @@ public class ProvisionController {
 					status = HttpStatus.CONFLICT;
 				}
 
-				// errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT +
-				// errorCode.replace("\"", "")).toString();
-
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorCode[1], ((FunctionalErrorException) ex).getMessage(),
 						null);
 
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 
 			} else {
 
@@ -1401,10 +1565,13 @@ public class ProvisionController {
 
 				System.out.println(apiResponse);
 
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 
 			}
 		}
@@ -1529,6 +1696,7 @@ public class ProvisionController {
 		ApiResponse<Provision> apiResponse;
 		Provision provision = null;
 		HttpStatus status;
+		String timestamp;
 
 		try {
 
@@ -1540,20 +1708,26 @@ public class ProvisionController {
 					Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()),
 					status.getReasonPhrase(), provision);
 
+			timestamp = getTimestamp();
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_GET_BY_ORDER_CODE, "", "", "");
+					ConstantsLogData.PROVISION_GET_BY_ORDER_CODE, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 
 		} catch (Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), e.getMessage(), null);
 
+			timestamp = getTimestamp();
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_GET_BY_ORDER_CODE, "", "", "");
+					ConstantsLogData.PROVISION_GET_BY_ORDER_CODE, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);
@@ -1684,6 +1858,7 @@ public class ProvisionController {
 
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
+		String timestamp;
 
 		try {
 			boolean estado = provisionService.updateShowLocation(provision);
@@ -1695,10 +1870,13 @@ public class ProvisionController {
 						String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody("OK");
 
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
+						ConstantsLogData.OPER_SHOW_LOCATION, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
 			} else {
 
 				status = HttpStatus.OK;
@@ -1707,10 +1885,13 @@ public class ProvisionController {
 						String.valueOf(status.value()), "No se encontraron datos del cliente", null);
 				apiResponse.setBody(null);
 
+				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
+						new Gson().toJson(apiResponse), ConstantsLogData.OPER_SHOW_LOCATION,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 			}
 
 		} catch (Exception ex) {
@@ -1718,10 +1899,13 @@ public class ProvisionController {
 			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
 					String.valueOf(status.value()), ex.getMessage(), null);
 
+			timestamp = getTimestamp();
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.OPER_SHOW_LOCATION, "", "", "");
+					ConstantsLogData.OPER_SHOW_LOCATION, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);

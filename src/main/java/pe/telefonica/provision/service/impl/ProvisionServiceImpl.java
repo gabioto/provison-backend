@@ -369,8 +369,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (provisionRepository.resetProvision(oldProvision)) {
 						// Enviar al log el cambio
 						trazabilidadSecurityApi.saveLogData("", "", "", "", "UPDATE", "oldST = " + oldSt,
-								"newST = " + newProvision.getXaIdSt(), ConstantsLogData.PROVISION_UPDATE_ST, "", "",
-								"");
+								"newST = " + newProvision.getXaIdSt(), ConstantsLogData.PROVISION_UPDATE_ST, "", "", "",
+								"", "");
 					}
 				}
 				resultList.add(oldProvision);

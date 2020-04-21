@@ -3,14 +3,11 @@ package pe.telefonica.provision.controller.request;
 public class LogDataFrontendRequest {
 
 	private String documentNumber;
-
 	private String documentType;
-
 	private String orderCode;
-
 	private String bucket;
-	
-	
+	private String activityType;
+
 	public String getDocumentNumber() {
 		return documentNumber;
 	}
@@ -42,7 +39,13 @@ public class LogDataFrontendRequest {
 	public void setBucket(String bucket) {
 		this.bucket = bucket;
 	}
-	
-	
+
+	public String getActivityType() {
+		return activityType;
+	}
+
+	public void setActivityType(String activityType) {
+		this.activityType = activityType;
+	}
 
 }

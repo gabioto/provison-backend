@@ -2,7 +2,6 @@ package pe.telefonica.provision.external;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -45,75 +43,11 @@ public class TrazabilidadSecurityApi {
 
 	@Autowired
 	private ExternalApi api;
-	
+
 	@Async
-	public Future<String> saveLogDataAsyn(String documentNumber, String documentType, String orderCode, String bucket, String typeLog,
-			String request, String response, String action, String messageId, String firstDate, String lastDate){
-		System.out.println( "Ejecutando método" );
-		 
-		RestTemplate restTemplate = new RestTemplate();
-
-		LogDataRequest logDataRequest = new LogDataRequest();
-
-		logDataRequest.setDocumentNumber(documentNumber);
-		logDataRequest.setDocumentType(documentType);
-		logDataRequest.setOrderCode(orderCode);
-		logDataRequest.setBucket(bucket);
-		logDataRequest.setLogType(typeLog);
-		logDataRequest.setRequest(request);
-		logDataRequest.setResponse(response);
-		logDataRequest.setAction(action);
-		logDataRequest.setMessageId(messageId);
-		logDataRequest.setFirstDate(firstDate);
-		logDataRequest.setLastDate(lastDate);
-		
-		/*
-		 * security.ibm.seguridad.clientId=ddcc9f10-166e-4643-bc40-1759901b54fe
-		 * security.ibm.seguridad.clientSecret=e2eafa5e-2f92-497c-8d7c-fc4ae534898c
-		 * security.ibm.seguridad.auth=Basic
-		 * dHJhY2VhYmlsaXR5VXNlcjptMFYxc3RAUlMzY1VSaXQm
-		 */
-
-		String saveLogDataUrl = api.getSecurityUrl() + api.getSecuritySaveLogData();
-
-		System.out.println(saveLogDataUrl);
-
-		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
-		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
-		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
-		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
-
-		/*
-		 * headersMap.add("Authorization",
-		 * "Basic dHJhY2VhYmlsaXR5VXNlcjptMFYxc3RAUlMzY1VSaXQm");
-		 * headersMap.add("X-IBM-Client-Id", "ddcc9f10-166e-4643-bc40-1759901b54fe");
-		 * headersMap.add("X-IBM-Client-Secret",
-		 * "e2eafa5e-2f92-497c-8d7c-fc4ae534898c");
-		 */
-
-		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logDataRequest, headersMap);
-
-		try {
-
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(saveLogDataUrl, entity, String.class);
-
-		} catch (Exception ex) {
-
-			System.out.println(ex.getMessage());
-		}
-	    /*try {
-	        Thread.sleep(5000);
-	        System.out.println("Termino de ejecutar");
-	        return new AsyncResult<String>("Que pasa neng !!!!");
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        }*/
-		return null;
-	}
-	
 	public void saveLogData(String documentNumber, String documentType, String orderCode, String bucket, String typeLog,
-			String request, String response, String action, String messageId, String firstDate, String lastDate) {
+			String request, String response, String action, String messageId, String firstDate, String lastDate,
+			String activityType, String channel) {
 
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -130,13 +64,8 @@ public class TrazabilidadSecurityApi {
 		logDataRequest.setMessageId(messageId);
 		logDataRequest.setFirstDate(firstDate);
 		logDataRequest.setLastDate(lastDate);
-		
-		/*
-		 * security.ibm.seguridad.clientId=ddcc9f10-166e-4643-bc40-1759901b54fe
-		 * security.ibm.seguridad.clientSecret=e2eafa5e-2f92-497c-8d7c-fc4ae534898c
-		 * security.ibm.seguridad.auth=Basic
-		 * dHJhY2VhYmlsaXR5VXNlcjptMFYxc3RAUlMzY1VSaXQm
-		 */
+		logDataRequest.setActivityType(activityType);
+		logDataRequest.setChannel(channel);
 
 		String saveLogDataUrl = api.getSecurityUrl() + api.getSecuritySaveLogData();
 
@@ -148,19 +77,12 @@ public class TrazabilidadSecurityApi {
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
 		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
 
-		/*
-		 * headersMap.add("Authorization",
-		 * "Basic dHJhY2VhYmlsaXR5VXNlcjptMFYxc3RAUlMzY1VSaXQm");
-		 * headersMap.add("X-IBM-Client-Id", "ddcc9f10-166e-4643-bc40-1759901b54fe");
-		 * headersMap.add("X-IBM-Client-Secret",
-		 * "e2eafa5e-2f92-497c-8d7c-fc4ae534898c");
-		 */
-
 		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logDataRequest, headersMap);
 
 		try {
 
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(saveLogDataUrl, entity, String.class);
+//			ResponseEntity<String> responseEntity = 
+			restTemplate.postForEntity(saveLogDataUrl, entity, String.class);
 
 		} catch (Exception ex) {
 
@@ -168,7 +90,7 @@ public class TrazabilidadSecurityApi {
 		}
 
 	}
-	
+
 	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
 			LocalDateTime startHour, LocalDateTime endHour) {
 		log.info(this.getClass().getName() + " - " + "logEvent");
@@ -207,7 +129,7 @@ public class TrazabilidadSecurityApi {
 			log.info(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
 		}
 	}
-	
+
 	@Async
 	public void thirdLogEventAsync(String third, String operation, String request, String response, String serviceUrl,
 			LocalDateTime startHour, LocalDateTime endHour) {
@@ -247,7 +169,6 @@ public class TrazabilidadSecurityApi {
 			log.info(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
 		}
 	}
-
 
 	public Boolean sendMail(String templateId, MailParameter[] mailParameters) {
 		RestTemplate restTemplate = new RestTemplate();

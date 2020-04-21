@@ -2,7 +2,7 @@ package pe.telefonica.provision.controller.request;
 
 import java.util.List;
 
-public class ApiTrazaSetContactInfoUpdateRequest {
+public class ApiTrazaSetContactInfoUpdateRequest extends LogDataFrontendRequest {
 	private String psiCode;
 	private String email;
 	private boolean holderWillReceive;

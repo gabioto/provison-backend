@@ -1874,7 +1874,7 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.OPER_SHOW_LOCATION, request.getHeader().getMessageId(),
+						ConstantsLogData.UPDATE_SHOW_LOCATION, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 						request.getHeader().getAppName());
 			} else {
@@ -1889,7 +1889,7 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "NOT_MATCH", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.OPER_SHOW_LOCATION,
+						new Gson().toJson(apiResponse), ConstantsLogData.UPDATE_SHOW_LOCATION,
 						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
 						request.getBody().getActivityType(), request.getHeader().getAppName());
 			}
@@ -1903,7 +1903,7 @@ public class ProvisionController {
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.OPER_SHOW_LOCATION, request.getHeader().getMessageId(),
+					ConstantsLogData.UPDATE_SHOW_LOCATION, request.getHeader().getMessageId(),
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 		}

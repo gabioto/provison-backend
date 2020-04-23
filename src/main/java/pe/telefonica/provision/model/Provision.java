@@ -246,6 +246,12 @@ public class Provision implements Serializable {
 	@Field("up_front_read")
 	private Boolean upFrontRead = false;
 
+	@Field("sub_reason_not_done")
+	private String subReasonNotDone;
+
+	@Field("action_not_done")
+	private String actionNotDone;
+
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -800,6 +806,22 @@ public class Provision implements Serializable {
 
 	public void setUpFrontRead(Boolean upFrontRead) {
 		this.upFrontRead = upFrontRead;
+	}
+
+	public String getSubReasonNotDone() {
+		return subReasonNotDone;
+	}
+
+	public void setSubReasonNotDone(String subReasonNotDone) {
+		this.subReasonNotDone = subReasonNotDone;
+	}
+
+	public String getActionNotDone() {
+		return actionNotDone;
+	}
+
+	public void setActionNotDone(String actionNotDone) {
+		this.actionNotDone = actionNotDone;
 	}
 
 	public Provision() {

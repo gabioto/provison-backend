@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -55,6 +54,7 @@ import pe.telefonica.provision.model.Internet;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
+import pe.telefonica.provision.model.ReturnedProvision;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.provision.InToa;
@@ -2434,6 +2434,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("show_location", false);
 				update.set("send_notify", false);
 
+				if (notDoneStatus.getReturnedList() != null && notDoneStatus.getReturnedList().size() > 0) {
+					Optional<ReturnedProvision> notDoneList = notDoneStatus.getReturnedList().stream()
+							.filter(x -> woNotdone.getaNotDoneSubReasonInstall().equals(x.getCodReason())).findFirst();
+
+					if (notDoneList.isPresent()) {
+						String nameReplace = (provision.getCustomer().getName() != null
+								&& !provision.getCustomer().getName().isEmpty())
+										? provision.getCustomer().getName().split(" ")[0]
+										: "Hola";
+						String action = notDoneList.get().getAction().replace(Constants.TEXT_NAME_REPLACE, nameReplace);
+						update.set("sub_reason_not_done", notDoneList.get().getSubReason());
+						update.set("action_not_done", action);
+					}
+				}
+
 				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
@@ -2651,9 +2666,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public List<Provision> getAllTraza(ProvisionRequest request) {
 		Optional<List<Provision>> provisions;
-		
-		provisions = provisionRepository.findAll(request.getDocumentType(),
-				request.getDocumentNumber());
+
+		provisions = provisionRepository.findAll(request.getDocumentType(), request.getDocumentNumber());
 
 		if (provisions.isPresent() && provisions.get().size() > 0) {
 

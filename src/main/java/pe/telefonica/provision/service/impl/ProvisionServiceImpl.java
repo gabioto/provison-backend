@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -1898,6 +1897,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("description_status",
 							inToa != null ? inToa.getDescription() : Status.IN_TOA.getDescription());
 					update.set("front_speech", inToa != null ? inToa.getFront() : "");
+
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
@@ -2196,6 +2196,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return false;
 				}
 
+				pe.telefonica.provision.model.Status cancelStatus = getInfoStatus(Status.WO_CANCEL.getStatusName(),
+						statusList);
+
 				if (provision.getXaIdSt() != null && !provision.getXaIdSt().isEmpty()) {
 					xaIdSt = provision.getXaIdSt();
 				} else {
@@ -2205,14 +2208,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 						return false;
 					}
 				}
-
-				// se cancela por que se regulariza la ficticia en una real
-				if (getData[16].toString().equals("2")) {
-					return false;
-				}
-
-				pe.telefonica.provision.model.Status cancelStatus = getInfoStatus(Status.WO_CANCEL.getStatusName(),
-						statusList);
 
 				Update update = new Update();
 
@@ -2651,9 +2646,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public List<Provision> getAllTraza(ProvisionRequest request) {
 		Optional<List<Provision>> provisions;
-		
-		provisions = provisionRepository.findAll(request.getDocumentType(),
-				request.getDocumentNumber());
+
+		provisions = provisionRepository.findAll(request.getDocumentType(), request.getDocumentNumber());
 
 		if (provisions.isPresent() && provisions.get().size() > 0) {
 

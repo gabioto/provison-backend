@@ -1398,7 +1398,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-		Optional<List<Provision>> optional = provisionRepository.getAllInTimeRange(startDate, endDate.plusDays(1));
+		Optional<List<Provision>> optional = provisionRepository.getAllInTimeRange(startDate, endDate);
 
 		if (optional.isPresent()) {
 			return optional.get();

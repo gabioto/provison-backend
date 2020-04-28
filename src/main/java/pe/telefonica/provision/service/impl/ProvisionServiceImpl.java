@@ -1398,7 +1398,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-		Optional<List<Provision>> optional = provisionRepository.getAllInTimeRange(startDate, endDate.plusDays(1));
+		Optional<List<Provision>> optional = provisionRepository.getAllInTimeRange(startDate, endDate);
 
 		if (optional.isPresent()) {
 			return optional.get();
@@ -1898,6 +1898,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("description_status",
 							inToa != null ? inToa.getDescription() : Status.IN_TOA.getDescription());
 					update.set("front_speech", inToa != null ? inToa.getFront() : "");
+
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
@@ -2196,6 +2197,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return false;
 				}
 
+				pe.telefonica.provision.model.Status cancelStatus = getInfoStatus(Status.WO_CANCEL.getStatusName(),
+						statusList);
+
 				if (provision.getXaIdSt() != null && !provision.getXaIdSt().isEmpty()) {
 					xaIdSt = provision.getXaIdSt();
 				} else {
@@ -2205,14 +2209,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 						return false;
 					}
 				}
-
-				// se cancela por que se regulariza la ficticia en una real
-				if (getData[16].toString().equals("2")) {
-					return false;
-				}
-
-				pe.telefonica.provision.model.Status cancelStatus = getInfoStatus(Status.WO_CANCEL.getStatusName(),
-						statusList);
 
 				Update update = new Update();
 

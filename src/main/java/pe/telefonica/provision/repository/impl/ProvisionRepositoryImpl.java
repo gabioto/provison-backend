@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import com.mongodb.client.result.UpdateResult;
 
+import pe.telefonica.provision.conf.ProjectConfig;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
@@ -36,6 +37,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	private static final Log log = LogFactory.getLog(ProvisionRepositoryImpl.class);
 	private final MongoOperations mongoOperations;
+
+	@Autowired
+	ProjectConfig projectConfig;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -176,7 +180,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		Query query = new Query(
 				Criteria.where("productName").ne(null).andOperator(Criteria.where("invite_message_date").gte(startDate),
-						Criteria.where("invite_message_date").lt(endDate)));
+						Criteria.where("invite_message_date").lte(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
@@ -338,20 +342,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
 		update.set("send_notify", true);
-		UpdateResult result = null;
 		for (int i = 0; i < listProvision.size(); i++) {
-			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
+			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())
+					&& Boolean.valueOf(projectConfig.getFunctionsProvisionEnable())) {
 				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
-				result = this.mongoOperations.updateFirst(
-						new Query(
-								Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
-						update, Provision.class);
-			} else {
-				result = this.mongoOperations.updateFirst(
-						new Query(
-								Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
-						update, Provision.class);
 			}
+
+			this.mongoOperations.updateFirst(
+					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+					update, Provision.class);
 		}
 	}
 

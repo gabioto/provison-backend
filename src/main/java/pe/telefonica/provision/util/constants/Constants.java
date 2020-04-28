@@ -119,5 +119,8 @@ public final class Constants {
 
 	public static final String ACTIVITY_TYPE_PROVISION = "PROVISION";
 	public static final String BARRA_VERTICAL = "|";
+	
+	public static final String DEFAULT_NOTDONE_SUBREASON = "[$name], tu pedido no pudo ser instalado en la fecha indicada. Lamentamos los inconvenientes.";
+	public static final String DEFAULT_NOTDONE_ACTION = "Nos comunicaremos contigo en breve.";
 
 }

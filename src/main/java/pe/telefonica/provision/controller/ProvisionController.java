@@ -78,12 +78,10 @@ public class ProvisionController {
 
 	@Autowired
 	public ProvisionController(ProvisionService provisionService) {
-
 		this.provisionService = provisionService;
 	}
 
 	@RequestMapping(value = "/getCustomerByDocument", method = RequestMethod.POST)
-
 	public ResponseEntity<ApiResponse<Customer>> getCustomerByDocument(
 			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
 

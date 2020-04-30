@@ -1331,7 +1331,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<Provision>>> requestAddressUpdate(
 			@RequestBody ApiRequest<AddressUpdateRequest> request) {
-
+		System.out.println("CORS NO FUNCTION");
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
 		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;

@@ -188,8 +188,8 @@ public class PSIApi extends ConfigRestTemplate {
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getResponseBodyAsString(),
-					requestUrl, startHour, endHour);
+			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request),
+					ex.getResponseBodyAsString(), requestUrl, startHour, endHour);
 
 			// JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -206,8 +206,8 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl,
-					startHour, endHour);
+			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(),
+					requestUrl, startHour, endHour);
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
@@ -305,8 +305,7 @@ public class PSIApi extends ConfigRestTemplate {
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 		Client client = Client.create();
-		WebResource webResource = client.resource(
-				"https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/customerinformation/v2/searchCustomer");
+		WebResource webResource = client.resource(api.getOauth2Url() + api.getSearchCustomer());
 
 		try {
 			JsonObject jsonBody = new JsonObject();
@@ -317,7 +316,7 @@ public class PSIApi extends ConfigRestTemplate {
 			jsonTefHeaderReq.addProperty("userLogin", "10223928");
 			jsonTefHeaderReq.addProperty("serviceChannel", "MS");
 			jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
-			jsonTefHeaderReq.addProperty("application", "APPVENTAS");
+			jsonTefHeaderReq.addProperty("application", "COLTRA");
 			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
 			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
 			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
@@ -367,7 +366,7 @@ public class PSIApi extends ConfigRestTemplate {
 
 	public boolean getBucketByProduct(String bucket, String product, String channel) {
 		log.info("PSIApi.getBucketByProduct()");
-		
+
 		RestTemplate restTemplate = new RestTemplate();
 		BucketRequest bucketRequest = new BucketRequest();
 
@@ -390,13 +389,13 @@ public class PSIApi extends ConfigRestTemplate {
 		try {
 			ResponseEntity<ResponseBucket> responseEntity = restTemplate.postForEntity(bucketUrl, entity,
 					ResponseBucket.class);
-			
+
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
 				if (responseEntity.getBody() != null && responseEntity.getBody().getBody() != null) {
 					return responseEntity.getBody().getBody().isContent();
 				}
 			}
-			
+
 			return false;
 		} catch (Exception ex) {
 			log.error(ex.getMessage());

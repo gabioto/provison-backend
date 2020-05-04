@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -65,14 +66,18 @@ public class PSIApi extends ConfigRestTemplate {
 
 	@Autowired
 	TrazabilidadSecurityApi loggerApi;
+	
+	@Autowired
+    private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
 
 	public Boolean updatePSIClient(PSIUpdateClientRequest requestx) {
 		String oAuthToken;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 
-		RestTemplate restTemplate = new RestTemplate(
-				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
+		// bypaseo
+		// SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient)
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 		/* RestTemplate restTemplate = new RestTemplate(); */
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

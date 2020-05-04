@@ -5,30 +5,25 @@ import java.time.LocalDateTime;
 public class LogDataRequest {
 
 	private String documentNumber;
-
 	private String documentType;
-
 	private String orderCode;
-
 	private String bucket;
-
 	private String logType;
-
 	private String request;
-
 	private String response;
-
 	private String action;
-
 	private String third;
 	private String operation;
 	private String url;
 	private LocalDateTime startHour;
 	private LocalDateTime endHour;
-	
+
 	private String messageId;
 	private String firstDate;
 	private String lastDate;
+
+	private String activityType;
+	private String channel;
 
 	public String getDocumentNumber() {
 		return documentNumber;
@@ -156,6 +151,22 @@ public class LogDataRequest {
 
 	public void setLastDate(String lastDate) {
 		this.lastDate = lastDate;
+	}
+
+	public String getActivityType() {
+		return activityType;
+	}
+
+	public void setActivityType(String activityType) {
+		this.activityType = activityType;
+	}
+
+	public String getChannel() {
+		return channel;
+	}
+
+	public void setChannel(String channel) {
+		this.channel = channel;
 	}
 
 }

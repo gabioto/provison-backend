@@ -1,5 +1,8 @@
 package pe.telefonica.provision.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Id;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -32,6 +35,9 @@ public class Status {
 
 	@Field("speech_without_schedule")
 	private String speechWithoutSchedule;
+
+	@Field("returned_list")
+	private List<ReturnedProvision> returnedList = new ArrayList<>();
 
 	public String getIdStatus() {
 		return idStatus;
@@ -87,6 +93,14 @@ public class Status {
 
 	public void setSpeechWithoutSchedule(String speechWithoutSchedule) {
 		this.speechWithoutSchedule = speechWithoutSchedule;
+	}
+
+	public List<ReturnedProvision> getReturnedList() {
+		return returnedList;
+	}
+
+	public void setReturnedList(List<ReturnedProvision> returnedList) {
+		this.returnedList = returnedList;
 	}
 
 }

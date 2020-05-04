@@ -66,19 +66,19 @@ public class PSIApi extends ConfigRestTemplate {
 
 	@Autowired
 	TrazabilidadSecurityApi loggerApi;
-	
+
 	@Autowired
-    private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
+	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
 
 	public Boolean updatePSIClient(PSIUpdateClientRequest requestx) {
 		String oAuthToken;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 		// Implementacion SSL
-		//RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
+		// RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		// bypaseo
-		RestTemplate restTemplate = new RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		RestTemplate restTemplate = new RestTemplate(
+				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		/* RestTemplate restTemplate = new RestTemplate(); */
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -193,8 +193,8 @@ public class PSIApi extends ConfigRestTemplate {
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getResponseBodyAsString(),
-					requestUrl, startHour, endHour);
+			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request),
+					ex.getResponseBodyAsString(), requestUrl, startHour, endHour);
 
 			// JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -211,8 +211,8 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl,
-					startHour, endHour);
+			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(),
+					requestUrl, startHour, endHour);
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
@@ -372,7 +372,7 @@ public class PSIApi extends ConfigRestTemplate {
 
 	public boolean getBucketByProduct(String bucket, String product, String channel) {
 		log.info("PSIApi.getBucketByProduct()");
-		
+
 		RestTemplate restTemplate = new RestTemplate();
 		BucketRequest bucketRequest = new BucketRequest();
 
@@ -395,13 +395,13 @@ public class PSIApi extends ConfigRestTemplate {
 		try {
 			ResponseEntity<ResponseBucket> responseEntity = restTemplate.postForEntity(bucketUrl, entity,
 					ResponseBucket.class);
-			
+
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
 				if (responseEntity.getBody() != null && responseEntity.getBody().getBody() != null) {
 					return responseEntity.getBody().getBody().isContent();
 				}
 			}
-			
+
 			return false;
 		} catch (Exception ex) {
 			log.error(ex.getMessage());

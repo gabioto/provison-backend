@@ -74,10 +74,10 @@ public class PSIApi extends ConfigRestTemplate {
 		String oAuthToken;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
-
-		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
+		// Implementacion SSL
+		//RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		// bypaseo
-		// SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient)
+		RestTemplate restTemplate = new RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 		/* RestTemplate restTemplate = new RestTemplate(); */
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

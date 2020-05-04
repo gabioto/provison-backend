@@ -11,8 +11,7 @@ import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 public class ConfigRestTemplate {
 	private RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
 	
-	
-	
+
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
     	SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient);
     	

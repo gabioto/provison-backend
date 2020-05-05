@@ -34,8 +34,6 @@ import com.sun.jersey.api.client.WebResource;
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
-import pe.telefonica.provision.conf.SSLClientFactory;
-import pe.telefonica.provision.conf.SSLClientFactory.HttpClientType;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.external.request.BucketRequest;
@@ -309,8 +307,7 @@ public class PSIApi extends ConfigRestTemplate {
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 		Client client = Client.create();
-		WebResource webResource = client.resource(
-				"https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/customerinformation/v2/searchCustomer");
+		WebResource webResource = client.resource(api.getOauth2Url() + api.getSearchCustomer());
 
 		try {
 			JsonObject jsonBody = new JsonObject();
@@ -321,7 +318,7 @@ public class PSIApi extends ConfigRestTemplate {
 			jsonTefHeaderReq.addProperty("userLogin", "10223928");
 			jsonTefHeaderReq.addProperty("serviceChannel", "MS");
 			jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
-			jsonTefHeaderReq.addProperty("application", "APPVENTAS");
+			jsonTefHeaderReq.addProperty("application", "COLTRA");
 			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
 			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
 			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");

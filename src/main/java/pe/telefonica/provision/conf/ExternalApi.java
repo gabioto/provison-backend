@@ -12,6 +12,7 @@ public class ExternalApi {
 	String provisionUrl;
 	String boUrl;
 	String psiUrl;
+	String oauth2Url;
 	String oauthToken;
 
 	String oauth2Client;
@@ -31,6 +32,7 @@ public class ExternalApi {
 	String bucketsByProduct;
 	String updateScheduleDate;
 	String cancelLocalSchedule;
+	String searchCustomer;
 
 	public String getSendSMSById() {
 		return sendSMSById;
@@ -206,6 +208,22 @@ public class ExternalApi {
 
 	public void setCancelLocalSchedule(String cancelLocalSchedule) {
 		this.cancelLocalSchedule = cancelLocalSchedule;
+	}
+
+	public String getOauth2Url() {
+		return oauth2Url;
+	}
+
+	public void setOauth2Url(String oauth2Url) {
+		this.oauth2Url = oauth2Url;
+	}
+
+	public String getSearchCustomer() {
+		return searchCustomer;
+	}
+
+	public void setSearchCustomer(String searchCustomer) {
+		this.searchCustomer = searchCustomer;
 	}
 
 }

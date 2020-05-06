@@ -14,6 +14,8 @@ public class ExternalApi {
 	String psiUrl;
 	String oauth2Url;
 	String oauthToken;
+	String customerSearchClient;
+	String customerSearchSecret;
 
 	String oauth2Client;
 	String oauth2RefreshToken;
@@ -224,6 +226,22 @@ public class ExternalApi {
 
 	public void setSearchCustomer(String searchCustomer) {
 		this.searchCustomer = searchCustomer;
+	}
+
+	public String getCustomerSearchClient() {
+		return customerSearchClient;
+	}
+
+	public void setCustomerSearchClient(String customerSearchClient) {
+		this.customerSearchClient = customerSearchClient;
+	}
+
+	public String getCustomerSearchSecret() {
+		return customerSearchSecret;
+	}
+
+	public void setCustomerSearchSecret(String customerSearchSecret) {
+		this.customerSearchSecret = customerSearchSecret;
 	}
 
 }

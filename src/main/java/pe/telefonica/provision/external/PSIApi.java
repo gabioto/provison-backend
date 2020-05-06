@@ -303,12 +303,19 @@ public class PSIApi extends ConfigRestTemplate {
 	}
 
 	public boolean getCarrier(String phoneNumber) {
+		// PRIMERA IMPLEMENTACION
+		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String requestUrl = api.getPsiUrl() + api.getSearchCustomer();
+		log.info("getCarrier - URL: " + requestUrl);
+		
 		String input = "";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 		Client client = Client.create();
 		WebResource webResource = client.resource(api.getOauth2Url() + api.getSearchCustomer());
-
+		
 		try {
 			JsonObject jsonBody = new JsonObject();
 			JsonObject jsonTefHeaderReq = new JsonObject();

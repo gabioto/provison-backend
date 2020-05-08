@@ -781,7 +781,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setGenericSpeech(paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
 				provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
 				status = Status.PAGADO.getStatusName().toLowerCase();
-				provisionx.setSendNotify(false);
+				update.set("send_notify",false);
 			}
 
 			if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {

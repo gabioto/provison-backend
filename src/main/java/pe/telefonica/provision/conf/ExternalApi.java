@@ -12,7 +12,10 @@ public class ExternalApi {
 	String provisionUrl;
 	String boUrl;
 	String psiUrl;
+	String oauth2Url;
 	String oauthToken;
+	String customerSearchClient;
+	String customerSearchSecret;
 
 	String oauth2Client;
 	String oauth2RefreshToken;
@@ -31,6 +34,7 @@ public class ExternalApi {
 	String bucketsByProduct;
 	String updateScheduleDate;
 	String cancelLocalSchedule;
+	String searchCustomer;
 
 	public String getSendSMSById() {
 		return sendSMSById;
@@ -206,6 +210,38 @@ public class ExternalApi {
 
 	public void setCancelLocalSchedule(String cancelLocalSchedule) {
 		this.cancelLocalSchedule = cancelLocalSchedule;
+	}
+
+	public String getOauth2Url() {
+		return oauth2Url;
+	}
+
+	public void setOauth2Url(String oauth2Url) {
+		this.oauth2Url = oauth2Url;
+	}
+
+	public String getSearchCustomer() {
+		return searchCustomer;
+	}
+
+	public void setSearchCustomer(String searchCustomer) {
+		this.searchCustomer = searchCustomer;
+	}
+
+	public String getCustomerSearchClient() {
+		return customerSearchClient;
+	}
+
+	public void setCustomerSearchClient(String customerSearchClient) {
+		this.customerSearchClient = customerSearchClient;
+	}
+
+	public String getCustomerSearchSecret() {
+		return customerSearchSecret;
+	}
+
+	public void setCustomerSearchSecret(String customerSearchSecret) {
+		this.customerSearchSecret = customerSearchSecret;
 	}
 
 }

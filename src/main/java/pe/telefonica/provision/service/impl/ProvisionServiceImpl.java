@@ -635,7 +635,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 		update.set("customer.name", getData[3]);
 		update.set("customer.document_type", getData[13]);
 		update.set("customer.document_number", getData[4]);
-		update.set("customer.phone_number", getData[5]);
+		boolean isUpdate = true;
+		if(getData[16].toString().equalsIgnoreCase(Status.CAIDA.getStatusName()) || getData[16].toString().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
+			isUpdate = false;
+		}
+		if (isUpdate) {
+			
+			update.set("customer.phone_number", getData[5]);
+			
+		}
+
 		update.set("customer.mail", getData[20]);
 		update.set("customer.carrier", false);
 		update.set("customer.address", getData[6]);

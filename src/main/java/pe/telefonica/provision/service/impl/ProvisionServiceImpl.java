@@ -703,17 +703,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			List<StatusLog> listLog = provisionx.getLogStatus();
 
-			/*
-			 * List<StatusLog> listIngresado = listLog.stream() .filter(items ->
-			 * Status.INGRESADO.getStatusName().equals(items.getStatus()))
-			 * .collect(Collectors.toList()); List<StatusLog> listCaida = listLog.stream()
-			 * .filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
-			 * .collect(Collectors.toList()); if (listIngresado.size() > 0) {
-			 * System.out.println("INGRESADO REPETIDO"); return false; }
-			 * 
-			 * if (listCaida.size() > 0) { System.out.println("CAIDA REPETIDO ==>"); return
-			 * false; }
-			 */
+			List<StatusLog> listIngresado = listLog.stream()
+					.filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()))
+					.collect(Collectors.toList());
+			List<StatusLog> listCaida = listLog.stream()
+					.filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
+					.collect(Collectors.toList());
+
+			if (listIngresado.size() > 0) {
+				System.out.println("INGRESADO REPETIDO");
+				return false;
+			}
+
+			if (listCaida.size() > 0) {
+				System.out.println("CAIDA REPETIDO ==>");
+				return false;
+			}
 
 			Update update = fillProvisionUpdate(request);
 

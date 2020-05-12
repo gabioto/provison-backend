@@ -23,7 +23,7 @@ import pe.telefonica.provision.util.constants.Constants;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("provision")
+@RequestMapping("report")
 @EnableAsync
 public class ReportController {
 
@@ -42,21 +42,21 @@ public class ReportController {
 			
 			if (provisions != null) {
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_AVERIA,
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(provisions);
 			} else {
 				
 				status = HttpStatus.NOT_FOUND;
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_AVERIA,
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), "No se encontraron registros", null);
 				apiResponse.setBody(null);
 			}
 			
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_AVERIA,
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
 		}
 		return ResponseEntity.status(status).body(apiResponse);

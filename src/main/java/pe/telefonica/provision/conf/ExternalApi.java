@@ -12,13 +12,12 @@ public class ExternalApi {
 	String provisionUrl;
 	String boUrl;
 	String psiUrl;
-	String oauth2Url;
+	String customerUrl;
 	String oauthToken;
 	String customerSearchClient;
 	String customerSearchSecret;
 
-	String oauth2Client;
-	String oauth2RefreshToken;
+	String apiClient;
 
 	String sendSMS;
 	String sendMail;
@@ -44,20 +43,12 @@ public class ExternalApi {
 		this.sendSMSById = sendSMSById;
 	}
 
-	public String getOauth2Client() {
-		return oauth2Client;
+	public String getApiClient() {
+		return apiClient;
 	}
 
-	public void setOauth2Client(String oauth2Client) {
-		this.oauth2Client = oauth2Client;
-	}
-
-	public String getOauth2RefreshToken() {
-		return oauth2RefreshToken;
-	}
-
-	public void setOauth2RefreshToken(String oauth2RefreshToken) {
-		this.oauth2RefreshToken = oauth2RefreshToken;
+	public void setApiClient(String apiClient) {
+		this.apiClient = apiClient;
 	}
 
 	public String getGetPSIToken() {
@@ -212,12 +203,12 @@ public class ExternalApi {
 		this.cancelLocalSchedule = cancelLocalSchedule;
 	}
 
-	public String getOauth2Url() {
-		return oauth2Url;
+	public String getCustomerUrl() {
+		return customerUrl;
 	}
 
-	public void setOauth2Url(String oauth2Url) {
-		this.oauth2Url = oauth2Url;
+	public void setCustomerUrl(String customerUrl) {
+		this.customerUrl = customerUrl;
 	}
 
 	public String getSearchCustomer() {

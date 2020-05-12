@@ -158,7 +158,7 @@ public class PSIApi extends ConfigRestTemplate {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Authorization", "Bearer " + oAuthToken);
-		headers.set("X-IBM-Client-Id", api.getOauth2Client());
+		headers.set("X-IBM-Client-Id", api.getApiClient());
 
 		log.info("updatePSIClient - headers: " + headers.toString());
 
@@ -305,7 +305,7 @@ public class PSIApi extends ConfigRestTemplate {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		String requestUrl = api.getOauth2Url() + api.getSearchCustomer();
+		String requestUrl = api.getCustomerUrl() + api.getSearchCustomer();
 		log.info("getCarrier - URL: " + requestUrl);
 
 		String input = "";

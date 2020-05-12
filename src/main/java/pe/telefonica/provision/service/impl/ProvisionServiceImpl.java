@@ -563,6 +563,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provision.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
 				provision.setActiveStatus(Status.PAGADO.getStatusName().toLowerCase());
 				provision.setStatusToa(Status.PAGADO.getStatusName().toLowerCase());
+				provision.setSendNotify(false);
 			}
 
 			listLog.add(statusLogCurrent);
@@ -702,17 +703,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			List<StatusLog> listLog = provisionx.getLogStatus();
 
-			/*
-			 * List<StatusLog> listIngresado = listLog.stream() .filter(items ->
-			 * Status.INGRESADO.getStatusName().equals(items.getStatus()))
-			 * .collect(Collectors.toList()); List<StatusLog> listCaida = listLog.stream()
-			 * .filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
-			 * .collect(Collectors.toList()); if (listIngresado.size() > 0) {
-			 * System.out.println("INGRESADO REPETIDO"); return false; }
-			 * 
-			 * if (listCaida.size() > 0) { System.out.println("CAIDA REPETIDO ==>"); return
-			 * false; }
-			 */
+			List<StatusLog> listIngresado = listLog.stream()
+					.filter(items -> Status.INGRESADO.getStatusName().equals(items.getStatus()))
+					.collect(Collectors.toList());
+			List<StatusLog> listCaida = listLog.stream()
+					.filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
+					.collect(Collectors.toList());
+
+			if (listIngresado.size() > 0) {
+				System.out.println("INGRESADO REPETIDO");
+				return false;
+			}
+
+			if (listCaida.size() > 0) {
+				System.out.println("CAIDA REPETIDO ==>");
+				return false;
+			}
 
 			Update update = fillProvisionUpdate(request);
 
@@ -780,6 +786,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setGenericSpeech(paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
 				provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
 				status = Status.PAGADO.getStatusName().toLowerCase();
+				update.set("send_notify",false);
 			}
 
 			if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
@@ -845,7 +852,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} else {
 
 			Provision provision = fillProvisionInsert(request);
-			provision = evaluateProvisionComponents(provision);
+			provision = evaluateProvisionComponents(provision);			
 			provisionRepository.insertProvision(provision);
 			return true;
 		}

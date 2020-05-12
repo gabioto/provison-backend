@@ -178,8 +178,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 * this.mongoOperations.find(query, Provision.class);
 		 */
 
-		Query query = new Query(
-				Criteria.where("productName").ne(null).andOperator(Criteria.where("invite_message_date").gte(startDate),
+		Query query = new Query(Criteria.where("productName").ne(null).and("xa_request").ne(null).and("xa_id_st")
+				.ne(null).andOperator(Criteria.where("invite_message_date").gte(startDate),
 						Criteria.where("invite_message_date").lte(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
@@ -325,6 +325,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
+		status.add(Status.PAGADO.getStatusName());
 
 		Query query = new Query(
 				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))

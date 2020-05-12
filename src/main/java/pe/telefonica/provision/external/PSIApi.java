@@ -28,9 +28,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
@@ -75,7 +72,8 @@ public class PSIApi extends ConfigRestTemplate {
 		// Implementacion SSL
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		// bypaseo
-		// RestTemplate restTemplate = new RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		// RestTemplate restTemplate = new
+		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		/* RestTemplate restTemplate = new RestTemplate(); */
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -160,7 +158,7 @@ public class PSIApi extends ConfigRestTemplate {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Authorization", "Bearer " + oAuthToken);
-		headers.set("X-IBM-Client-Id", api.getOauth2Client());
+		headers.set("X-IBM-Client-Id", api.getApiClient());
 
 		log.info("updatePSIClient - headers: " + headers.toString());
 
@@ -303,19 +301,17 @@ public class PSIApi extends ConfigRestTemplate {
 	}
 
 	public boolean getCarrier(String phoneNumber) {
-		// PRIMERA IMPLEMENTACION
+
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		String requestUrl = api.getPsiUrl() + api.getSearchCustomer();
+		String requestUrl = api.getCustomerUrl() + api.getSearchCustomer();
 		log.info("getCarrier - URL: " + requestUrl);
-		
+
 		String input = "";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
-		Client client = Client.create();
-		WebResource webResource = client.resource(api.getOauth2Url() + api.getSearchCustomer());
-		
+
 		try {
 			JsonObject jsonBody = new JsonObject();
 			JsonObject jsonTefHeaderReq = new JsonObject();
@@ -343,19 +339,19 @@ public class PSIApi extends ConfigRestTemplate {
 			Gson gson = new Gson();
 			input = gson.toJson(jsonBody);
 
-			// GENESIS
-			ClientResponse clientResponse = webResource.accept(new String[] { "application/json" })
-					.header("Content-type", "application/json")
-					.header("X-IBM-Client-Id", "42eac6bc-c8a8-4faf-b96b-6650a929a28d")
-					.header("X-IBM-Client-Secret", "kY1vH1tQ8iX2uO7nX7sP5tD5mR0cO5cM6qD8cK3bW5vK3eG8gE")
-					.post(ClientResponse.class, input);
-			String output = (String) clientResponse.getEntity(String.class);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set("X-IBM-Client-Id", api.getCustomerSearchClient());
+			headers.set("X-IBM-Client-Secret", api.getCustomerSearchSecret());
+
+			HttpEntity<String> entity = new HttpEntity<>(input, headers);
+
+			ResponseEntity<String> output = restTemplate.postForEntity(requestUrl, entity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output, webResource.getURI().getPath(), startHour,
-					endHour);
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output.getBody(), requestUrl, startHour, endHour);
 
-			JsonElement jsonElement = gson.fromJson(output, JsonElement.class);
+			JsonElement jsonElement = gson.fromJson(output.getBody(), JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
 
 			JsonObject joOutputSearchData = jsonOutput.getAsJsonObject("SearchCustomerResponseData");
@@ -367,8 +363,8 @@ public class PSIApi extends ConfigRestTemplate {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(), webResource.getURI().getPath(),
-					startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(), requestUrl, startHour,
+					endHour);
 			return false;
 		}
 	}

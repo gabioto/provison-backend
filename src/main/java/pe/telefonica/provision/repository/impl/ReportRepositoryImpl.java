@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import pe.telefonica.provision.controller.request.report.ReportInviteMessageRequest;
+import pe.telefonica.provision.controller.request.report.ReportByRegisterDateRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.repository.ReportRepository;
 
@@ -23,12 +23,12 @@ public class ReportRepositoryImpl implements ReportRepository{
 	}
 	
 	@Override
-	public List<Provision> getProvisionsByInviteMessageDate(ReportInviteMessageRequest request) {
-		Query query = new Query(Criteria.where("invite_message_date").gte(request.getStartDateStr()).andOperator(
-						Criteria.where("invite_message_date").lte(request.getEndDateStr())));
-		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+	public Long getProvisionsByRegisterDate(ReportByRegisterDateRequest request) {
+		Query query = new Query(Criteria.where("register_date").gte(request.getStartDate()).andOperator(
+						Criteria.where("register_date").lte(request.getEndDate())));
 		
-		return provisions;
+		//List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+		return this.mongoOperations.count(query, Provision.class);
 	}
 
 }

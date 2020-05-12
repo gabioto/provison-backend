@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
-import pe.telefonica.provision.controller.request.report.ReportInviteMessageRequest;
+import pe.telefonica.provision.controller.request.report.ReportByRegisterDateRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.service.ReportService;
 import pe.telefonica.provision.util.constants.Constants;
@@ -30,34 +30,27 @@ public class ReportController {
 	@Autowired
 	private ReportService reportService;
 	
-	@RequestMapping(value = "/getAllInTimeRange", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> getAllInTimeRange(
-			@RequestBody @Valid ApiRequest<ReportInviteMessageRequest> request) {
+	@RequestMapping(value = "/getCountProvisionByRegisterDate", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<Long>> getAllInTimeRange(
+			@RequestBody @Valid ApiRequest<ReportByRegisterDateRequest> request) {
 		
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<Long> apiResponse;
 		HttpStatus status;
 		try {
 			
-			List<Provision> provisions = reportService.getFaultsByInviteMessageDate(request.getBody());
+			Long provisions = reportService.getProvisionByRegisterDate(request.getBody());
 			
-			if (provisions != null) {
+			
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(provisions);
-			} else {
-				
-				status = HttpStatus.NOT_FOUND;
-
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), "No se encontraron registros", null);
-				apiResponse.setBody(null);
-			}
+			
 			
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
+			apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), ex.getMessage().toString(), null);
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}

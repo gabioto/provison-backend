@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import pe.telefonica.provision.controller.request.report.ReportInviteMessageRequest;
+import pe.telefonica.provision.controller.request.report.ReportByRegisterDateRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.repository.ReportRepository;
 import pe.telefonica.provision.service.ReportService;
@@ -19,8 +19,8 @@ public class ReportServiceImpl implements ReportService{
 	private ReportRepository reportRepository;
 	
 	@Override
-	public List<Provision> getFaultsByInviteMessageDate(ReportInviteMessageRequest request) {
-		return reportRepository.getProvisionsByInviteMessageDate(request);
+	public Long getProvisionByRegisterDate(ReportByRegisterDateRequest request) {
+		return reportRepository.getProvisionsByRegisterDate(request);
 	}
 
 }

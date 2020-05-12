@@ -325,6 +325,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
+		status.add(Status.PAGADO.getStatusName());
 
 		Query query = new Query(
 				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))

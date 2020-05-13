@@ -1019,10 +1019,10 @@ public class ProvisionController {
 			}
 		}
 
-		restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
+		/*restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "OK", new Gson().toJson(request),
 				new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
 				request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
-				request.getBody().getActivityType(), request.getHeader().getAppName());
+				request.getBody().getActivityType(), request.getHeader().getAppName());*/
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}

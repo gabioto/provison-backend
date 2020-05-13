@@ -22,7 +22,6 @@ import org.springframework.stereotype.Repository;
 
 import com.mongodb.client.result.UpdateResult;
 
-import pe.telefonica.provision.conf.ProjectConfig;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
@@ -38,8 +37,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private static final Log log = LogFactory.getLog(ProvisionRepositoryImpl.class);
 	private final MongoOperations mongoOperations;
 
-	@Autowired
-	ProjectConfig projectConfig;
+	//@Autowired
+	//ProjectConfig projectConfig;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -345,7 +344,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		update.set("send_notify", true);
 		for (int i = 0; i < listProvision.size(); i++) {
 			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())
-					&& Boolean.valueOf(projectConfig.getFunctionsProvisionEnable())) {
+					&& Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 			}
 

@@ -31,7 +31,7 @@ public class ReportController {
 	private ReportService reportService;
 	
 	@RequestMapping(value = "/getCountProvisionByRegisterDate", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<Long>> getAllInTimeRange(
+	public ResponseEntity<ApiResponse<Long>> getCountProvisionByRegisterDate(
 			@RequestBody @Valid ApiRequest<ReportByRegisterDateRequest> request) {
 		
 		ApiResponse<Long> apiResponse;

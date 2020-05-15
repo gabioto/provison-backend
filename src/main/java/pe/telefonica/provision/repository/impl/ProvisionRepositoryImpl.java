@@ -327,9 +327,19 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.WO_NOTDONE.getStatusName());
 		status.add(Status.PAGADO.getStatusName());
 
-		Query query = new Query(
+		/*Query query = new Query(
 				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))
+						.limit(5);*/
+		
+		Query query = new Query(
+				Criteria.where(
+					 "notifications.caida_send_notify").is(false)
+				.and("notifications.pagado_send_notify").is(false)
+				.and("notifications.into_send_notify").is(false)
+				.and("notifications.notdone_send_notify").is(false).
+				and("last_tracking_status").in(status).and("customer").ne(null))
 						.limit(5);
+		
 		query.with(new Sort(new Order(Direction.ASC, "_id")));
 
 		List<Provision> provision = this.mongoOperations.find(query, Provision.class);

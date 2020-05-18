@@ -37,8 +37,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private static final Log log = LogFactory.getLog(ProvisionRepositoryImpl.class);
 	private final MongoOperations mongoOperations;
 
-	//@Autowired
-	//ProjectConfig projectConfig;
+	// @Autowired
+	// ProjectConfig projectConfig;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -326,9 +326,17 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.WO_NOTDONE.getStatusName());
 		status.add(Status.PAGADO.getStatusName());
 
-		Query query = new Query(
-				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))
-						.limit(5);
+		/*
+		 * Query query = new Query(
+		 * Criteria.where("send_notify").is(false).and("last_tracking_status").in(status
+		 * ).and("customer").ne(null)) .limit(5);
+		 */
+
+		Query query = new Query(Criteria.where("notifications.caida_send_notify").is(false)
+				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
+				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
+				.and("customer").ne(null)).limit(5);
+
 		query.with(new Sort(new Order(Direction.ASC, "_id")));
 
 		List<Provision> provision = this.mongoOperations.find(query, Provision.class);
@@ -341,12 +349,37 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public void updateFlagDateNotify(List<Provision> listProvision) {
 		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
-		update.set("send_notify", true);
+		
 		for (int i = 0; i < listProvision.size(); i++) {
-			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())
-					&& Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
-				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+			
+			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.caida_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.caida_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
 			}
+			
+			if (Status.PAGADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.pagado_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.pagado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+			
+			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.into_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.into_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+
+			if (Status.WO_NOTDONE.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.notdone_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.notdone_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+					
 
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),

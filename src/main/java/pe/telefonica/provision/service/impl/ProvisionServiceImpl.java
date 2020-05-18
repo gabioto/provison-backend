@@ -58,6 +58,7 @@ import pe.telefonica.provision.model.ReturnedProvision;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.provision.InToa;
+import pe.telefonica.provision.model.provision.Notifications;
 import pe.telefonica.provision.model.provision.WoCancel;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
@@ -428,9 +429,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setCodePsCode(getData[28]);
 		provision.setLegacies(getData[42]);
 		provision.setProductSignal(getData[43]);
-		provision.setSendNotify(
-				(Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
-
+		//provision.setSendNotify(
+				//(Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
+		
+		Notifications notifications = new Notifications();
+		notifications.setIntoaSendNotify((Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
+		
+		provision.setNotifications(notifications);
+		
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
 		productPsAdmin.add(getData[45]);
@@ -1902,7 +1908,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[17]);
-					update.set("send_notify", false);
+					//update.set("send_notify", false);
+					update.set("notifications.intoa_send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
@@ -1932,7 +1939,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[17]);
-					update.set("send_notify", false);
+					//update.set("send_notify", false);
+					update.set("notifications.intoa_send_notify", false);
 					update.set("show_location", false);
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);
@@ -2067,7 +2075,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("activity_type", getData[5].toLowerCase());
 				update.set("xa_id_st", getData[6]);
 				update.set("show_location", false);
-
+				update.set("notifications.prestart_send_notify", false);
+				
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setXaidst(provision.getXaIdSt());
@@ -2183,7 +2192,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_requirement_number", getData[9]);
 				update.set("appt_number", getData[10]);
 				update.set("activity_type", getData[13].toLowerCase());
-
+				update.set("notifications.completed_send_notify", false);
+				
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
 				statusLog.setXaidst(provision.getXaIdSt());

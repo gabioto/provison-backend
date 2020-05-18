@@ -8,37 +8,37 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Notifications implements Serializable {
 
 	@Field("caida_send_notify")
-	private Boolean caidaSendNotify;
+	private Boolean caidaSendNotify = false;
 
 	@Field("caida_send_date")
 	private LocalDateTime caidaSendDate;
 
 	@Field("pagado_send_notify")
-	private Boolean pagadoSendNotify;
+	private Boolean pagadoSendNotify = false;
 
 	@Field("pagado_send_date")
 	private LocalDateTime pagadoSendDate;
 
 	@Field("into_send_notify")
-	private Boolean intoaSendNotify;
+	private Boolean intoaSendNotify = false;
 
 	@Field("into_send_date")
 	private LocalDateTime intoaSendDate;
 
 	@Field("prestart_send_notify")
-	private Boolean prestartSendNotify;
+	private Boolean prestartSendNotify = false;
 
 	@Field("prestart_send_date")
 	private LocalDateTime prestartSendDate;
 
 	@Field("notdone_send_notify")
-	private Boolean notdoneSendNotify;
+	private Boolean notdoneSendNotify = false;
 
 	@Field("notdone_send_date")
 	private LocalDateTime notdoneSendDate;
 
 	@Field("completed_send_notify")
-	private Boolean completedSendNotify;
+	private Boolean completedSendNotify = false;
 
 	@Field("completed_send_date")
 	private LocalDateTime completedSendDate;

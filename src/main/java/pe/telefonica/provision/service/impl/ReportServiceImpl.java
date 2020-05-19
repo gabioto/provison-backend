@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pe.telefonica.provision.controller.common.NotificationResponse;
 import pe.telefonica.provision.controller.request.report.ReportByRegisterDateRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.repository.ReportRepository;
@@ -21,6 +22,12 @@ public class ReportServiceImpl implements ReportService{
 	@Override
 	public Long getProvisionByRegisterDate(ReportByRegisterDateRequest request) {
 		return reportRepository.getProvisionsByRegisterDate(request);
+	}
+
+	@Override
+	public NotificationResponse countByEventNotication(ReportByRegisterDateRequest request) {
+		
+		return reportRepository.getCountByEventNotication(request);
 	}
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
+import pe.telefonica.provision.controller.common.NotificationResponse;
 import pe.telefonica.provision.controller.request.report.ReportByRegisterDateRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.service.ReportService;
@@ -51,6 +52,30 @@ public class ReportController {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), ex.getMessage().toString(), null);
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+	
+	@RequestMapping(value = "/getCountByEventNotication", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<NotificationResponse>> getCountByEventNotication(
+			@RequestBody @Valid ApiRequest<ReportByRegisterDateRequest> request) {
+		
+		ApiResponse<NotificationResponse> apiResponse = null;
+		HttpStatus status;
+		try {
+						
+			NotificationResponse notificationResponse= reportService.countByEventNotication(request.getBody());
+			
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<NotificationResponse>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody(notificationResponse);
+			
+			
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			//apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
+			//		Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), ex.getMessage().toString(), null);
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}

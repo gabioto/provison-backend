@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import pe.telefonica.provision.controller.common.NotificationResponse;
 import pe.telefonica.provision.controller.request.report.ReportByRegisterDateRequest;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.repository.ReportRepository;
@@ -29,6 +30,37 @@ public class ReportRepositoryImpl implements ReportRepository{
 		
 		//List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 		return this.mongoOperations.count(query, Provision.class);
+	}
+
+	@Override
+	public NotificationResponse getCountByEventNotication(ReportByRegisterDateRequest request) {
+		Query queryInToa = new Query(Criteria.where("into_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("into_send_date").lte(request.getEndDate())));
+		
+		Long contadorInToa=this.mongoOperations.count(queryInToa, Provision.class);
+		
+		Query queryWoPrestart = new Query(Criteria.where("prestart_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("prestart_send_date").lte(request.getEndDate())));
+		
+		Long contadorWoPrestart=this.mongoOperations.count(queryWoPrestart, Provision.class);
+		
+		Query queryWoCompleted = new Query(Criteria.where("completed_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("completed_send_date").lte(request.getEndDate())));
+		
+		Long contadorWoCompleted=this.mongoOperations.count(queryWoCompleted, Provision.class);
+		
+		Query queryWoNotdone = new Query(Criteria.where("completed_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("completed_send_date").lte(request.getEndDate())));
+		
+		Long contadorWoNotdone=this.mongoOperations.count(queryWoNotdone, Provision.class);
+		
+		NotificationResponse notification=new NotificationResponse();
+		notification.setSms_into(contadorInToa);
+		notification.setSms_prestart(contadorWoPrestart);
+		notification.setSms_completed(contadorWoCompleted);
+		notification.setSms_notdone(contadorWoNotdone);
+		
+		return notification;
 	}
 
 }

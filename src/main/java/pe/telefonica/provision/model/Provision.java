@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.model.provision.InToa;
+import pe.telefonica.provision.model.provision.Notifications;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
@@ -251,7 +252,10 @@ public class Provision implements Serializable {
 
 	@Field("action_not_done")
 	private String actionNotDone;
-
+	
+	@Field("notifications")
+	private Notifications notifications;
+	
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -947,5 +951,15 @@ public class Provision implements Serializable {
 	public void setDescriptionStatus(String descriptionStatus) {
 		this.descriptionStatus = descriptionStatus;
 	}
+
+	public Notifications getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(Notifications notifications) {
+		this.notifications = notifications;
+	}
+	
+	
 
 }

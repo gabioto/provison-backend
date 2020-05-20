@@ -177,8 +177,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 */
 
 		Query query = new Query(Criteria.where("productName").ne(null).and("xa_request").ne(null).and("xa_id_st")
-				.ne(null).andOperator(Criteria.where("invite_message_date").gte(startDate),
-						Criteria.where("invite_message_date").lte(endDate)));
+				.ne(null).andOperator(Criteria.where("into_send_date").gte(startDate),
+						Criteria.where("into_send_date").lte(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
@@ -331,10 +331,23 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 * ).and("customer").ne(null)) .limit(5);
 		 */
 
-		Query query = new Query(Criteria.where("notifications.caida_send_notify").is(false)
+		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
 				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
 				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
 				.and("customer").ne(null)).limit(5);
+		
+		Criteria criteria = new Criteria();
+		criteria.orOperator(
+				Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
+				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status").is(Status.PAGADO.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.IN_TOA.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
+				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
+				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName())
+				
+				).and("customer").ne(null).and("notifications").ne(null);
+		
+		Query query = new Query(criteria).limit(5);
 
 		query.with(new Sort(new Order(Direction.ASC, "_id")));
 
@@ -380,7 +393,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				}
 
 			}
-					
+			
+			if (Status.WO_COMPLETED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.completed_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+					update.set("notifications.completed_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+			
+			if (Status.WO_CANCEL.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.cancel_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+					update.set("notifications.cancel_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+			
+				
 
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),

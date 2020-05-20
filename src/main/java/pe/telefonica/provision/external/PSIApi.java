@@ -87,33 +87,20 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getHeaderIn().setLang("es");
 		request.getHeaderIn().setEntity("TDP");
 
-		request.getHeaderIn().setSystem("SIVADAC");
-		request.getHeaderIn().setSubsystem("SIVADAC");
-		request.getHeaderIn().setOriginator("PE:TDP:SIVADAC:SIVADAC");
+		request.getHeaderIn().setSystem("COLTRA");
+		request.getHeaderIn().setSubsystem("COLTRA");
+		request.getHeaderIn().setOriginator("PE:TDP:COLTRA:COLTRA");
 		request.getHeaderIn().setSender("OracleServiceBus");
-		request.getHeaderIn().setUserId("USERSIVADAC");
-		request.getHeaderIn().setWsId("SistemSivadac");
+		request.getHeaderIn().setUserId("USERCOLTRA");
+		request.getHeaderIn().setWsId("SistemColtra");
 		request.getHeaderIn().setWsIp("10.10.10.10");
 		request.getHeaderIn().setOperation("updateClient");
-		request.getHeaderIn().setDestination("PE:SIVADAC:SIVADAC:SIVADAC");
+		request.getHeaderIn().setDestination("PE:TDP:COLTRA:COLTRA");
 		request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
 
-		/*
-		 * request.getHeaderIn().setSystem("COL");
-		 * request.getHeaderIn().setSubsystem("TRA");
-		 * request.getHeaderIn().setOriginator("PE:TDP:COL:TRA");
-		 * request.getHeaderIn().setSender("OracleServiceBus");
-		 * request.getHeaderIn().setUserId("USERTRA");
-		 * request.getHeaderIn().setWsId("SistemTRA");
-		 * request.getHeaderIn().setWsIp("192.168.100.1");
-		 * request.getHeaderIn().setOperation("updateClient");
-		 * request.getHeaderIn().setDestination("PE:TDP:COL:TRA");
-		 * request.getHeaderIn().setExecId("550e8400-e29b-41d4-a716-446655440000");
-		 * request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.
-		 * TIMESTAMP_FORMAT_PSI)); request.getHeaderIn().setMsgType("REQUEST");
-		 */
+		
 		System.out.println(generateAuthString());
 
 		request.getBodyUpdateClient().getUser().setNow(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_USER));
@@ -121,35 +108,9 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
 		request.getBodyUpdateClient().getUser().setAuth_string(generateAuthString());
 
-		/*
-		 * request.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
-		 * request.getBodyUpdateClient().setCorreo(provision.getCustomer().getMail());
-		 * 
-		 * request.getBodyUpdateClient().setNombre_completo(provision.getCustomer().
-		 * getContactName());
-		 * request.getBodyUpdateClient().setNombre_completo2(provision.getCustomer().
-		 * getContactName1());
-		 * request.getBodyUpdateClient().setNombre_completo3(provision.getCustomer().
-		 * getContactName2());
-		 * request.getBodyUpdateClient().setNombre_completo4(provision.getCustomer().
-		 * getContactName3());
-		 * 
-		 * request.getBodyUpdateClient().setTelefono1(String.valueOf(provision.
-		 * getCustomer().getContactPhoneNumber()));
-		 * request.getBodyUpdateClient().setTelefono2(provision.getCustomer().
-		 * getContactPhoneNumber1() != null ?
-		 * String.valueOf(provision.getCustomer().getContactPhoneNumber1()): "");
-		 * request.getBodyUpdateClient().setTelefono3(provision.getCustomer().
-		 * getContactPhoneNumber2() != null ?
-		 * String.valueOf(provision.getCustomer().getContactPhoneNumber2()): "");
-		 * request.getBodyUpdateClient().setTelefono4(provision.getCustomer().
-		 * getContactPhoneNumber2() != null ?
-		 * String.valueOf(provision.getCustomer().getContactPhoneNumber3()): "");
-		 */
 		log.info("updatePSIClient - request: " + request.toString());
 
 		oAuthToken = getAuthToken(request.getBodyUpdateClient().getNombre_completo());
-		// log.info("updatePSIClient - oAuthToken: " + oAuthToken);
 
 		if (oAuthToken.isEmpty()) {
 			return false;
@@ -191,7 +152,6 @@ public class PSIApi extends ConfigRestTemplate {
 			loggerApi.thirdLogEventAsync("PSI", "updatePSIClient", new Gson().toJson(request),
 					ex.getResponseBodyAsString(), requestUrl, startHour, endHour);
 
-			// JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 			System.out.println(jsonDecode);
 
@@ -201,8 +161,7 @@ public class PSIApi extends ConfigRestTemplate {
 			String codeError = appDetail.get("exceptionAppCode").toString();
 
 			throw new FunctionalErrorException(message, ex, codeError);
-			// throw new ServerNotFoundException(ex.getResponseBodyAsString());
-			// return false;
+		
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -325,7 +284,7 @@ public class PSIApi extends ConfigRestTemplate {
 			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
 			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
 			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
-			jsonTefHeaderReq.addProperty("transactionTimestamp", "2019-05-28T15:08:31.960");
+			jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 			jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
 			jsonTefHeaderReq.addProperty("version", "1.0");
 

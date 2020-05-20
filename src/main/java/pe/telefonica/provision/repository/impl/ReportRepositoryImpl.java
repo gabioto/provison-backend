@@ -34,23 +34,23 @@ public class ReportRepositoryImpl implements ReportRepository{
 
 	@Override
 	public NotificationResponse getCountByEventNotication(ReportByRegisterDateRequest request) {
-		Query queryInToa = new Query(Criteria.where("into_send_date").gte(request.getStartDate()).andOperator(
-				Criteria.where("into_send_date").lte(request.getEndDate())));
+		Query queryInToa = new Query(Criteria.where("notifications.into_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("notifications.into_send_date").lte(request.getEndDate())));
 		
 		Long contadorInToa=this.mongoOperations.count(queryInToa, Provision.class);
 		
-		Query queryWoPrestart = new Query(Criteria.where("prestart_send_date").gte(request.getStartDate()).andOperator(
-				Criteria.where("prestart_send_date").lte(request.getEndDate())));
+		Query queryWoPrestart = new Query(Criteria.where("notifications.prestart_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("notifications.prestart_send_date").lte(request.getEndDate())));
 		
 		Long contadorWoPrestart=this.mongoOperations.count(queryWoPrestart, Provision.class);
 		
-		Query queryWoCompleted = new Query(Criteria.where("completed_send_date").gte(request.getStartDate()).andOperator(
-				Criteria.where("completed_send_date").lte(request.getEndDate())));
+		Query queryWoCompleted = new Query(Criteria.where("notifications.completed_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("notifications.completed_send_date").lte(request.getEndDate())));
 		
 		Long contadorWoCompleted=this.mongoOperations.count(queryWoCompleted, Provision.class);
 		
-		Query queryWoNotdone = new Query(Criteria.where("completed_send_date").gte(request.getStartDate()).andOperator(
-				Criteria.where("completed_send_date").lte(request.getEndDate())));
+		Query queryWoNotdone = new Query(Criteria.where("notifications.completed_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("notifications.completed_send_date").lte(request.getEndDate())));
 		
 		Long contadorWoNotdone=this.mongoOperations.count(queryWoNotdone, Provision.class);
 		

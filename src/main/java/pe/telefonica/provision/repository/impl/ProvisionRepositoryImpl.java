@@ -343,7 +343,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status").is(Status.PAGADO.getStatusName()),
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.IN_TOA.getStatusName()),
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
-				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
+				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
 				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName())
 				
 				).and("customer").ne(null).and("notifications").ne(null);

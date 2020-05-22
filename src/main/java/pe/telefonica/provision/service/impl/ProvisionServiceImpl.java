@@ -1735,7 +1735,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setCommercialOp(request.getCommercialOp());
 
 			Customer customer = new Customer();
-
+			
+			Notifications notifications = new Notifications();
+			provisionAdd.setNotifications(notifications);
+			
 			customer.setDocumentType(request.getCustomerDocumentType());
 			customer.setDocumentNumber(request.getCustomerDocumentNumber());
 			customer.setName(request.getCustomerName());

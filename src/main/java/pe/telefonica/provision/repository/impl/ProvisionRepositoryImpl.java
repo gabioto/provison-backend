@@ -2,7 +2,9 @@ package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Repository;
 
 import com.mongodb.client.result.UpdateResult;
 
+import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
@@ -37,9 +40,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private static final Log log = LogFactory.getLog(ProvisionRepositoryImpl.class);
 	private final MongoOperations mongoOperations;
 
-	// @Autowired
-	// ProjectConfig projectConfig;
-
+	@Autowired
+	private ExternalApi api;
+	
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -47,13 +50,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
-		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
+		diasVidaProvision  = diasVidaProvision * -1;		
+		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
+		String formattedDateTime01 = dateStart.format(formatter);
+		System.out.println("formattedDateTime01: "+formattedDateTime01);
 
-		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
-								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
-				Provision.class);
+		//LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+
+		Query query = new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+				.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
+						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))).limit(3);
+		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		List<Provision> provisions = this.mongoOperations.find(query ,Provision.class);	
+		
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
@@ -79,14 +90,19 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
 
-		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
-
-		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("customer.document_type")
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
+		diasVidaProvision  = diasVidaProvision * -1;
+		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
+		String formattedDateTime = dateStart.format(formatter);
+		System.out.println("formattedDateTime: "+formattedDateTime);
+		
+		Query query =new Query(Criteria.where("customer.document_type")
 				.is(documentType).and("customer.document_number").is(documentNumber)
 				.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""),
-
-						Criteria.where("register_date").gte(dateStart))),
-				Provision.class);
+						Criteria.where("register_date").gte(dateStart))).limit(3);
+		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		Provision provision = this.mongoOperations.findOne(query, Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}

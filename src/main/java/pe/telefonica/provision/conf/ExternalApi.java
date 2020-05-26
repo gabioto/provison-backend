@@ -34,6 +34,17 @@ public class ExternalApi {
 	String updateScheduleDate;
 	String cancelLocalSchedule;
 	String searchCustomer;
+	
+	String nroDiasVidaProvision;
+
+	
+	public String getNroDiasVidaProvision() {
+		return nroDiasVidaProvision;
+	}
+
+	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
+		this.nroDiasVidaProvision = nroDiasVidaProvision;
+	}
 
 	public String getSendSMSById() {
 		return sendSMSById;

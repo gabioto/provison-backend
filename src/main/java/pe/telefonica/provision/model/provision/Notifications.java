@@ -42,6 +42,13 @@ public class Notifications implements Serializable {
 
 	@Field("completed_send_date")
 	private LocalDateTime completedSendDate;
+	
+	@Field("cancel_send_notify")
+	private Boolean cancelSendNotify = false;
+
+	@Field("cancel_send_date")
+	private LocalDateTime cancelSendDate;
+	
 
 	public Boolean getCaidaSendNotify() {
 		return caidaSendNotify;
@@ -138,5 +145,23 @@ public class Notifications implements Serializable {
 	public void setCompletedSendDate(LocalDateTime completedSendDate) {
 		this.completedSendDate = completedSendDate;
 	}
+
+	public Boolean getCancelSendNotify() {
+		return cancelSendNotify;
+	}	
+
+	public LocalDateTime getCancelSendDate() {
+		return cancelSendDate;
+	}
+
+	public void setCancelSendNotify(Boolean cancelSendNotify) {
+		this.cancelSendNotify = cancelSendNotify;
+	}
+
+	public void setCancelSendDate(LocalDateTime cancelSendDate) {
+		this.cancelSendDate = cancelSendDate;
+	}
+	
+	
 
 }

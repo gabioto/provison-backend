@@ -178,8 +178,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 */
 
 		Query query = new Query(Criteria.where("productName").ne(null).and("xa_request").ne(null).and("xa_id_st")
-				.ne(null).andOperator(Criteria.where("into_send_date").gte(startDate),
-						Criteria.where("into_send_date").lte(endDate)));
+				.ne(null).andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
+						Criteria.where("notifications.into_send_date").lte(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);

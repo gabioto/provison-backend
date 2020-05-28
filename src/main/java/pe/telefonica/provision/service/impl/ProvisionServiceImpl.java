@@ -1736,8 +1736,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			Customer customer = new Customer();
 			
-			Notifications notifications = new Notifications();
-			provisionAdd.setNotifications(notifications);
+			//Notifications notifications = new Notifications();
+			//provisionAdd.setNotifications(notifications);
 			
 			customer.setDocumentType(request.getCustomerDocumentType());
 			customer.setDocumentNumber(request.getCustomerDocumentNumber());
@@ -2095,6 +2095,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 						preStartStatus != null ? preStartStatus.getFront() : Status.WO_PRESTART.getFrontSpeech());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
+				
+				//Job Woprestart
+				
 
 				provisionRepository.updateProvision(provision, update);
 				return true;

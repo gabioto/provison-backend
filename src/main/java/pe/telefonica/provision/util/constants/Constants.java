@@ -42,7 +42,10 @@ public final class Constants {
 	public static final String API_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
 	public static final String PARAM_KEY_OAUTH_TOKEN = "PARAM_KEY_OAUTH_TOKEN";
-
+	
+	
+	public static final String OPER_GET_TECH_AVAILABLE = "OPER_GET_TECH_AVAILABLE";
+	public static final String OPER_GET_TOKEN_EXTERNAL = "OPER_GET_TOKEN_EXTERNAL";
 	public static final String OPER_GET_OAUTH_TOKEN = "OPER_GET_OAUTH_TOKEN";
 	public static final String OPER_GET_ALL_IN_TIME_RANGE = "OPER_GET_ALL_IN_TIME_RANGE";
 	public static final String OPER_GET_ORDER_TO_NOTIFY = "OPER_GET_ORDER_TO_NOTIFY";

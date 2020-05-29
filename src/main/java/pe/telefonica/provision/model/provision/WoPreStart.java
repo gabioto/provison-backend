@@ -41,7 +41,7 @@ public class WoPreStart implements Serializable {
 	private String trackingUrl;
 
 	@Field("available_tracking")
-	private Boolean availableTracking;
+	private Boolean availableTracking = false;
 
 	@Field("register_date")
 	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));

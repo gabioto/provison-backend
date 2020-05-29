@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.common.ResponseHeader;
@@ -46,7 +47,10 @@ import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
+import pe.telefonica.provision.external.SimpliConnectApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
+import pe.telefonica.provision.external.request.schedule.GetTechnicianAvailableRequest;
+import pe.telefonica.provision.external.request.simpli.SimpliRequest;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.HomePhone;
@@ -89,7 +93,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private PSIApi restPSI;
-
+	
+	@Autowired
+	private SimpliConnectApi simpliConnectApi;
 	@Autowired
 	private TrazabilidadSecurityApi trazabilidadSecurityApi;
 
@@ -2071,10 +2077,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
-
+				
+				String[] technicianInfo = getData[3].split("-");
+				
 				woPreStart.setNameResource(getData[3]);
 				woPreStart.setDate(getData[4]);
-				update.set("wo_prestart", woPreStart);
+				woPreStart.setTechnicalId(technicianInfo[0]);
+				woPreStart.setFullName(technicianInfo[1]);
+				woPreStart.setDocumentNumber(getData[9]);
+				woPreStart.setPhoneNumber(getData[10]);
+				woPreStart.setLatitude(getData[14]);
+				woPreStart.setLongitude(getData[13]);
+				
+				
+				
 				update.set("activity_type", getData[5].toLowerCase());
 				update.set("xa_id_st", getData[6]);
 				update.set("show_location", false);
@@ -2097,8 +2113,45 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 				
 				//Job Woprestart
-				
-
+				LocalDateTime nowDate =  LocalDateTime.now(ZoneOffset.of("-05:00"));
+				if(nowDate.getHour() > 8 && nowDate.getHour() < 20) {
+					
+					//SMS
+					//sendSmsWoPrestart(fault);
+					update.set("notifications.prestart_send_notify", true);
+					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+					
+					String tokenExternal = trazabilidadSecurityApi.gerateToken();
+					//validate TechAvailable
+					GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
+					getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
+					
+					woPreStart.setAvailableTracking(false);
+					String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
+					if(isAvailableTech != null) {
+						SimpliRequest  simpliRequest = new SimpliRequest();
+						simpliRequest.setLatitude(woPreStart.getLatitude());
+						simpliRequest.setLongitude(woPreStart.getLongitude());
+						simpliRequest.setVisitTitle(woPreStart.getFullName());
+						simpliRequest.setVisitAddress(provision.getCustomer().getAddress());
+						simpliRequest.setDriverUserName(isAvailableTech);
+						simpliRequest.setToken(tokenExternal);
+						
+						
+						String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+						
+						woPreStart.setTrackingUrl(urlSimpli);
+						
+						if(urlSimpli != null) {
+							woPreStart.setAvailableTracking(true);
+						}
+						
+						
+						
+					}
+					
+				}
+				update.set("wo_prestart", woPreStart);
 				provisionRepository.updateProvision(provision, update);
 				return true;
 				/*

@@ -44,8 +44,8 @@ public class ReportRepositoryImpl implements ReportRepository{
 		
 		Long contadorWoPrestart=this.mongoOperations.count(queryWoPrestart, Provision.class);
 		
-		Query queryWoCompleted = new Query(Criteria.where("notifications.completed_send_date").gte(request.getStartDate()).andOperator(
-				Criteria.where("notifications.completed_send_date").lte(request.getEndDate())));
+		Query queryWoCompleted = new Query(Criteria.where("notifications.notdone_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("notifications.notdone_send_date").lte(request.getEndDate())));
 		
 		Long contadorWoCompleted=this.mongoOperations.count(queryWoCompleted, Provision.class);
 		

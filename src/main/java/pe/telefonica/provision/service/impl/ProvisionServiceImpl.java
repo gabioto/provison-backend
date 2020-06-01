@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.common.ResponseHeader;
@@ -34,6 +34,7 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.request.SMSByIdRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
@@ -84,16 +85,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private static final Log log = LogFactory.getLog(ProvisionServiceImpl.class);
 	private ProvisionRepository provisionRepository;
 
-	/*
-	 * @Autowired private ProvisionTexts provisionTexts;
-	 */
+	@Autowired
+	private ProvisionTexts provisionTexts;
 
 	@Autowired
 	private BOApi bOApi;
 
 	@Autowired
 	private PSIApi restPSI;
-	
+
 	@Autowired
 	private SimpliConnectApi simpliConnectApi;
 	@Autowired
@@ -435,14 +435,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 		provision.setCodePsCode(getData[28]);
 		provision.setLegacies(getData[42]);
 		provision.setProductSignal(getData[43]);
-		//provision.setSendNotify(
-				//(Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
-		
+		// provision.setSendNotify(
+		// (Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) &&
+		// !getData[4].startsWith(Constants.RUC_NATURAL)));
+
 		Notifications notifications = new Notifications();
-		notifications.setIntoaSendNotify((Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
-		
+		notifications.setIntoaSendNotify(
+				(Constants.TIPO_RUC.equalsIgnoreCase(getData[13]) && !getData[4].startsWith(Constants.RUC_NATURAL)));
+
 		provision.setNotifications(notifications);
-		
+
 		List<String> productPsAdmin = new ArrayList<>();
 		productPsAdmin.add(getData[44]);
 		productPsAdmin.add(getData[45]);
@@ -798,7 +800,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provisionx.setGenericSpeech(paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
 				provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
 				status = Status.PAGADO.getStatusName().toLowerCase();
-				update.set("send_notify",false);
+				update.set("send_notify", false);
 			}
 
 			if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
@@ -864,7 +866,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		} else {
 
 			Provision provision = fillProvisionInsert(request);
-			provision = evaluateProvisionComponents(provision);			
+			provision = evaluateProvisionComponents(provision);
 			provisionRepository.insertProvision(provision);
 			return true;
 		}
@@ -1562,21 +1564,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 	}
 
-	/*
-	 * private void sendInfoUpdateSMS(Provision provision) { //
-	 * ApiResponse<List<Contacts>> contactsResponse = //
-	 * getContactList(provision.getIdProvision()); List<Contact> contacts = new
-	 * ArrayList<>(); Contact holder = new Contact();
-	 * holder.setIsMovistar(provision.getCustomer().getCarrier());
-	 * holder.setFullName(provision.getCustomer().getName());
-	 * holder.setHolder(true);
-	 * holder.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-	 * contacts.add(holder); //
-	 * contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
-	 * 
-	 * trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY,
-	 * null, provisionTexts.getWebUrl()); }
-	 */
+	private void sendInfoUpdateSMS(Provision provision) {
+
+		ApiResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
+		List<Contact> contacts = new ArrayList<>();
+		Contact holder = new Contact();
+		holder.setIsMovistar(provision.getCustomer().getCarrier());
+		holder.setFullName(provision.getCustomer().getName());
+		holder.setHolder(true);
+		holder.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contacts.add(holder);
+		contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
+
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
+	}
 
 	@Override
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) {
@@ -1741,10 +1742,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setCommercialOp(request.getCommercialOp());
 
 			Customer customer = new Customer();
-			
-			//Notifications notifications = new Notifications();
-			//provisionAdd.setNotifications(notifications);
-			
+
+			Notifications notifications = new Notifications();
+			notifications.setIntoaSendNotify(false);
+			provisionAdd.setNotifications(notifications);
+
 			customer.setDocumentType(request.getCustomerDocumentType());
 			customer.setDocumentNumber(request.getCustomerDocumentNumber());
 			customer.setName(request.getCustomerName());
@@ -1818,6 +1820,88 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		return errorBucket;
+	}
+	
+	private void sendSMSWoPrestartContact(Provision provision) {
+			if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+				return;
+			}
+			List<Contacts> conct = provision.getContacts();
+			
+			for(Contacts item: conct) {
+				String text = item.getFullName();
+
+				String nameCapitalize = text.substring(0, 1).toUpperCase() + text.substring(1);
+
+				List<MsgParameter> msgParameters = new ArrayList<>();
+				MsgParameter paramName = new MsgParameter();
+				paramName.setKey(Constants.TEXT_NAME_REPLACE);
+				paramName.setValue(nameCapitalize);
+
+				//MsgParameter paramProduct = new MsgParameter();
+				//paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
+				//paramProduct.setValue(provision.getProductName());
+
+				msgParameters.add(paramName);
+				//msgParameters.add(paramProduct);
+
+				List<Contact> contacts = new ArrayList<>();
+
+				Contact contactCustomer = new Contact();
+				contactCustomer.setPhoneNumber(item.getPhoneNumber());
+				contactCustomer.setIsMovistar(item.getCarrier());
+				contactCustomer.setFullName(item.getFullName());
+				contactCustomer.setHolder(false);
+				contacts.add(contactCustomer);
+
+				String urlTraza = provision.getWoPreStart().getTrackingUrl();
+
+				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_SCHEDULE_TECHNICIAN_KEY,
+						msgParameters.toArray(new MsgParameter[0]), urlTraza);
+			}
+			
+			
+
+		
+	}
+	
+
+	private void sendSMSWoPrestartHolder(Provision provision) {
+			if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+				return;
+			}
+			String text = provision.getCustomer().getName();
+
+			String nameCapitalize = text.substring(0, 1).toUpperCase() + text.substring(1);
+
+			List<MsgParameter> msgParameters = new ArrayList<>();
+			MsgParameter paramName = new MsgParameter();
+			paramName.setKey(Constants.TEXT_NAME_REPLACE);
+			paramName.setValue(nameCapitalize);
+
+			//MsgParameter paramProduct = new MsgParameter();
+			//paramProduct.setKey(Constants.TEXT_PRODUCT_REPLACE);
+			//paramProduct.setValue(provision.getProductName());
+
+			msgParameters.add(paramName);
+			//msgParameters.add(paramProduct);
+
+			List<Contact> contacts = new ArrayList<>();
+
+			Contact contactCustomer = new Contact();
+			contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+			contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+			contactCustomer.setFullName(provision.getCustomer().getName());
+			contactCustomer.setHolder(true);
+			contacts.add(contactCustomer);
+
+			String urlTraza = provisionTexts.getWebUrl();
+			//MSG_FAULT_WOPRESTART
+			//MSG_PRO_SCHEDULE_TECHNICIAN_KEY
+			trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_FAULT_WOPRESTART,
+					msgParameters.toArray(new MsgParameter[0]), urlTraza);
+
+		
 	}
 
 	@Override
@@ -1917,7 +2001,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[17]);
-					//update.set("send_notify", false);
+					// update.set("send_notify", false);
 					update.set("notifications.intoa_send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
@@ -1948,7 +2032,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("appt_number", getData[6]);
 					update.set("activity_type", getData[8].toLowerCase());
 					update.set("work_zone", getData[17]);
-					//update.set("send_notify", false);
+					// update.set("send_notify", false);
 					update.set("notifications.intoa_send_notify", false);
 					update.set("show_location", false);
 					if (provision.getXaIdSt() != null) {
@@ -2077,9 +2161,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
-				
+
 				String[] technicianInfo = getData[3].split("-");
-				
+
 				woPreStart.setNameResource(getData[3]);
 				woPreStart.setDate(getData[4]);
 				woPreStart.setTechnicalId(technicianInfo[0]);
@@ -2088,14 +2172,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woPreStart.setPhoneNumber(getData[10]);
 				woPreStart.setLatitude(getData[14]);
 				woPreStart.setLongitude(getData[13]);
-				
-				
-				
+
 				update.set("activity_type", getData[5].toLowerCase());
 				update.set("xa_id_st", getData[6]);
 				update.set("show_location", false);
 				update.set("notifications.prestart_send_notify", false);
-				
+
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setXaidst(provision.getXaIdSt());
@@ -2111,45 +2193,47 @@ public class ProvisionServiceImpl implements ProvisionService {
 						preStartStatus != null ? preStartStatus.getFront() : Status.WO_PRESTART.getFrontSpeech());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-				
-				//Job Woprestart
-				LocalDateTime nowDate =  LocalDateTime.now(ZoneOffset.of("-05:00"));
-				if(nowDate.getHour() > 8 && nowDate.getHour() < 20) {
-					
-					//SMS
-					//sendSmsWoPrestart(fault);
+
+				// Job Woprestart
+				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+				if (nowDate.getHour() > 8 && nowDate.getHour() < 23) {
+
+					// SMS
+					sendSMSWoPrestartHolder(provision);
 					update.set("notifications.prestart_send_notify", true);
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
-					
+
 					String tokenExternal = trazabilidadSecurityApi.gerateToken();
-					//validate TechAvailable
+					// validate TechAvailable
 					GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
 					getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
-					
+
 					woPreStart.setAvailableTracking(false);
 					String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
-					if(isAvailableTech != null) {
-						SimpliRequest  simpliRequest = new SimpliRequest();
+					if (isAvailableTech != null) {
+						SimpliRequest simpliRequest = new SimpliRequest();
 						simpliRequest.setLatitude(woPreStart.getLatitude());
 						simpliRequest.setLongitude(woPreStart.getLongitude());
 						simpliRequest.setVisitTitle(woPreStart.getFullName());
 						simpliRequest.setVisitAddress(provision.getCustomer().getAddress());
 						simpliRequest.setDriverUserName(isAvailableTech);
 						simpliRequest.setToken(tokenExternal);
-						
-						
+
 						String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
-						
+
 						woPreStart.setTrackingUrl(urlSimpli);
-						
-						if(urlSimpli != null) {
+
+						if (urlSimpli != null) {
+							//SEND SMS BY cONTACTS
+							woPreStart.setTrackingUrl(urlSimpli);
+							provision.setWoPreStart(woPreStart);
+							sendSMSWoPrestartContact(provision);
+							
 							woPreStart.setAvailableTracking(true);
 						}
-						
-						
-						
+
 					}
-					
+
 				}
 				update.set("wo_prestart", woPreStart);
 				provisionRepository.updateProvision(provision, update);
@@ -2252,7 +2336,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("appt_number", getData[10]);
 				update.set("activity_type", getData[13].toLowerCase());
 				update.set("notifications.completed_send_notify", false);
-				
+
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
 				statusLog.setXaidst(provision.getXaIdSt());

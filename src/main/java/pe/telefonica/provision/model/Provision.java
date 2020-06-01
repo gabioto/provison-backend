@@ -182,7 +182,7 @@ public class Provision implements Serializable {
 	private Customer customer;
 
 	@Field("contacts")
-	private List<Contacts> contacts;
+	private List<Contacts> contacts= new ArrayList<>();
 
 	@Field("work_zone")
 	private String workZone;

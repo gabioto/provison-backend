@@ -173,7 +173,7 @@ public class TrazabilidadSecurityApi {
 		return false;
 
 	}
-
+	@Async
 	public ApiResponse<SMSByIdResponse> sendSMS(List<Contact> contacts, String msgKey, MsgParameter[] msgParameters,
 			String webURL) {
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();

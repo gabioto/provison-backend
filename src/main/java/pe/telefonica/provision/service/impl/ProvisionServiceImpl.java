@@ -1823,7 +1823,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 	
 	private void sendSMSWoPrestartContact(Provision provision) {
-			if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+			if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 				return;
 			}
 			List<Contacts> conct = provision.getContacts();
@@ -1867,7 +1867,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	
 
 	private void sendSMSWoPrestartHolder(Provision provision) {
-			if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+			if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 				return;
 			}
 			String text = provision.getCustomer().getName();

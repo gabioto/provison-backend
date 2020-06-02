@@ -1743,9 +1743,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			Customer customer = new Customer();
 
-			Notifications notifications = new Notifications();
-			notifications.setIntoaSendNotify(false);
-			provisionAdd.setNotifications(notifications);
+			
 
 			customer.setDocumentType(request.getCustomerDocumentType());
 			customer.setDocumentNumber(request.getCustomerDocumentNumber());
@@ -1793,7 +1791,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionAdd.setFrontSpeech(
 					fictitious != null ? fictitious.getFront() : Status.FICTICIOUS_SCHEDULED.getFrontSpeech());
 			provisionAdd.setComponents(new ArrayList<>());
-
+			
+			Notifications notifications = new Notifications();
+			notifications.setIntoaSendNotify(false);
+			provisionAdd.setNotifications(notifications);
+			
 			provisionRepository.insertProvision(provisionAdd);
 
 		}

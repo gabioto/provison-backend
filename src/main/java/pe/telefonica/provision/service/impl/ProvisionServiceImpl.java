@@ -2195,6 +2195,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				// Job Woprestart
+				woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 				if (nowDate.getHour() > 8 && nowDate.getHour() < 23) {
 
@@ -2208,7 +2209,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
 					getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
 
-					woPreStart.setAvailableTracking(false);
+					
 					String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
 					if (isAvailableTech != null) {
 						SimpliRequest simpliRequest = new SimpliRequest();

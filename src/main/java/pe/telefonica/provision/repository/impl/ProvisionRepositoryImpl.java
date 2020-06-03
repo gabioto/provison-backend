@@ -359,7 +359,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		
 		Criteria criteria = new Criteria();
 		criteria.orOperator(
-				Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
+				//Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
 				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status").is(Status.PAGADO.getStatusName()),
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.IN_TOA.getStatusName()),
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
@@ -490,6 +490,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
 		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
+		today = today.minusDays(1);
 		LocalDate yesterday = today.minusDays(1);
 
 		List<Provision> provisions = this.mongoOperations

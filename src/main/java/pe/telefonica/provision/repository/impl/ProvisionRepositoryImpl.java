@@ -388,28 +388,30 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
 				update.set("notifications.caida_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.caida_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
 			
 			if (Status.PAGADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
 				update.set("notifications.pagado_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.pagado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
 			
-			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus()) ||
+					Status.SCHEDULED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())
+					){
 				update.set("notifications.into_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.into_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
 
 			if (Status.WO_NOTDONE.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
 				update.set("notifications.notdone_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.notdone_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 
@@ -417,23 +419,23 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			
 			if (Status.WO_COMPLETED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
 				update.set("notifications.completed_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.completed_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
 			
 			if (Status.WO_CANCEL.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
 				update.set("notifications.cancel_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_FUNCTIONS_PROVISION_ENABLE"))) {
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.cancel_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
 			
 				
 
-			this.mongoOperations.updateFirst(
+			/*this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
-					update, Provision.class);
+					update, Provision.class);*/
 		}
 	}
 

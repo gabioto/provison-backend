@@ -46,9 +46,9 @@ import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
+import pe.telefonica.provision.external.SimpliConnectApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
-import pe.telefonica.provision.external.SimpliConnectApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.external.request.schedule.GetTechnicianAvailableRequest;
 import pe.telefonica.provision.external.request.simpli.SimpliRequest;
@@ -1818,7 +1818,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					+ provision.getCustomer().getDocumentNumber());
 		}
 		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) { // validate bucket and
-			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
+			errorBucket = !getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
 		}
 
 		return errorBucket;
@@ -2673,25 +2673,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		try {
 			boolean responseBucket = restPSI.getBucketByProduct(bucket, product, channel);
-
-			/*
-			 * if (responseBucket != null) { // HACER MATCH BUCKET POR PRODUCTO - GENESIS
-			 * 
-			 * for (Map.Entry<String, List<OrigenBean>> entry :
-			 * responseBucket.getBody().getContent().entrySet()) { if
-			 * (channel.trim().equalsIgnoreCase(entry.getKey())) { for (int i = 0; i <
-			 * entry.getValue().size(); i++) { for (int j = 0; j <
-			 * entry.getValue().get(i).getBuckets().size(); j++) { if
-			 * (entry.getValue().get(i).getBuckets().get(j).trim().equalsIgnoreCase(bucket.
-			 * trim()) &&
-			 * entry.getValue().get(i).getProduct().trim().equalsIgnoreCase(product)) {
-			 * System.out.println("bucket => " + entry.getValue().get(i).getBuckets().get(j)
-			 * + ", product => " + entry.getValue().get(i).getProduct()); // errorValidate =
-			 * true; errorValidate = false; break; } } if (!errorValidate) { break; } } if
-			 * (!errorValidate) { break; } } }
-			 * 
-			 * return errorValidate; } else { throw new Exception(); }
-			 */
 
 			return responseBucket;
 

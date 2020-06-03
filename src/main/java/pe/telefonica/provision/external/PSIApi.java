@@ -100,7 +100,6 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
 
-		
 		System.out.println(generateAuthString());
 
 		request.getBodyUpdateClient().getUser().setNow(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_USER));
@@ -149,8 +148,8 @@ public class PSIApi extends ConfigRestTemplate {
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request),
-					ex.getResponseBodyAsString(), requestUrl, startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getResponseBodyAsString(),
+					requestUrl, startHour, endHour);
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 			System.out.println(jsonDecode);
@@ -161,12 +160,12 @@ public class PSIApi extends ConfigRestTemplate {
 			String codeError = appDetail.get("exceptionAppCode").toString();
 
 			throw new FunctionalErrorException(message, ex, codeError);
-		
+
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(),
-					requestUrl, startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(), requestUrl,
+					startHour, endHour);
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
@@ -335,8 +334,8 @@ public class PSIApi extends ConfigRestTemplate {
 		BucketRequest bucketRequest = new BucketRequest();
 
 		bucketRequest.setBucket(bucket);
-		bucketRequest.setChannel(product);
-		bucketRequest.setProduct(channel);
+		bucketRequest.setChannel(channel);
+		bucketRequest.setProduct(product);
 
 		String bucketUrl = api.getSecurityUrl() + api.getBucketsByProduct();
 

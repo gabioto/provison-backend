@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecurityAgendamiento;
@@ -24,6 +25,7 @@ import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
 import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.external.request.ScheduleUpdatePSICodeRealRequest;
+import pe.telefonica.provision.external.request.schedule.GetTechnicianAvailableRequest;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
@@ -262,6 +264,54 @@ public class TrazabilidadScheduleApi {
 			return false;
 		}
 
+	}
+	
+	
+	public String getTechAvailable(GetTechnicianAvailableRequest request) {
+		log.info("updateCancelSchedule");
+		
+		
+		RestTemplate restTemplate = new RestTemplate();
+		String urlSchedule = api.getScheduleUrl() + api.getScheduleGetTechAvailable();
+		
+		System.out.println(urlSchedule);
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", iBMSecurityAgendamiento.getAuth());
+		headersMap.add("X-IBM-Client-Id", iBMSecurityAgendamiento.getClientId());
+		headersMap.add("X-IBM-Client-Secret", iBMSecurityAgendamiento.getClientSecret());
+
+		ApiRequest<GetTechnicianAvailableRequest> apiRequest = new ApiRequest<GetTechnicianAvailableRequest>(
+				Constants.APP_NAME_AGENDAMIENTO, Constants.APP_NAME_AGENDAMIENTO, Constants.OPER_GET_TECH_AVAILABLE,
+				request);
+
+		HttpEntity<ApiRequest<GetTechnicianAvailableRequest>> entityProvision = new HttpEntity<ApiRequest<GetTechnicianAvailableRequest>>(
+				apiRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
+					String.class);
+
+			log.info("responseEntity: " + responseEntity.getBody());
+			if(responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+				String driverUserName = jsonObject.get("body").getAsJsonObject().get("driverUsername").toString().replaceAll("\"",
+						"");
+				
+				return driverUserName;
+			}
+			return null;
+		} catch (HttpClientErrorException ex) {
+			log.info("Exception = " + ex.getMessage());
+			log.info("Exception = " + ex.getResponseBodyAsString());
+
+			return null;
+		} catch (Exception ex) {
+			log.info("Exception = " + ex.getMessage());
+			return null;
+		}
 	}
 
 }

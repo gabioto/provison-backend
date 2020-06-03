@@ -2,7 +2,9 @@ package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -22,7 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import com.mongodb.client.result.UpdateResult;
 
-import pe.telefonica.provision.conf.ProjectConfig;
+import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.model.Provision;
@@ -39,7 +42,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	private final MongoOperations mongoOperations;
 
 	@Autowired
-	ProjectConfig projectConfig;
+	private ExternalApi api;
+	
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -48,13 +52,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
-		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
+		diasVidaProvision  = diasVidaProvision * -1;		
+		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
+		String formattedDateTime01 = dateStart.format(formatter);
+		System.out.println("formattedDateTime01: "+formattedDateTime01);
 
-		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
-								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
-				Provision.class);
+		//LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+
+		Query query = new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+				.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
+						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))).limit(3);
+		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		List<Provision> provisions = this.mongoOperations.find(query ,Provision.class);	
+		
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
@@ -80,14 +92,19 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
 
-		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
-
-		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("customer.document_type")
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
+		diasVidaProvision  = diasVidaProvision * -1;
+		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
+		String formattedDateTime = dateStart.format(formatter);
+		System.out.println("formattedDateTime: "+formattedDateTime);
+		
+		Query query =new Query(Criteria.where("customer.document_type")
 				.is(documentType).and("customer.document_number").is(documentNumber)
 				.andOperator(Criteria.where("product_name").ne(null), Criteria.where("product_name").ne(""),
-
-						Criteria.where("register_date").gte(dateStart))),
-				Provision.class);
+						Criteria.where("register_date").gte(dateStart))).limit(3);
+		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		Provision provision = this.mongoOperations.findOne(query, Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
 	}
@@ -148,6 +165,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public boolean updateProvision(Provision provision, Update update) {
+		//BasicQuery query = new BasicQuery("");
+		
 		UpdateResult result = this.mongoOperations.updateFirst(
 				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
 				Provision.class);
@@ -179,8 +198,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 */
 
 		Query query = new Query(Criteria.where("productName").ne(null).and("xa_request").ne(null).and("xa_id_st")
-				.ne(null).andOperator(Criteria.where("invite_message_date").gte(startDate),
-						Criteria.where("invite_message_date").lte(endDate)));
+				.ne(null).andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
+						Criteria.where("notifications.into_send_date").lte(endDate)));
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
@@ -325,10 +344,32 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.SCHEDULED.getStatusName());
 		status.add(Status.CAIDA.getStatusName());
 		status.add(Status.WO_NOTDONE.getStatusName());
+		status.add(Status.PAGADO.getStatusName());
 
-		Query query = new Query(
-				Criteria.where("send_notify").is(false).and("last_tracking_status").in(status).and("customer").ne(null))
-						.limit(5);
+		/*
+		 * Query query = new Query(
+		 * Criteria.where("send_notify").is(false).and("last_tracking_status").in(status
+		 * ).and("customer").ne(null)) .limit(5);
+		 */
+
+		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
+				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
+				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
+				.and("customer").ne(null)).limit(5);
+		
+		Criteria criteria = new Criteria();
+		criteria.orOperator(
+				Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
+				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status").is(Status.PAGADO.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.IN_TOA.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
+				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
+				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName())
+				
+				).and("customer").ne(null).and("notifications").ne(null);
+		
+		Query query = new Query(criteria).limit(5);
+
 		query.with(new Sort(new Order(Direction.ASC, "_id")));
 
 		List<Provision> provision = this.mongoOperations.find(query, Provision.class);
@@ -341,12 +382,56 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public void updateFlagDateNotify(List<Provision> listProvision) {
 		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
-		update.set("send_notify", true);
+		
 		for (int i = 0; i < listProvision.size(); i++) {
-			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())
-					&& Boolean.valueOf(projectConfig.getFunctionsProvisionEnable())) {
-				update.set("invite_message_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+
+			
+			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.caida_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.caida_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
 			}
+			
+			if (Status.PAGADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.pagado_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.pagado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+			
+			if (Status.IN_TOA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus()) ||
+					Status.SCHEDULED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())
+					){
+				update.set("notifications.into_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.into_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+
+			if (Status.WO_NOTDONE.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.notdone_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.notdone_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+
+			}
+			
+			if (Status.WO_COMPLETED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.completed_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.completed_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+			
+			if (Status.WO_CANCEL.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.cancel_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.cancel_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+			
+			
 
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),

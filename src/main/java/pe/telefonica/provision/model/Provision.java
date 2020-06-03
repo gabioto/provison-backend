@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.model.provision.InToa;
+import pe.telefonica.provision.model.provision.Notifications;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
@@ -181,7 +182,7 @@ public class Provision implements Serializable {
 	private Customer customer;
 
 	@Field("contacts")
-	private List<Contacts> contacts;
+	private List<Contacts> contacts= new ArrayList<>();
 
 	@Field("work_zone")
 	private String workZone;
@@ -246,6 +247,15 @@ public class Provision implements Serializable {
 	@Field("up_front_read")
 	private Boolean upFrontRead = false;
 
+	@Field("sub_reason_not_done")
+	private String subReasonNotDone;
+
+	@Field("action_not_done")
+	private String actionNotDone;
+	
+	@Field("notifications")
+	private Notifications notifications;
+	
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -802,6 +812,22 @@ public class Provision implements Serializable {
 		this.upFrontRead = upFrontRead;
 	}
 
+	public String getSubReasonNotDone() {
+		return subReasonNotDone;
+	}
+
+	public void setSubReasonNotDone(String subReasonNotDone) {
+		this.subReasonNotDone = subReasonNotDone;
+	}
+
+	public String getActionNotDone() {
+		return actionNotDone;
+	}
+
+	public void setActionNotDone(String actionNotDone) {
+		this.actionNotDone = actionNotDone;
+	}
+
 	public Provision() {
 
 	}
@@ -925,5 +951,15 @@ public class Provision implements Serializable {
 	public void setDescriptionStatus(String descriptionStatus) {
 		this.descriptionStatus = descriptionStatus;
 	}
+
+	public Notifications getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(Notifications notifications) {
+		this.notifications = notifications;
+	}
+	
+	
 
 }

@@ -412,11 +412,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				}
 			}
 			
-				
+			
 
-			/*this.mongoOperations.updateFirst(
+			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
-					update, Provision.class);*/
+					update, Provision.class);
 		}
 	}
 

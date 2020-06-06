@@ -2,7 +2,6 @@ package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -489,8 +487,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
-		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
-		LocalDate yesterday = today.minusDays(1);
+//		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
+//		LocalDate yesterday = today.minusDays(1);
+		LocalDate yesterday = LocalDate.now(ZoneOffset.of("-05:00"));
+		LocalDate today = yesterday.plusDays(1);
 
 		List<Provision> provisions = this.mongoOperations
 				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(

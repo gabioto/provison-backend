@@ -487,10 +487,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
-//		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
-//		LocalDate yesterday = today.minusDays(1);
-		LocalDate yesterday = LocalDate.now(ZoneOffset.of("-05:00"));
-		LocalDate today = yesterday.plusDays(1);
+		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00")).minusDays(1);
+		LocalDate yesterday = today.minusDays(1);
 
 		List<Provision> provisions = this.mongoOperations
 				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(

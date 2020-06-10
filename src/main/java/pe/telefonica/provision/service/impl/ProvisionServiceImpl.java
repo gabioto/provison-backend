@@ -958,7 +958,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					contacts.add(contactCustomer);
 
 					trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_BO_KEY,
-							msgParameters.toArray(new MsgParameter[0]), "");
+							msgParameters.toArray(new MsgParameter[0]), "", "");
 					// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 					// Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
 					// MsgParameter[0]), "");
@@ -997,7 +997,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				contacts.add(contactCustomer);
 
 				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY,
-						msgParameters.toArray(new MsgParameter[0]), "");
+						msgParameters.toArray(new MsgParameter[0]), "", "");
 
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 				// Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new
@@ -1276,7 +1276,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		contacts.add(contactCustomer);
 
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY,
-				msgParameters.toArray(new MsgParameter[0]), "");
+				msgParameters.toArray(new MsgParameter[0]), "", "");
 	}
 
 	/*
@@ -1576,7 +1576,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		contacts.add(holder);
 		contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
 
-		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl(), "");
 	}
 
 	@Override
@@ -1859,7 +1859,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				String urlTraza = provision.getWoPreStart().getTrackingUrl();
 
 				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_SCHEDULE_TECHNICIAN_KEY,
-						msgParameters.toArray(new MsgParameter[0]), urlTraza);
+						msgParameters.toArray(new MsgParameter[0]), "", urlTraza);
 			}
 			
 			
@@ -1901,7 +1901,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			//MSG_FAULT_WOPRESTART
 			//MSG_PRO_SCHEDULE_TECHNICIAN_KEY
 			trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_FAULT_WOPRESTART,
-					msgParameters.toArray(new MsgParameter[0]), urlTraza);
+					msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
 
 		
 	}

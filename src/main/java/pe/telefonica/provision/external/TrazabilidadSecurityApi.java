@@ -137,7 +137,7 @@ public class TrazabilidadSecurityApi {
 		}
 	}
 
-
+	@Async
 	public Boolean sendMail(String templateId, MailParameter[] mailParameters) {
 		RestTemplate restTemplate = new RestTemplate();
 

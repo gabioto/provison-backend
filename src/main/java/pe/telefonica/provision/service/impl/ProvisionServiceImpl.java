@@ -45,9 +45,9 @@ import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
+import pe.telefonica.provision.external.SimpliConnectApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
-import pe.telefonica.provision.external.SimpliConnectApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
 import pe.telefonica.provision.external.request.schedule.GetTechnicianAvailableRequest;
 import pe.telefonica.provision.external.request.simpli.SimpliRequest;
@@ -2860,7 +2860,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 	}
 	
-	private Boolean sendEmailToCustomer(Customer objCustomer, WoPreStart objWoPreStart) {
+	private void sendEmailToCustomer(Customer objCustomer, WoPreStart objWoPreStart) {
 		ArrayList<MailParameter> mailParameters = new ArrayList<MailParameter>();
 		String customerFullName = objCustomer.getName();
 
@@ -2896,11 +2896,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		MailParameter mailParameter5 = new MailParameter();
 		mailParameter5.setParamKey("SCHEDULEORDER");
-		mailParameter5.setParamValue(System.getenv("http://www.movistar.com.pe"));
+		mailParameter5.setParamValue(provisionTexts.getWebUrl());
 		mailParameters.add(mailParameter5);
 
-		boolean isSendMail = trazabilidadSecurityApi.sendMail("192826", mailParameters.toArray(new MailParameter[mailParameters.size()]));
-		return isSendMail;
+		trazabilidadSecurityApi.sendMail("192826", mailParameters.toArray(new MailParameter[mailParameters.size()]));
 	}
 
 }

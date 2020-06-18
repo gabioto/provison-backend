@@ -87,6 +87,7 @@ public class SMSByIdRequest {
 		private String msgKey;
 		private MsgParameter[] msgParameters;
 		private String webURL;
+		private String webContactURL;
 
 		public Message() {
 			ArrayList<MsgParameter> arrayList = new ArrayList<>();
@@ -115,6 +116,14 @@ public class SMSByIdRequest {
 
 		public void setWebURL(String webURL) {
 			this.webURL = webURL;
+		}
+
+		public String getWebContactURL() {
+			return webContactURL;
+		}
+
+		public void setWebContactURL(String webContactURL) {
+			this.webContactURL = webContactURL;
 		}
 
 		@Override

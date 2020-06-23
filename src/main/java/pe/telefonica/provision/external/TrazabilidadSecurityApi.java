@@ -137,7 +137,7 @@ public class TrazabilidadSecurityApi {
 		}
 	}
 
-
+	@Async
 	public Boolean sendMail(String templateId, MailParameter[] mailParameters) {
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -175,7 +175,7 @@ public class TrazabilidadSecurityApi {
 	}
 	@Async
 	public ApiResponse<SMSByIdResponse> sendSMS(List<Contact> contacts, String msgKey, MsgParameter[] msgParameters,
-			String webURL) {
+			String webURL, String webContactURL) {
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
 		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
@@ -193,6 +193,8 @@ public class TrazabilidadSecurityApi {
 		message.setMsgKey(msgKey);
 		message.setMsgParameters(msgParameters);
 		message.setWebURL(webURL);
+		message.setWebContactURL(webContactURL);
+		
 
 		System.out.println(webURL);
 

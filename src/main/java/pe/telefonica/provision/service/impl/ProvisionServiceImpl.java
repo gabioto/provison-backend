@@ -34,7 +34,6 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
-import pe.telefonica.provision.controller.request.SMSByIdRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
@@ -967,7 +966,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					contacts.add(contactCustomer);
 
 					trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_BO_KEY,
-							msgParameters.toArray(new MsgParameter[0]), "");
+							msgParameters.toArray(new MsgParameter[0]), "", "");
 					// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 					// Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY, msgParameters.toArray(new
 					// MsgParameter[0]), "");
@@ -1006,7 +1005,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				contacts.add(contactCustomer);
 
 				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY,
-						msgParameters.toArray(new MsgParameter[0]), "");
+						msgParameters.toArray(new MsgParameter[0]), "", "");
 
 				// ApiResponse<SMSByIdResponse> apiResponse = sendSMS(provision.getCustomer(),
 				// Constants.MSG_PRO_CUSTOMER_UNREACHABLE_KEY, msgParameters.toArray(new
@@ -1285,7 +1284,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		contacts.add(contactCustomer);
 
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_CANCELLED_BY_CUSTOMER_KEY,
-				msgParameters.toArray(new MsgParameter[0]), "");
+				msgParameters.toArray(new MsgParameter[0]), "", "");
 	}
 
 	/*
@@ -1573,8 +1572,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 	}
 
-	private void sendInfoUpdateSMS(Provision provision) {
-
+	/*private void sendInfoUpdateSMS(Provision provision) {
 		ApiResponse<List<Contacts>> contactsResponse = getContactList(provision.getIdProvision());
 		List<Contact> contacts = new ArrayList<>();
 		Contact holder = new Contact();
@@ -1585,8 +1583,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 		contacts.add(holder);
 		contacts.addAll(SMSByIdRequest.mapContacts(provision.getContacts()));
 
-		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl());
-	}
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_CONTACT_UPDATED_KEY, null, provisionTexts.getWebUrl(), "");
+	}*/
 
 	@Override
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) {
@@ -1868,7 +1866,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				String urlTraza = provision.getWoPreStart().getTrackingUrl();
 
 				trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_SCHEDULE_TECHNICIAN_KEY,
-						msgParameters.toArray(new MsgParameter[0]), urlTraza);
+						msgParameters.toArray(new MsgParameter[0]), "", urlTraza);
 			}
 			
 			
@@ -1910,7 +1908,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			//MSG_FAULT_WOPRESTART
 			//MSG_PRO_SCHEDULE_TECHNICIAN_KEY
 			trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_FAULT_WOPRESTART,
-					msgParameters.toArray(new MsgParameter[0]), urlTraza);
+					msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
 
 		
 	}
@@ -2223,6 +2221,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					
 					String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
 					if (isAvailableTech != null) {
+						sendEmailToCustomer(provision.getCustomer(), woPreStart);
+						
+						
 						SimpliRequest simpliRequest = new SimpliRequest();
 						simpliRequest.setLatitude(woPreStart.getLatitude());
 						simpliRequest.setLongitude(woPreStart.getLongitude());
@@ -2848,4 +2849,47 @@ public class ProvisionServiceImpl implements ProvisionService {
 			return null;
 		}
 	}
+	
+	private void sendEmailToCustomer(Customer objCustomer, WoPreStart objWoPreStart) {
+		ArrayList<MailParameter> mailParameters = new ArrayList<MailParameter>();
+		String customerFullName = objCustomer.getName();
+
+		MailParameter mailParameter1 = new MailParameter();
+		mailParameter1.setParamKey("SHORTNAME");
+		if (customerFullName.trim().length() > 0) {
+			String[] customerFullNameArrStr = customerFullName.split(" ");
+			mailParameter1.setParamValue(customerFullNameArrStr[0]);
+		} else {
+			mailParameter1.setParamValue("");
+		}
+		mailParameters.add(mailParameter1);
+
+		MailParameter mailParameter2 = new MailParameter();
+		mailParameter2.setParamKey("EMAIL");
+		mailParameter2.setParamValue(objCustomer.getMail());
+		mailParameters.add(mailParameter2);
+
+		MailParameter mailParameter3 = new MailParameter();
+		mailParameter3.setParamKey("TECNICNAME");
+		mailParameter3.setParamValue(objWoPreStart.getFullName());
+		mailParameters.add(mailParameter3);
+
+		MailParameter mailParameter4 = new MailParameter();
+		mailParameter4.setParamKey("TECNICID");
+		mailParameter4.setParamValue(objWoPreStart.getDocumentNumber());
+		mailParameters.add(mailParameter4);
+
+		mailParameter4 = new MailParameter();
+		mailParameter4.setParamKey("TECNICDOCTYPE");
+		mailParameter4.setParamValue(objWoPreStart.getDocumentNumber().length() == 8 ? "DNI" : "N° DOCUMENTO");
+		mailParameters.add(mailParameter4);
+
+		MailParameter mailParameter5 = new MailParameter();
+		mailParameter5.setParamKey("SCHEDULEORDER");
+		mailParameter5.setParamValue(provisionTexts.getWebUrl());
+		mailParameters.add(mailParameter5);
+
+		trazabilidadSecurityApi.sendMail("192826", mailParameters.toArray(new MailParameter[mailParameters.size()]));
+	}
+
 }

@@ -2206,7 +2206,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// Job Woprestart
 				woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-				if (nowDate.getHour() >= 7 && nowDate.getHour() <= 19) {
+				if (nowDate.getHour() >= 0 && nowDate.getHour() <= 23) {
 
 					// SMS
 					sendSMSWoPrestartHolder(provision);

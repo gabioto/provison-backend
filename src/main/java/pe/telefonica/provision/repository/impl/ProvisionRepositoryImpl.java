@@ -200,8 +200,24 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Query query = new Query(Criteria.where("productName").ne(null).and("xa_request").ne(null).and("xa_id_st")
 				.ne(null).andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
 						Criteria.where("notifications.into_send_date").lte(endDate)));
+		
+		query.fields().include("xa_request");
+		query.fields().include("sale_code");
+		query.fields().include("commercial_op");
+		query.fields().include("customer.province");
+		query.fields().include("customer.department");
+		query.fields().include("customer.district");
+		query.fields().include("customer.document_type");
+		query.fields().include("customer.document_number");
+		query.fields().include("customer.phone_number");
+		query.fields().include("product_name");
+		query.fields().include("notifications.into_send_Date");
+		query.fields().include("register_date");
+		query.fields().include("origin_code");
+		query.fields().include("last_tracking_status");
+		
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
-
+		
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}

@@ -201,7 +201,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				.ne(null).andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
 						Criteria.where("notifications.into_send_date").lte(endDate)));
 		
-		query.fields().include("xa_request");
+		/*query.fields().include("xa_request");
 		query.fields().include("sale_code");
 		query.fields().include("commercial_op");
 		query.fields().include("customer.province");
@@ -214,7 +214,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		query.fields().include("notifications.into_send_Date");
 		query.fields().include("register_date");
 		query.fields().include("origin_code");
-		query.fields().include("last_tracking_status");
+		query.fields().include("last_tracking_status");*/
 		
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 		

@@ -41,7 +41,7 @@ public class ProvisionTrazaDto implements Serializable {
 	private List<Contacts> contacts= new ArrayList<Contacts>();
 	
 	@Field("customer")
-	private Customer customer;
+	private CustomerDto customer;
 	
 	@Field("dummy_st_psi_code")
 	private String dummyStPsiCode;
@@ -118,7 +118,7 @@ public class ProvisionTrazaDto implements Serializable {
 		return contacts;
 	}
 
-	public Customer getCustomer() {
+	public CustomerDto getCustomer() {
 		return customer;
 	}
 
@@ -210,7 +210,7 @@ public class ProvisionTrazaDto implements Serializable {
 		this.contacts = contacts;
 	}
 
-	public void setCustomer(Customer customer) {
+	public void setCustomer(CustomerDto customer) {
 		this.customer = customer;
 	}
 

@@ -56,6 +56,9 @@ public class ProvisionTrazaDto implements Serializable {
 	@Field("_id")
 	private String idProvision;
 	
+	@Field("is_up_front")
+	private Boolean isUpFront = false;
+	
 	@Field("is_update_dummy_st_psi_code")
 	private boolean isUpdatedummyStPsiCode;
 	
@@ -135,7 +138,7 @@ public class ProvisionTrazaDto implements Serializable {
 		return idProvision;
 	}
 
-	public boolean isUpdatedummyStPsiCode() {
+	public boolean getIsUpdatedummyStPsiCode() {
 		return isUpdatedummyStPsiCode;
 	}
 
@@ -273,6 +276,14 @@ public class ProvisionTrazaDto implements Serializable {
 
 	public void setXaIdSt(String xaIdSt) {
 		this.xaIdSt = xaIdSt;
+	}
+
+	public Boolean getIsUpFront() {
+		return isUpFront;
+	}
+
+	public void setIsUpFront(Boolean isUpFront) {
+		this.isUpFront = isUpFront;
 	}
 
 	public void setXaRequest(String xaRequest) {

@@ -55,37 +55,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-<<<<<<< HEAD
-	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
-		diasVidaProvision  = diasVidaProvision * -1;		
-		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime01 = dateStart.format(formatter);
-		System.out.println("formattedDateTime01: "+formattedDateTime01);
-=======
 	public Optional<List<ProvisionDto>> findAll(String documentType, String documentNumber) {
 		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
->>>>>>> refs/heads/dev
-
-<<<<<<< HEAD
-		//LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
-
-		Query query = new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-				.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
-						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))).limit(3);
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
-		List<Provision> provisions = this.mongoOperations.find(query ,Provision.class);	
 		
-		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
-=======
 		List<ProvisionDto> provisions = this.mongoOperations.find(
 				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
 						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
 				ProvisionDto.class);		
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
->>>>>>> refs/heads/dev
 		return optionalProvisions;
 	}
 

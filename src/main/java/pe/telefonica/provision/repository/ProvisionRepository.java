@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.dto.ProvisionDto;
+import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
@@ -15,7 +17,9 @@ import pe.telefonica.provision.model.Status;
 
 public interface ProvisionRepository {
 
-	Optional<List<Provision>> findAll(String documentType, String documentNumber);
+	Optional<List<ProvisionDto>> findAll(String documentType, String documentNumber);
+	
+	Optional<List<ProvisionTrazaDto>> findAllTraza(String documentType, String documentNumber);
 
 	List<Provision> findAllTraza__tes(String documentType, String documentNumber);
 

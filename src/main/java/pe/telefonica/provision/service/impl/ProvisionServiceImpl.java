@@ -43,6 +43,7 @@ import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.dto.ProvisionDto;
+import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
 import pe.telefonica.provision.external.SimpliConnectApi;
@@ -161,53 +162,37 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public List<ProvisionDto> getAll(ApiRequest<ProvisionRequest> provisionRequest) {
 
-		Optional<List<Provision>> provisions;
-		List<ProvisionDto> listProvisionDto = new ArrayList<>();
+		Optional<List<ProvisionDto>> provisions;
+		List<ProvisionDto> listProvisionDto = new ArrayList<ProvisionDto>();
 
 		provisions = provisionRepository.findAll(provisionRequest.getBody().getDocumentType(),
 				provisionRequest.getBody().getDocumentNumber());
 
 		if (provisions.isPresent() && provisions.get().size() > 0) {
-
-			provisions.get().stream().map(item -> {
-				ProvisionDto provisionDto = new ProvisionDto();
-
-				provisionDto.setIdProvision(item.getIdProvision());
-				provisionDto.setXaRequest(item.getXaRequest());
-				provisionDto.setXaIdSt(item.getXaIdSt());
-				provisionDto.setOriginCode(item.getOriginCode());
-				provisionDto.setProductName(item.getProductName());
-				provisionDto.setActiveStatus(item.getActiveStatus());
-				Customer customer = item.getCustomer();
-				provisionDto.setCustomer(customer);
-
-				List<Contacts> contacts = item.getContacts();
-				provisionDto.setContacts(contacts);
-
-				provisionDto.setWorkZone(item.getWorkZone());
-				provisionDto.setLastTrackingStatus(item.getLastTrackingStatus());
-				provisionDto.setDescriptionStatus(item.getDescriptionStatus());
-				provisionDto.setGenericSpeech(item.getGenericSpeech());
-
-				List<StatusLog> logStatus = item.getLogStatus();
-
-				provisionDto.setLogStatus(logStatus);
-
-				UpFront upFront = item.getUpFront();
-
-				provisionDto.setUpFront(upFront);
-
-				listProvisionDto.add(provisionDto);
-
-				return true;
-			}).collect(Collectors.toList());
-
+			listProvisionDto = provisions.get();
+			
 			return listProvisionDto;
 		} else {
 			return null;
 		}
 	}
 
+	@Override
+	public List<ProvisionTrazaDto> getAllTraza(ApiRequest<ProvisionRequest> provisionRequest) {
+		Optional<List<ProvisionTrazaDto>> provisions;
+		List<ProvisionTrazaDto> listProvisionDto = new ArrayList<ProvisionTrazaDto>();
+		
+		provisions = provisionRepository.findAllTraza(provisionRequest.getBody().getDocumentType(), provisionRequest.getBody().getDocumentNumber());
+
+		if (provisions.isPresent() && provisions.get().size() > 0) {
+			listProvisionDto = provisions.get();
+			
+			return listProvisionDto;
+		} else {
+			return null;
+		}
+	}
+	
 	private Provision evaluateProvisionComponents(Provision provision) {
 		ProductType producType = null;
 		try {
@@ -2844,20 +2829,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		return provisions;
-	}
-
-	@Override
-	public List<Provision> getAllTraza(ProvisionRequest request) {
-		Optional<List<Provision>> provisions;
-
-		provisions = provisionRepository.findAll(request.getDocumentType(), request.getDocumentNumber());
-
-		if (provisions.isPresent() && provisions.get().size() > 0) {
-
-			return provisions.get();
-		} else {
-			return null;
-		}
 	}
 	
 	private void sendEmailToCustomer(Customer objCustomer, WoPreStart objWoPreStart) {

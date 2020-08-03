@@ -18,7 +18,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
@@ -32,6 +37,7 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.external.request.LogDataRequest;
+import pe.telefonica.provision.external.request.security.GetTokenExternalRequest;
 import pe.telefonica.provision.util.constants.Constants;
 
 @Component
@@ -90,7 +96,8 @@ public class TrazabilidadSecurityApi {
 		}
 
 	}
-
+	
+	@Async
 	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
 			LocalDateTime startHour, LocalDateTime endHour) {
 		log.info(this.getClass().getName() + " - " + "logEvent");
@@ -131,45 +138,6 @@ public class TrazabilidadSecurityApi {
 	}
 
 	@Async
-	public void thirdLogEventAsync(String third, String operation, String request, String response, String serviceUrl,
-			LocalDateTime startHour, LocalDateTime endHour) {
-		log.info(this.getClass().getName() + " - " + "logEvent");
-
-		String url = api.getSecurityUrl() + api.getSaveThirdLogData();
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
-		headers.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
-		headers.add("Authorization", ibmSecuritySeguridad.getAuth());
-
-		LogDataRequest logRequest = new LogDataRequest();
-		logRequest.setThird(third);
-		logRequest.setOperation(operation);
-		logRequest.setRequest(request);
-		logRequest.setResponse(response);
-		logRequest.setUrl(serviceUrl);
-		logRequest.setStartHour(startHour);
-		logRequest.setEndHour(endHour);
-
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
-		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logRequest, headers);
-
-		try {
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
-
-			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-				log.info(this.getClass().getName() + " - " + "logEvent - OK");
-			} else {
-				log.info(this.getClass().getName() + " - " + "logEvent - ERR");
-			}
-		} catch (Exception e) {
-			log.info(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
-		}
-	}
-
 	public Boolean sendMail(String templateId, MailParameter[] mailParameters) {
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -205,9 +173,9 @@ public class TrazabilidadSecurityApi {
 		return false;
 
 	}
-
+	@Async
 	public ApiResponse<SMSByIdResponse> sendSMS(List<Contact> contacts, String msgKey, MsgParameter[] msgParameters,
-			String webURL) {
+			String webURL, String webContactURL) {
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
 		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
@@ -225,6 +193,8 @@ public class TrazabilidadSecurityApi {
 		message.setMsgKey(msgKey);
 		message.setMsgParameters(msgParameters);
 		message.setWebURL(webURL);
+		message.setWebContactURL(webContactURL);
+		
 
 		System.out.println(webURL);
 
@@ -266,6 +236,59 @@ public class TrazabilidadSecurityApi {
 			return responseEntity.getBody();
 
 		} catch (Exception e) {
+			return null;
+		}
+
+	}
+	
+	public String gerateToken() {
+
+		log.info(this.getClass().getName() + " - " + "gerateToken");
+		// RestTemplate restTemplate = new
+		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		// restTemplate.getMessageConverters().add(new
+		// MappingJackson2HttpMessageConverter());
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String requestUrl = api.getSecurityUrl() + api.getSecurityGetOAuthToken();
+		
+		GetTokenExternalRequest getTokenExternalRequest = new  GetTokenExternalRequest();
+
+		getTokenExternalRequest.setTokenKey("");
+		
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
+		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
+
+		ApiRequest<GetTokenExternalRequest> apiRequest = new ApiRequest<GetTokenExternalRequest>(Constants.APP_NAME_PROVISION,
+				Constants.USER_SEGURIDAD, Constants.OPER_GET_TOKEN_EXTERNAL, getTokenExternalRequest);
+
+		HttpEntity<ApiRequest<GetTokenExternalRequest>> entity = new HttpEntity<ApiRequest<GetTokenExternalRequest>>(apiRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrl, entity, String.class);
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString().replaceAll("\"",
+						"");
+				
+				System.out.println(responseEntity);
+				return token;
+			} else {
+				return null;
+			}
+		} catch (HttpClientErrorException e) {
+			log.info("HttpClientErrorException = " + e.getMessage());
+			log.info("HttpClientErrorException = " + e.getResponseBodyAsString());
+			return null;
+		
+		} catch (Exception ex) {
+
+			System.out.println(ex.getMessage());
 			return null;
 		}
 

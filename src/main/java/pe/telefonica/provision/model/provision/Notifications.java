@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class Notifications implements Serializable {
-
+	
+	private static final long serialVersionUID = 5094729030347835498L;
 	@Field("caida_send_notify")
 	private Boolean caidaSendNotify = false;
 

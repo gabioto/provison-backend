@@ -3,42 +3,63 @@ package pe.telefonica.provision.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.Provision.StatusLog;
 
+@Document(collection = "collProvision")
+@JsonPropertyOrder({ "idProvision" })
 public class ProvisionDto {
-
+	@Field("_id")
 	private String idProvision;
 
+	@Field("xa_request")
 	private String xaRequest;
 
+	@Field("xa_id_st")
 	private String xaIdSt;
 
+	@Field("origin_code")
 	private String originCode;
 
+	@Field("product_name")
 	private String productName;
 
+	@Field("active_status")
 	private String activeStatus;
 
+	@Field("customer")
 	private Customer customer;
 
-	private List<Contacts> contacts;
+	@Field("contacts")
+	private List<Contacts> contacts = new ArrayList<Contacts>();
 
+	@Field("work_zone")
 	private String workZone;
 
+	@Field("last_tracking_status")
 	private String lastTrackingStatus;
 
+	@Field("description_status")
 	private String descriptionStatus;
 
+	@Field("generic_speech")
 	private String genericSpeech;
 
+	@Field("log_status")
 	private List<StatusLog> logStatus = new ArrayList<StatusLog>();
 
+	@Field("up_front")
 	private UpFront upFront;
 
+	@Field("is_up_front")
 	private Boolean isUpFront = false;
 
 	public String getIdProvision() {
@@ -160,6 +181,5 @@ public class ProvisionDto {
 	public void setIsUpFront(Boolean isUpFront) {
 		this.isUpFront = isUpFront;
 	}
-	
-	
+		
 }

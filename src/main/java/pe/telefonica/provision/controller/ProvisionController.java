@@ -48,6 +48,7 @@ import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ProvisionDto;
+import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
@@ -144,10 +145,10 @@ public class ProvisionController {
 	 * @description get all provisions related to type and number of the document
 	 */
 	@RequestMapping(value = "/getAllProvision", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> getAllProvision(
+	public ResponseEntity<ApiResponse<List<ProvisionTrazaDto>>> getAllProvision(
 			@RequestBody ApiRequest<ProvisionRequest> request) {
 
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<List<ProvisionTrazaDto>> apiResponse;
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
@@ -161,7 +162,7 @@ public class ProvisionController {
 
 			timestamp = getTimestamp();
 
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento obligatorio", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -177,7 +178,7 @@ public class ProvisionController {
 			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Numero de documento obligatorio", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -192,21 +193,20 @@ public class ProvisionController {
 			errorInternal = ErrorCode.get(Constants.GET_ORDERS + errorInternal.replace("\"", "")).toString();
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, errorInternal, "Tipo de documento debe ser cadena", null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 			return ResponseEntity.status(status).body(apiResponse);
-
 		}
 
 		try {
-			List<Provision> provisions = provisionService.getAllTraza(request.getBody());
+			List<ProvisionTrazaDto> provisions = provisionService.getAllTraza(request);
 
 			if (provisions != null) {
 
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
 				apiResponse.setBody(provisions);
@@ -224,7 +224,7 @@ public class ProvisionController {
 
 			} else {
 				status = HttpStatus.NOT_FOUND;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()),
 						"No se encontraron provisiones", null);
 				apiResponse.setBody(provisions);
@@ -243,7 +243,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+			apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
 
 			timestamp = getTimestamp();
@@ -460,7 +460,7 @@ public class ProvisionController {
 		HttpStatus status;
 
 		try {
-
+			
 			Boolean provisions = provisionService.insertProvision(request.getBody());
 
 			if (provisions) {

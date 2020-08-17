@@ -28,6 +28,10 @@ import com.mongodb.client.result.UpdateResult;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.dto.ProvisionDto;
+import pe.telefonica.provision.dto.ProvisionTrazaDto;
+import pe.telefonica.provision.model.Contacts;
+import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
@@ -51,7 +55,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<List<Provision>> findAll(String documentType, String documentNumber) {
+
+	public Optional<List<ProvisionDto>> findAll(String documentType, String documentNumber) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
 		diasVidaProvision  = diasVidaProvision * -1;		
@@ -65,12 +70,26 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))).limit(3);
 		query.with(new Sort(new Order(Direction.DESC, "register_date")));
-		List<Provision> provisions = this.mongoOperations.find(query ,Provision.class);	
+		List<ProvisionDto> provisions = this.mongoOperations.find(query ,ProvisionDto.class);	
 		
-		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
+
 		return optionalProvisions;
 	}
 
+	@Override
+	public Optional<List<ProvisionTrazaDto>> findAllTraza(String documentType, String documentNumber) {
+		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+
+		List<ProvisionTrazaDto> provisions = this.mongoOperations.find(
+				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
+								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
+				ProvisionTrazaDto.class);
+		Optional<List<ProvisionTrazaDto>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
+	}
+	
 	@Override
 	public List<Provision> findAllTraza__tes(String documentType, String documentNumber) {
 
@@ -223,11 +242,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<Provision> getProvisionByXaRequest(String xaRequest) {
+	public Provision getProvisionByXaRequest(String xaRequest) {
 		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(xaRequest)),
 				Provision.class);
-		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
-		return optionalOrder;
+		return provision;
+		//Optional<Provision> optionalOrder = Optional.ofNullable(provision);
+		//return optionalOrder;
 	}
 
 	@Override

@@ -56,6 +56,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 
+
 	public Optional<List<ProvisionDto>> findAll(String documentType, String documentNumber) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
@@ -73,6 +74,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		List<ProvisionDto> provisions = this.mongoOperations.find(query ,ProvisionDto.class);	
 		
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
+
 
 		return optionalProvisions;
 	}

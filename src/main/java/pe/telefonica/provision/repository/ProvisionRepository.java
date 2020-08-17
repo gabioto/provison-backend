@@ -27,10 +27,10 @@ public interface ProvisionRepository {
 
 	Optional<Provision> getOrderTraza(String documentType, String documentNumber);
 
-	Optional<Provision> getProvisionByXaRequest(String xaRequest);
+	Provision getProvisionByXaRequest(String xaRequest);
 
 	Provision getProvisionBySaleCode(String saleCode);
-
+	
 	Provision getProvisionByXaIdSt(String xaIdSt);
 
 	Provision getProvisionByDummyStPsiCode(String dummyStPsiCode);

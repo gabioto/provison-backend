@@ -46,8 +46,15 @@ public enum Status {
 			"Hola, la solicitud de cancelación de tu pedido Movistar se realizo con éxito. [Si el cliente menciona que él no solicitó la cancelación, sigue flujo regular de reingreso de pedido]",
 			"", "Tu pedido ha sido cancelado"),
 	PENDIENTE_PAGO("PENDIENTE-PAGO", 15, "PENDIENTE DE PAGO", "", "", "Pendiente de pago"),
-	PAGADO("PAGADO", 16, "PAGADO", "", "", "Pagado");
-
+	PAGADO("PAGADO", 16, "PAGADO", "", "", "Pagado"),
+	
+	FINALIZADO("FINALIZADO", 17, "FINALIZADO", "generic speech", "", "Finalizado"),
+	TERMINADA("TERMINADA", 18, "TERMINADA", "generic speech", "", "Terminado"),
+	CANCELADA_ATIS("CANCELADA_ATIS", 19, "CANCELADA_ATIS", "generic speech", "", "Cancelada atis"),
+	PENDIENTE_DE_VALIDACION("PENDIENTE_DE_VALIDACION", 20, "PENDIENTE DE VALIDACION", "", "", "Pendiente de validacion"),
+	CONFIGURADA("CONFIGURADA", 21, "CONFIGURADA", "", "", "Configurada"),
+	PENDIENTE_DE_APROBACION("PENDIENTE_DE_APROBACION", 22, "PENDIENTE DE APROBACION", "", "", "Pendiente de aprovacion");
+	
 	private String statusName;
 	private int statusId;
 	private String description;

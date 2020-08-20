@@ -44,23 +44,32 @@ public class ReportRepositoryImpl implements ReportRepository{
 		
 		Long contadorWoPrestart=this.mongoOperations.count(queryWoPrestart, Provision.class);
 		
+		Query queryWoNotdone = new Query(Criteria.where("notifications.notdone_send_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("notifications.notdone_send_date").lte(request.getEndDate())));
+		
+		Long contadorWoNotdone=this.mongoOperations.count(queryWoNotdone, Provision.class);
+		
 		Query queryWoCompleted = new Query(Criteria.where("notifications.completed_send_date").gte(request.getStartDate()).andOperator(
 				Criteria.where("notifications.completed_send_date").lte(request.getEndDate())));
 		
 		Long contadorWoCompleted=this.mongoOperations.count(queryWoCompleted, Provision.class);
 		
-		Query queryWoNotdone = new Query(Criteria.where("notifications.completed_send_date").gte(request.getStartDate()).andOperator(
-				Criteria.where("notifications.completed_send_date").lte(request.getEndDate())));
-		
-		Long contadorWoNotdone=this.mongoOperations.count(queryWoNotdone, Provision.class);
-		
 		NotificationResponse notification=new NotificationResponse();
 		notification.setSms_into(contadorInToa);
 		notification.setSms_prestart(contadorWoPrestart);
-		notification.setSms_completed(contadorWoCompleted);
 		notification.setSms_notdone(contadorWoNotdone);
+		notification.setSms_completed(contadorWoCompleted);
 		
 		return notification;
+	}
+
+	@Override
+	public List<Provision> getAllProvision(ReportByRegisterDateRequest request) {
+		Query query = new Query(Criteria.where("status_change_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("status_change_date").lte(request.getEndDate())));
+		
+		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+		return provisions;
 	}
 
 }

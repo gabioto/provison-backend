@@ -14,8 +14,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import pe.telefonica.provision.dto.ComponentsDto;
+import pe.telefonica.provision.model.provision.Configurada;
 import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.Notifications;
+import pe.telefonica.provision.model.provision.PendienteDeAprobacion;
+import pe.telefonica.provision.model.provision.PendienteDeValidacion;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoPreStart;
@@ -124,6 +127,9 @@ public class Provision implements Serializable {
 	@Field("commercial_op")
 	private String commercialOp;
 
+	@Field("commercial_op_atis")
+	private String commercialOpAtis;
+
 	@Field("product_code")
 	private String productCode;
 
@@ -182,7 +188,7 @@ public class Provision implements Serializable {
 	private Customer customer;
 
 	@Field("contacts")
-	private List<Contacts> contacts;
+	private List<Contacts> contacts = new ArrayList<>();
 
 	@Field("work_zone")
 	private String workZone;
@@ -252,10 +258,45 @@ public class Provision implements Serializable {
 
 	@Field("action_not_done")
 	private String actionNotDone;
-	
+
 	@Field("notifications")
 	private Notifications notifications;
+
+	@Field("cod_cliente_atis")
+	private String codClienteAtis;
+
+	@Field("cod_cuenta_atis")
+	private String codCuentaAtis;
+
+	@Field("technology")
+	private String technology;
+
+	@Field("cancelado_motivo_atis")
+	private String canceladoMotivoAtis;
+
+	@Field("cancelado_submotivo_atis")
+	private String canceladoSubmotivoAtis;
+
+	@Field("pendiente_de_validacion")
+	private PendienteDeValidacion pendienteDeValidacion;
+
+	@Field("pendiente_de_aprovacion")
+	private PendienteDeAprobacion pendienteDeAproacion;
+
+	@Field("configurada")
+	private Configurada configurada;
 	
+	@Field("status_change_date")
+	private LocalDateTime statusChangeDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+	
+	public LocalDateTime getStatusChangeDate() {
+		return statusChangeDate;
+	}
+
+	public void setStatusChangeDate(LocalDateTime statusChangeDate) {
+		this.statusChangeDate = statusChangeDate;
+	}
+
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -510,6 +551,14 @@ public class Provision implements Serializable {
 
 	public void setCommercialOp(String commercialOp) {
 		this.commercialOp = commercialOp;
+	}
+
+	public String getCommercialOpAtis() {
+		return commercialOpAtis;
+	}
+
+	public void setCommercialOpAtis(String commercialOpAtis) {
+		this.commercialOpAtis = commercialOpAtis;
 	}
 
 	public String getProductCode() {
@@ -828,6 +877,70 @@ public class Provision implements Serializable {
 		this.actionNotDone = actionNotDone;
 	}
 
+	public String getCodClienteAtis() {
+		return codClienteAtis;
+	}
+
+	public String getCodCuentaAtis() {
+		return codCuentaAtis;
+	}
+
+	public String getTechnology() {
+		return technology;
+	}
+
+	public String getCanceladoMotivoAtis() {
+		return canceladoMotivoAtis;
+	}
+
+	public String getCanceladoSubmotivoAtis() {
+		return canceladoSubmotivoAtis;
+	}
+
+	public void setCodClienteAtis(String codClienteAtis) {
+		this.codClienteAtis = codClienteAtis;
+	}
+
+	public void setCodCuentaAtis(String codCuentaAtis) {
+		this.codCuentaAtis = codCuentaAtis;
+	}
+
+	public void setTechnology(String technology) {
+		this.technology = technology;
+	}
+
+	public void setCanceladoMotivoAtis(String canceladoMotivoAtis) {
+		this.canceladoMotivoAtis = canceladoMotivoAtis;
+	}
+
+	public void setCanceladoSubmotivoAtis(String canceladoSubmotivoAtis) {
+		this.canceladoSubmotivoAtis = canceladoSubmotivoAtis;
+	}
+
+	public PendienteDeValidacion getPendienteDeValidacion() {
+		return pendienteDeValidacion;
+	}
+
+	public PendienteDeAprobacion getPendienteDeAproacion() {
+		return pendienteDeAproacion;
+	}
+
+	public Configurada getConfigurada() {
+		return configurada;
+	}
+
+	public void setPendienteDeValidacion(PendienteDeValidacion pendienteDeValidacion) {
+		this.pendienteDeValidacion = pendienteDeValidacion;
+	}
+
+	public void setPendienteDeAproacion(PendienteDeAprobacion pendienteDeAproacion) {
+		this.pendienteDeAproacion = pendienteDeAproacion;
+	}
+
+	public void setConfigurada(Configurada configurada) {
+		this.configurada = configurada;
+	}
+
 	public Provision() {
 
 	}
@@ -959,7 +1072,5 @@ public class Provision implements Serializable {
 	public void setNotifications(Notifications notifications) {
 		this.notifications = notifications;
 	}
-	
-	
 
 }

@@ -42,7 +42,10 @@ public final class Constants {
 	public static final String API_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
 	public static final String PARAM_KEY_OAUTH_TOKEN = "PARAM_KEY_OAUTH_TOKEN";
-
+	
+	
+	public static final String OPER_GET_TECH_AVAILABLE = "OPER_GET_TECH_AVAILABLE";
+	public static final String OPER_GET_TOKEN_EXTERNAL = "OPER_GET_TOKEN_EXTERNAL";
 	public static final String OPER_GET_OAUTH_TOKEN = "OPER_GET_OAUTH_TOKEN";
 	public static final String OPER_GET_ALL_IN_TIME_RANGE = "OPER_GET_ALL_IN_TIME_RANGE";
 	public static final String OPER_GET_ORDER_TO_NOTIFY = "OPER_GET_ORDER_TO_NOTIFY";
@@ -70,7 +73,9 @@ public final class Constants {
 	public static final String MSG_PRO_CANCELLED_BY_BO_KEY = "MSG_PRO_CANCELLED_BY_BO_KEY";
 	// Cuando el cliente cancela desde la web
 	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
-
+	public static final String MSG_FAULT_WOPRESTART 		= "MSG_FAULT_WOPRESTART";
+	public static final String MSG_PRO_SCHEDULE_TECHNICIAN_KEY= "MSG_PRO_SCHEDULE_TECHNICIAN_KEY";
+	
 	// Codigos de los endpoints de PSI
 	public static final String PSI_CODE_CAPACITY = "201";
 	public static final String PSI_CODE_SCHEDULE = "202";
@@ -88,6 +93,7 @@ public final class Constants {
 	public static final String OPER_VALIDATE_DATA = "OPER_VALIDATE_DATA";
 	public static final String OPER_VALIDATE_USER = "OPER_VALIDATE_USER";
 	public static final String OPER_MONITORING_PROVISION = "OPER_MONITORING_PROVISION";
+	public static final String OPER_GET_SALE_CODE = "OPER_GET_SALE_CODE";
 	public static final String OPER_GET_PROVISION_ALL = "OPER_GET_PROVISION_ALL";
 	public static final String OPER_GET_PROVISION_BY_REGISTER_DATE = "OPER_GET_PROVISION_BY_REGISTER_DATE";
 	public static final String OPER_INSERT_PROVISION = "OPER_INSERT_PROVISION";
@@ -104,6 +110,8 @@ public final class Constants {
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
 	public static final String OPER_GET_PROVISION_BY_SALE_CODE = "OPER_GET_PROVISION_BY_SALE_CODE";
+	
+	public static final String OPER_GET_ALL_PROVISION = "OPER_GET_ALL_PROVISION";
 
 	public static final String TIPO_RUC = "ruc";
 	public static final String RUC_NATURAL = "10";

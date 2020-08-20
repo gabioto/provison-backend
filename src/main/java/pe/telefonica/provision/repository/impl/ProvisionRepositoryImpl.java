@@ -223,11 +223,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public Optional<Provision> getProvisionByXaRequest(String xaRequest) {
+	public Provision getProvisionByXaRequest(String xaRequest) {
 		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(xaRequest)),
 				Provision.class);
-		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
-		return optionalOrder;
+		return provision;
+		//Optional<Provision> optionalOrder = Optional.ofNullable(provision);
+		//return optionalOrder;
 	}
 
 	@Override

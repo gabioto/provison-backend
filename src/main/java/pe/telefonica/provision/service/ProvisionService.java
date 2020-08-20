@@ -33,7 +33,7 @@ public interface ProvisionService {
 
 	ApiResponse<List<Contacts>> getContactList(String provisionId);
 
-	List<Provision> insertProvisionList(List<Provision> provisionList);
+	//List<Provision> insertProvisionList(List<Provision> provisionList);
 
 	boolean insertProvision(InsertOrderRequest request);
 

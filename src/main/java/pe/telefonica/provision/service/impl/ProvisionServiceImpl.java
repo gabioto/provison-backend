@@ -1735,6 +1735,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("log_status", listLog);
 
 			provisionRepository.updateProvision(provision, update);
+			
+			/**/
+			// Validar si tiene INGRESADO y actualizar agenda
+			if (provision.getLastTrackingStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
+
+				ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
+				updateFicRequest.setOrderCode(provision.getXaRequest());
+				updateFicRequest.setOriginCode(request.getOriginCode());
+				updateFicRequest.setSaleCode(provision.getSaleCode());
+				updateFicRequest.setFictitiousCode(request.getDummyXaRequest());
+				updateFicRequest.setRequestName(provision.getProductName());
+				updateFicRequest.setRequestId(provision.getIdProvision());
+				System.out.println("UPDATE SCHEDULE FICTITIOUS ==>");
+
+				trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+			}
+			/**/
 
 		} else {
 

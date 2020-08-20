@@ -1734,7 +1734,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
 
-			provisionRepository.updateProvision(provision, update);
+			
 			
 			/**/
 			// Validar si tiene INGRESADO y actualizar agenda
@@ -1748,10 +1748,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 				updateFicRequest.setRequestName(provision.getProductName());
 				updateFicRequest.setRequestId(provision.getIdProvision());
 				System.out.println("UPDATE SCHEDULE FICTITIOUS ==>");
-
+				update.set("is_update_dummy_st_psi_code", true);
 				trazabilidadScheduleApi.updateFicticious(updateFicRequest);
 			}
 			/**/
+			
+			provisionRepository.updateProvision(provision, update);
 
 		} else {
 

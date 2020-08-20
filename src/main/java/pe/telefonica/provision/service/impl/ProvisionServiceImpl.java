@@ -857,10 +857,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("description_status", provisionx.getDescriptionStatus());
 				update.set("generic_speech", provisionx.getGenericSpeech());
 				update.set("front_speech", provisionx.getFrontSpeech());
-
+				update.set("front_speech", provisionx.getFrontSpeech());			
+				
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionx = evaluateProvisionComponents(provisionx);
 
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
@@ -953,6 +954,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					pendienteDeAprobacion.setRequestDate(getData[2]);
 					update.set("pendiente_de_aprovacion", pendienteDeAprobacion);
 				}
+				
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
 				return isUpdate ? true : false;
@@ -2066,7 +2069,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 							dummyInToa != null ? dummyInToa.getDescription() : Status.DUMMY_IN_TOA.getDescription());
 					update.set("front_speech",
 							dummyInToa != null ? dummyInToa.getFront() : Status.DUMMY_IN_TOA.getFrontSpeech());
-
+					update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+					
 					provisionRepository.updateProvision(provision, update);
 					return true;
 
@@ -2107,7 +2111,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 
 					update.set("show_location", false);
-
+					update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 					provisionRepository.updateProvision(provision, update);
 					return true;
 				} else {
@@ -2223,7 +2227,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					// send sms invitation
 					provision.setContacts(contacts);
-
+					update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 					log.info("UPDATE PROVISION");
 					provisionRepository.updateProvision(provision, update);
 
@@ -2330,6 +2334,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				}
 				update.set("wo_prestart", woPreStart);
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionRepository.updateProvision(provision, update);
 				return true;
 				/*
@@ -2383,7 +2388,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						initStatus != null ? initStatus.getFront() : Status.WO_INIT.getFrontSpeech());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionRepository.updateProvision(provision, update);
 				return true;
 				/*
@@ -2444,7 +2449,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 						completedStatus != null ? completedStatus.getFront() : Status.WO_COMPLETED.getFrontSpeech());
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				
 				provisionRepository.updateProvision(provision, update);
 				return true;
 				/*
@@ -2504,7 +2510,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
-
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				
 				// Actualiza estado en provision
 				provisionRepository.updateProvision(provision, update);
 
@@ -2608,7 +2615,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				update.set("show_location", false);
-
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				
 				// Actualizar provision
 				provisionRepository.updateProvision(provision, update);
 
@@ -2722,7 +2730,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("sub_reason_not_done", subReason);
 					update.set("action_not_done", Constants.DEFAULT_NOTDONE_ACTION);
 				}
-
+				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				
 				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();

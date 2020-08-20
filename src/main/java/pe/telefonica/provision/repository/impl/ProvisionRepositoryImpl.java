@@ -68,9 +68,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))).limit(3);
 		query.with(new Sort(new Order(Direction.DESC, "register_date")));
-		List<ProvisionDto> provisions = this.mongoOperations.find(query ,ProvisionDto.class);
+		
+		List<ProvisionDto> provisions = this.mongoOperations.find(query ,ProvisionDto.class);	
 		
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
+
 		return optionalProvisions;
 	}
 

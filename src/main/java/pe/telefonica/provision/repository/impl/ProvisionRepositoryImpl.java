@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -381,7 +382,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.IN_TOA.getStatusName()),
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
 				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
-				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName())
+				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName()),
+				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status").is(Status.CANCELADA_ATIS.getStatusName())
 				
 				).and("customer").ne(null).and("notifications").ne(null);
 		
@@ -446,6 +448,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				}
 			}
 			
+			
+			if (Status.CANCELADA_ATIS.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.cancelada_atis_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.cancelada_atis_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
 			
 
 			this.mongoOperations.updateFirst(

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class Notifications implements Serializable {
-	
+
 	private static final long serialVersionUID = 5094729030347835498L;
 	@Field("caida_send_notify")
 	private Boolean caidaSendNotify = false;
@@ -43,13 +43,18 @@ public class Notifications implements Serializable {
 
 	@Field("completed_send_date")
 	private LocalDateTime completedSendDate;
-	
+
 	@Field("cancel_send_notify")
 	private Boolean cancelSendNotify = false;
 
 	@Field("cancel_send_date")
 	private LocalDateTime cancelSendDate;
-	
+
+	@Field("cancelada_atis_send_notify")
+	private Boolean canceladaAtisSendNotify = false;
+
+	@Field("cancelada_atis_send_date")
+	private LocalDateTime canceladaAtisSendDate;
 
 	public Boolean getCaidaSendNotify() {
 		return caidaSendNotify;
@@ -149,7 +154,7 @@ public class Notifications implements Serializable {
 
 	public Boolean getCancelSendNotify() {
 		return cancelSendNotify;
-	}	
+	}
 
 	public LocalDateTime getCancelSendDate() {
 		return cancelSendDate;
@@ -162,7 +167,21 @@ public class Notifications implements Serializable {
 	public void setCancelSendDate(LocalDateTime cancelSendDate) {
 		this.cancelSendDate = cancelSendDate;
 	}
-	
-	
+
+	public Boolean getCanceladaAtisSendNotify() {
+		return canceladaAtisSendNotify;
+	}
+
+	public void setCanceladaAtisSendNotify(Boolean canceladaAtisSendNotify) {
+		this.canceladaAtisSendNotify = canceladaAtisSendNotify;
+	}
+
+	public LocalDateTime getCanceladaAtisSendDate() {
+		return canceladaAtisSendDate;
+	}
+
+	public void setCanceladaAtisSendDate(LocalDateTime canceladaAtisSendDate) {
+		this.canceladaAtisSendDate = canceladaAtisSendDate;
+	}
 
 }

@@ -76,7 +76,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
 
 
-
 		return optionalProvisions;
 	}
 

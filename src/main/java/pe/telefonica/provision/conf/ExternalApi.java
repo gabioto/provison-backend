@@ -41,6 +41,17 @@ public class ExternalApi {
 	String simpliGetUrl;
 	String simpliBaseUrl;
 
+
+	public String getNroDiasVidaProvision() {
+		return nroDiasVidaProvision;
+	}
+
+	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
+		this.nroDiasVidaProvision = nroDiasVidaProvision;
+	}
+	
+
+
 	public String getSecurityUrl() {
 		return securityUrl;
 	}
@@ -141,10 +152,7 @@ public class ExternalApi {
 		return searchCustomer;
 	}
 
-	public String getNroDiasVidaProvision() {
-		return nroDiasVidaProvision;
-	}
-
+	
 	public String getScheduleGetTechAvailable() {
 		return scheduleGetTechAvailable;
 	}
@@ -261,9 +269,7 @@ public class ExternalApi {
 		this.searchCustomer = searchCustomer;
 	}
 
-	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
-		this.nroDiasVidaProvision = nroDiasVidaProvision;
-	}
+	
 
 	public void setScheduleGetTechAvailable(String scheduleGetTechAvailable) {
 		this.scheduleGetTechAvailable = scheduleGetTechAvailable;

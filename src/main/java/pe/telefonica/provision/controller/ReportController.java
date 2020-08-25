@@ -78,7 +78,7 @@ public class ReportController {
 	}
 	
 	@RequestMapping(value = "/getAllProvision", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> getAllFaults(
+	public ResponseEntity<ApiResponse<List<Provision>>> getAllProvisions(
 			@RequestBody @Valid ApiRequest<ReportByRegisterDateRequest> request) {
 		
 		ApiResponse<List<Provision>> apiResponse;

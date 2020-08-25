@@ -285,6 +285,17 @@ public class Provision implements Serializable {
 
 	@Field("configurada")
 	private Configurada configurada;
+	
+	@Field("status_change_date")
+	private LocalDateTime statusChangeDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+	
+	public LocalDateTime getStatusChangeDate() {
+		return statusChangeDate;
+	}
+
+	public void setStatusChangeDate(LocalDateTime statusChangeDate) {
+		this.statusChangeDate = statusChangeDate;
+	}
 
 	public String getIdProvision() {
 		return idProvision;

@@ -34,11 +34,20 @@ public class ExternalApi {
 	String updateScheduleDate;
 	String cancelLocalSchedule;
 	String searchCustomer;
+	String nroDiasVidaProvision;
 	String scheduleGetTechAvailable;
 	String securityGetOAuthToken;
 	String simpliGetUrl;
 	String simpliBaseUrl;
 
+	public String getNroDiasVidaProvision() {
+		return nroDiasVidaProvision;
+	}
+
+	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
+		this.nroDiasVidaProvision = nroDiasVidaProvision;
+	}
+	
 	public String getSecurityUrl() {
 		return securityUrl;
 	}

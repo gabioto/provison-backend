@@ -63,4 +63,13 @@ public class ReportRepositoryImpl implements ReportRepository{
 		return notification;
 	}
 
+	@Override
+	public List<Provision> getAllProvision(ReportByRegisterDateRequest request) {
+		Query query = new Query(Criteria.where("status_change_date").gte(request.getStartDate()).andOperator(
+				Criteria.where("status_change_date").lte(request.getEndDate())));
+		
+		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+		return provisions;
+	}
+
 }

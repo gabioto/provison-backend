@@ -30,4 +30,10 @@ public class ReportServiceImpl implements ReportService{
 		return reportRepository.getCountByEventNotication(request);
 	}
 
+	@Override
+	public List<Provision> getAllProvisions(ReportByRegisterDateRequest request) {
+		
+		return reportRepository.getAllProvision(request);
+	}
+
 }

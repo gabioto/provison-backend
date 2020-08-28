@@ -398,6 +398,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
 				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
 				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName()),
+				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status").is(Status.WO_COMPLETED.getStatusName()),
+				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status").is(Status.FINALIZADO.getStatusName()),
+				
 				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status").is(Status.CANCELADA_ATIS.getStatusName())
 				
 				).and("customer").ne(null).and("notifications").ne(null);
@@ -451,6 +454,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			
 			if (Status.WO_COMPLETED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
 				update.set("notifications.completed_send_notify", true);
+				update.set("notifications.finalizado_send_notify", true);
 				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.completed_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
@@ -463,6 +467,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				}
 			}
 			
+			if (Status.FINALIZADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+				update.set("notifications.finalizado_send_notify", true);
+				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.finalizado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
 			
 			if (Status.CANCELADA_ATIS.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
 				update.set("notifications.cancelada_atis_send_notify", true);

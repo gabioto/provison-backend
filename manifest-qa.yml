@@ -1,17 +1,15 @@
----
 applications:
-  - name: PROVISION-TRAZABILIDAD
-    routes:
-    - route: provision-trazabilidad-test.mybluemix.net/
-    memory: 2GB
-    path: target/tdp-provision-1.0.2-SNAPSHOT.jar
-    buildpack: liberty-for-java
-    health-check-type: process
-    disk_quota: 2GB
-    instances: 2
-    env:
-      TDP_FUNCTIONS_PROVISION_ENABLE: true
-      TDP_FUNCTIONS_FAULT_ENABLE: true
-      TDP_MESSAGE_PROVISION_ENABLE: true
-      TDP_MESSAGE_FAULT_ENABLE: true  
-
+- name: PROVISION-TRAZABILIDAD
+  routes:
+  - route: provision-trazabilidad-test.mybluemix.net/
+  memory: 2GB
+  path: target/tdp-provision-1.0.2-SNAPSHOT.jar
+  buildpack: liberty-for-java
+  health-check-type: process
+  disk_quota: 2GB
+  instances: 2
+  env:
+    TDP_FUNCTIONS_PROVISION_ENABLE: true
+    TDP_FUNCTIONS_FAULT_ENABLE: true
+    TDP_MESSAGE_PROVISION_ENABLE: true
+    TDP_MESSAGE_FAULT_ENABLE: true

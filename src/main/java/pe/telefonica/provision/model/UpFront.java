@@ -27,6 +27,9 @@ public class UpFront {
 	@Field("payment_date")
 	private LocalDateTime paymentDate;
 
+	@Field("payment_return")
+	private LocalDateTime paymentReturn;
+
 	public String getCip() {
 		return cip;
 	}
@@ -81,6 +84,14 @@ public class UpFront {
 
 	public void setPaymentDate(LocalDateTime paymentDate) {
 		this.paymentDate = paymentDate;
+	}
+
+	public LocalDateTime getPaymentReturn() {
+		return paymentReturn;
+	}
+
+	public void setPaymentReturn(LocalDateTime paymentReturn) {
+		this.paymentReturn = paymentReturn;
 	}
 
 	@Override

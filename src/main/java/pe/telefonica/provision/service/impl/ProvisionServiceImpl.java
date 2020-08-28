@@ -920,6 +920,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(
 							Status.CANCELADA_ATIS.getStatusName(), statusList);
 
+					LocalDateTime paymentReturn = LocalDateTime.now(ZoneOffset.of("-05:00"));
+
+					paymentReturn.plusDays(15);
+
+					UpFront upFront = provisionx.getUpFront();
+					upFront.setPaymentReturn(paymentReturn);
+
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.CANCELADA_ATIS.getDescription());
 					update.set("generic_speech", finalizado != null ? finalizado.getGenericSpeech()
@@ -934,6 +941,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.CANCELADA_ATIS.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
+					update.set("up_front", upFront);	
 
 				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_DE_VALIDACION.getStatusName())) {
 					PendienteDeValidacion pendienteDeValidacion = new PendienteDeValidacion();

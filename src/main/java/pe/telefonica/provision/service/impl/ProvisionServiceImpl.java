@@ -927,7 +927,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if(upFront != null) {
 						upFront.setPaymentReturn(paymentReturn);
 						
-						update.set("up_front", paymentReturn);	
+						update.set("up_front", upFront);	
 					}
 					
 					

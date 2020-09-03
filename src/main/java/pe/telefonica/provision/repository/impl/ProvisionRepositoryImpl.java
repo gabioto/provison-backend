@@ -383,10 +383,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 * ).and("customer").ne(null)) .limit(5);
 		 */
 
-		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
-				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
-				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
-				.and("customer").ne(null)).limit(5);
+//		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
+//				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
+//				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
+//				.and("customer").ne(null)).limit(5);
 
 		Criteria criteria = new Criteria();
 		criteria.orOperator(
@@ -401,6 +401,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 						.is(Status.WO_NOTDONE.getStatusName()),
 				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status")
 						.is(Status.WO_CANCEL.getStatusName()),
+				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status")
+						.is(Status.WO_COMPLETED.getStatusName()),
 				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status")
 						.is(Status.CANCELADA_ATIS.getStatusName())
 

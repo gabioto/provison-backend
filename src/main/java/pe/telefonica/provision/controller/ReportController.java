@@ -37,16 +37,13 @@ public class ReportController {
 		
 		ApiResponse<Long> apiResponse;
 		HttpStatus status;
-		try {
-			
+		try {			
 			Long provisions = reportService.getProvisionByRegisterDate(request.getBody());
-			
 			
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), status.getReasonPhrase(), null);
-				apiResponse.setBody(provisions);
-			
+				apiResponse.setBody(provisions);			
 			
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -79,4 +76,38 @@ public class ReportController {
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
+	
+	@RequestMapping(value = "/getAllProvision", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<Provision>>> getAllProvisions(
+			@RequestBody @Valid ApiRequest<ReportByRegisterDateRequest> request) {
+		
+		ApiResponse<List<Provision>> apiResponse;
+		HttpStatus status;
+		try {			
+			List<Provision> provisions = reportService.getAllProvisions(request.getBody());
+			
+			if (provisions != null) {
+				status = HttpStatus.OK;
+				
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_ALL_PROVISION, String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody(provisions);
+			} else {				
+				status = HttpStatus.NOT_FOUND;
+
+				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_ALL_PROVISION, String.valueOf(status.value()), "No se encontraron registros", null);
+				apiResponse.setBody(null);
+			}			
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_ALL_PROVISION, String.valueOf(status.value()), ex.getMessage().toString(), null);
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+	
+	
+	
 }

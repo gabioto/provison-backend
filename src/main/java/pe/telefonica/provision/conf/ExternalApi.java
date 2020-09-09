@@ -35,11 +35,19 @@ public class ExternalApi {
 	String cancelLocalSchedule;
 	String searchCustomer;
 
+	String nroDiasVidaProvision;
 	String scheduleGetTechAvailable;
 	String securityGetOAuthToken;
 	String simpliGetUrl;
 	String simpliBaseUrl;
-	String nroDiasVidaProvision;
+
+	public String getNroDiasVidaProvision() {
+		return nroDiasVidaProvision;
+	}
+
+	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
+		this.nroDiasVidaProvision = nroDiasVidaProvision;
+	}
 
 	public String getSecurityUrl() {
 		return securityUrl;
@@ -157,10 +165,6 @@ public class ExternalApi {
 		return simpliBaseUrl;
 	}
 
-	public String getNroDiasVidaProvision() {
-		return nroDiasVidaProvision;
-	}
-
 	public void setSecurityUrl(String securityUrl) {
 		this.securityUrl = securityUrl;
 	}
@@ -275,10 +279,6 @@ public class ExternalApi {
 
 	public void setSimpliBaseUrl(String simpliBaseUrl) {
 		this.simpliBaseUrl = simpliBaseUrl;
-	}
-
-	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
-		this.nroDiasVidaProvision = nroDiasVidaProvision;
 	}
 
 }

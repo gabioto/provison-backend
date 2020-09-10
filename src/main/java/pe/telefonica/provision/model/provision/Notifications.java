@@ -56,6 +56,12 @@ public class Notifications implements Serializable {
 	@Field("cancelada_atis_send_date")
 	private LocalDateTime canceladaAtisSendDate;
 
+	@Field("finalizado_send_notify")
+	private Boolean finalizadoSendNotify = false;
+
+	@Field("finalizado_send_date")
+	private LocalDateTime finalizadoSendDate;
+
 	public Boolean getCaidaSendNotify() {
 		return caidaSendNotify;
 	}
@@ -182,6 +188,22 @@ public class Notifications implements Serializable {
 
 	public void setCanceladaAtisSendDate(LocalDateTime canceladaAtisSendDate) {
 		this.canceladaAtisSendDate = canceladaAtisSendDate;
+	}
+
+	public Boolean getFinalizadoSendNotify() {
+		return finalizadoSendNotify;
+	}
+
+	public LocalDateTime getFinalizadoSendDate() {
+		return finalizadoSendDate;
+	}
+
+	public void setFinalizadoSendNotify(Boolean finalizadoSendNotify) {
+		this.finalizadoSendNotify = finalizadoSendNotify;
+	}
+
+	public void setFinalizadoSendDate(LocalDateTime finalizadoSendDate) {
+		this.finalizadoSendDate = finalizadoSendDate;
 	}
 
 }

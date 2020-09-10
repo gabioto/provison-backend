@@ -390,6 +390,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		Criteria criteria = new Criteria();
 		criteria.orOperator(
+
 				// Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
 				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status")
 						.is(Status.PAGADO.getStatusName()),
@@ -403,6 +404,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 						.is(Status.WO_CANCEL.getStatusName()),
 				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status")
 						.is(Status.WO_COMPLETED.getStatusName()),
+				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status")
+						.is(Status.FINALIZADO.getStatusName()),
+
 				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status")
 						.is(Status.CANCELADA_ATIS.getStatusName())
 
@@ -457,7 +461,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 			if (Status.WO_COMPLETED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.completed_send_notify", true);
+				update.set("notifications.finalizado_send_notify", true);
+
 				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+
 					update.set("notifications.completed_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
@@ -469,7 +476,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				}
 			}
 
+			if (Status.FINALIZADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
+				update.set("notifications.finalizado_send_notify", true);
+				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+					update.set("notifications.finalizado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+				}
+			}
+
 			if (Status.CANCELADA_ATIS.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
+
 				update.set("notifications.cancelada_atis_send_notify", true);
 				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.cancelada_atis_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));

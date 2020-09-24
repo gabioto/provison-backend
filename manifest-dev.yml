@@ -10,3 +10,6 @@ applications:
     env:
       TDP_FUNCTIONS_PROVISION_ENABLE: true
       TDP_FUNCTIONS_FAULT_ENABLE: true
+      TDP_DATA_MONGODB_URI: mongodb://admin:WSSEKLEAQPOSGUEA@portal-ssl1165-48.bmix-dal-yp-475fda4f-3013-4c51-939c-310ac34e7992.3558158292.composedb.com:23243,portal-ssl639-56.bmix-dal-yp-475fda4f-3013-4c51-939c-310ac34e7992.3558158292.composedb.com:23243/compose?authSource=admin&ssl=true
+      TDP_DATA_MONGODB_DATABASE: compose
+      

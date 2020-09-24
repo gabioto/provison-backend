@@ -924,15 +924,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					paymentReturn = paymentReturn.plusDays(15);
 					UpFront upFront = provisionx.getUpFront();
-					if(upFront != null) {
+					if (upFront != null) {
 						upFront.setPaymentReturn(paymentReturn);
-						
-						update.set("up_front", upFront);	
+
+						update.set("up_front", upFront);
 					}
-					
-					
-					
-					
+
 					System.out.println("Hola mundo");
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.CANCELADA_ATIS.getDescription());
@@ -948,7 +945,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.CANCELADA_ATIS.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-					
 
 				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_DE_VALIDACION.getStatusName())) {
 					PendienteDeValidacion pendienteDeValidacion = new PendienteDeValidacion();
@@ -2353,22 +2349,29 @@ public class ProvisionServiceImpl implements ProvisionService {
 						simpliRequest.setDriverUserName(isAvailableTech);
 						simpliRequest.setToken(tokenExternal);
 
-						String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+						int count = 0;
+						int maxTries = 2;
+						
+						while (true) {
+							log.info("Simpli Attempt #" + count);
+							
+							String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
 
-						woPreStart.setTrackingUrl(urlSimpli);
+							if (urlSimpli != null) {
+								// SEND SMS BY CONTACTS
+								woPreStart.setTrackingUrl(urlSimpli);
+								provision.setWoPreStart(woPreStart);
+								sendSMSWoPrestartContact(provision);
 
-						if (urlSimpli != null) {
-							// SEND SMS BY cONTACTS
-							woPreStart.setTrackingUrl(urlSimpli);
-							provision.setWoPreStart(woPreStart);
-							sendSMSWoPrestartContact(provision);
-
-							woPreStart.setAvailableTracking(true);
+								woPreStart.setAvailableTracking(true);
+							} else {
+								if (++count == maxTries)
+									break;
+							}
 						}
-
 					}
-
 				}
+
 				update.set("wo_prestart", woPreStart);
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionRepository.updateProvision(provision, update);

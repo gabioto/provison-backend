@@ -22,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.gson.Gson;
+
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
@@ -32,6 +34,7 @@ import pe.telefonica.provision.controller.request.ContactRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
+import pe.telefonica.provision.controller.request.KafkaTOARequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
@@ -1933,7 +1936,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return true;
 	}
 
-	private boolean validateBuckectProduct(String[] getData, Provision provision) throws Exception {
+	private boolean validateBuckectProduct(KafkaTOARequest kafkaTOARequest, Provision provision) throws Exception {
 		boolean errorBucket = false; // validar IN_TOA
 		// Valida DNI
 		log.info("validateBuckectProduct");
@@ -1947,8 +1950,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
 					+ provision.getCustomer().getDocumentNumber());
 		}
-		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(getData[0] == null ? "" : getData[0])) { // validate bucket and
-			errorBucket = !getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), getData[17]);
+
+		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(kafkaTOARequest.getEventType() == null ? "" : kafkaTOARequest.getEventType())) { // validate bucket and
+			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), kafkaTOARequest.getEvent().getAppointment().getAdditionalData().get(1).getValue());
+
 		}
 
 		return errorBucket;
@@ -2034,29 +2039,42 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
 			throws Exception {
+		
+		
+		KafkaTOARequest kafkaTOARequest = new Gson().fromJson(request.getData(), KafkaTOARequest.class);
+		
+		String getXaRequirementNumber = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(1).getValue();
+		String getXaRequest = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(0).getValue();
+		boolean fromSale = getXaRequirementNumber.startsWith("MT") || getXaRequirementNumber.startsWith("VF");
+
 		boolean bool = false;
 		log.info("ProvisionServiceImpl.provisionUpdateFromTOA()");
 		String[] getData = request.getData().split("\\|", -1);
 		Provision provision = new Provision();
 		// validar si es vf o mt
-		boolean fromSale = xaRequirementNumber.startsWith("MT") || xaRequirementNumber.startsWith("VF");
+		//boolean fromSale = xaRequirementNumber.startsWith("MT") || xaRequirementNumber.startsWith("VF");
 
 		if (!fromSale) {
-			provision = provisionRepository.getByOrderCodeForUpdate(xaRequest);
+			provision = provisionRepository.getByOrderCodeForUpdate(getXaRequest);
 		} else {
 			// Llamar al método de busqueda ficticio
-			provision = provisionRepository.getByOrderCodeForUpdateFicticious(xaRequirementNumber);
+			provision = provisionRepository.getByOrderCodeForUpdateFicticious(getXaRequirementNumber);
 		}
-
+		
 		log.info("Antes de update provision");
-		bool = updateProvision(provision, getData, request, fromSale);
+		bool = updateProvision(provision, kafkaTOARequest, request, fromSale);
 		log.info("Depues de update provision");
 		return bool;
 	}
 
-	private boolean updateProvision(Provision provision, String[] getData, UpdateFromToaRequest request,
+	private boolean updateProvision(Provision provision, KafkaTOARequest kafkaTOARequest, UpdateFromToaRequest request,
 			boolean fromSale) throws Exception {
-
+		
+		String getXaRequest = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(0).getValue();
+		String getXaRequirementNumber = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(1).getValue();
+		String getXaIdSt =  kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(2).getValue();
+		
+		KafkaTOARequest.Event.Appointment appointment =  kafkaTOARequest.getEvent().getAppointment();
 		String speech = "";
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
@@ -2068,7 +2086,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			List<StatusLog> listLog = provision.getLogStatus();
 			log.info("Provision statuslog");
 			// valida Bucket x Producto
-			boolean boolBucket = validateBuckectProduct(getData, provision);
+			boolean boolBucket = validateBuckectProduct(kafkaTOARequest, provision);
 
 			if (boolBucket) {
 				return false;
@@ -2111,7 +2129,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 //				} else if (getData[2].toString().equals("0")
 //						&& (!origin.equalsIgnoreCase("VF") && !origin.equalsIgnoreCase("MT"))) {
-				} else if (getData[2].toString().equals("0") && !fromSale) {
+				} else if (getXaRequest.toString().equals("0") && !fromSale) {
 
 					log.info("IF 2");
 					// IN_TOA Monoproducto
@@ -2127,12 +2145,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.IN_TOA.getStatusName());
 
-					update.set("xa_request", getData[5]);
-					update.set("xa_id_st", getData[4]);
-					update.set("xa_requirement_number", getData[5]);
-					update.set("appt_number", getData[6]);
-					update.set("activity_type", getData[8].toLowerCase());
-					update.set("work_zone", getData[17]);
+					update.set("xa_request", getXaRequirementNumber);
+					update.set("xa_id_st", getXaIdSt);
+					update.set("xa_requirement_number", getXaRequirementNumber);
+					update.set("appt_number", appointment.getId());
+					update.set("activity_type", appointment.getDescription().toLowerCase());
+					update.set("work_zone", appointment.getAdditionalData().get(1).getValue());
 					// update.set("send_notify", false);
 					update.set("notifications.intoa_send_notify", false);
 					listLog.add(statusLog);
@@ -2159,11 +2177,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 					// update.set("xa_creation_date", getData[3]);
 					// SI SMS
 					// update.set("xa_request", getData[2]);
-					update.set("xa_id_st", getData[4]);
-					update.set("xa_requirement_number", getData[5]);
-					update.set("appt_number", getData[6]);
-					update.set("activity_type", getData[8].toLowerCase());
-					update.set("work_zone", getData[17]);
+					update.set("xa_id_st", getXaIdSt);
+					update.set("xa_requirement_number", getXaRequirementNumber);
+					update.set("appt_number", appointment.getId());
+					update.set("activity_type", appointment.getDescription().toLowerCase());
+					update.set("work_zone", appointment.getAdditionalData().get(1).getValue());
 					// update.set("send_notify", false);
 					update.set("notifications.intoa_send_notify", false);
 					update.set("show_location", false);
@@ -2174,12 +2192,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
-					inToa.setXaNote(getData[9]);
-					inToa.setXaCreationDate(getData[3]);
-					inToa.setDate(getData[15]);
-					inToa.setXaScheduler(getData[16]);
-					inToa.setLongitude(getData[18]);
-					inToa.setLatitude(getData[19]);
+					inToa.setXaNote(appointment.getNote().get(0).getText());
+					inToa.setXaCreationDate(appointment.getCreationDate());
+					inToa.setDate(kafkaTOARequest.getEventTime());
+					inToa.setXaScheduler(appointment.getScheduler());
+					inToa.setLongitude(appointment.getRelatedPlace().getCoordinates().getLongitude());
+					inToa.setLatitude(appointment.getRelatedPlace().getCoordinates().getLatitude());
 
 					update.set("in_toa", inToa);
 					update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
@@ -2187,7 +2205,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.IN_TOA.getStatusName());
-					statusLog.setXaidst(getData[4]);
+					statusLog.setXaidst(getXaIdSt);
 
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
 					update.set("generic_speech", inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule()
@@ -2217,7 +2235,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 								StatusLog statusSchedule = new StatusLog();
 								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
-								statusSchedule.setXaidst(getData[4]);
+								statusSchedule.setXaidst(getXaIdSt);
 								statusSchedule.setScheduledDate(listLogx.get(0).getScheduledDate());
 								statusSchedule.setScheduledRange(listLogx.get(0).getScheduledRange());
 								listLog.add(statusSchedule);
@@ -2233,7 +2251,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("UPDATE PSICODEREAL");
 								// update psiCode by schedule
 								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getData[4], getData[8].toLowerCase(),
+										provision.getXaRequest(), getXaIdSt, appointment.getDescription().toLowerCase(),
 										provision.getCustomer());
 
 							}
@@ -2288,34 +2306,35 @@ public class ProvisionServiceImpl implements ProvisionService {
 						statusList);
 
 				Update update = new Update();
-				update.set("external_id", getData[1]);
+				update.set("external_id", appointment.getRelatedParty().get(1).getId());
 				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
 				WoPreStart woPreStart = new WoPreStart();
 
-				String[] technicianInfo = getData[3].split("-");
+				//String[] technicianInfo = getData[3].split("-");
 
-				woPreStart.setNameResource(getData[3]);
-				woPreStart.setDate(getData[4]);
-				woPreStart.setTechnicalId(technicianInfo[0]);
-				woPreStart.setFullName(technicianInfo[1]);
-				woPreStart.setDocumentNumber(getData[9]);
-				woPreStart.setPhoneNumber(getData[10]);
-				woPreStart.setLatitude(getData[14]);
-				woPreStart.setLongitude(getData[13]);
+				woPreStart.setNameResource(appointment.getRelatedParty().get(1).getName());
+				woPreStart.setDate(appointment.getStatusChangeDate());
+				woPreStart.setTechnicalId(appointment.getRelatedParty().get(1).getId());
+				woPreStart.setFullName(appointment.getRelatedParty().get(1).getName());
+				woPreStart.setDocumentNumber(appointment.getRelatedParty().get(1).getLegalId().get(0).getNationalId());
+				woPreStart.setPhoneNumber(appointment.getRelatedParty().get(1).getContactMedium().get(0).getNumber());
+				woPreStart.setLatitude(appointment.getRelatedPlace().getCoordinates().getLatitude());
+				woPreStart.setLongitude(appointment.getRelatedPlace().getCoordinates().getLongitude());
 
-				update.set("activity_type", getData[5].toLowerCase());
-				update.set("xa_id_st", getData[6]);
+				update.set("activity_type", appointment.getDescription().toLowerCase());
+				update.set("xa_id_st", getXaIdSt);
 				update.set("show_location", false);
 				update.set("notifications.prestart_send_notify", false);
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setXaidst(provision.getXaIdSt());
-
-				update.set("customer.latitude", getData[14]);
-				update.set("customer.longitude", getData[13]);
+				
+				
+				update.set("customer.latitude", appointment.getRelatedPlace().getCoordinates().getLatitude());
+				update.set("customer.longitude", appointment.getRelatedPlace().getCoordinates().getLongitude());
 				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
 				update.set("generic_speech", preStartStatus != null ? preStartStatus.getGenericSpeech()
 						: Status.WO_PRESTART.getGenericSpeech());
@@ -2396,18 +2415,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 				WoInit woInit = new WoInit();
 
-				woInit.setNameResource(getData[2]);
-				woInit.setEtaStartTime(getData[3]);
-				woInit.setEtaEndTime(getData[10]);
-				woInit.setXaCreationDate(getData[6]);
-				woInit.setDate(getData[23]);
-				woInit.setXaNote(getData[15]);
+				woInit.setNameResource(appointment.getRelatedParty().get(1).getName());
+				woInit.setEtaStartTime(appointment.getStartDate());
+				woInit.setEtaEndTime(appointment.getEndDate());
+				woInit.setXaCreationDate(appointment.getCreationDate());
+				woInit.setDate(appointment.getStatusChangeDate());
+				woInit.setXaNote(appointment.getNote().get(0).getText());
+				
 				update.set("wo_init", woInit);
 				update.set("show_location", false);
-				update.set("xa_id_st", getData[7]);
-				update.set("xa_requirement_number", getData[8]);
-				update.set("appt_number", getData[9]);
-				update.set("activity_type", getData[14].toLowerCase());
+				update.set("xa_id_st", getXaIdSt);
+				update.set("xa_requirement_number", getXaRequirementNumber);
+				update.set("appt_number", appointment.getId());
+				update.set("activity_type", appointment.getDescription().toLowerCase());
 				update.set("active_status", Constants.PROVISION_STATUS_WOINIT);
 
 				// update.set("xa_request", getData[5]);
@@ -2451,25 +2471,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 				WoCompleted woCompleted = new WoCompleted();
 
-				woCompleted.setXaCreationDate(getData[7]);
-				woCompleted.setDate(getData[4]);
-				woCompleted.setXaNote(getData[14]);
-				woCompleted.setEtaStartTime(getData[2]);
-				woCompleted.setEtaEndTime(getData[3]);
+				woCompleted.setXaCreationDate(appointment.getCreationDate());
+				woCompleted.setDate(appointment.getStatusChangeDate());
+				woCompleted.setXaNote(appointment.getNote().get(0).getText());
+				woCompleted.setEtaStartTime(appointment.getStartDate());
+				woCompleted.setEtaEndTime(appointment.getEndDate());
 
-				woCompleted.setObservation(getData[22]);
-				woCompleted.setReceivePersonName(getData[23]);
-				woCompleted.setReceivePersonId(getData[24]);
-				woCompleted.setRelationship(getData[25]);
+				woCompleted.setObservation(appointment.getStatusChangeDate());
+//				woCompleted.setReceivePersonName(getData[23]);
+//				woCompleted.setReceivePersonId(getData[24]);
+//				woCompleted.setRelationship(getData[25]);
 				update.set("wo_completed", woCompleted);
 
 				update.set("active_status", Constants.PROVISION_STATUS_COMPLETED);
 
 				update.set("show_location", false);
-				update.set("xa_id_st", getData[8]);
-				update.set("xa_requirement_number", getData[9]);
-				update.set("appt_number", getData[10]);
-				update.set("activity_type", getData[13].toLowerCase());
+				update.set("xa_id_st", getXaIdSt);
+				update.set("xa_requirement_number", getXaRequirementNumber);
+				update.set("appt_number", appointment.getId());
+				update.set("activity_type", appointment.getDescription().toLowerCase());
 				update.set("notifications.completed_send_notify", false);
 
 				StatusLog statusLog = new StatusLog();
@@ -2499,7 +2519,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				String xaIdSt = "";
 
 				// se cancela por que se regulariza la ficticia en una real
-				if (getData[16].toString().equals("2")) {
+				if (appointment.getStatusReason().toString().equals("2")) {
 					return false;
 				}
 
@@ -2519,8 +2539,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 
 				WoCancel woCancel = new WoCancel();
-				woCancel.setUserCancel(getData[15]);
-				woCancel.setXaCancelReason(getData[16]);
+				woCancel.setUserCancel(appointment.getRelatedParty().get(2).getId());
+				woCancel.setXaCancelReason(appointment.getStatusReason());
 				update.set("wo_cancel", woCancel);
 				update.set("active_status", Constants.PROVISION_STATUS_CANCELLED);
 
@@ -2529,8 +2549,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setXaidst(xaIdSt);
 
 				update.set("send_notify", false);
-				update.set("xa_cancel_reason", getData[16]);
-				update.set("user_cancel", getData[15]);
+				update.set("xa_cancel_reason", appointment.getStatusReason());
+				update.set("user_cancel", appointment.getRelatedParty().get(2).getId());
 				update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
 				update.set("generic_speech",
 						cancelStatus != null ? cancelStatus.getGenericSpeech() : Status.WO_CANCEL.getGenericSpeech());
@@ -2538,9 +2558,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 						cancelStatus != null ? cancelStatus.getDescription() : Status.WO_CANCEL.getDescription());
 				update.set("front_speech",
 						cancelStatus != null ? cancelStatus.getFront() : Status.WO_CANCEL.getFrontSpeech());
-				update.set("xa_id_st", getData[4]);
-				update.set("xa_requirement_number", getData[5]);
-				update.set("appt_number", getData[6]);
+				update.set("xa_id_st", getXaIdSt);
+				update.set("xa_requirement_number", getXaRequirementNumber);
+				update.set("appt_number", appointment.getId());
 
 				update.set("show_location", false);
 
@@ -2556,8 +2576,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
 				scheduleNotDoneRequest.setStPsiCode(xaIdSt);
 
-				if (getData[4].toString().equals(getData[5].toString())
-						&& getData[5].toString().equals(getData[6].toString())) {
+				if (getXaIdSt.equals(getXaRequirementNumber.toString())
+						&& getXaRequirementNumber.toString().equals(appointment.getId().toString())) {
 					scheduleNotDoneRequest.setFlgFicticious(true);
 					scheduleNotDoneRequest.setRequestType(Constants.ACTIVITY_TYPE_PROVISION.toLowerCase());
 				} else {
@@ -2577,20 +2597,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 				pe.telefonica.provision.model.Status rescheduleStatus = getInfoStatus(Status.SCHEDULED.getStatusName(),
 						statusList);
 
-				String identificadorSt = getData[4].toString();
+				String identificadorSt = getXaIdSt.toString();
 
 				Update update = new Update();
 				WoReshedule woReshedule = new WoReshedule();
 				String range = "AM";
 
-				if (getData[17].toString().trim().equals("09-13") || getData[17].toString().trim().equals("9-13")) {
+				if (appointment.getTimeSlot().trim().equals("09-13") || appointment.getTimeSlot().toString().trim().equals("9-13")) {
 					range = "AM";
 				} else {
 					range = "PM";
 				}
 				String rangeFinal = range;
 
-				String dateString = getData[16];// formateador.format(date);
+				//String dateString = getData[16];// formateador.format(date);
+				String dateString = appointment.getScheduledDate();
 
 				if ((identificadorSt == null || identificadorSt.isEmpty())
 						&& (rangeFinal == null || rangeFinal.isEmpty())
@@ -2621,15 +2642,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 //					return true;
 //				}
 
-				woReshedule.setXaAppointmentScheduler(getData[23]);
+				woReshedule.setXaAppointmentScheduler(appointment.getScheduler());
 				woReshedule.setTimeSlot(range);
 				update.set("wo_schedule", woReshedule);
 				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 
-				update.set("xa_id_st", getData[4]);
-				update.set("xa_requirement_number", getData[5]);
-				update.set("appt_number", getData[6]);
-				update.set("activity_type", getData[8].toLowerCase());
+				update.set("xa_id_st", getXaIdSt);
+				update.set("xa_requirement_number", getXaRequirementNumber);
+				update.set("appt_number", appointment.getId());
+				update.set("activity_type", appointment.getDescription().toLowerCase());
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());
@@ -2637,7 +2658,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setScheduledDate(dateString);
 				statusLog.setXaidst(provision.getXaIdSt());
 
-				update.set("date", getData[16]);
+				update.set("date",appointment.getScheduledDate());
 				update.set("send_notify", false);
 				update.set("time_slot", range);
 				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
@@ -2661,7 +2682,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// el que formatea
 				SimpleDateFormat formateador2 = new SimpleDateFormat("dd/MM/yyyy");
 
-				Date date2 = parseador2.parse(getData[16]);// ("31-03-2016");
+				Date date2 = parseador2.parse(appointment.getScheduledDate());// ("31-03-2016");
 				System.out.println("Fecha de reschedule => " + formateador2.format(date2));
 				String dateString2 = formateador2.format(date2);
 
@@ -2679,7 +2700,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				scheduleRequest.setRequestType(provision.getActivityType());
 				scheduleRequest.setSelectedDate(dateString2);
 				scheduleRequest.setSelectedRange(range);
-				scheduleRequest.setStpsiCode(getData[4]);
+				scheduleRequest.setStpsiCode(getXaIdSt);
 				scheduleRequest.setCustomer(customer);
 
 				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
@@ -2701,20 +2722,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 				Update update = new Update();
 				WoNotdone woNotdone = new WoNotdone();
 
-				woNotdone.setaNotDoneTypeInstall(getData[21]);
-				woNotdone.setaNotDoneReasonInstall(getData[22]);
-				woNotdone.setaNotDoneSubReasonInstall(getData[23]);
-				woNotdone.setaNotDoneTypeRepair(getData[24]);
-				woNotdone.setaNotDoneArea(getData[25]);
-				woNotdone.setaNotDoneReasonRepair(getData[26]);
-				woNotdone.setaObservation(getData[27]);
-				woNotdone.setUserNotdone(getData[28]);
+				woNotdone.setaNotDoneTypeInstall(appointment.getAdditionalData().get(2).getValue());
+				woNotdone.setaNotDoneReasonInstall(appointment.getStatusReason());
+				woNotdone.setaNotDoneSubReasonInstall(appointment.getStatusReason());
+//				woNotdone.setaNotDoneTypeRepair(getData[24]);
+//				woNotdone.setaNotDoneArea(getData[25]);
+//				woNotdone.setaNotDoneReasonRepair(getData[26]);
+				woNotdone.setaObservation(appointment.getNote().get(0).getText());
+				woNotdone.setUserNotdone(appointment.getRelatedParty().get(4).getId());
 
 				update.set("wo_notdone", woNotdone);
-				update.set("xa_id_st", getData[9]);
-				update.set("xa_requirement_number", getData[10]);
-				update.set("appt_number", getData[11]);
-				update.set("activity_type", getData[14].toLowerCase());
+				update.set("xa_id_st", getXaIdSt);
+				update.set("xa_requirement_number", getXaRequirementNumber);
+				update.set("appt_number", appointment.getId());
+				update.set("activity_type", appointment.getDescription());
 
 				update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
 
@@ -2729,8 +2750,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 						? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
 						: speech;
 
-				update.set("a_observation", getData[27]);
-				update.set("user_notdone", getData[28]);
+				update.set("a_observation", appointment.getNote().get(0).getText());
+				update.set("user_notdone", appointment.getRelatedParty().get(4).getId());
 				update.set("last_tracking_status", Status.WO_NOTDONE.getStatusName());
 				update.set("generic_speech", speech);
 				update.set("description_status",

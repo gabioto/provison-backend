@@ -2035,7 +2035,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
+	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request)
 			throws Exception {
 		
 		

@@ -2048,9 +2048,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 		boolean fromSale = getXaRequirementNumber.startsWith("MT") || getXaRequirementNumber.startsWith("VF");
 
 		boolean bool = false;
-		log.info("ProvisionServiceImpl.provisionUpdateFromTOA()");
-		String[] getData = request.getData().split("\\|", -1);
+		
 		Provision provision = new Provision();
+		
 		// validar si es vf o mt
 		//boolean fromSale = xaRequirementNumber.startsWith("MT") || xaRequirementNumber.startsWith("VF");
 

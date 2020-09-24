@@ -853,8 +853,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("description_status", provisionx.getDescriptionStatus());
 				update.set("generic_speech", provisionx.getGenericSpeech());
 				update.set("front_speech", provisionx.getFrontSpeech());
-				update.set("front_speech", provisionx.getFrontSpeech());			
-				
+				update.set("front_speech", provisionx.getFrontSpeech());
+
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
@@ -920,6 +920,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(
 							Status.CANCELADA_ATIS.getStatusName(), statusList);
 
+					LocalDateTime paymentReturn = LocalDateTime.now(ZoneOffset.of("-05:00"));
+
+					paymentReturn = paymentReturn.plusDays(15);
+					UpFront upFront = provisionx.getUpFront();
+					if(upFront != null) {
+						upFront.setPaymentReturn(paymentReturn);
+						
+						update.set("up_front", upFront);	
+					}
+					
+					
+					
+					
+					System.out.println("Hola mundo");
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.CANCELADA_ATIS.getDescription());
 					update.set("generic_speech", finalizado != null ? finalizado.getGenericSpeech()
@@ -934,6 +948,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.CANCELADA_ATIS.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
+					
 
 				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_DE_VALIDACION.getStatusName())) {
 					PendienteDeValidacion pendienteDeValidacion = new PendienteDeValidacion();
@@ -956,7 +971,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("pendiente_de_aprovacion", pendienteDeAprobacion);
 				}
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-				
+
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
 				return isUpdate ? true : false;
 
@@ -1828,7 +1843,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("log_status", listLog);
 
 			provisionRepository.updateProvision(provision, update);
-			
+
 			/**/
 			// Validar si tiene INGRESADO y actualizar agenda
 			if (provision.getLastTrackingStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
@@ -2024,7 +2039,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 		String[] getData = request.getData().split("\\|", -1);
 		Provision provision = new Provision();
 		// validar si es vf o mt
-		if (!xaRequirementNumber.startsWith("MT") && !xaRequirementNumber.startsWith("VF")) {
+		boolean fromSale = xaRequirementNumber.startsWith("MT") || xaRequirementNumber.startsWith("VF");
+
+		if (!fromSale) {
 			provision = provisionRepository.getByOrderCodeForUpdate(xaRequest);
 		} else {
 			// Llamar al método de busqueda ficticio
@@ -2032,13 +2049,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		log.info("Antes de update provision");
-		bool = updateProvision(provision, getData, request);
+		bool = updateProvision(provision, getData, request, fromSale);
 		log.info("Depues de update provision");
 		return bool;
 	}
 
-	private boolean updateProvision(Provision provision, String[] getData, UpdateFromToaRequest request)
-			throws Exception {
+	private boolean updateProvision(Provision provision, String[] getData, UpdateFromToaRequest request,
+			boolean fromSale) throws Exception {
 
 		String speech = "";
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
@@ -2067,9 +2084,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 					: speech;
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-				String origin = getData[6].toString().substring(0, 2);
-				if (getData[2].toString().equals("0")
-						&& (origin.equalsIgnoreCase("VF") || origin.equalsIgnoreCase("MT"))) {
+//				String origin = getData[6].toString().substring(0, 2);
+
+//				if (getData[2].toString().equals("0") && fromSale) {
+				if (fromSale) {
 
 					log.info("IF 1");
 					// IN_TOA fictitious
@@ -2087,12 +2105,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("front_speech",
 							dummyInToa != null ? dummyInToa.getFront() : Status.DUMMY_IN_TOA.getFrontSpeech());
 					update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-					
+
 					provisionRepository.updateProvision(provision, update);
 					return true;
 
-				} else if (getData[2].toString().equals("0")
-						&& (!origin.equalsIgnoreCase("VF") && !origin.equalsIgnoreCase("MT"))) {
+//				} else if (getData[2].toString().equals("0")
+//						&& (!origin.equalsIgnoreCase("VF") && !origin.equalsIgnoreCase("MT"))) {
+				} else if (getData[2].toString().equals("0") && !fromSale) {
 
 					log.info("IF 2");
 					// IN_TOA Monoproducto
@@ -2467,7 +2486,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-				
+
 				provisionRepository.updateProvision(provision, update);
 				return true;
 				/*
@@ -2528,7 +2547,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-				
+
 				// Actualiza estado en provision
 				provisionRepository.updateProvision(provision, update);
 
@@ -2633,7 +2652,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				update.set("show_location", false);
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-				
+
 				// Actualizar provision
 				provisionRepository.updateProvision(provision, update);
 
@@ -2748,7 +2767,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("action_not_done", Constants.DEFAULT_NOTDONE_ACTION);
 				}
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-				
+
 				// Actualiza provision
 				provisionRepository.updateProvision(provision, update);
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();

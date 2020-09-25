@@ -39,7 +39,7 @@ public interface ProvisionService {
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
+	boolean provisionUpdateFromTOA(UpdateFromToaRequest request)
 			throws Exception;
 
 	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;

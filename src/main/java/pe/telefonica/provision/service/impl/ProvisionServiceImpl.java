@@ -927,15 +927,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 					paymentReturn = paymentReturn.plusDays(15);
 					UpFront upFront = provisionx.getUpFront();
-					if(upFront != null) {
+					if (upFront != null) {
 						upFront.setPaymentReturn(paymentReturn);
-						
-						update.set("up_front", upFront);	
+
+						update.set("up_front", upFront);
 					}
-					
-					
-					
-					
+
 					System.out.println("Hola mundo");
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.CANCELADA_ATIS.getDescription());
@@ -951,7 +948,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.CANCELADA_ATIS.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-					
 
 				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_DE_VALIDACION.getStatusName())) {
 					PendienteDeValidacion pendienteDeValidacion = new PendienteDeValidacion();
@@ -1597,87 +1593,99 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
 
 		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
+		int count = 0;
+		int maxTries = 2;
 
-		try {
-			if (provision != null) {
-				List<ContactRequest> listContact = request.getContacts();
-				List<Contacts> contactsList = new ArrayList<>();
+		while (true) {
+			try {
+				log.info("Attempt times: " + (count + 1));
 
-				if (request.isHolderWillReceive()) {
-					ContactRequest contactRequest = new ContactRequest();
-					contactRequest.setFullName(provision.getCustomer().getName());
-					contactRequest.setPhoneNumber((provision.getCustomer().getPhoneNumber() != null
-							&& !provision.getCustomer().getPhoneNumber().isEmpty())
-									? Integer.valueOf(provision.getCustomer().getPhoneNumber())
-									: 0);
-					request.getContacts().clear();
-					request.getContacts().add(contactRequest);
-				}
+				if (provision != null) {
+					List<ContactRequest> listContact = request.getContacts();
+					List<Contacts> contactsList = new ArrayList<>();
 
-				for (int a = 0; a < request.getContacts().size(); a++) {
-					Contacts contacts = new Contacts();
-					contacts.setFullName(listContact.get(a).getFullName());
-					contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
-					boolean isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
-					contacts.setCarrier(isMovistar);
-					contactsList.add(contacts);
-
-					if (a == 0) {
-						psiRequest.getBodyUpdateClient().setNombre_completo(listContact.get(a).getFullName());
-						psiRequest.getBodyUpdateClient().setTelefono1(listContact.get(a).getPhoneNumber().toString());
+					if (request.isHolderWillReceive()) {
+						ContactRequest contactRequest = new ContactRequest();
+						contactRequest.setFullName(provision.getCustomer().getName());
+						contactRequest.setPhoneNumber((provision.getCustomer().getPhoneNumber() != null
+								&& !provision.getCustomer().getPhoneNumber().isEmpty())
+										? Integer.valueOf(provision.getCustomer().getPhoneNumber())
+										: 0);
+						request.getContacts().clear();
+						request.getContacts().add(contactRequest);
 					}
 
-					if (a == 1) {
-						psiRequest.getBodyUpdateClient().setNombre_completo2(listContact.get(a).getFullName());
-						psiRequest.getBodyUpdateClient().setTelefono2(listContact.get(a).getPhoneNumber().toString());
+					for (int a = 0; a < request.getContacts().size(); a++) {
+						Contacts contacts = new Contacts();
+						contacts.setFullName(listContact.get(a).getFullName());
+						contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
+						boolean isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
+						contacts.setCarrier(isMovistar);
+						contactsList.add(contacts);
+
+						if (a == 0) {
+							psiRequest.getBodyUpdateClient().setNombre_completo(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono1(listContact.get(a).getPhoneNumber().toString());
+						}
+
+						if (a == 1) {
+							psiRequest.getBodyUpdateClient().setNombre_completo2(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono2(listContact.get(a).getPhoneNumber().toString());
+						}
+
+						if (a == 2) {
+							psiRequest.getBodyUpdateClient().setNombre_completo3(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono3(listContact.get(a).getPhoneNumber().toString());
+						}
+
+						if (a == 3) {
+							psiRequest.getBodyUpdateClient().setNombre_completo4(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono4(listContact.get(a).getPhoneNumber().toString());
+						}
+
 					}
 
-					if (a == 2) {
-						psiRequest.getBodyUpdateClient().setNombre_completo3(listContact.get(a).getFullName());
-						psiRequest.getBodyUpdateClient().setTelefono3(listContact.get(a).getPhoneNumber().toString());
+					psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
+					psiRequest.getBodyUpdateClient().setCorreo(
+							provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
+
+					System.out.println(provision.getCustomer().getMail());
+
+					boolean updatedPsi = restPSI.updatePSIClient(psiRequest);
+
+					if (updatedPsi) {
+						Update update = new Update();
+						update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
+						provisionRepository.updateProvision(provision, update);
+
+						if (provision.getContacts() != null) {
+							provision.getContacts().clear();
+						}
+
+						provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
+
+						// if (!request.isHolderWillReceive()) {
+						// sendInfoUpdateSMS(provision);
+						// sendContactInfoChangedMail(provision);
+						// }
+					} else {
+						throw new Exception();
 					}
 
-					if (a == 3) {
-						psiRequest.getBodyUpdateClient().setNombre_completo4(listContact.get(a).getFullName());
-						psiRequest.getBodyUpdateClient().setTelefono4(listContact.get(a).getPhoneNumber().toString());
-					}
+					return provision;
 
-				}
-
-				psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
-				psiRequest.getBodyUpdateClient()
-						.setCorreo(provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
-
-				System.out.println(provision.getCustomer().getMail());
-
-				boolean updatedPsi = restPSI.updatePSIClient(psiRequest);
-
-				if (updatedPsi) {
-					Update update = new Update();
-					update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
-					provisionRepository.updateProvision(provision, update);
-
-					if (provision.getContacts() != null) {
-						provision.getContacts().clear();
-					}
-
-					provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
-
-					// if (!request.isHolderWillReceive()) {
-					// sendInfoUpdateSMS(provision);
-					// sendContactInfoChangedMail(provision);
-					// }
 				} else {
-					throw new Exception();
+					return null;
 				}
-
-				return provision;
-
-			} else {
-				return null;
+			} catch (Exception e) {
+				if (++count == maxTries) {
+					throw e;
+				}
 			}
-		} catch (Exception e) {
-			throw e;
 		}
 	}
 
@@ -2372,22 +2380,29 @@ public class ProvisionServiceImpl implements ProvisionService {
 						simpliRequest.setDriverUserName(isAvailableTech);
 						simpliRequest.setToken(tokenExternal);
 
-						String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+						int count = 0;
+						int maxTries = 2;
 
-						woPreStart.setTrackingUrl(urlSimpli);
+						while (true) {
+							log.info("Simpli Attempt #" + count);
 
-						if (urlSimpli != null) {
-							// SEND SMS BY cONTACTS
-							woPreStart.setTrackingUrl(urlSimpli);
-							provision.setWoPreStart(woPreStart);
-							sendSMSWoPrestartContact(provision);
+							String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
 
-							woPreStart.setAvailableTracking(true);
+							if (urlSimpli != null) {
+								// SEND SMS BY CONTACTS
+								woPreStart.setTrackingUrl(urlSimpli);
+								provision.setWoPreStart(woPreStart);
+								sendSMSWoPrestartContact(provision);
+
+								woPreStart.setAvailableTracking(true);
+							} else {
+								if (++count == maxTries)
+									break;
+							}
 						}
-
 					}
-
 				}
+
 				update.set("wo_prestart", woPreStart);
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionRepository.updateProvision(provision, update);

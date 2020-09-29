@@ -2363,8 +2363,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 						int count = 0;
 						int maxTries = 2;
+						boolean needSend = true;
 
-						while (true) {
+						while (needSend) {
 							log.info("Simpli Attempt #" + count);
 
 							String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
@@ -2380,6 +2381,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 								if (++count == maxTries)
 									break;
 							}
+							
+							needSend = false;
 						}
 					}
 				}

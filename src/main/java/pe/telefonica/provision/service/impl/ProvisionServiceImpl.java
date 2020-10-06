@@ -1951,7 +1951,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					+ provision.getCustomer().getDocumentNumber());
 		}
 		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(kafkaTOARequest.getEventType() == null ? "" : kafkaTOARequest.getEventType())) { // validate bucket and
-			errorBucket = getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), kafkaTOARequest.getEvent().getAppointment().getAdditionalData().get(1).getValue());
+			errorBucket = !getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), kafkaTOARequest.getEvent().getAppointment().getAdditionalData().get(1).getValue());
 		}
 
 		return errorBucket;

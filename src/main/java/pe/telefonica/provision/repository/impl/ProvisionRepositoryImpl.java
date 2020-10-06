@@ -383,27 +383,34 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 * ).and("customer").ne(null)) .limit(5);
 		 */
 
-		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
-				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
-				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
-				.and("customer").ne(null)).limit(5);
+//		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
+//				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
+//				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
+//				.and("customer").ne(null)).limit(5);
 
 		Criteria criteria = new Criteria();
 		criteria.orOperator(
 
-				//Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
-				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status").is(Status.PAGADO.getStatusName()),
-				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.IN_TOA.getStatusName()),
-				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
-				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
-				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName()),
-				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status").is(Status.WO_COMPLETED.getStatusName()),
-				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status").is(Status.FINALIZADO.getStatusName()),
-				
-				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status").is(Status.CANCELADA_ATIS.getStatusName())
-				
-				).and("customer").ne(null).and("notifications").ne(null);
-		
+				// Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
+				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status")
+						.is(Status.PAGADO.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status")
+						.is(Status.IN_TOA.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status")
+						.is(Status.SCHEDULED.getStatusName()),
+				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status")
+						.is(Status.WO_NOTDONE.getStatusName()),
+				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status")
+						.is(Status.WO_CANCEL.getStatusName()),
+				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status")
+						.is(Status.WO_COMPLETED.getStatusName()),
+				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status")
+						.is(Status.FINALIZADO.getStatusName()),
+
+				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status")
+						.is(Status.CANCELADA_ATIS.getStatusName())
+
+		).and("customer").ne(null).and("notifications").ne(null);
 
 		Query query = new Query(criteria).limit(5);
 
@@ -468,10 +475,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update.set("notifications.cancel_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
-			
-			if (Status.FINALIZADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+
+			if (Status.FINALIZADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.finalizado_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.finalizado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}

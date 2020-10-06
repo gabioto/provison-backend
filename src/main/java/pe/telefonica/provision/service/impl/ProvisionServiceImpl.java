@@ -2070,7 +2070,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		
 		String getXaRequest = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(0).getValue();
 		String getXaRequirementNumber = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(1).getValue();
-		String getXaIdSt =  kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(2).getValue();
+		String getXaIdSt =  kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(5).getValue();
 		
 		KafkaTOARequest.Event.Appointment appointment =  kafkaTOARequest.getEvent().getAppointment();
 		String speech = "";

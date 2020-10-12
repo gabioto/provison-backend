@@ -3,6 +3,7 @@ package pe.telefonica.provision.service.impl;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+
+import javax.swing.text.DateFormatter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1932,7 +1935,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionRepository.insertProvision(provisionAdd);
 
 		}
-
+	
 		return true;
 	}
 
@@ -2051,7 +2054,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		
 		// validar si es vf o mt
 		//boolean fromSale = xaRequirementNumber.startsWith("MT") || xaRequirementNumber.startsWith("VF");
-
+	
 		if (!fromSale) {
 			provision = provisionRepository.getByOrderCodeForUpdate(getXaRequest);
 		} else {
@@ -2609,7 +2612,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				String rangeFinal = range;
 
 				//String dateString = getData[16];// formateador.format(date);
-				String dateString = appointment.getScheduledDate();
+				String dateString = appointment.getScheduledDate().substring(0, 10);
 
 				if ((identificadorSt == null || identificadorSt.isEmpty())
 						&& (rangeFinal == null || rangeFinal.isEmpty())
@@ -2627,9 +2630,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 				List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()))
 						.collect(Collectors.toList());
+				
+				//FORMATER SCHEDULE DATE
+				String dateSchedule = dateString;
+				
+				
+				
+//				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.of("-05:00"));
+//				LocalDateTime dateTime = LocalDateTime.parse(dateSchedule, formatter);		
 
+				
+				
+				
 				if (listLogx.size() > 0) {
-					if (listLogx.get(listLogx.size() - 1).getScheduledDate().contentEquals(dateString)
+					if (listLogx.get(listLogx.size() - 1).getScheduledDate().contentEquals(dateString.toString())
 							&& listLogx.get(listLogx.size() - 1).getScheduledRange().contentEquals(rangeFinal)) {
 						return true;
 					}
@@ -2653,7 +2667,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.SCHEDULED.getStatusName());
 				statusLog.setScheduledRange(rangeFinal);
-				statusLog.setScheduledDate(dateString);
+				statusLog.setScheduledDate(dateString.toString());
 				statusLog.setXaidst(provision.getXaIdSt());
 
 				update.set("date",appointment.getScheduledDate());

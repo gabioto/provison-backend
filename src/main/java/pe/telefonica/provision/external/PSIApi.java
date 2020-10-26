@@ -137,8 +137,8 @@ public class PSIApi extends ConfigRestTemplate {
 			 * PSIUpdateClientResponse.class);
 			 */
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request),
-					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(entity.getBody()),
+					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour, endHour, responseEntity.getStatusCodeValue());
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
@@ -149,8 +149,8 @@ public class PSIApi extends ConfigRestTemplate {
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request),
-					ex.getResponseBodyAsString(), requestUrl, startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(entity.getBody()),
+					ex.getResponseBodyAsString(), requestUrl, startHour, endHour, ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 			System.out.println(jsonDecode);
@@ -165,8 +165,8 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(request), ex.getMessage(),
-					requestUrl, startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(entity.getBody()), ex.getMessage(),
+					requestUrl, startHour, endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
@@ -271,44 +271,44 @@ public class PSIApi extends ConfigRestTemplate {
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 
+		JsonObject jsonBody = new JsonObject();
+		JsonObject jsonTefHeaderReq = new JsonObject();
+		JsonObject jsonSearchCustomer = new JsonObject();
+		JsonObject jsonCustomerId = new JsonObject();
+		JsonObject jsonTelephoneNumber = new JsonObject();
+		jsonTefHeaderReq.addProperty("userLogin", "10223928");
+		jsonTefHeaderReq.addProperty("serviceChannel", "MS");
+		jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
+		jsonTefHeaderReq.addProperty("application", "COLTRA");
+		jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
+		jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
+		jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
+		jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
+		jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
+		jsonTefHeaderReq.addProperty("version", "1.0");
+
+		jsonTelephoneNumber.addProperty("number", phoneNumber);
+		jsonCustomerId.add("telephoneNumber", jsonTelephoneNumber);
+		jsonSearchCustomer.add("customerIdentification", jsonCustomerId);
+
+		jsonBody.add("TefHeaderReq", jsonTefHeaderReq);
+		jsonBody.add("SearchCustomerRequestData", jsonSearchCustomer);
+
+		Gson gson = new Gson();
+		input = gson.toJson(jsonBody);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("X-IBM-Client-Id", api.getCustomerSearchClient());
+		headers.set("X-IBM-Client-Secret", api.getCustomerSearchSecret());
+			
+		HttpEntity<String> entity = new HttpEntity<>(input, headers);
+		
 		try {
-			JsonObject jsonBody = new JsonObject();
-			JsonObject jsonTefHeaderReq = new JsonObject();
-			JsonObject jsonSearchCustomer = new JsonObject();
-			JsonObject jsonCustomerId = new JsonObject();
-			JsonObject jsonTelephoneNumber = new JsonObject();
-			jsonTefHeaderReq.addProperty("userLogin", "10223928");
-			jsonTefHeaderReq.addProperty("serviceChannel", "MS");
-			jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
-			jsonTefHeaderReq.addProperty("application", "COLTRA");
-			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
-			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
-			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
-			jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
-			jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
-			jsonTefHeaderReq.addProperty("version", "1.0");
-
-			jsonTelephoneNumber.addProperty("number", phoneNumber);
-			jsonCustomerId.add("telephoneNumber", jsonTelephoneNumber);
-			jsonSearchCustomer.add("customerIdentification", jsonCustomerId);
-
-			jsonBody.add("TefHeaderReq", jsonTefHeaderReq);
-			jsonBody.add("SearchCustomerRequestData", jsonSearchCustomer);
-
-			Gson gson = new Gson();
-			input = gson.toJson(jsonBody);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.set("X-IBM-Client-Id", api.getCustomerSearchClient());
-			headers.set("X-IBM-Client-Secret", api.getCustomerSearchSecret());
-
-			HttpEntity<String> entity = new HttpEntity<>(input, headers);
-
 			ResponseEntity<String> output = restTemplate.postForEntity(requestUrl, entity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output.getBody(), requestUrl, startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "getCarrier", entity.getBody(), output.getBody(), requestUrl, startHour, endHour, output.getStatusCodeValue());
 
 			JsonElement jsonElement = gson.fromJson(output.getBody(), JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
@@ -322,8 +322,8 @@ public class PSIApi extends ConfigRestTemplate {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(), requestUrl, startHour,
-					endHour);
+			loggerApi.thirdLogEvent("PSI", "getCarrier", entity.getBody(), e.getLocalizedMessage(), requestUrl, startHour,
+					endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return false;
 		}
 	}

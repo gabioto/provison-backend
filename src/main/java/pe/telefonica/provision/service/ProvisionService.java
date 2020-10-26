@@ -24,6 +24,7 @@ public interface ProvisionService {
 	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
 
 	Provision getProvisionBySaleCode(String saleCode);
+	
 
 	List<ProvisionDto> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 	

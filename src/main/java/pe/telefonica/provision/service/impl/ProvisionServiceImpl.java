@@ -2192,7 +2192,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("xa_requirement_number", getXaRequirementNumber);
 					update.set("appt_number", appointment.getId());
 					update.set("activity_type", appointment.getDescription().toLowerCase());
-					update.set("work_zone", appointment.getAdditionalData().get(2).getValue());
+					update.set("work_zone", appointment.getAdditionalData().get(1).getValue());
 					// update.set("send_notify", false);
 					update.set("notifications.intoa_send_notify", false);
 					update.set("show_location", false);

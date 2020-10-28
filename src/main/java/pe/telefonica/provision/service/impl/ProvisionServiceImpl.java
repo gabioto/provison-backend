@@ -1943,7 +1943,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionRepository.insertProvision(provisionAdd);
 
 		}
-	
+
 		return true;
 	}
 
@@ -1961,8 +1961,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
 					+ provision.getCustomer().getDocumentNumber());
 		}
-		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(kafkaTOARequest.getEventType() == null ? "" : kafkaTOARequest.getEventType())) { // validate bucket and
-			errorBucket = !getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(), kafkaTOARequest.getEvent().getAppointment().getAdditionalData().get(1).getValue());
+		if (Constants.STATUS_IN_TOA
+				.equalsIgnoreCase(kafkaTOARequest.getEventType() == null ? "" : kafkaTOARequest.getEventType())) { // validate
+																													// bucket
+																													// and
+			errorBucket = !getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(),
+					kafkaTOARequest.getEvent().getAppointment().getAdditionalData().get(1).getValue());
 		}
 
 		return errorBucket;
@@ -2046,30 +2050,31 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request)
-			throws Exception {
-		
-		
+	public boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception {
+
 		KafkaTOARequest kafkaTOARequest = new Gson().fromJson(request.getData(), KafkaTOARequest.class);
-		
-		String getXaRequirementNumber = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(1).getValue();
-		String getXaRequest = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(0).getValue();
+
+		String getXaRequirementNumber = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0)
+				.getAdditionalData().get(1).getValue();
+		String getXaRequest = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData()
+				.get(0).getValue();
 		boolean fromSale = getXaRequirementNumber.startsWith("MT") || getXaRequirementNumber.startsWith("VF");
 
 		boolean bool = false;
-		
+
 		Provision provision = new Provision();
-		
+
 		// validar si es vf o mt
-		//boolean fromSale = xaRequirementNumber.startsWith("MT") || xaRequirementNumber.startsWith("VF");
-	
+		// boolean fromSale = xaRequirementNumber.startsWith("MT") ||
+		// xaRequirementNumber.startsWith("VF");
+
 		if (!fromSale) {
 			provision = provisionRepository.getByOrderCodeForUpdate(getXaRequest);
 		} else {
 			// Llamar al método de busqueda ficticio
 			provision = provisionRepository.getByOrderCodeForUpdateFicticious(getXaRequirementNumber);
 		}
-		
+
 		log.info("Antes de update provision");
 		bool = updateProvision(provision, kafkaTOARequest, request, fromSale);
 		log.info("Depues de update provision");
@@ -2078,12 +2083,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private boolean updateProvision(Provision provision, KafkaTOARequest kafkaTOARequest, UpdateFromToaRequest request,
 			boolean fromSale) throws Exception {
-		
-		String getXaRequest = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(0).getValue();
-		String getXaRequirementNumber = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(1).getValue();
-		String getXaIdSt =  kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData().get(5).getValue();
-		
-		KafkaTOARequest.Event.Appointment appointment =  kafkaTOARequest.getEvent().getAppointment();
+
+		String getXaRequest = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData()
+				.get(0).getValue();
+		String getXaRequirementNumber = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0)
+				.getAdditionalData().get(1).getValue();
+		String getXaIdSt = kafkaTOARequest.getEvent().getAppointment().getRelatedObject().get(0).getAdditionalData()
+				.get(5).getValue();
+
+		KafkaTOARequest.Event.Appointment appointment = kafkaTOARequest.getEvent().getAppointment();
 		String speech = "";
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
@@ -2198,6 +2206,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("has_schedule", false);
 					}
 
+					update.set("wo_prestart.available_tracking", false);
+					update.set("wo_prestart.tracking_url", null);
 					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
@@ -2321,7 +2331,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				WoPreStart woPreStart = new WoPreStart();
 
-				//String[] technicianInfo = getData[3].split("-");
+				// String[] technicianInfo = getData[3].split("-");
 
 				woPreStart.setNameResource(appointment.getRelatedParty().get(1).getName());
 				woPreStart.setDate(appointment.getStatusChangeDate());
@@ -2340,8 +2350,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 				statusLog.setXaidst(provision.getXaIdSt());
-				
-				
+
 				update.set("customer.latitude", appointment.getRelatedPlace().getCoordinates().getLatitude());
 				update.set("customer.longitude", appointment.getRelatedPlace().getCoordinates().getLongitude());
 				update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
@@ -2355,6 +2364,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				// Job Woprestart
+
 				woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 				if (nowDate.getHour() > 8 && nowDate.getHour() < 23) {
@@ -2363,42 +2373,45 @@ public class ProvisionServiceImpl implements ProvisionService {
 					sendSMSWoPrestartHolder(provision);
 					update.set("notifications.prestart_send_notify", true);
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+					
+					if (Boolean.valueOf(System.getenv("TDP_SIMPLI_ENABLE"))) {
+						String tokenExternal = trazabilidadSecurityApi.gerateToken();
+						// validate TechAvailable
+						GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
+						getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
 
-					String tokenExternal = trazabilidadSecurityApi.gerateToken();
-					// validate TechAvailable
-					GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
-					getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
+						String isAvailableTech = trazabilidadScheduleApi
+								.getTechAvailable(getTechnicianAvailableRequest);
+						if (isAvailableTech != null) {
+							sendEmailToCustomer(provision.getCustomer(), woPreStart);
 
-					String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
-					if (isAvailableTech != null) {
-						sendEmailToCustomer(provision.getCustomer(), woPreStart);
+							SimpliRequest simpliRequest = new SimpliRequest();
+							simpliRequest.setLatitude(woPreStart.getLatitude());
+							simpliRequest.setLongitude(woPreStart.getLongitude());
+							simpliRequest.setVisitTitle(woPreStart.getFullName());
+							simpliRequest.setVisitAddress(provision.getCustomer().getAddress());
+							simpliRequest.setDriverUserName(isAvailableTech);
+							simpliRequest.setToken(tokenExternal);
 
-						SimpliRequest simpliRequest = new SimpliRequest();
-						simpliRequest.setLatitude(woPreStart.getLatitude());
-						simpliRequest.setLongitude(woPreStart.getLongitude());
-						simpliRequest.setVisitTitle(woPreStart.getFullName());
-						simpliRequest.setVisitAddress(provision.getCustomer().getAddress());
-						simpliRequest.setDriverUserName(isAvailableTech);
-						simpliRequest.setToken(tokenExternal);
+							int count = 0;
+							int maxTries = 2;
 
-						int count = 0;
-						int maxTries = 2;
+							while (true) {
+								log.info("Simpli Attempt #" + count);
 
-						while (true) {
-							log.info("Simpli Attempt #" + count);
+								String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
 
-							String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+								if (urlSimpli != null) {
+									// SEND SMS BY CONTACTS
+									woPreStart.setTrackingUrl(urlSimpli);
+									provision.setWoPreStart(woPreStart);
+									sendSMSWoPrestartContact(provision);
 
-							if (urlSimpli != null) {
-								// SEND SMS BY CONTACTS
-								woPreStart.setTrackingUrl(urlSimpli);
-								provision.setWoPreStart(woPreStart);
-								sendSMSWoPrestartContact(provision);
-
-								woPreStart.setAvailableTracking(true);
-							} else {
-								if (++count == maxTries)
-									break;
+									woPreStart.setAvailableTracking(true);
+								} else {
+									if (++count == maxTries)
+										break;
+								}
 							}
 						}
 					}
@@ -2437,7 +2450,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woInit.setXaCreationDate(appointment.getCreationDate());
 				woInit.setDate(appointment.getStatusChangeDate());
 				woInit.setXaNote(appointment.getNote().get(0).getText());
-				
+
 				update.set("wo_init", woInit);
 				update.set("show_location", false);
 				update.set("xa_id_st", getXaIdSt);
@@ -2619,14 +2632,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 				WoReshedule woReshedule = new WoReshedule();
 				String range = "AM";
 
-				if (appointment.getTimeSlot().trim().equals("09-13") || appointment.getTimeSlot().toString().trim().equals("9-13")) {
+				if (appointment.getTimeSlot().trim().equals("09-13")
+						|| appointment.getTimeSlot().toString().trim().equals("9-13")) {
 					range = "AM";
 				} else {
 					range = "PM";
 				}
 				String rangeFinal = range;
 
-				//String dateString = getData[16];// formateador.format(date);
+				// String dateString = getData[16];// formateador.format(date);
 				String dateString = appointment.getScheduledDate().substring(0, 10);
 
 				if ((identificadorSt == null || identificadorSt.isEmpty())
@@ -2645,18 +2659,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 				List<StatusLog> listLogx = listLog.stream()
 						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()))
 						.collect(Collectors.toList());
-				
-				//FORMATER SCHEDULE DATE
+
+				// FORMATER SCHEDULE DATE
 				String dateSchedule = dateString;
-				
-				
-				
+
 //				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.of("-05:00"));
 //				LocalDateTime dateTime = LocalDateTime.parse(dateSchedule, formatter);		
 
-				
-				
-				
 				if (listLogx.size() > 0) {
 					if (listLogx.get(listLogx.size() - 1).getScheduledDate().contentEquals(dateString.toString())
 							&& listLogx.get(listLogx.size() - 1).getScheduledRange().contentEquals(rangeFinal)) {
@@ -2685,7 +2694,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				statusLog.setScheduledDate(dateString.toString());
 				statusLog.setXaidst(provision.getXaIdSt());
 
-				update.set("date",appointment.getScheduledDate());
+				update.set("date", appointment.getScheduledDate());
 				update.set("send_notify", false);
 				update.set("time_slot", range);
 				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());

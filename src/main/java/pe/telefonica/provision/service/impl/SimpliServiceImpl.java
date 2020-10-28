@@ -35,6 +35,7 @@ public class SimpliServiceImpl implements SimpliService {
 			Update update = new Update();
 			update.set("wo_prestart.tracking_url", request.getTracking());
 			update.set("wo_prestart.available_tracking", true);
+			update.set("wo_prestart.eta", request.getEta());
 			
 			boolean updated = provisionRepository.updateProvision(provision, update);
 			if(updated) {

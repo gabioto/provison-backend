@@ -42,8 +42,7 @@ public class SimpliController {
 		SimpliUrlResponse simpliUrlResponse = new SimpliUrlResponse();
 		SimpliUrlResponse.Body body = new SimpliUrlResponse.Body();
 		SimpliUrlResponse.Header header =  new SimpliUrlResponse.Header();
-		System.out.println(UNICA_ServiceId);
-		System.out.println(UNICA_PID);
+		
 		HttpStatus status;
 		
 		header.setUNICA_ServiceId(UNICA_ServiceId.toString());

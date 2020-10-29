@@ -44,7 +44,7 @@ public class WoPreStart implements Serializable {
 	private Boolean availableTracking = false;
 
 	@Field("eta")
-	private Boolean eta;
+	private String eta;
 
 	@Field("register_date")
 	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -129,11 +129,11 @@ public class WoPreStart implements Serializable {
 		this.availableTracking = availableTracking;
 	}
 
-	public Boolean getEta() {
+	public String getEta() {
 		return eta;
 	}
 
-	public void setEta(Boolean eta) {
+	public void setEta(String eta) {
 		this.eta = eta;
 	}
 

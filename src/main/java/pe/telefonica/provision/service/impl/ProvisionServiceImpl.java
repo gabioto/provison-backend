@@ -3,7 +3,6 @@ package pe.telefonica.provision.service.impl;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,8 +13,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-
-import javax.swing.text.DateFormatter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -2331,7 +2328,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
-				WoPreStart woPreStart = new WoPreStart();
+				WoPreStart woPreStart = provision.getWoPreStart() != null ? provision.getWoPreStart()
+						: new WoPreStart();
 
 				// String[] technicianInfo = getData[3].split("-");
 
@@ -2376,7 +2374,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("notifications.prestart_send_notify", true);
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 
-					
 					if (Boolean.valueOf(System.getenv("TDP_SIMPLI_ENABLE"))) {
 						String tokenExternal = trazabilidadSecurityApi.gerateToken();
 						// validate TechAvailable
@@ -2667,7 +2664,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						.collect(Collectors.toList());
 
 				// FORMATER SCHEDULE DATE
-				String dateSchedule = dateString;
+//				String dateSchedule = dateString;
 
 //				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.of("-05:00"));
 //				LocalDateTime dateTime = LocalDateTime.parse(dateSchedule, formatter);		

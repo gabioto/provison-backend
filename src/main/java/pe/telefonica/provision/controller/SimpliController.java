@@ -13,15 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import pe.telefonica.provision.controller.common.ApiRequest;
-import pe.telefonica.provision.controller.common.ApiResponse;
-import pe.telefonica.provision.controller.request.rating.SetRatingRequest;
 import pe.telefonica.provision.controller.request.simpli.SetSimpliUrlRequest;
 import pe.telefonica.provision.controller.response.simpli.SimpliUrlResponse;
-import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.service.SimpliService;
-import pe.telefonica.provision.util.constants.Constants;
 
 @RestController
 @CrossOrigin(origins = "*")

@@ -7,38 +7,34 @@ import org.springframework.stereotype.Service;
 import pe.telefonica.provision.controller.request.simpli.SetSimpliUrlRequest;
 import pe.telefonica.provision.controller.response.simpli.SimpliUrlResponse;
 import pe.telefonica.provision.model.Provision;
-
-import pe.telefonica.provision.service.SimpliService;
-import pe.telefonica.provision.repository.RatingRepository;
 import pe.telefonica.provision.repository.ProvisionRepository;
+import pe.telefonica.provision.service.SimpliService;
 
 @Service
 public class SimpliServiceImpl implements SimpliService {
 
 	@Autowired
-	private RatingRepository ratingRepository;
-
-	@Autowired
 	private ProvisionRepository provisionRepository;
-
 
 	@Override
 	public SimpliUrlResponse setSimpliUrl(SetSimpliUrlRequest request) {
-		
+
 		SimpliUrlResponse simpliUrlResponse = new SimpliUrlResponse();
 		SimpliUrlResponse.Body body = new SimpliUrlResponse.Body();
-		
-		Provision provision = provisionRepository.getProvisionByXaRequest(request.getXa_peticion());
-		
+		String xaRequest = !request.getXa_peticion().equals("0") ? request.getXa_peticion()
+				: request.getXa_requirement_number();
+
+		Provision provision = provisionRepository.getProvisionByXaRequest(xaRequest);
+
 		body.setAPPT_Numer(request.getAppt_number());
-		if(provision != null) {
+		if (provision != null) {
 			Update update = new Update();
 			update.set("wo_prestart.tracking_url", request.getTracking());
 			update.set("wo_prestart.available_tracking", true);
 			update.set("wo_prestart.eta", request.getEta());
-			
+
 			boolean updated = provisionRepository.updateProvision(provision, update);
-			if(updated) {
+			if (updated) {
 				body.setStatus("OK");
 			} else {
 				body.setStatus("FAILED_UPDATE");
@@ -46,10 +42,10 @@ public class SimpliServiceImpl implements SimpliService {
 		} else {
 			body.setStatus("REGISTER_DOES_NOT_ EXIST");
 		}
-		
+
 		simpliUrlResponse.setBody(body);
 		return simpliUrlResponse;
-		
+
 	}
 
 }

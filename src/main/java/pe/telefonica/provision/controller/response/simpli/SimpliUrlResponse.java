@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,8 +28,8 @@ public class SimpliUrlResponse {
 	@AllArgsConstructor
 	@EqualsAndHashCode(callSuper = false)
 	public static class Body {
-		private String APPT_Numer;
-		private String status;
+		private String apptNumber;
+		private String Status;
 
 	}
 }

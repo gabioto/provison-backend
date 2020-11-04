@@ -43,7 +43,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private ExternalApi api;
-
+	
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -64,10 +64,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
 		query.with(new Sort(new Order(Direction.DESC, "register_date")));
-
-		List<ProvisionDto> provisions = this.mongoOperations.find(query, ProvisionDto.class);
+		List<ProvisionDto> provisions = this.mongoOperations.find(query ,ProvisionDto.class);
+		
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
-
 		return optionalProvisions;
 	}
 
@@ -83,7 +82,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<List<ProvisionTrazaDto>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
-
+	
 	@Override
 	public List<Provision> findAllTraza__tes(String documentType, String documentNumber) {
 
@@ -231,7 +230,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 */
 
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
-
+		
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
@@ -426,7 +425,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public void updateFlagDateNotify(List<Provision> listProvision) {
 		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
-
+		
 		for (int i = 0; i < listProvision.size(); i++) {
 
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
@@ -490,6 +489,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update.set("notifications.cancelada_atis_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
+			
 
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),

@@ -26,12 +26,12 @@ public class SimpliServiceImpl implements SimpliService {
 
 		Provision provision = provisionRepository.getProvisionByXaRequest(xaRequest);
 
-		body.setAPPT_Numer(request.getAppt_number());
+		body.setApptNumber(request.getApptNumber());
 		if (provision != null) {
 			Update update = new Update();
 			update.set("wo_prestart.tracking_url", request.getTracking());
 			update.set("wo_prestart.available_tracking", true);
-			update.set("wo_prestart.eta", request.getEta());
+			update.set("wo_prestart.eta", request.getETA());
 
 			boolean updated = provisionRepository.updateProvision(provision, update);
 			if (updated) {
@@ -40,12 +40,11 @@ public class SimpliServiceImpl implements SimpliService {
 				body.setStatus("FAILED_UPDATE");
 			}
 		} else {
-			body.setStatus("REGISTER_DOES_NOT_ EXIST");
+			body.setStatus("REGISTER_DOES_NOT_EXIST");
 		}
 
 		simpliUrlResponse.setBody(body);
 		return simpliUrlResponse;
-
 	}
 
 }

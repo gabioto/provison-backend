@@ -208,23 +208,59 @@ public class SimpliController {
 		}
 		
 		try {			
-			simpliUrlResponse = new ApiSimpliResponse<SimpliUrlResponse>(simpliService.setSimpliUrl(request));
-			status = HttpStatus.OK;
-			
-			Gson gson = new Gson();
-		    String json = gson.toJson(simpliUrlResponse);
-		    String cadena = "{\"body\":{\"body\":";
-		    int posicion = json.indexOf(cadena);
-		    if (posicion > -1) {
-		    	json = json.substring(posicion + cadena.length());
-		    	json = json.substring(0, json.length() - 2);	    
-		    }
-		    
-			return ResponseEntity.status(status)
-					.header("UNICA-ServiceId", UNICA_ServiceId)
-					.header("UNICA-PID", UNICA_PID)
-					.header("Content-Type", "application/json;charset=UTF-8")
-					.body(json);		
+			SimpliUrlResponse objSimpliUrlResponse = simpliService.setSimpliUrl(request);
+			if (objSimpliUrlResponse.getBody().getStatus().equals("OK")) {			
+				simpliUrlResponse = new ApiSimpliResponse<SimpliUrlResponse>(objSimpliUrlResponse);
+				status = HttpStatus.OK;
+				
+				Gson gson = new Gson();
+			    String json = gson.toJson(simpliUrlResponse);
+			    String cadena = "{\"body\":{\"body\":";
+			    int posicion = json.indexOf(cadena);
+			    if (posicion > -1) {
+			    	json = json.substring(posicion + cadena.length());
+			    	json = json.substring(0, json.length() - 2);	    
+			    }
+			    
+			    return ResponseEntity.status(status)
+						.header("UNICA-ServiceId", UNICA_ServiceId)
+						.header("UNICA-PID", UNICA_PID)
+						.header("Content-Type", "application/json;charset=UTF-8")
+						.body(json);
+			} else {
+				responseError = new ErrorResponse();
+				if (objSimpliUrlResponse.getBody().getStatus().equals("NOT_FOUND")) {			
+					status = HttpStatus.NOT_FOUND;
+				
+					responseError.setExceptionId("SVC1006");
+					responseError.setExceptionText("Resource " + request.getXa_activity_type() + " does not exist");
+					responseError.setMoreInfo("Reference to a resource identifier which does not exist in the collection/repository referred");
+					responseError.setUserMessage("Not existing Resource Id");					
+				} else {
+					status = HttpStatus.BAD_REQUEST;
+					
+					responseError.setExceptionId("SVC0001");
+					responseError.setExceptionText("Generic Client Error");
+					responseError.setMoreInfo("API Generic wildcard fault response");
+					responseError.setUserMessage("Generic Client Error");
+				}
+				apiErrorResponse = new ApiErrorResponse<ErrorResponse>(responseError);
+				
+				Gson gson = new Gson();
+			    String json = gson.toJson(apiErrorResponse);
+			    String cadena = "{\"body\":";
+			    int posicion = json.indexOf(cadena);
+			    if (posicion > -1) {
+			    	json = json.substring(posicion + cadena.length());
+			    	json = json.substring(0, json.length() - 1);	    
+			    }
+			    
+			    return ResponseEntity.status(status)
+						.header("UNICA-ServiceId", UNICA_ServiceId)
+						.header("UNICA-PID", UNICA_PID)
+						.header("Content-Type", "application/json;charset=UTF-8")
+						.body(json);
+			}
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			

@@ -37,10 +37,10 @@ public class SimpliServiceImpl implements SimpliService {
 			if (updated) {
 				body.setStatus("OK");
 			} else {
-				body.setStatus("FAILED_UPDATE");
+				body.setStatus("ERROR");
 			}
 		} else {
-			body.setStatus("REGISTER_DOES_NOT_EXIST");
+			body.setStatus("NOT_FOUND");
 		}
 
 		simpliUrlResponse.setBody(body);

@@ -2365,7 +2365,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				// Job Woprestart
 
-				woPreStart.setAvailableTracking(false);
+				//woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 				if (nowDate.getHour() > 8 && nowDate.getHour() < 23) {
 
@@ -2396,7 +2396,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 							int count = 0;
 							int maxTries = 2;
 							boolean needSend = true;
-							while (true) {
+							while (needSend) {
 								log.info("Simpli Attempt #" + count);
 
 								String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);

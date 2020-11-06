@@ -234,7 +234,6 @@ public class SimpliController {
 		
 		try {			
 			SimpliUrlResponse objSimpliUrlResponse = simpliService.setSimpliUrl(request);
-			objSimpliUrlResponse = null;
 			if (objSimpliUrlResponse.getBody().getStatus().equals("OK")) {			
 				simpliUrlResponse = new ApiSimpliResponse<SimpliUrlResponse>(objSimpliUrlResponse);
 				status = HttpStatus.OK;

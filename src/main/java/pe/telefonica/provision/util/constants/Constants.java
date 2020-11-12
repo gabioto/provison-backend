@@ -132,4 +132,9 @@ public final class Constants {
 	public static final String DEFAULT_NOTDONE_SUBREASON = "[$name], tu pedido no pudo ser instalado en la fecha indicada. Lamentamos los inconvenientes.";
 	public static final String DEFAULT_NOTDONE_ACTION = "Nos comunicaremos contigo en breve.";
 
+	
+	//ORDERS
+	public static final String SOURCE_ORDERS_ORDENES = "ORDENES";
+	public static final String SOURCE_ORDERS_VENTAS_FIJA = "";
+	public static final String SOURCE_ORDERS_ATIS = "ATIS";
 }

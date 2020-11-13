@@ -6,10 +6,12 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Repository;
 
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 
+@Repository
 public class OrderRepositoryImpl implements OrderRepository {
 
 	@Autowired

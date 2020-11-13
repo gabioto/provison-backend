@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import pe.telefonica.provision.controller.request.order.OrderRequest;
 import pe.telefonica.provision.controller.response.ErrorResponse;
@@ -19,6 +20,7 @@ import pe.telefonica.provision.service.OrderService;
 import pe.telefonica.provision.util.StringUtil;
 import pe.telefonica.provision.util.constants.Constants;
 
+@Service
 public class OrderServiceImpl implements OrderService {
 
 	private static final Log log = LogFactory.getLog(OrderServiceImpl.class);

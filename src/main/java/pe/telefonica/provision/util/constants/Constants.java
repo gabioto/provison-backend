@@ -1,5 +1,8 @@
 package pe.telefonica.provision.util.constants;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 public final class Constants {
 
 	public static final String ADDRESS_CHANGED = "addressChanged";
@@ -13,7 +16,7 @@ public final class Constants {
 	public static final String PROVISION_STATUS_ADDRESS_CHANGED = "addressChanged";
 	public static final String PROVISION_STATUS_CAIDA = "caida";
 	public static final String PROVISION_STATUS_CANCELLED = "cancelled";
-	
+
 	public static final String PROVISION_STATUS_COMPLETED = "completed";
 	public static final String PROVISION_STATUS_DONE = "done";
 	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
@@ -36,14 +39,14 @@ public final class Constants {
 	public static final String DATE_FORMAT_EMAILING = "dd' de 'MMMMM' de 'yyyy";
 	public static final String TIMESTAMP_FORMAT_PSI = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String TIMESTAMP_FORMAT_USER = "yyyy-MM-dd HH:mm:ss";
+	public static final LocalDateTime LOCAL_DATE_ZONE = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 	public static final String ENVIROMENT_PROD = "prod";
 
 	public static final String API_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
 	public static final String PARAM_KEY_OAUTH_TOKEN = "PARAM_KEY_OAUTH_TOKEN";
-	
-	
+
 	public static final String OPER_GET_TECH_AVAILABLE = "OPER_GET_TECH_AVAILABLE";
 	public static final String OPER_GET_TOKEN_EXTERNAL = "OPER_GET_TOKEN_EXTERNAL";
 	public static final String OPER_GET_OAUTH_TOKEN = "OPER_GET_OAUTH_TOKEN";
@@ -73,9 +76,9 @@ public final class Constants {
 	public static final String MSG_PRO_CANCELLED_BY_BO_KEY = "MSG_PRO_CANCELLED_BY_BO_KEY";
 	// Cuando el cliente cancela desde la web
 	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
-	public static final String MSG_FAULT_WOPRESTART 		= "MSG_FAULT_WOPRESTART";
-	public static final String MSG_PRO_SCHEDULE_TECHNICIAN_KEY= "MSG_PRO_SCHEDULE_TECHNICIAN_KEY";
-	
+	public static final String MSG_FAULT_WOPRESTART = "MSG_FAULT_WOPRESTART";
+	public static final String MSG_PRO_SCHEDULE_TECHNICIAN_KEY = "MSG_PRO_SCHEDULE_TECHNICIAN_KEY";
+
 	// Codigos de los endpoints de PSI
 	public static final String PSI_CODE_CAPACITY = "201";
 	public static final String PSI_CODE_SCHEDULE = "202";
@@ -110,7 +113,7 @@ public final class Constants {
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
 	public static final String OPER_GET_PROVISION_BY_SALE_CODE = "OPER_GET_PROVISION_BY_SALE_CODE";
-	
+
 	public static final String OPER_GET_ALL_PROVISION = "OPER_GET_ALL_PROVISION";
 
 	public static final String TIPO_RUC = "ruc";
@@ -128,13 +131,12 @@ public final class Constants {
 
 	public static final String ACTIVITY_TYPE_PROVISION = "PROVISION";
 	public static final String BARRA_VERTICAL = "|";
-	
+
 	public static final String DEFAULT_NOTDONE_SUBREASON = "[$name], tu pedido no pudo ser instalado en la fecha indicada. Lamentamos los inconvenientes.";
 	public static final String DEFAULT_NOTDONE_ACTION = "Nos comunicaremos contigo en breve.";
 
-	
-	//ORDERS
+	// ORDERS
 	public static final String SOURCE_ORDERS_ORDENES = "ORDENES";
-	public static final String SOURCE_ORDERS_VENTAS_FIJA = "";
+	public static final String SOURCE_ORDERS_VENTAS_FIJA = "VENTASFIJA_PARKUR";
 	public static final String SOURCE_ORDERS_ATIS = "ATIS";
 }

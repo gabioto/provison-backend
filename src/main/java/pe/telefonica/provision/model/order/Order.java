@@ -18,11 +18,11 @@ import lombok.Setter;
 @Document(collection = "collOrder")
 @JsonPropertyOrder({ "idOrder" })
 public class Order {
-	
+
 	@Id
 	@Field("_id")
 	private String idOrder;
-	
+
 	private String source;
 
 	private String code;
@@ -35,7 +35,7 @@ public class Order {
 
 	private String documentNumber;
 
-	private String registerDate;
+	private LocalDateTime registerDate;
 
 	private String execSuspDate;
 
@@ -76,6 +76,6 @@ public class Order {
 	private String note2;
 
 	private String oldResult;
-	
+
 	private LocalDateTime registerLocalDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 }

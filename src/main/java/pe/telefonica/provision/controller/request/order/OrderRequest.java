@@ -3,6 +3,7 @@ package pe.telefonica.provision.controller.request.order;
 import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
+import pe.telefonica.provision.util.DateUtil;
 
 @Getter
 @Setter
@@ -70,7 +71,7 @@ public class OrderRequest {
 		order.setPhone(phone);
 		order.setDocumentType(documentType);
 		order.setDocumentNumber(documentNumber);
-		order.setRegisterDate(registerDate);
+		order.setRegisterDate(DateUtil.stringToLocalDateTime(registerDate));
 		order.setExecSuspDate(execSuspDate);
 		order.setExecRecoxDate(execRecoxDate);
 		order.setNote1(note1);

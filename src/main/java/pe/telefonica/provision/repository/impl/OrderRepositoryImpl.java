@@ -1,5 +1,8 @@
 package pe.telefonica.provision.repository.impl;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -30,14 +33,42 @@ public class OrderRepositoryImpl implements OrderRepository {
 
 	@Override
 	public Order getOrderByAtisCode(String atisCode) {
-		// TODO Auto-generated method stub
-		return null;
+		return mongoOperations.findOne(new Query(Criteria.where("atisOrder").is(atisCode)), Order.class);
 	}
 
 	@Override
 	public Order getOrderBySaleCode(String saleCode) {
-		// TODO Auto-generated method stub
-		return null;
+		return mongoOperations.findOne(new Query(Criteria.where("code").is(saleCode)), Order.class);
+	}
+
+	@Override
+	public List<Order> getOrdersByAtisCode(String atisCode, LocalDateTime startDate, LocalDateTime endDate) {
+
+		Query query = null;
+
+		if (startDate != null && endDate != null) {
+			query = new Query(Criteria.where("atisOrder").is(atisCode));
+		} else {
+			query = new Query(Criteria.where("atisOrder").is(atisCode).andOperator(
+					Criteria.where("registerDate").gte(startDate), Criteria.where("registerDate").lte(endDate)));
+		}
+
+		return mongoOperations.find(query, Order.class);
+	}
+
+	@Override
+	public List<Order> getOrdersBySaleCode(String saleCode, LocalDateTime startDate, LocalDateTime endDate) {
+
+		Query query = null;
+
+		if (startDate != null && endDate != null) {
+			query = new Query(Criteria.where("code").is(saleCode));
+		} else {
+			query = new Query(Criteria.where("code").is(saleCode).andOperator(
+					Criteria.where("registerDate").gte(startDate), Criteria.where("registerDate").lte(endDate)));
+		}
+
+		return mongoOperations.find(query, Order.class);
 	}
 
 }

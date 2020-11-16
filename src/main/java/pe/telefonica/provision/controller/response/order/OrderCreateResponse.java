@@ -9,7 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderCreateResponse {
 
-	private String orderId;
-	
+	private String source;
+
+	private String code;
+
 	private boolean success;
 }

@@ -39,7 +39,7 @@ public class DateUtil {
 
 	public static LocalDateTime stringToLocalDateTime(String stringDate) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_WS);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_USER);
 			LocalDateTime dateTime = LocalDateTime.parse(stringDate, formatter);
 			return dateTime;
 		} catch (Exception e) {

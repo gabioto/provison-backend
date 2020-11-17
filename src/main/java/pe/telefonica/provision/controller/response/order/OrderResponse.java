@@ -2,11 +2,14 @@ package pe.telefonica.provision.controller.response.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pe.telefonica.provision.model.order.Order;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrderResponse {
 
 	private String source;
@@ -62,4 +65,8 @@ public class OrderResponse {
 	private String note2;
 
 	private String oldResult;
+	
+	public OrderResponse fromOrder(Order order) {
+		return null;
+	}
 }

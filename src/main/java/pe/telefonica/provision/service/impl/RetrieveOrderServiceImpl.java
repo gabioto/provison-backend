@@ -1,13 +1,18 @@
 package pe.telefonica.provision.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import pe.telefonica.provision.controller.response.order.OrderResponse;
+import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.service.RetreiveOrderService;
 import pe.telefonica.provision.util.DateUtil;
@@ -52,11 +57,24 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	}
 
 	private ResponseEntity<Object> getOrderBySaleCode(String code, LocalDateTime startDate, LocalDateTime endDate) {
+		List<Order> orders = new ArrayList<>();
 
-		return null;
+		try {
+			orders = orderRepository.getOrdersBySaleCode(code, startDate, endDate);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		return new ResponseEntity<Object>(orders, HttpStatus.OK);
 	}
 
 	private ResponseEntity<Object> getOrderByOrderCode(String order, LocalDateTime startDate, LocalDateTime endDate) {
+		try {
+			List<Order> orders = orderRepository.getOrdersByAtisCode(order, startDate, endDate);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 		return null;
 	}

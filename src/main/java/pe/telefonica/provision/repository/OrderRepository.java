@@ -20,4 +20,6 @@ public interface OrderRepository {
 	List<Order> getOrdersByAtisCode(String atisCode, LocalDateTime startDate, LocalDateTime endDate);
 
 	List<Order> getOrdersBySaleCode(String saleCode, LocalDateTime startDate, LocalDateTime endDate);
+	
+	List<Order> getOrdersByPhone(String publicId, LocalDateTime startDate, LocalDateTime endDate);
 }

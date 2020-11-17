@@ -16,6 +16,7 @@ import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.service.RetreiveOrderService;
 import pe.telefonica.provision.util.DateUtil;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Service
 public class RetrieveOrderServiceImpl implements RetreiveOrderService {
@@ -41,17 +42,30 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 				return getOrderByOrderCode(order, lStartDate, lEndDate);
 			}
 		} else {
-
+			if (originSystem.equals(Constants.SOURCE_ORDERS_ATIS)) {
+				return getOrderAtis(publicId, lStartDate, lEndDate);
+			} else {
+				return getOrderCms(publicId, orderCode, customerCode, lStartDate, lEndDate);
+			}
 		}
 		return null;
 	}
 
-	private ResponseEntity<Object> getOrderAtis() {
+	private ResponseEntity<Object> getOrderAtis(String publicId, LocalDateTime startDate, LocalDateTime endDate) {
+		List<Order> orders = new ArrayList<>();
 
-		return null;
+		try {
+			orders = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		return new ResponseEntity<Object>(new OrderResponse().fromOrderList(orders), HttpStatus.OK);
 	}
 
-	private ResponseEntity<Object> getOrderCms() {
+	private ResponseEntity<Object> getOrderCms(String publicId, String orderCode, String customerCode,
+			LocalDateTime startDate, LocalDateTime endDate) {
 
 		return null;
 	}
@@ -66,16 +80,18 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 			// TODO: handle exception
 		}
 
-		return new ResponseEntity<Object>(orders, HttpStatus.OK);
+		return new ResponseEntity<Object>(new OrderResponse().fromOrderList(orders), HttpStatus.OK);
 	}
 
 	private ResponseEntity<Object> getOrderByOrderCode(String order, LocalDateTime startDate, LocalDateTime endDate) {
+		List<Order> orders = new ArrayList<>();
+
 		try {
-			List<Order> orders = orderRepository.getOrdersByAtisCode(order, startDate, endDate);
+			orders = orderRepository.getOrdersByAtisCode(order, startDate, endDate);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 
-		return null;
+		return new ResponseEntity<Object>(new OrderResponse().fromOrderList(orders), HttpStatus.OK);
 	}
 }

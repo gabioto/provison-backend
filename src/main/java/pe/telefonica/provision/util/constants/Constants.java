@@ -139,4 +139,5 @@ public final class Constants {
 	public static final String SOURCE_ORDERS_ORDENES = "ORDENES";
 	public static final String SOURCE_ORDERS_VENTAS_FIJA = "VENTASFIJA_PARKUR";
 	public static final String SOURCE_ORDERS_ATIS = "ATIS";
+	public static final String SOURCE_ORDERS_CMS = "CMS";
 }

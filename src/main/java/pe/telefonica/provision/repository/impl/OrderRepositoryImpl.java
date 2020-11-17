@@ -44,31 +44,40 @@ public class OrderRepositoryImpl implements OrderRepository {
 	@Override
 	public List<Order> getOrdersByAtisCode(String atisCode, LocalDateTime startDate, LocalDateTime endDate) {
 
-		Query query = null;
+		Criteria criteria = Criteria.where("atisOrder").is(atisCode);
 
 		if (startDate != null && endDate != null) {
-			query = new Query(Criteria.where("atisOrder").is(atisCode));
-		} else {
-			query = new Query(Criteria.where("atisOrder").is(atisCode).andOperator(
-					Criteria.where("registerDate").gte(startDate), Criteria.where("registerDate").lte(endDate)));
+			criteria.andOperator(Criteria.where("registerDate").gte(startDate),
+					Criteria.where("registerDate").lte(endDate));
 		}
 
-		return mongoOperations.find(query, Order.class);
+		return mongoOperations.find(new Query(criteria), Order.class);
 	}
 
 	@Override
 	public List<Order> getOrdersBySaleCode(String saleCode, LocalDateTime startDate, LocalDateTime endDate) {
 
-		Query query = null;
+		Criteria criteria = Criteria.where("code").is(saleCode);
 
 		if (startDate != null && endDate != null) {
-			query = new Query(Criteria.where("code").is(saleCode));
-		} else {
-			query = new Query(Criteria.where("code").is(saleCode).andOperator(
-					Criteria.where("registerDate").gte(startDate), Criteria.where("registerDate").lte(endDate)));
+			criteria.andOperator(Criteria.where("registerDate").gte(startDate),
+					Criteria.where("registerDate").lte(endDate));
 		}
 
-		return mongoOperations.find(query, Order.class);
+		return mongoOperations.find(new Query(criteria), Order.class);
+	}
+
+	@Override
+	public List<Order> getOrdersByPhone(String publicId, LocalDateTime startDate, LocalDateTime endDate) {
+
+		Criteria criteria = Criteria.where("phone").is(publicId);
+
+		if (startDate != null && endDate != null) {
+			criteria.andOperator(Criteria.where("registerDate").gte(startDate),
+					Criteria.where("registerDate").lte(endDate));
+		}
+
+		return mongoOperations.find(new Query(criteria), Order.class);
 	}
 
 }

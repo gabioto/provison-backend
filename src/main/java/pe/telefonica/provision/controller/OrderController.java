@@ -21,11 +21,11 @@ import pe.telefonica.provision.controller.request.order.OrderRequest;
 import pe.telefonica.provision.service.OrderService;
 import pe.telefonica.provision.service.RetreiveOrderService;
 
-@RestController
-@EnableWebMvc
-@Validated
-@CrossOrigin(origins = "*")
-@RequestMapping("orders/v1/order")
+//@RestController
+//@EnableWebMvc
+//@Validated
+//@CrossOrigin(origins = "*")
+//@RequestMapping("orders/v1/order")
 
 public class OrderController {
 

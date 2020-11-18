@@ -36,8 +36,8 @@ public class OrderController {
 	private RetreiveOrderService retrieveOrderService;
 
 	// Creación de ordenes
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
+//	@PostMapping
+//	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<Object> createOrder(@Valid @RequestBody OrderRequest request) throws Exception {
 		return orderService.createOrder(request);
 	}

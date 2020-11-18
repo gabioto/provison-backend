@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
+import pe.telefonica.provision.util.DateUtil;
 
 @Getter
 @Setter
@@ -76,7 +77,7 @@ public class OrderResponse {
 		phone = order.getPhone();
 		documentType = order.getDocumentType();
 		documentNumber = order.getDocumentNumber();
-		registerDate = order.getRegisterDate().toString();
+		registerDate = DateUtil.localDateTimeToString(order.getRegisterDate());
 		execSuspDate = order.getExecSuspDate();
 		execRecoxDate = order.getExecRecoxDate();
 		note1 = order.getNote1();

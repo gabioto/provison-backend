@@ -71,7 +71,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
+		String requestUrl = api.getPsiUrl() + api.getProductOrders();
 		log.info("updatePSIClient - URL: " + requestUrl);
 
 		PSIUpdateClientRequest request = new PSIUpdateClientRequest();

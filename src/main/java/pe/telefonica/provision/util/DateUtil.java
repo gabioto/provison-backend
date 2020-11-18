@@ -47,6 +47,15 @@ public class DateUtil {
 		}
 	}
 
+	public static String localDateTimeToString(LocalDateTime date) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_USER);
+			return date.format(formatter);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public static Date getToday() {
 		Calendar now = Calendar.getInstance();
 		now.set(Calendar.HOUR, 0);

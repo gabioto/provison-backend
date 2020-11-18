@@ -34,6 +34,7 @@ public class ExternalApi {
 	String updateScheduleDate;
 	String cancelLocalSchedule;
 	String searchCustomer;
+	String productOrders;
 
 	String nroDiasVidaProvision;
 	String scheduleGetTechAvailable;
@@ -279,6 +280,14 @@ public class ExternalApi {
 
 	public void setSimpliBaseUrl(String simpliBaseUrl) {
 		this.simpliBaseUrl = simpliBaseUrl;
+	}
+
+	public String getProductOrders() {
+		return productOrders;
+	}
+
+	public void setProductOrders(String productOrders) {
+		this.productOrders = productOrders;
 	}
 
 }

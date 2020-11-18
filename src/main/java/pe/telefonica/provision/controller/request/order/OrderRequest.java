@@ -1,14 +1,20 @@
 package pe.telefonica.provision.controller.request.order;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.util.DateUtil;
 
 @Getter
 @Setter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class OrderRequest {
 
 	private String source;

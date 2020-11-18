@@ -585,7 +585,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		update.set("back", getData[1]);
 		update.set("product_name", getData[10]);
 		update.set("xa_request", getData[11]);
-		update.set("origin_code", request.getDataOrigin());
+		//update.set("origin_code", request.getDataOrigin());
 		update.set("commercial_op", getData[12].toUpperCase());
 		update.set("product_code", getData[14]);
 		update.set("product_name_source", getData[15]);

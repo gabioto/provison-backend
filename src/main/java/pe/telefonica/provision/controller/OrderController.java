@@ -15,14 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import pe.telefonica.provision.controller.request.order.OrderRequest;
 import pe.telefonica.provision.service.OrderService;
 import pe.telefonica.provision.service.RetreiveOrderService;
 
 @RestController
-@EnableWebMvc
+//@EnableWebMvc
 @Validated
 @CrossOrigin(origins = "*")
 @RequestMapping("orders/v1/order")

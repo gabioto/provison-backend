@@ -49,7 +49,7 @@ public class DateUtil {
 
 	public static String localDateTimeToString(LocalDateTime date) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_USER);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_PSI);
 			return date.format(formatter);
 		} catch (Exception e) {
 			return null;

@@ -1,8 +1,5 @@
 package pe.telefonica.provision.util.constants;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
 public final class Constants {
 
 	public static final String ADDRESS_CHANGED = "addressChanged";
@@ -39,7 +36,6 @@ public final class Constants {
 	public static final String DATE_FORMAT_EMAILING = "dd' de 'MMMMM' de 'yyyy";
 	public static final String TIMESTAMP_FORMAT_PSI = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String TIMESTAMP_FORMAT_USER = "yyyy-MM-dd HH:mm:ss";
-	public static final LocalDateTime LOCAL_DATE_ZONE = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 	public static final String ENVIROMENT_PROD = "prod";
 

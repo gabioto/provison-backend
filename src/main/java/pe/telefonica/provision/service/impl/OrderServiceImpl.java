@@ -1,5 +1,8 @@
 package pe.telefonica.provision.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
 				StringUtil.getValue(order.getReleaseOrderDate(), orderSaved.getReleaseOrderDate()));
 		update.set("note2", StringUtil.getValue(order.getNote2(), orderSaved.getNote2()));
 		update.set("oldResult", StringUtil.getValue(order.getOldResult(), orderSaved.getOldResult()));
-		update.set("registerLocalDate", Constants.LOCAL_DATE_ZONE);
+		update.set("registerLocalDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 
 		if (!order.getSource().equals(Constants.SOURCE_ORDERS_ATIS)) {
 			update.set("commercialOp", order.getSource());

@@ -1,8 +1,6 @@
 package pe.telefonica.provision.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 
 import pe.telefonica.provision.controller.response.ErrorResponse;
 import pe.telefonica.provision.controller.response.order.OrderResponse;
+import pe.telefonica.provision.external.ProductOrdersApi;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.service.RetreiveOrderService;
@@ -28,6 +27,9 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
+
+	@Autowired
+	private ProductOrdersApi productOrdersApi;
 
 	private MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
 
@@ -60,12 +62,11 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	}
 
 	private ResponseEntity<Object> getOrderAtis(String publicId, LocalDateTime startDate, LocalDateTime endDate) {
-		List<Order> orders = new ArrayList<>();
 
 		try {
-			orders = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
+			Order order = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
 
-			return evaluateOrders(orders, publicId);
+			return evaluateOrders(order, publicId);
 		} catch (Exception e) {
 			return setInternalError(e.getLocalizedMessage());
 		}
@@ -73,43 +74,58 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
 	private ResponseEntity<Object> getOrderCms(String publicId, String orderCode, String customerCode,
 			LocalDateTime startDate, LocalDateTime endDate) {
+		try {
+			Order order = productOrdersApi.getProductOrders(publicId, orderCode, customerCode);
+			Order lOrder = orderRepository.getOrdersByCmsCode(publicId, startDate, endDate);
 
-		return null;
+			// Si order es nulo y lOrder es nulo, debe devolver respuesta no existe
+			// Si order es nulo y lOrder existe, debe devolver respuesta lOrder
+			// Si order existe y lOrder es nulo, se debe insertar y devolver order
+			// Si order existe y lorder existe , se debe actualizar y devolver merge de
+			// orders
+			if (lOrder != null) {
+
+				orderRepository.saveOrder(order);
+			}
+
+			return evaluateOrders(order, publicId);
+		} catch (Exception e) {
+			return setInternalError(e.getLocalizedMessage());
+		}
+
 	}
 
 	private ResponseEntity<Object> getOrderBySaleCode(String code, LocalDateTime startDate, LocalDateTime endDate) {
-		List<Order> orders = new ArrayList<>();
 
 		try {
-			orders = orderRepository.getOrdersBySaleCode(code, startDate, endDate);
+			Order order = orderRepository.getOrdersBySaleCode(code, startDate, endDate);
 
-			return evaluateOrders(orders, code);
+			return evaluateOrders(order, code);
 		} catch (Exception e) {
 			return setInternalError(e.getLocalizedMessage());
 		}
 	}
 
 	private ResponseEntity<Object> getOrderByOrderCode(String order, LocalDateTime startDate, LocalDateTime endDate) {
-		List<Order> orders = new ArrayList<>();
 
 		try {
-			orders = orderRepository.getOrdersByAtisCode(order, startDate, endDate);
+			Order lOrder = orderRepository.getOrdersByAtisCode(order, startDate, endDate);
 
-			return evaluateOrders(orders, order);
+			return evaluateOrders(lOrder, order);
 		} catch (Exception e) {
 			return setInternalError(e.getLocalizedMessage());
 		}
 	}
 
-	private ResponseEntity<Object> evaluateOrders(List<Order> orders, String filterCode) {
+	private ResponseEntity<Object> evaluateOrders(Order order, String filterCode) {
 		HttpStatus status;
 		Object response;
 
-		log.info("Orders - " + orders.size() + ": " + orders.toString());
+		log.info("Orders - " + (order != null ? order.toString() : "null"));
 
-		if (orders != null && orders.size() > 0) {
+		if (order != null) {
 			status = HttpStatus.OK;
-			response = new OrderResponse().fromOrderList(orders);
+			response = new OrderResponse().fromOrder(order);
 		} else {
 			status = HttpStatus.NOT_FOUND;
 			response = new ErrorResponse("SVC1006",

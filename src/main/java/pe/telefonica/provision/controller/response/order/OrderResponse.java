@@ -3,6 +3,8 @@ package pe.telefonica.provision.controller.response.order;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,62 +18,85 @@ import pe.telefonica.provision.util.DateUtil;
 @NoArgsConstructor
 public class OrderResponse {
 
-	private String source;
-
+	@JsonProperty("codigo")
 	private String code;
 
+	@JsonProperty("codigoServicio")
 	private String serviceCode;
 
+	@JsonProperty("telefono")
 	private String phone;
 
+	@JsonProperty("tipoDocumento")
 	private String documentType;
 
+	@JsonProperty("numeroDocumento")
 	private String documentNumber;
 
+	@JsonProperty("fechaRegistro")
 	private String registerDate;
 
+	@JsonProperty("fechaEjecucionSusp")
 	private String execSuspDate;
 
+	@JsonProperty("fechaEjecucionRecox")
 	private String execRecoxDate;
 
+	@JsonProperty("nota1")
 	private String note1;
 
+	@JsonProperty("Aplicación")
 	private String application;
 
+	@JsonProperty("TransaccionComercial")
 	private String commercialOp;
 
+	@JsonProperty("contactoTelefono")
 	private String contactPhone;
 
+	@JsonProperty("contactoCelular")
 	private String contactCellphone;
 
+	@JsonProperty("contactoCorreo")
 	private String contactMail;
 
+	@JsonProperty("codigoError")
 	private String errorCode;
 
+	@JsonProperty("descripcionError")
 	private String errorDescription;
 
+	@JsonProperty("fechaRecepcion")
 	private String receptionDate;
 
+	@JsonProperty("estado")
 	private String status;
 
+	@JsonProperty("pedidoAtis")
 	private String atisOrder;
 
+	@JsonProperty("requerimientoCMS")
 	private String cmsRequest;
 
+	@JsonProperty("estadoIdOrden")
 	private String statusOrderCode;
 
+	@JsonProperty("estadoDescripcionOrden")
 	private String statusOrderDescription;
 
+	@JsonProperty("fechaRegistroOrden")
 	private String registerOrderDate;
 
+	@JsonProperty("fechaEmisionOrden")
 	private String releaseOrderDate;
 
+	@JsonProperty("nota2")
 	private String note2;
 
-	private String oldResult;
+	@JsonProperty("resultadoId")
+	private String idResult;
 
 	public OrderResponse fromOrder(Order order) {
-		source = order.getSource();
 		code = order.getCode();
 		serviceCode = order.getServiceCode();
 		phone = order.getPhone();
@@ -97,7 +122,7 @@ public class OrderResponse {
 		registerOrderDate = order.getRegisterOrderDate();
 		releaseOrderDate = order.getReleaseOrderDate();
 		note2 = order.getNote2();
-		oldResult = order.getOldResult();
+		idResult = order.getIdResult();
 		return this;
 	}
 

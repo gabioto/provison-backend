@@ -109,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
 		update.set("releaseOrderDate",
 				StringUtil.getValue(order.getReleaseOrderDate(), orderSaved.getReleaseOrderDate()));
 		update.set("note2", StringUtil.getValue(order.getNote2(), orderSaved.getNote2()));
-		update.set("oldResult", StringUtil.getValue(order.getOldResult(), orderSaved.getOldResult()));
+		update.set("idResult", StringUtil.getValue(order.getIdResult(), orderSaved.getIdResult()));
 		update.set("registerLocalDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 
 		if (!order.getSource().equals(Constants.SOURCE_ORDERS_ATIS)) {

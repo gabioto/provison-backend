@@ -91,7 +91,7 @@ public class OrderRequest {
 		order.setRegisterOrderDate(registerOrderDate);
 		order.setReleaseOrderDate(releaseOrderDate);
 		order.setNote2(note2);
-		order.setOldResult(oldResult);
+		order.setIdResult(oldResult);
 
 		return order;
 	}

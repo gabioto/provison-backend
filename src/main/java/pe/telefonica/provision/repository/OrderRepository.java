@@ -1,7 +1,6 @@
 package pe.telefonica.provision.repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.data.mongodb.core.query.Update;
 
@@ -17,9 +16,11 @@ public interface OrderRepository {
 
 	Order getOrderBySaleCode(String saleCode);
 
-	List<Order> getOrdersByAtisCode(String atisCode, LocalDateTime startDate, LocalDateTime endDate);
+	Order getOrdersByAtisCode(String atisCode, LocalDateTime startDate, LocalDateTime endDate);
 
-	List<Order> getOrdersBySaleCode(String saleCode, LocalDateTime startDate, LocalDateTime endDate);
-	
-	List<Order> getOrdersByPhone(String publicId, LocalDateTime startDate, LocalDateTime endDate);
+	Order getOrdersByCmsCode(String cmsCode, LocalDateTime startDate, LocalDateTime endDate);
+
+	Order getOrdersBySaleCode(String saleCode, LocalDateTime startDate, LocalDateTime endDate);
+
+	Order getOrdersByPhone(String publicId, LocalDateTime startDate, LocalDateTime endDate);
 }

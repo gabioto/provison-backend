@@ -77,7 +77,7 @@ public class Order {
 
 	private String note2;
 
-	private String oldResult;
+	private String idResult;
 
 	private LocalDateTime registerLocalDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 }

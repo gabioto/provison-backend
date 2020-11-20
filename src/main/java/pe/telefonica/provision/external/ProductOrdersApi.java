@@ -33,6 +33,7 @@ import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.external.response.ProductOrderResponse;
 import pe.telefonica.provision.model.OAuthToken;
+import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OAuthTokenRepository;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
@@ -59,7 +60,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 	@Autowired
 	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
 
-	public ProductOrderResponse getProductOrders(String publicId, String orderCode, String customerCode) {
+	public Order getProductOrders(String publicId, String orderCode, String customerCode) {
 
 		String oAuthToken;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -93,24 +94,23 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 				.queryParam("relatedSource.serviceCode", "");
 
 		try {
+			ResponseEntity<ProductOrderResponse> responseEntity = restTemplate.exchange(builder.toUriString(),
+					HttpMethod.GET, new HttpEntity<>(headers), ProductOrderResponse.class);
 
-			ResponseEntity<String> responseEntity = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,
-					new HttpEntity<>(headers), String.class);
-
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(builder.toUriString()),
+			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(builder.toUriString()),
 					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour,
 					LocalDateTime.now(ZoneOffset.of("-05:00")), responseEntity.getStatusCodeValue());
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 //			return responseEntity.getStatusCode().equals(HttpStatus.OK);
-			return null;
+			return responseEntity.getBody().fromThis();
+			
 		} catch (HttpClientErrorException ex) {
-
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(""), ex.getResponseBodyAsString(),
+			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getResponseBodyAsString(),
 					requestUrl, startHour, LocalDateTime.now(ZoneOffset.of("-05:00")), ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -125,7 +125,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(""), ex.getMessage(), requestUrl,
+			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getMessage(), requestUrl,
 					startHour, LocalDateTime.now(ZoneOffset.of("-05:00")), HttpStatus.INTERNAL_SERVER_ERROR.value());
 			throw new ServerNotFoundException(ex.getMessage());
 		}

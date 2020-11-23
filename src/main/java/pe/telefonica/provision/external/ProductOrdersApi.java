@@ -60,16 +60,18 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 	@Autowired
 	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
 
-	public Order getProductOrders(String publicId, String orderCode, String customerCode) {
+	public Order getProductOrders(String publicId, String order, String orderCode, String customerCode) {
 
 		String oAuthToken;
+		UriComponentsBuilder builder;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 		// Implementacion SSL
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		String requestUrl = api.getPsiUrl() + api.getProductOrders();
+//		String requestUrl = api.getPsiUrl() + api.getProductOrders();
+		String requestUrl = "https://apisd.telefonica.com.pe/vp-tecnologia/bss/ri/productordermanagement/v3/productOrders";
 		log.info("updatePSIClient - URL: " + requestUrl);
 
 		oAuthToken = getAuthToken();
@@ -87,11 +89,14 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 		log.info("updatePSIClient - headers: " + headers.toString());
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParam("id", publicId)
-				.queryParam("customerId", "").queryParam("accountId", "").queryParam("productType", "")
-				.queryParam("publicId", "").queryParam("relatedSource.name", "")
-				.queryParam("relatedSource.customerId", "").queryParam("relatedSource.accountId", "")
-				.queryParam("relatedSource.serviceCode", "");
+		if (!order.isEmpty()) {
+			builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParam("id", order);
+		} else {
+			builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParam("customerId", "")
+					.queryParam("accountId", "").queryParam("productType", "").queryParam("publicId", publicId)
+					.queryParam("relatedSource.name", "CMS").queryParam("relatedSource.customerId", customerCode)
+					.queryParam("relatedSource.accountId", orderCode).queryParam("relatedSource.serviceCode", "");
+		}
 
 		try {
 			ResponseEntity<ProductOrderResponse> responseEntity = restTemplate.exchange(builder.toUriString(),
@@ -103,9 +108,8 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
-//			return responseEntity.getStatusCode().equals(HttpStatus.OK);
-			return responseEntity.getBody().fromThis();
-			
+			return responseEntity.getBody().fromThis(publicId);
+
 		} catch (HttpClientErrorException ex) {
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());

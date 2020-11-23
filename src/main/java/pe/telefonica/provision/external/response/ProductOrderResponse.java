@@ -3,6 +3,7 @@ package pe.telefonica.provision.external.response;
 import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Getter
 @Setter
@@ -42,8 +43,14 @@ public class ProductOrderResponse {
 		private String id;
 		private String href;
 	}
-	
-	public Order fromThis() {
-		return new Order();
+
+	public Order fromThis(String publicId) {
+		Order order = new Order();
+		order.setCommercialOp(productOrderType.getProductOrderType());
+		order.setRegisterOrderDate(productOrderType.getOrderDate());
+		order.setCmsRequest(productOrderType.getId());
+		order.setPhone(publicId);
+		order.setStatusOrderDescription(Constants.ATIS_CMS_STATUS.get(productOrderType.getStatus()));
+		return order;
 	}
 }

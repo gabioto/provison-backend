@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.util.DateUtil;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Getter
 @Setter
@@ -87,7 +88,9 @@ public class OrderRequest {
 		order.setAtisOrder(atisOrder);
 		order.setCmsRequest(cmsRequest);
 		order.setStatusOrderCode(statusOrderCode);
-		order.setStatusOrderDescription(statusOrderDescription);
+		order.setStatusOrderDescription(
+				source.equals(Constants.SOURCE_ORDERS_ATIS) ? Constants.ATIS_CMS_STATUS.get(statusOrderCode)
+						: statusOrderDescription);
 		order.setRegisterOrderDate(registerOrderDate);
 		order.setReleaseOrderDate(releaseOrderDate);
 		order.setNote2(note2);

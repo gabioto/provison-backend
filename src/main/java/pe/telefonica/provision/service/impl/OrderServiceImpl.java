@@ -113,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
 		update.set("registerLocalDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 
 		if (!order.getSource().equals(Constants.SOURCE_ORDERS_ATIS)) {
-			update.set("commercialOp", order.getSource());
+			update.set("commercialOp", order.getCommercialOp());
 		}
 
 		return update;

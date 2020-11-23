@@ -1,5 +1,9 @@
 package pe.telefonica.provision.util.constants;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public final class Constants {
 
 	public static final String ADDRESS_CHANGED = "addressChanged";
@@ -136,4 +140,20 @@ public final class Constants {
 	public static final String SOURCE_ORDERS_VENTAS_FIJA = "VENTASFIJA_PARKUR";
 	public static final String SOURCE_ORDERS_ATIS = "ATIS";
 	public static final String SOURCE_ORDERS_CMS = "CMS";
+
+	public static final Map<String, String> ATIS_CMS_STATUS = Stream.of(new String[][] {
+		  { "new", "EN PROCESO" }, 
+		  { "rejeted", "EN PROCESO" },
+		  { "pending", "EN PROCESO" }, 
+		  { "completed", "COMPLETADO" }, 
+		  { "rejected", "CANCELADO" }, 
+		  { "CE", "EN PROCESO" }, 
+		  { "PV", "EN PROCESO" }, 
+		  { "PD", "EN PROCESO" }, 
+		  { "PE", "EN PROCESO" }, 
+		  { "FI", "EN PROCESO" }, 
+		  { "TE", "COMPLETADO" }, 
+		  { "CG", "CANCELADO" }
+		}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.service.RetreiveOrderService;
 import pe.telefonica.provision.util.DateUtil;
+import pe.telefonica.provision.util.StringUtil;
 import pe.telefonica.provision.util.constants.Constants;
 
 @Service
@@ -55,7 +57,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 			if (originSystem.equals(Constants.SOURCE_ORDERS_ATIS)) {
 				return getOrderAtis(publicId, lStartDate, lEndDate);
 			} else {
-				return getOrderCms(publicId, orderCode, customerCode, lStartDate, lEndDate);
+				return getOrderCms(publicId, order, orderCode, customerCode, lStartDate, lEndDate);
 			}
 		}
 		return null;
@@ -72,10 +74,10 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		}
 	}
 
-	private ResponseEntity<Object> getOrderCms(String publicId, String orderCode, String customerCode,
+	private ResponseEntity<Object> getOrderCms(String publicId, String orderAtis, String orderCode, String customerCode,
 			LocalDateTime startDate, LocalDateTime endDate) {
 		try {
-			Order order = productOrdersApi.getProductOrders(publicId, orderCode, customerCode);
+			Order order = productOrdersApi.getProductOrders(publicId, orderAtis, orderCode, customerCode);
 			Order lOrder = orderRepository.getOrdersByCmsCode(publicId, startDate, endDate);
 
 			// Si order es nulo y lOrder es nulo, debe devolver respuesta no existe
@@ -84,7 +86,8 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 			// Si order existe y lorder existe , se debe actualizar y devolver merge de
 			// orders
 			if (lOrder != null) {
-
+				orderRepository.updateOrder(lOrder.getIdOrder(), updateOrderFields(order, lOrder));
+			} else {
 				orderRepository.saveOrder(order);
 			}
 
@@ -143,5 +146,17 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 						"There was a problem in the Service Providers network that prevented to carry out the request",
 						"Generic Server Fault"),
 				headers, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	private Update updateOrderFields(Order order, Order orderSaved) {
+		Update update = new Update();
+		update.set("commercialOp", order.getSource());
+		update.set("registerOrderDate", StringUtil.getValue(order.getCode(), orderSaved.getCode()));
+		update.set("cmsRequest", StringUtil.getValue(order.getServiceCode(), orderSaved.getServiceCode()));
+		update.set("phone", StringUtil.getValue(order.getPhone(), orderSaved.getPhone()));
+		update.set("statusOrderDescription",
+				StringUtil.getValue(order.getDocumentType(), orderSaved.getDocumentType()));
+
+		return update;
 	}
 }

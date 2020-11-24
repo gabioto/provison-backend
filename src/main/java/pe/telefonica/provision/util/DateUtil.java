@@ -4,6 +4,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,8 +40,12 @@ public class DateUtil {
 	}
 
 	public static LocalDateTime stringToLocalDateTime(String stringDate) {
+		return stringToLocalDateTime(stringDate, Constants.TIMESTAMP_FORMAT_ORDERS);
+	}
+
+	public static LocalDateTime stringToLocalDateTime(String stringDate, String format) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_USER);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 			LocalDateTime dateTime = LocalDateTime.parse(stringDate, formatter);
 			return dateTime;
 		} catch (Exception e) {
@@ -49,8 +55,11 @@ public class DateUtil {
 
 	public static String localDateTimeToString(LocalDateTime date) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_PSI);
-			return date.format(formatter);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_CMS_ATIS);
+
+			ZonedDateTime zone = ZonedDateTime.of(date, ZoneOffset.of("-05:00"));
+
+			return zone.format(formatter);
 		} catch (Exception e) {
 			return null;
 		}

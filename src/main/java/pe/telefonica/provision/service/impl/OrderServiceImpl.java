@@ -86,8 +86,10 @@ public class OrderServiceImpl implements OrderService {
 		update.set("phone", StringUtil.getValue(order.getPhone(), orderSaved.getPhone()));
 		update.set("documentType", StringUtil.getValue(order.getDocumentType(), orderSaved.getDocumentType()));
 		update.set("documentNumber", StringUtil.getValue(order.getDocumentNumber(), orderSaved.getDocumentNumber()));
-		update.set("execSuspDate", StringUtil.getValue(order.getExecSuspDate(), orderSaved.getExecSuspDate()));
-		update.set("execRecoxDate", StringUtil.getValue(order.getExecRecoxDate(), orderSaved.getExecRecoxDate()));
+		update.set("execSuspDate",
+				order.getExecSuspDate() != null ? order.getExecSuspDate() : orderSaved.getExecSuspDate());
+		update.set("execRecoxDate",
+				order.getExecRecoxDate() != null ? order.getExecRecoxDate() : orderSaved.getExecRecoxDate());
 		update.set("note1", StringUtil.getValue(order.getNote1(), orderSaved.getNote1()));
 		update.set("application", StringUtil.getValue(order.getApplication(), orderSaved.getApplication()));
 		update.set("contactPhone", StringUtil.getValue(order.getContactPhone(), orderSaved.getContactPhone()));
@@ -97,17 +99,18 @@ public class OrderServiceImpl implements OrderService {
 		update.set("errorCode", StringUtil.getValue(order.getErrorCode(), orderSaved.getErrorCode()));
 		update.set("errorDescription",
 				StringUtil.getValue(order.getErrorDescription(), orderSaved.getErrorDescription()));
-		update.set("receptionDate", StringUtil.getValue(order.getReceptionDate(), orderSaved.getReceptionDate()));
+		update.set("receptionDate",
+				order.getReceptionDate() != null ? order.getReceptionDate() : orderSaved.getReceptionDate());
 		update.set("status", StringUtil.getValue(order.getStatus(), orderSaved.getStatus()));
 		update.set("atisOrder", StringUtil.getValue(order.getAtisOrder(), orderSaved.getAtisOrder()));
 		update.set("cmsRequest", StringUtil.getValue(order.getCmsRequest(), orderSaved.getCmsRequest()));
 		update.set("statusOrderCode", StringUtil.getValue(order.getStatusOrderCode(), orderSaved.getStatusOrderCode()));
 		update.set("statusOrderDescription",
 				StringUtil.getValue(order.getStatusOrderDescription(), orderSaved.getStatusOrderDescription()));
-		update.set("registerOrderDate",
-				StringUtil.getValue(order.getRegisterOrderDate(), orderSaved.getRegisterOrderDate()));
+		update.set("registerOrderDate", order.getRegisterOrderDate() != null ? order.getRegisterOrderDate()
+				: orderSaved.getRegisterOrderDate());
 		update.set("releaseOrderDate",
-				StringUtil.getValue(order.getReleaseOrderDate(), orderSaved.getReleaseOrderDate()));
+				order.getReleaseOrderDate() != null ? order.getReleaseOrderDate() : orderSaved.getReleaseOrderDate());
 		update.set("note2", StringUtil.getValue(order.getNote2(), orderSaved.getNote2()));
 		update.set("idResult", StringUtil.getValue(order.getIdResult(), orderSaved.getIdResult()));
 		update.set("registerLocalDate", LocalDateTime.now(ZoneOffset.of("-05:00")));

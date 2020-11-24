@@ -103,8 +103,8 @@ public class OrderResponse {
 		documentType = order.getDocumentType();
 		documentNumber = order.getDocumentNumber();
 		registerDate = DateUtil.localDateTimeToString(order.getRegisterDate());
-		execSuspDate = order.getExecSuspDate();
-		execRecoxDate = order.getExecRecoxDate();
+		execSuspDate = DateUtil.localDateTimeToString(order.getExecSuspDate());
+		execRecoxDate = DateUtil.localDateTimeToString(order.getExecRecoxDate());
 		note1 = order.getNote1();
 		application = order.getApplication();
 		commercialOp = order.getCommercialOp();
@@ -113,14 +113,14 @@ public class OrderResponse {
 		contactMail = order.getContactMail();
 		errorCode = order.getErrorCode();
 		errorDescription = order.getErrorDescription();
-		receptionDate = order.getReceptionDate();
+		receptionDate = DateUtil.localDateTimeToString(order.getReceptionDate());
 		status = order.getStatus();
 		atisOrder = order.getAtisOrder();
 		cmsRequest = order.getCmsRequest();
 		statusOrderCode = order.getStatusOrderCode();
 		statusOrderDescription = order.getStatusOrderDescription();
-		registerOrderDate = order.getRegisterOrderDate();
-		releaseOrderDate = order.getReleaseOrderDate();
+		registerOrderDate = DateUtil.localDateTimeToString(order.getRegisterOrderDate());
+		releaseOrderDate = DateUtil.localDateTimeToString(order.getReleaseOrderDate());
 		note2 = order.getNote2();
 		idResult = order.getIdResult();
 		return this;

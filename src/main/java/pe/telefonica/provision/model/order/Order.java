@@ -39,9 +39,9 @@ public class Order {
 
 	private LocalDateTime registerDate;
 
-	private String execSuspDate;
+	private LocalDateTime execSuspDate;
 
-	private String execRecoxDate;
+	private LocalDateTime execRecoxDate;
 
 	private String note1;
 
@@ -59,7 +59,7 @@ public class Order {
 
 	private String errorDescription;
 
-	private String receptionDate;
+	private LocalDateTime receptionDate;
 
 	private String status;
 
@@ -71,9 +71,9 @@ public class Order {
 
 	private String statusOrderDescription;
 
-	private String registerOrderDate;
+	private LocalDateTime registerOrderDate;
 
-	private String releaseOrderDate;
+	private LocalDateTime releaseOrderDate;
 
 	private String note2;
 

@@ -3,6 +3,7 @@ package pe.telefonica.provision.external.response;
 import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
+import pe.telefonica.provision.util.DateUtil;
 import pe.telefonica.provision.util.constants.Constants;
 
 @Getter
@@ -47,9 +48,11 @@ public class ProductOrderResponse {
 	public Order fromThis(String publicId) {
 		Order order = new Order();
 		order.setCommercialOp(productOrderType.getProductOrderType());
-		order.setRegisterOrderDate(productOrderType.getOrderDate());
+		order.setRegisterOrderDate(
+				DateUtil.stringToLocalDateTime(productOrderType.getOrderDate(), Constants.TIMESTAMP_FORMAT_CMS_ATIS));
 		order.setCmsRequest(productOrderType.getId());
-		order.setPhone(publicId);
+		order.setServiceCode(publicId);
+		order.setStatusOrderCode(productOrderType.getStatus());
 		order.setStatusOrderDescription(Constants.ATIS_CMS_STATUS.get(productOrderType.getStatus()));
 		return order;
 	}

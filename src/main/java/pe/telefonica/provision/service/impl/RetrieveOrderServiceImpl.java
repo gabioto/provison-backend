@@ -1,6 +1,7 @@
 package pe.telefonica.provision.service.impl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -150,13 +151,15 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
 	private Update updateOrderFields(Order order, Order orderSaved) {
 		Update update = new Update();
-		update.set("commercialOp", order.getSource());
-		update.set("registerOrderDate", StringUtil.getValue(order.getCode(), orderSaved.getCode()));
-		update.set("cmsRequest", StringUtil.getValue(order.getServiceCode(), orderSaved.getServiceCode()));
-		update.set("phone", StringUtil.getValue(order.getPhone(), orderSaved.getPhone()));
+		update.set("commercialOp", StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOp()));
+		update.set("registerOrderDate", order.getRegisterOrderDate() != null ? order.getRegisterOrderDate()
+				: orderSaved.getRegisterOrderDate());
+		update.set("cmsRequest", StringUtil.getValue(order.getCmsRequest(), orderSaved.getCmsRequest()));
+		update.set("serviceCode", StringUtil.getValue(order.getServiceCode(), orderSaved.getServiceCode()));
 		update.set("statusOrderDescription",
-				StringUtil.getValue(order.getDocumentType(), orderSaved.getDocumentType()));
-
+				StringUtil.getValue(order.getStatusOrderDescription(), orderSaved.getStatusOrderDescription()));
+		update.set("statusOrderCode", StringUtil.getValue(order.getStatusOrderCode(), orderSaved.getStatusOrderCode()));
+		update.set("registerLocalDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 		return update;
 	}
 }

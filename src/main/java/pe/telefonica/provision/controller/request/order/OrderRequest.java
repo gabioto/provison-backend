@@ -73,8 +73,8 @@ public class OrderRequest {
 		order.setDocumentType(documentType);
 		order.setDocumentNumber(documentNumber);
 		order.setRegisterDate(DateUtil.stringToLocalDateTime(registerDate));
-		order.setExecSuspDate(execSuspDate);
-		order.setExecRecoxDate(execRecoxDate);
+		order.setExecSuspDate(DateUtil.stringToLocalDateTime(execSuspDate));
+		order.setExecRecoxDate(DateUtil.stringToLocalDateTime(execRecoxDate));
 		order.setNote1(note1);
 		order.setApplication(application);
 		order.setCommercialOp(commercialOp);
@@ -83,7 +83,7 @@ public class OrderRequest {
 		order.setContactMail(contactMail);
 		order.setErrorCode(errorCode);
 		order.setErrorDescription(errorDescription);
-		order.setReceptionDate(receptionDate);
+		order.setReceptionDate(DateUtil.stringToLocalDateTime(receptionDate));
 		order.setStatus(status);
 		order.setAtisOrder(atisOrder);
 		order.setCmsRequest(cmsRequest);
@@ -91,8 +91,8 @@ public class OrderRequest {
 		order.setStatusOrderDescription(
 				source.equals(Constants.SOURCE_ORDERS_ATIS) ? Constants.ATIS_CMS_STATUS.get(statusOrderCode)
 						: statusOrderDescription);
-		order.setRegisterOrderDate(registerOrderDate);
-		order.setReleaseOrderDate(releaseOrderDate);
+		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(registerOrderDate));
+		order.setReleaseOrderDate(DateUtil.stringToLocalDateTime(releaseOrderDate));
 		order.setNote2(note2);
 		order.setIdResult(oldResult);
 

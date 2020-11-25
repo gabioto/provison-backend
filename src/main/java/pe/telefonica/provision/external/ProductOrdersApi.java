@@ -3,7 +3,9 @@ package pe.telefonica.provision.external;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +62,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 	@Autowired
 	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
 
-	public Order getProductOrders(String publicId, String order, String orderCode, String customerCode) {
+	public List<Order> getProductOrders(String publicId, String order, String orderCode, String customerCode) {
 
 		String oAuthToken;
 		UriComponentsBuilder builder;
@@ -99,8 +101,10 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		}
 
 		try {
-			ResponseEntity<ProductOrderResponse> responseEntity = restTemplate.exchange(builder.toUriString(),
-					HttpMethod.GET, new HttpEntity<>(headers), ProductOrderResponse.class);
+			ResponseEntity<List<ProductOrderResponse>> responseEntity = restTemplate.exchange(builder.toUriString(),
+					HttpMethod.GET, new HttpEntity<>(headers),
+					new ParameterizedTypeReference<List<ProductOrderResponse>>() {
+					});
 
 			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(builder.toUriString()),
 					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour,
@@ -108,7 +112,9 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
-			return responseEntity.getBody().fromThis(publicId);
+			return responseEntity.getBody().parallelStream().map(response -> {
+				return response.fromThis(publicId);
+			}).collect(Collectors.toList());
 
 		} catch (HttpClientErrorException ex) {
 			log.info("HttpClientErrorException = " + ex.getMessage());

@@ -1,5 +1,8 @@
 package pe.telefonica.provision.external.response;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
@@ -10,26 +13,19 @@ import pe.telefonica.provision.util.constants.Constants;
 @Setter
 public class ProductOrderResponse {
 
-	private ProductOrderType productOrderType;
-
-	@Getter
-	@Setter
-	public class ProductOrderType {
-		private String id;
-		private String href;
-		private String correlationId;
-		private String description;
-		private String productOrderType;
-		private String orderDate;
-		private String completionDate;
-		private String status;
-		private String statusReason;
-		private String statusChangeDate;
-		private String source;
-		private RelatedParty relatedParty;
-		private Channel channel;
-
-	}
+	private String id;
+	private String href;
+	private String correlationId;
+	private String description;
+	private String productOrderType;
+	private String orderDate;
+	private String completionDate;
+	private String status;
+	private String statusReason;
+	private String statusChangeDate;
+	private String source;
+	private List<RelatedParty> relatedParty = new ArrayList<>();
+	private List<Channel> channel = new ArrayList<>();
 
 	@Getter
 	@Setter
@@ -47,13 +43,12 @@ public class ProductOrderResponse {
 
 	public Order fromThis(String publicId) {
 		Order order = new Order();
-		order.setCommercialOp(productOrderType.getProductOrderType());
-		order.setRegisterOrderDate(
-				DateUtil.stringToLocalDateTime(productOrderType.getOrderDate(), Constants.TIMESTAMP_FORMAT_CMS_ATIS));
-		order.setCmsRequest(productOrderType.getId());
+		order.setCommercialOp(getProductOrderType());
+		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(getOrderDate(), Constants.TIMESTAMP_FORMAT_CMS_ATIS));
+		order.setCmsRequest(getId());
 		order.setServiceCode(publicId);
-		order.setStatusOrderCode(productOrderType.getStatus());
-		order.setStatusOrderDescription(Constants.ATIS_CMS_STATUS.get(productOrderType.getStatus()));
+		order.setStatusOrderCode(getStatus());
+		order.setStatusOrderDescription(Constants.ATIS_CMS_STATUS.get(getStatus()));
 		return order;
 	}
 }

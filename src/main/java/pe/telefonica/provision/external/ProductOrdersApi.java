@@ -66,7 +66,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 		String oAuthToken;
 		UriComponentsBuilder builder;
-		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
 
 		// Implementacion SSL
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
@@ -94,10 +94,10 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		if (!order.isEmpty()) {
 			builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParam("id", order);
 		} else {
-			builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParam("customerId", "")
-					.queryParam("accountId", "").queryParam("productType", "").queryParam("publicId", publicId)
-					.queryParam("relatedSource.name", "CMS").queryParam("relatedSource.customerId", customerCode)
-					.queryParam("relatedSource.accountId", orderCode).queryParam("relatedSource.serviceCode", "");
+			builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParam("customerId", customerCode)
+					.queryParam("accountId", orderCode).queryParam("productType", "").queryParam("publicId", publicId)
+					.queryParam("relatedSource.name", "").queryParam("relatedSource.customerId", "")
+					.queryParam("relatedSource.accountId", "").queryParam("relatedSource.serviceCode", "");
 		}
 
 		try {
@@ -108,7 +108,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(builder.toUriString()),
 					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour,
-					LocalDateTime.now(ZoneOffset.of("-05:00")), responseEntity.getStatusCodeValue());
+					LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)), responseEntity.getStatusCodeValue());
 
 			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
@@ -121,7 +121,8 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getResponseBodyAsString(),
-					requestUrl, startHour, LocalDateTime.now(ZoneOffset.of("-05:00")), ex.getStatusCode().value());
+					requestUrl, startHour, LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)),
+					ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 			System.out.println(jsonDecode);
@@ -136,7 +137,8 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getMessage(), requestUrl,
-					startHour, LocalDateTime.now(ZoneOffset.of("-05:00")), HttpStatus.INTERNAL_SERVER_ERROR.value());
+					startHour, LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)),
+					HttpStatus.INTERNAL_SERVER_ERROR.value());
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}

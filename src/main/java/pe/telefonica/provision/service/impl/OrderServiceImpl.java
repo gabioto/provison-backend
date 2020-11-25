@@ -49,7 +49,8 @@ public class OrderServiceImpl implements OrderService {
 			}
 
 			if (orderSaved != null) {
-				if (orderSaved.getStatus().equals(order.getStatus())) {
+				if (order.getSource().equals(Constants.SOURCE_ORDERS_VENTAS_FIJA)
+						&& orderSaved.getStatus().equals(order.getStatus())) {
 					return new ResponseEntity<Object>(
 							new ErrorResponse("SVC1000", "Duplicate status field",
 									"Status field has the same value as the stored one", "Duplicate status field"),
@@ -86,6 +87,8 @@ public class OrderServiceImpl implements OrderService {
 		update.set("phone", StringUtil.getValue(order.getPhone(), orderSaved.getPhone()));
 		update.set("documentType", StringUtil.getValue(order.getDocumentType(), orderSaved.getDocumentType()));
 		update.set("documentNumber", StringUtil.getValue(order.getDocumentNumber(), orderSaved.getDocumentNumber()));
+		update.set("registerDate",
+				order.getRegisterDate() != null ? order.getRegisterDate() : orderSaved.getRegisterDate());
 		update.set("execSuspDate",
 				order.getExecSuspDate() != null ? order.getExecSuspDate() : orderSaved.getExecSuspDate());
 		update.set("execRecoxDate",
@@ -113,7 +116,7 @@ public class OrderServiceImpl implements OrderService {
 				order.getReleaseOrderDate() != null ? order.getReleaseOrderDate() : orderSaved.getReleaseOrderDate());
 		update.set("note2", StringUtil.getValue(order.getNote2(), orderSaved.getNote2()));
 		update.set("idResult", StringUtil.getValue(order.getIdResult(), orderSaved.getIdResult()));
-		update.set("registerLocalDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+		update.set("lastUpdateDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
 		if (!order.getSource().equals(Constants.SOURCE_ORDERS_ATIS)) {
 			update.set("commercialOp", order.getCommercialOp());

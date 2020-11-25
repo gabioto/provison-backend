@@ -1,11 +1,10 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -48,8 +47,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Criteria criteria = Criteria.where("cmsRequest").is(cmsCode);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
-				Order.class);
+		return mongoOperations.findOne(new Query(criteria), Order.class);
 	}
 
 	@Override
@@ -58,8 +56,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Criteria criteria = Criteria.where("atisOrder").is(atisCode);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
-				Order.class);
+		return mongoOperations.findOne(new Query(criteria), Order.class);
 	}
 
 	@Override
@@ -68,18 +65,16 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Criteria criteria = Criteria.where("code").is(saleCode);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
-				Order.class);
+		return mongoOperations.findOne(new Query(criteria), Order.class);
 	}
 
 	@Override
-	public Order getOrdersByPhone(String publicId, LocalDateTime startDate, LocalDateTime endDate) {
+	public List<Order> getOrdersByPhone(String publicId, LocalDateTime startDate, LocalDateTime endDate) {
 
 		Criteria criteria = Criteria.where("phone").is(publicId);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
-				Order.class);
+		return mongoOperations.find(new Query(criteria), Order.class);
 	}
 
 	private Criteria validateFilterBetweenDates(Criteria criteria, LocalDateTime startDate, LocalDateTime endDate) {

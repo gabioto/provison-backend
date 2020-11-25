@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import pe.telefonica.provision.util.constants.Constants;
 
 @Getter
 @Setter
@@ -79,5 +80,9 @@ public class Order {
 
 	private String idResult;
 
-	private LocalDateTime registerLocalDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+	private LocalDateTime registerLocalDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
+
+	private LocalDateTime lastUpdateDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
+	
+	private LocalDateTime auxDate;
 }

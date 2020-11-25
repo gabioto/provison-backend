@@ -2,7 +2,10 @@ package pe.telefonica.provision.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,11 +72,13 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 			LocalDateTime endDate) {
 
 		boolean filterByOrder = false;
+		List<Order> orders = new ArrayList<>();
 		Order order;
 
 		try {
 			if (orderAtis.isEmpty()) {
-				order = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
+				orders = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
+				order = getLastOrder(orders);
 			} else {
 				order = orderRepository.getOrdersByAtisCode(orderAtis, startDate, endDate);
 				filterByOrder = true;
@@ -87,6 +92,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
 	private ResponseEntity<Object> getOrderCms(String publicId, String orderAtis, String orderCode, String customerCode,
 			LocalDateTime startDate, LocalDateTime endDate) {
+
 		try {
 			List<Order> order = productOrdersApi.getProductOrders(publicId, orderAtis, orderCode, customerCode);
 			Order lOrder = orderRepository.getOrdersByCmsCode(publicId, startDate, endDate);
@@ -132,6 +138,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	}
 
 	private ResponseEntity<Object> evaluateOrders(Order order, String filterCode) {
+
 		HttpStatus status;
 		Object response;
 
@@ -152,6 +159,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	}
 
 	private ResponseEntity<Object> setInternalError(String message) {
+
 		return new ResponseEntity<Object>(
 				new ErrorResponse("SVR1000", String.format("Generic Server Error: %1$s - Details", message),
 						"There was a problem in the Service Providers network that prevented to carry out the request",
@@ -159,8 +167,31 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 				headers, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	private Order getLastOrder(List<Order> orders) {
+
+		List<Order> orderDates = orders.stream().map(order -> {
+			if (order.getRegisterDate() != null) {
+				order.setAuxDate(order.getRegisterDate());
+			} else if (order.getRegisterOrderDate() != null) {
+				order.setAuxDate(order.getRegisterOrderDate());
+			} else {
+				order.setAuxDate(order.getRegisterLocalDate());
+			}
+
+			return order;
+		}).collect(Collectors.toList());
+
+		Comparator<Order> comparator = Comparator.comparing(Order::getAuxDate);
+
+		Order maxDatedOrder = orderDates.stream().filter(emp -> emp.getAuxDate() != null).max(comparator).get();
+
+		return maxDatedOrder;
+	}
+
 	private Update updateOrderFields(Order order, Order orderSaved) {
+
 		Update update = new Update();
+		update.set("source", Constants.SOURCE_ORDERS_CMS);
 		update.set("commercialOp", StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOp()));
 		update.set("registerOrderDate", order.getRegisterOrderDate() != null ? order.getRegisterOrderDate()
 				: orderSaved.getRegisterOrderDate());
@@ -169,7 +200,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		update.set("statusOrderDescription",
 				StringUtil.getValue(order.getStatusOrderDescription(), orderSaved.getStatusOrderDescription()));
 		update.set("statusOrderCode", StringUtil.getValue(order.getStatusOrderCode(), orderSaved.getStatusOrderCode()));
-		update.set("registerLocalDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+		update.set("lastUpdateDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 		return update;
 	}
 }

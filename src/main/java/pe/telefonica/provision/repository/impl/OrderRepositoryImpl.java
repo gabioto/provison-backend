@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,12 +34,12 @@ public class OrderRepositoryImpl implements OrderRepository {
 
 	@Override
 	public Order getOrderByAtisCode(String atisCode) {
-		return mongoOperations.findOne(new Query(Criteria.where("atisOrder").is(atisCode)), Order.class);
+		return getOrdersByAtisCode(atisCode, null, null);
 	}
 
 	@Override
 	public Order getOrderBySaleCode(String saleCode) {
-		return mongoOperations.findOne(new Query(Criteria.where("code").is(saleCode)), Order.class);
+		return getOrdersBySaleCode(saleCode, null, null);
 	}
 
 	@Override
@@ -46,7 +48,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Criteria criteria = Criteria.where("cmsRequest").is(cmsCode);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria), Order.class);
+		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
+				Order.class);
 	}
 
 	@Override
@@ -55,7 +58,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Criteria criteria = Criteria.where("atisOrder").is(atisCode);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria), Order.class);
+		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
+				Order.class);
 	}
 
 	@Override
@@ -64,7 +68,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Criteria criteria = Criteria.where("code").is(saleCode);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria), Order.class);
+		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
+				Order.class);
 	}
 
 	@Override
@@ -73,7 +78,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Criteria criteria = Criteria.where("phone").is(publicId);
 		criteria = validateFilterBetweenDates(criteria, startDate, endDate);
 
-		return mongoOperations.findOne(new Query(criteria), Order.class);
+		return mongoOperations.findOne(new Query(criteria).with(new Sort(Direction.DESC, "registerLocalDate")),
+				Order.class);
 	}
 
 	private Criteria validateFilterBetweenDates(Criteria criteria, LocalDateTime startDate, LocalDateTime endDate) {

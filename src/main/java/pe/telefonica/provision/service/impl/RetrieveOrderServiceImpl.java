@@ -2,6 +2,7 @@ package pe.telefonica.provision.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,7 +57,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 			}
 		} else {
 			if (originSystem.equals(Constants.SOURCE_ORDERS_ATIS)) {
-				return getOrderAtis(publicId, lStartDate, lEndDate);
+				return getOrderAtis(publicId, order, lStartDate, lEndDate);
 			} else {
 				return getOrderCms(publicId, order, orderCode, customerCode, lStartDate, lEndDate);
 			}
@@ -64,12 +65,21 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		return null;
 	}
 
-	private ResponseEntity<Object> getOrderAtis(String publicId, LocalDateTime startDate, LocalDateTime endDate) {
+	private ResponseEntity<Object> getOrderAtis(String publicId, String orderAtis, LocalDateTime startDate,
+			LocalDateTime endDate) {
+
+		boolean filterByOrder = false;
+		Order order;
 
 		try {
-			Order order = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
+			if (orderAtis.isEmpty()) {
+				order = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
+			} else {
+				order = orderRepository.getOrdersByAtisCode(orderAtis, startDate, endDate);
+				filterByOrder = true;
+			}
 
-			return evaluateOrders(order, publicId);
+			return evaluateOrders(order, filterByOrder ? orderAtis : publicId);
 		} catch (Exception e) {
 			return setInternalError(e.getLocalizedMessage());
 		}
@@ -78,7 +88,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	private ResponseEntity<Object> getOrderCms(String publicId, String orderAtis, String orderCode, String customerCode,
 			LocalDateTime startDate, LocalDateTime endDate) {
 		try {
-			Order order = productOrdersApi.getProductOrders(publicId, orderAtis, orderCode, customerCode);
+			List<Order> order = productOrdersApi.getProductOrders(publicId, orderAtis, orderCode, customerCode);
 			Order lOrder = orderRepository.getOrdersByCmsCode(publicId, startDate, endDate);
 
 			// Si order es nulo y lOrder es nulo, debe devolver respuesta no existe
@@ -87,12 +97,12 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 			// Si order existe y lorder existe , se debe actualizar y devolver merge de
 			// orders
 			if (lOrder != null) {
-				orderRepository.updateOrder(lOrder.getIdOrder(), updateOrderFields(order, lOrder));
+				orderRepository.updateOrder(lOrder.getIdOrder(), updateOrderFields(order.get(0), lOrder));
 			} else {
-				orderRepository.saveOrder(order);
+				orderRepository.saveOrder(order.get(0));
 			}
 
-			return evaluateOrders(order, publicId);
+			return evaluateOrders(order.get(0), publicId);
 		} catch (Exception e) {
 			return setInternalError(e.getLocalizedMessage());
 		}

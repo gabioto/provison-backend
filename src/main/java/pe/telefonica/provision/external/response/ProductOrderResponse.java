@@ -43,12 +43,12 @@ public class ProductOrderResponse {
 
 	public Order fromThis(String publicId) {
 		Order order = new Order();
-		order.setCommercialOp(getProductOrderType());
-		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(getOrderDate(), Constants.TIMESTAMP_FORMAT_CMS_ATIS));
-		order.setCmsRequest(getId());
+		order.setCommercialOp(productOrderType);
+		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(orderDate, Constants.TIMESTAMP_FORMAT_CMS_ATIS));
+		order.setCmsRequest(id);
 		order.setServiceCode(publicId);
-		order.setStatusOrderCode(getStatus());
-		order.setStatusOrderDescription(Constants.ATIS_CMS_STATUS.get(getStatus()));
+		order.setStatusOrderCode(status);
+		order.setStatusOrderDescription(Constants.ATIS_CMS_STATUS.get(status));
 		return order;
 	}
 }

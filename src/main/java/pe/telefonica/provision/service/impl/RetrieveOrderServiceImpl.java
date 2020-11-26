@@ -90,29 +90,36 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		}
 	}
 
-	private ResponseEntity<Object> getOrderCms(String publicId, String orderAtis, String orderCode, String customerCode,
+	private ResponseEntity<Object> getOrderCms(String publicId, String id, String orderCode, String customerCode,
 			LocalDateTime startDate, LocalDateTime endDate) {
 
 		try {
-			List<Order> order = productOrdersApi.getProductOrders(publicId, orderAtis, orderCode, customerCode);
-			Order lOrder = orderRepository.getOrdersByCmsCode(publicId, startDate, endDate);
+			List<Order> orders = productOrdersApi.getProductOrders(publicId, id, orderCode, customerCode);
 
-			// Si order es nulo y lOrder es nulo, debe devolver respuesta no existe
-			// Si order es nulo y lOrder existe, debe devolver respuesta lOrder
-			// Si order existe y lOrder es nulo, se debe insertar y devolver order
-			// Si order existe y lorder existe , se debe actualizar y devolver merge de
-			// orders
-			if (lOrder != null) {
-				orderRepository.updateOrder(lOrder.getIdOrder(), updateOrderFields(order.get(0), lOrder));
+			if (orders != null && orders.size() > 0) {
+				if (!id.isEmpty()) {
+					saveCmsOrder(orders.get(0), startDate, endDate);
+
+					return evaluateOrders(orders.get(0), id);
+				} else {
+					for (Order order : orders) {
+						saveCmsOrder(order, startDate, endDate);
+					}
+
+					Order returnedOrder = getLastOrder(orders);
+
+					return evaluateOrders(returnedOrder, publicId);
+				}
 			} else {
-				orderRepository.saveOrder(order.get(0));
+				return evaluateOrders(null,
+						id != null ? id
+								: String.format("publicId: %1$s, codCliente: %2$s, codCuenta: %3$s", publicId,
+										customerCode, orderCode));
 			}
 
-			return evaluateOrders(order.get(0), publicId);
 		} catch (Exception e) {
 			return setInternalError(e.getLocalizedMessage());
 		}
-
 	}
 
 	private ResponseEntity<Object> getOrderBySaleCode(String code, LocalDateTime startDate, LocalDateTime endDate) {
@@ -165,6 +172,16 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 						"There was a problem in the Service Providers network that prevented to carry out the request",
 						"Generic Server Fault"),
 				headers, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	private void saveCmsOrder(Order order, LocalDateTime startDate, LocalDateTime endDate) {
+		Order lOrder = orderRepository.getOrdersByCmsCode(order.getCmsRequest(), startDate, endDate);
+
+		if (lOrder != null) {
+			orderRepository.updateOrder(lOrder.getIdOrder(), updateOrderFields(order, lOrder));
+		} else {
+			orderRepository.saveOrder(order);
+		}
 	}
 
 	private Order getLastOrder(List<Order> orders) {

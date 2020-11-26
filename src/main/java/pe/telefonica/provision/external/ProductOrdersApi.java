@@ -15,7 +15,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -79,7 +78,6 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		oAuthToken = getAuthToken();
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("UNICA-ServiceId", "");
 		headers.set("UNICA-Application", "");
 		headers.set("UNICA-PID", "");

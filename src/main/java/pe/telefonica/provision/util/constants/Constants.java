@@ -147,7 +147,7 @@ public final class Constants {
 	public static final Map<String, String> ATIS_CMS_STATUS = Stream
 			.of(new String[][] { { "new", "EN PROCESO" }, { "rejeted", "EN PROCESO" }, { "pending", "EN PROCESO" },
 					{ "completed", "COMPLETADO" }, { "rejected", "CANCELADO" }, { "CE", "EN PROCESO" },
-					{ "PV", "EN PROCESO" }, { "PD", "EN PROCESO" }, { "PE", "EN PROCESO" }, { "FI", "EN PROCESO" },
+					{ "PV", "EN PROCESO" }, { "PD", "EN PROCESO" }, { "PE", "EN PROCESO" }, { "FI", "COMPLETADO" },
 					{ "TE", "COMPLETADO" }, { "CG", "CANCELADO" } })
 			.collect(Collectors.toMap(data -> data[0], data -> data[1]));
 

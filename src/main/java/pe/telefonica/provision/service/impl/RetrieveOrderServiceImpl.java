@@ -44,11 +44,18 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	public ResponseEntity<Object> getOrder(String uServiceId, String uPid, String code, String originSystem,
 			String publicId, String order, String orderCode, String customerCode, String startDate, String endDate) {
 
-		LocalDateTime lStartDate = DateUtil.stringToLocalDateTime(startDate);
-		LocalDateTime lEndDate = DateUtil.stringToLocalDateTime(endDate);
-
 		headers.add("UNICA-ServiceId", uServiceId);
 		headers.add("UNICA-PID", uPid);
+
+		LocalDateTime lStartDate = DateUtil.stringToLocalDateTime(startDate,
+				Constants.TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE);
+		LocalDateTime lEndDate = DateUtil.stringToLocalDateTime(endDate, Constants.TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE);
+		ResponseEntity<Object> validateResponse = validateDates(lStartDate, lEndDate,
+				(!startDate.isEmpty() || !startDate.isEmpty()));
+
+		if (validateResponse != null) {
+			return validateResponse;
+		}
 
 		if (originSystem.isEmpty()) {
 			if (!code.isEmpty()) {
@@ -65,7 +72,11 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 				return getOrderCms(publicId, order, orderCode, customerCode, lStartDate, lEndDate);
 			}
 		}
-		return null;
+
+		return new ResponseEntity<Object>(
+				new ErrorResponse("SVC0001", "Generic Client Error: Empty query params",
+						"API Generic wildcard fault response", "Generic Client Error"),
+				headers, HttpStatus.BAD_REQUEST);
 	}
 
 	private ResponseEntity<Object> getOrderAtis(String publicId, String orderAtis, LocalDateTime startDate,
@@ -73,12 +84,16 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
 		boolean filterByOrder = false;
 		List<Order> orders = new ArrayList<>();
-		Order order;
+		Order order = null;
 
 		try {
 			if (orderAtis.isEmpty()) {
 				orders = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
-				order = getLastOrder(orders);
+
+				if (orders.size() > 0) {
+					order = getLastOrder(orders);
+				}
+
 			} else {
 				order = orderRepository.getOrdersByAtisCode(orderAtis, startDate, endDate);
 				filterByOrder = true;
@@ -144,36 +159,6 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		}
 	}
 
-	private ResponseEntity<Object> evaluateOrders(Order order, String filterCode) {
-
-		HttpStatus status;
-		Object response;
-
-		log.info("Orders - " + (order != null ? order.toString() : "null"));
-
-		if (order != null) {
-			status = HttpStatus.OK;
-			response = new OrderResponse().fromOrder(order);
-		} else {
-			status = HttpStatus.NOT_FOUND;
-			response = new ErrorResponse("SVC1006",
-					String.format("Resource %1$s does not exist %1$s Resource Identifier", filterCode),
-					"Reference to a resource identifier which does not exist in the collection/repository referred (e.g.: invalid Id)",
-					"Not existing Resource Id");
-		}
-
-		return new ResponseEntity<Object>(response, headers, status);
-	}
-
-	private ResponseEntity<Object> setInternalError(String message) {
-
-		return new ResponseEntity<Object>(
-				new ErrorResponse("SVR1000", String.format("Generic Server Error: %1$s - Details", message),
-						"There was a problem in the Service Providers network that prevented to carry out the request",
-						"Generic Server Fault"),
-				headers, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
 	private void saveCmsOrder(Order order, LocalDateTime startDate, LocalDateTime endDate) {
 		Order lOrder = orderRepository.getOrdersByCmsCode(order.getCmsRequest(), startDate, endDate);
 
@@ -205,6 +190,18 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		return maxDatedOrder;
 	}
 
+	private ResponseEntity<Object> validateDates(LocalDateTime startDate, LocalDateTime endDate, boolean haveValue) {
+		if (startDate != null && endDate != null) {
+			if (endDate.isBefore(startDate)) {
+				return setBadRequestElement("fechaRegistroInicio/fechaRegistroFin");
+			}
+		} else if (haveValue) {
+			return setBadRequestElement("fechaRegistroInicio/fechaRegistroFin");
+		}
+
+		return null;
+	}
+
 	private Update updateOrderFields(Order order, Order orderSaved) {
 
 		Update update = new Update();
@@ -220,4 +217,42 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		update.set("lastUpdateDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 		return update;
 	}
+
+	private ResponseEntity<Object> evaluateOrders(Order order, String filterCode) {
+
+		HttpStatus status;
+		Object response;
+
+		log.info("Orders - " + (order != null ? order.toString() : "null"));
+
+		if (order != null) {
+			status = HttpStatus.OK;
+			response = new OrderResponse().fromOrder(order);
+		} else {
+			status = HttpStatus.NOT_FOUND;
+			response = new ErrorResponse("SVC1006", String.format("Resource %1$s does not exist", filterCode),
+					"Reference to a resource identifier which does not exist in the collection/repository referred (e.g.: invalid Id)",
+					"Not existing Resource Id");
+		}
+
+		return new ResponseEntity<Object>(response, headers, status);
+	}
+
+	private ResponseEntity<Object> setBadRequestElement(String message) {
+
+		return new ResponseEntity<Object>(new ErrorResponse("SVC1001",
+				String.format("Invalid parameter: %1$s", message),
+				"API Request with an element not conforming to Swagger definitions or to a list of allowed Query Parameters.",
+				"Invalid parameter"), headers, HttpStatus.BAD_REQUEST);
+	}
+
+	private ResponseEntity<Object> setInternalError(String message) {
+
+		return new ResponseEntity<Object>(
+				new ErrorResponse("SVR1000", String.format("Generic Server Error: %1$s", message),
+						"There was a problem in the Service Providers network that prevented to carry out the request",
+						"Generic Server Fault"),
+				headers, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 }

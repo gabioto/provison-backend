@@ -44,6 +44,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	public ResponseEntity<Object> getOrder(String uServiceId, String uPid, String code, String originSystem,
 			String publicId, String order, String orderCode, String customerCode, String startDate, String endDate) {
 
+		headers.clear();
 		headers.add("UNICA-ServiceId", uServiceId);
 		headers.add("UNICA-PID", uPid);
 

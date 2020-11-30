@@ -3,6 +3,7 @@ package pe.telefonica.provision.external.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
@@ -29,6 +30,7 @@ public class ProductOrderResponse {
 
 	@Getter
 	@Setter
+	@AllArgsConstructor
 	public class RelatedParty {
 		private String id;
 		private String href;
@@ -36,6 +38,7 @@ public class ProductOrderResponse {
 
 	@Getter
 	@Setter
+	@AllArgsConstructor
 	public class Channel {
 		private String id;
 		private String href;

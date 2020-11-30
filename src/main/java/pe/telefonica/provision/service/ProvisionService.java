@@ -24,6 +24,7 @@ public interface ProvisionService {
 	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
 
 	Provision getProvisionBySaleCode(String saleCode);
+	
 
 	List<ProvisionDto> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 	
@@ -39,7 +40,7 @@ public interface ProvisionService {
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request, String xaRequest, String xaRequirementNumber)
+	boolean provisionUpdateFromTOA(UpdateFromToaRequest request)
 			throws Exception;
 
 	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;

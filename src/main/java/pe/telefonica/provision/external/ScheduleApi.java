@@ -113,8 +113,8 @@ public class ScheduleApi {
 					PSIWorkResponse.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "modifyWork", url, new Gson().toJson(responseEntity.getBody()), url,
-					startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
+					startHour, endHour, responseEntity.getStatusCodeValue());
 
 			log.info("modifyWork - Body: " + responseEntity.getBody().toString());
 
@@ -128,8 +128,8 @@ public class ScheduleApi {
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(request), ex.getResponseBodyAsString(), url,
-					startHour, endHour);
+			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getResponseBodyAsString(), url,
+					startHour, endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 			System.out.println(jsonDecode);
@@ -144,8 +144,8 @@ public class ScheduleApi {
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(request), ex.getMessage(), url, startHour,
-					endHour);
+			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getMessage(), url, startHour,
+					endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}

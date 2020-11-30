@@ -233,5 +233,10 @@
     "name": "external.api.oauth2Url",
     "type": "java.lang.String",
     "description": "A description for 'external.api.oauth2Url'"
+  },
+  {
+    "name": "external.api.productOrders",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.productOrders'"
   }
 ]}

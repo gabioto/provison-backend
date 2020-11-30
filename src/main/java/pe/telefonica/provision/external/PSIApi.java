@@ -214,6 +214,50 @@ public class PSIApi extends ConfigRestTemplate {
 			return "";
 		}
 	}
+	
+	private String getTokenFromOnPremise(String customerName, boolean toInsert) {
+		RestTemplate restTemplate = new RestTemplate();
+		boolean updated = true;
+		String urlToken = api.getSecurityUrl() + api.getOauthTokenOnPremise();
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", security.getAuth());
+		headersMap.add("X-IBM-Client-Id", security.getClientId());
+		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
+
+		ApiRequest<Object> request = new ApiRequest<Object>(Constants.APP_NAME_PROVISION, customerName,
+				Constants.OPER_GET_OAUTH_TOKEN, null);
+
+		HttpEntity<ApiRequest<Object>> entityToken = new HttpEntity<ApiRequest<Object>>(request, headersMap);
+
+		try {
+			ParameterizedTypeReference<ApiResponse<OAuthToken>> parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<OAuthToken>>() {
+			};
+			ResponseEntity<ApiResponse<OAuthToken>> responseEntity = restTemplate.exchange(urlToken, HttpMethod.POST,
+					entityToken, parameterizedTypeReference);
+
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				if (toInsert) {
+					// insertToken(responseEntity.getBody().getBody());
+					oAuthTokenRepository.insertToken(responseEntity.getBody().getBody());
+				} else {
+					updated = oAuthTokenRepository.updateToken(responseEntity.getBody());
+
+					// updated = updateTokenInCollection(responseEntity.getBody());
+				}
+			} else {
+				return "";
+			}
+
+			log.info("responseEntity: " + responseEntity.getBody());
+
+			return updated ? ((OAuthToken) responseEntity.getBody().getBody()).getAccessToken() : "";
+		} catch (Exception e) {
+			log.info("Exception = " + e.getMessage());
+			return "";
+		}
+	}
 
 	// Util
 	private String generateAuthString() {
@@ -243,6 +287,28 @@ public class PSIApi extends ConfigRestTemplate {
 
 		return psiTokenGenerated;
 	}
+	
+	private String getAuthTokenOnPremise(String customerName) {
+		String psiTokenGenerated = "";
+		Optional<OAuthToken> optionalAuthToken = oAuthTokenRepository.getOAuthTokeOnPremise();
+
+		if (optionalAuthToken.isPresent()) {
+			OAuthToken oAuthToken = optionalAuthToken.get();
+			Date now = new Date();
+			long timeDiff = now.getTime() - (Long.parseLong(oAuthToken.getConsentedOn()) * 1000);
+
+			if (timeDiff >= ((Integer.parseInt(oAuthToken.getExpiresIn()) - 5) * 1000)) {
+				psiTokenGenerated = getTokenFromOnPremise(customerName, false);
+			} else {
+				psiTokenGenerated = oAuthToken.getAccessToken();
+			}
+
+		} else {
+			psiTokenGenerated = getTokenFromOnPremise(customerName, true);
+		}
+
+		return psiTokenGenerated;
+	}
 
 	private String stringToMD5(String string) {
 		try {
@@ -258,8 +324,85 @@ public class PSIApi extends ConfigRestTemplate {
 		}
 		return null;
 	}
-
+	
 	public boolean getCarrier(String phoneNumber) {
+
+		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String requestUrl = api.getCustomerUrlOnPremise() + api.getSearchCustomerOnPremise();
+		log.info("getCarrier - URL: " + requestUrl);
+
+		String input = "";
+		String oAuthToken;
+		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		LocalDateTime endHour;
+
+		try {
+			JsonObject jsonBody = new JsonObject();
+			JsonObject jsonTefHeaderReq = new JsonObject();
+			JsonObject jsonSearchCustomer = new JsonObject();
+			JsonObject jsonCustomerId = new JsonObject();
+			JsonObject jsonTelephoneNumber = new JsonObject();
+			jsonTefHeaderReq.addProperty("userLogin", "10223928");
+			jsonTefHeaderReq.addProperty("serviceChannel", "MS");
+			jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
+			jsonTefHeaderReq.addProperty("application", "COLTRA");
+			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
+			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
+			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
+			jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
+			jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
+			jsonTefHeaderReq.addProperty("version", "1.0");
+
+			jsonTelephoneNumber.addProperty("number", phoneNumber);
+			jsonCustomerId.add("telephoneNumber", jsonTelephoneNumber);
+			jsonSearchCustomer.add("customerIdentification", jsonCustomerId);
+
+			jsonBody.add("TefHeaderReq", jsonTefHeaderReq);
+			jsonBody.add("SearchCustomerRequestData", jsonSearchCustomer);
+
+			Gson gson = new Gson();
+			input = gson.toJson(jsonBody);
+			//getAuthToken(request.getBodyUpdateClient().getNombre_completo());
+			oAuthToken = getAuthTokenOnPremise("OAUTH_TOKEN_ON_PREMISE");
+
+			if (oAuthToken.isEmpty()) {
+				return false;
+			}
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.set("X-IBM-Client-Id", api.getCustomerSearchClient());
+			//headers.set("X-IBM-Client-Secret", api.getCustomerSearchSecret());
+			headers.set("Authorization", "Bearer " + oAuthToken);
+
+			HttpEntity<String> entity = new HttpEntity<>(input, headers);
+
+			ResponseEntity<String> output = restTemplate.postForEntity(requestUrl, entity, String.class);
+
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output.getBody(), requestUrl, startHour, endHour);
+
+			JsonElement jsonElement = gson.fromJson(output.getBody(), JsonElement.class);
+			JsonObject jsonOutput = jsonElement.getAsJsonObject();
+
+			JsonObject joOutputSearchData = jsonOutput.getAsJsonObject("SearchCustomerResponseData");
+			JsonObject joOutputSearchList = joOutputSearchData.getAsJsonObject("searchCustomerResultsList");
+			JsonArray jaCustomerResults = joOutputSearchList.getAsJsonArray("searchCustomerResults");
+
+			return jaCustomerResults.size() > 0;
+		} catch (Exception e) {
+			// Se detecta error, por lo tanto se considera otro operador.
+			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(), requestUrl, startHour,
+					endHour);
+			return false;
+		}
+	}
+
+	public boolean getCarrierOld(String phoneNumber) {
 
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

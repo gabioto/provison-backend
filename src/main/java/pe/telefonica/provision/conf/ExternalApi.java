@@ -13,10 +13,10 @@ public class ExternalApi {
 	String boUrl;
 	String psiUrl;
 	String customerUrl;
+	String customerUrlOnPremise;
 	String oauthToken;
 	String customerSearchClient;
 	String customerSearchSecret;
-
 	String apiClient;
 
 	String sendSMS;
@@ -34,11 +34,22 @@ public class ExternalApi {
 	String updateScheduleDate;
 	String cancelLocalSchedule;
 	String searchCustomer;
+	String searchCustomerOnPremise;
 	String nroDiasVidaProvision;
 	String scheduleGetTechAvailable;
 	String securityGetOAuthToken;
 	String simpliGetUrl;
 	String simpliBaseUrl;
+	String oauthTokenOnPremise;
+	
+	
+	public String getOauthTokenOnPremise() {
+		return oauthTokenOnPremise;
+	}
+
+	public void setOauthTokenOnPremise(String oauthTokenOnPremise) {
+		this.oauthTokenOnPremise = oauthTokenOnPremise;
+	}
 
 	public String getNroDiasVidaProvision() {
 		return nroDiasVidaProvision;
@@ -278,6 +289,22 @@ public class ExternalApi {
 
 	public void setSimpliBaseUrl(String simpliBaseUrl) {
 		this.simpliBaseUrl = simpliBaseUrl;
+	}
+
+	public String getCustomerUrlOnPremise() {
+		return customerUrlOnPremise;
+	}
+
+	public void setCustomerUrlOnPremise(String customerUrlOnPremise) {
+		this.customerUrlOnPremise = customerUrlOnPremise;
+	}
+
+	public String getSearchCustomerOnPremise() {
+		return searchCustomerOnPremise;
+	}
+
+	public void setSearchCustomerOnPremise(String searchCustomerOnPremise) {
+		this.searchCustomerOnPremise = searchCustomerOnPremise;
 	}
 
 }

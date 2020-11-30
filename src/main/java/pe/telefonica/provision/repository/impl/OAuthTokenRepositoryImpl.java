@@ -41,6 +41,21 @@ public class OAuthTokenRepositoryImpl implements OAuthTokenRepository {
 
 		return optionalPsiToken;
 	}
+	
+	@Override
+	public Optional<OAuthToken> getOAuthTokeOnPremise() {
+		OAuthToken oAuthToken = null;
+		try {
+			oAuthToken = this.mongoOperations
+					.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN_ON_PREMISE")), OAuthToken.class);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+		}
+
+		Optional<OAuthToken> optionalPsiToken = Optional.ofNullable(oAuthToken);
+
+		return optionalPsiToken;
+	}
 
 	@Override
 	public void insertToken(OAuthToken oAuthToken) {

@@ -69,7 +69,8 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		} else {
 			if (originSystem.equals(Constants.SOURCE_ORDERS_ATIS)) {
 				return getOrderAtis(publicId, order, lStartDate, lEndDate);
-			} else {
+
+			} else if (originSystem.equals(Constants.SOURCE_ORDERS_CMS)) {
 				return getOrderCms(publicId, order, orderCode, customerCode, lStartDate, lEndDate);
 			}
 		}
@@ -88,16 +89,16 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		Order order = null;
 
 		try {
-			if (orderAtis.isEmpty()) {
+			if (!orderAtis.isEmpty()) {
+				order = orderRepository.getOrdersByAtisCode(orderAtis, startDate, endDate);
+				filterByOrder = true;
+
+			} else if (!publicId.isEmpty()) {
 				orders = orderRepository.getOrdersByPhone(publicId, startDate, endDate);
 
 				if (orders.size() > 0) {
 					order = getLastOrder(orders);
 				}
-
-			} else {
-				order = orderRepository.getOrdersByAtisCode(orderAtis, startDate, endDate);
-				filterByOrder = true;
 			}
 
 			return evaluateOrders(order, filterByOrder ? orderAtis : publicId);
@@ -161,6 +162,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	}
 
 	private void saveCmsOrder(Order order, LocalDateTime startDate, LocalDateTime endDate) {
+
 		Order lOrder = orderRepository.getOrdersByCmsCode(order.getCmsRequest(), startDate, endDate);
 
 		if (lOrder != null) {
@@ -192,6 +194,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 	}
 
 	private ResponseEntity<Object> validateDates(LocalDateTime startDate, LocalDateTime endDate, boolean haveValue) {
+
 		if (startDate != null && endDate != null) {
 			if (endDate.isBefore(startDate)) {
 				return setBadRequestElement("fechaRegistroInicio/fechaRegistroFin");

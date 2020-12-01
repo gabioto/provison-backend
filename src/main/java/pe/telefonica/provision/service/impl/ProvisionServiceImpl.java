@@ -3,7 +3,6 @@ package pe.telefonica.provision.service.impl;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,8 +13,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-
-import javax.swing.text.DateFormatter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1962,12 +1959,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
 					+ provision.getCustomer().getDocumentNumber());
 		}
+
 		if (Constants.STATUS_IN_TOA
 				.equalsIgnoreCase(kafkaTOARequest.getEventType() == null ? "" : kafkaTOARequest.getEventType())) { // validate
 																													// bucket
 																													// and
 			errorBucket = !getBucketByProduct(provision.getOriginCode(), provision.getCommercialOp(),
 					kafkaTOARequest.getEvent().getAppointment().getAdditionalData().get(1).getValue());
+
 		}
 
 		return errorBucket;
@@ -2207,8 +2206,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("has_schedule", false);
 					}
 
-					update.set("wo_prestart.available_tracking", false);
-					update.set("wo_prestart.tracking_url", null);
+					//update.set("wo_prestart.available_tracking", false);
+					//update.set("wo_prestart.tracking_url", null);
 					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
@@ -2330,7 +2329,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
-				WoPreStart woPreStart = new WoPreStart();
+				WoPreStart woPreStart = provision.getWoPreStart() != null ? provision.getWoPreStart()
+						: new WoPreStart();
 
 				// String[] technicianInfo = getData[3].split("-");
 
@@ -2366,7 +2366,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				// Job Woprestart
 
-				woPreStart.setAvailableTracking(false);
+				//woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 				if (nowDate.getHour() > 8 && nowDate.getHour() < 23) {
 
@@ -2374,7 +2374,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					sendSMSWoPrestartHolder(provision);
 					update.set("notifications.prestart_send_notify", true);
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
-					
+
 					if (Boolean.valueOf(System.getenv("TDP_SIMPLI_ENABLE"))) {
 						String tokenExternal = trazabilidadSecurityApi.gerateToken();
 						// validate TechAvailable
@@ -2396,8 +2396,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 							int count = 0;
 							int maxTries = 2;
-
-							while (true) {
+							boolean needSend = true;
+							while (needSend) {
 								log.info("Simpli Attempt #" + count);
 
 								String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
@@ -2413,7 +2413,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 									if (++count == maxTries)
 										break;
 								}
+
 							}
+							
+							needSend = false;
 						}
 					}
 				}
@@ -2662,7 +2665,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						.collect(Collectors.toList());
 
 				// FORMATER SCHEDULE DATE
-				String dateSchedule = dateString;
+//				String dateSchedule = dateString;
 
 //				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.of("-05:00"));
 //				LocalDateTime dateTime = LocalDateTime.parse(dateSchedule, formatter);		

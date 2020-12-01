@@ -24,6 +24,7 @@ public class LogDataRequest {
 
 	private String activityType;
 	private String channel;
+	private int status;
 
 	public String getDocumentNumber() {
 		return documentNumber;
@@ -167,6 +168,14 @@ public class LogDataRequest {
 
 	public void setChannel(String channel) {
 		this.channel = channel;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 }

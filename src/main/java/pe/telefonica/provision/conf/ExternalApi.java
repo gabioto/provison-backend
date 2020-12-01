@@ -34,6 +34,7 @@ public class ExternalApi {
 	String updateScheduleDate;
 	String cancelLocalSchedule;
 	String searchCustomer;
+	String productOrders;
 
 	String searchCustomerOnPremise;
 	String nroDiasVidaProvision;
@@ -306,6 +307,14 @@ public class ExternalApi {
 
 	public void setSearchCustomerOnPremise(String searchCustomerOnPremise) {
 		this.searchCustomerOnPremise = searchCustomerOnPremise;
+	}
+	
+	public String getProductOrders() {
+		return productOrders;
+	}
+
+	public void setProductOrders(String productOrders) {
+		this.productOrders = productOrders;
 	}
 
 }

@@ -43,7 +43,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private ExternalApi api;
-
+	
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
 		this.mongoOperations = mongoOperations;
@@ -64,10 +64,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
 		query.with(new Sort(new Order(Direction.DESC, "register_date")));
-
-		List<ProvisionDto> provisions = this.mongoOperations.find(query, ProvisionDto.class);
+		List<ProvisionDto> provisions = this.mongoOperations.find(query ,ProvisionDto.class);
+		
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
-
 		return optionalProvisions;
 	}
 
@@ -91,7 +90,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<List<ProvisionTrazaDto>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
-
+	
 	@Override
 	public List<Provision> findAllTraza__tes(String documentType, String documentNumber) {
 
@@ -239,7 +238,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 */
 
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
-
+		
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
@@ -249,8 +248,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Provision provision = this.mongoOperations.findOne(new Query(Criteria.where("xaRequest").is(xaRequest)),
 				Provision.class);
 		return provision;
-		// Optional<Provision> optionalOrder = Optional.ofNullable(provision);
-		// return optionalOrder;
 	}
 
 	@Override
@@ -391,27 +388,34 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		 * ).and("customer").ne(null)) .limit(5);
 		 */
 
-		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
-				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
-				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
-				.and("customer").ne(null)).limit(5);
+//		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
+//				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
+//				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
+//				.and("customer").ne(null)).limit(5);
 
 		Criteria criteria = new Criteria();
 		criteria.orOperator(
 
-				//Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
-				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status").is(Status.PAGADO.getStatusName()),
-				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.IN_TOA.getStatusName()),
-				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status").is(Status.SCHEDULED.getStatusName()),
-				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status").is(Status.WO_NOTDONE.getStatusName()),
-				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status").is(Status.WO_CANCEL.getStatusName()),
-				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status").is(Status.WO_COMPLETED.getStatusName()),
-				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status").is(Status.FINALIZADO.getStatusName()),
-				
-				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status").is(Status.CANCELADA_ATIS.getStatusName())
-				
-				).and("customer").ne(null).and("notifications").ne(null);
-		
+				// Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
+				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status")
+						.is(Status.PAGADO.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status")
+						.is(Status.IN_TOA.getStatusName()),
+				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status")
+						.is(Status.SCHEDULED.getStatusName()),
+				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status")
+						.is(Status.WO_NOTDONE.getStatusName()),
+				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status")
+						.is(Status.WO_CANCEL.getStatusName()),
+				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status")
+						.is(Status.WO_COMPLETED.getStatusName()),
+				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status")
+						.is(Status.FINALIZADO.getStatusName()),
+
+				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status")
+						.is(Status.CANCELADA_ATIS.getStatusName())
+
+		).and("customer").ne(null).and("notifications").ne(null);
 
 		Query query = new Query(criteria).limit(5);
 
@@ -427,7 +431,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	public void updateFlagDateNotify(List<Provision> listProvision) {
 		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
-
+		
 		for (int i = 0; i < listProvision.size(); i++) {
 
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
@@ -476,10 +480,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update.set("notifications.cancel_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
-			
-			if (Status.FINALIZADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())){
+
+			if (Status.FINALIZADO.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.finalizado_send_notify", true);
-				if(Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.finalizado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
@@ -491,6 +495,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update.set("notifications.cancelada_atis_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
+			
 
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),

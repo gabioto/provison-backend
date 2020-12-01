@@ -1,61 +1,58 @@
 package pe.telefonica.provision.controller.request.simpli;
 
-import java.time.LocalTime;
-
 public class SetSimpliUrlRequest {
-	private String tracking;
+	private String Tracking;
 	private String xa_peticion;
 	private String xa_activity_type;
 	private String xa_requirement_number;
-	private String appt_number;
-	private String eta;
+	private String apptNumber;
+	private String ETA;
 
 	public String getTracking() {
-		return tracking;
-	}
-
-	public void setTracking(String tracking) {
-		this.tracking = tracking;
+		return Tracking;
 	}
 
 	public String getXa_peticion() {
 		return xa_peticion;
 	}
 
-	public void setXa_peticion(String xa_peticion) {
-		this.xa_peticion = xa_peticion;
-	}
-
 	public String getXa_activity_type() {
 		return xa_activity_type;
-	}
-
-	public void setXa_activity_type(String xa_activity_type) {
-		this.xa_activity_type = xa_activity_type;
 	}
 
 	public String getXa_requirement_number() {
 		return xa_requirement_number;
 	}
 
+	public String getApptNumber() {
+		return apptNumber;
+	}
+
+	public String getETA() {
+		return ETA;
+	}
+
+	public void setTracking(String tracking) {
+		Tracking = tracking;
+	}
+
+	public void setXa_peticion(String xa_peticion) {
+		this.xa_peticion = xa_peticion;
+	}
+
+	public void setXa_activity_type(String xa_activity_type) {
+		this.xa_activity_type = xa_activity_type;
+	}
+
 	public void setXa_requirement_number(String xa_requirement_number) {
 		this.xa_requirement_number = xa_requirement_number;
 	}
 
-	public String getAppt_number() {
-		return appt_number;
+	public void setApptNumber(String apptNumber) {
+		this.apptNumber = apptNumber;
 	}
 
-	public void setAppt_number(String appt_number) {
-		this.appt_number = appt_number;
+	public void setETA(String eta) {
+		ETA = eta;
 	}
-
-	public String getEta() {
-		return eta;
-	}
-
-	public void setEta(String eta) {
-		this.eta = eta;
-	}
-
 }

@@ -99,7 +99,7 @@ public class TrazabilidadSecurityApi {
 	
 	@Async
 	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
-			LocalDateTime startHour, LocalDateTime endHour) {
+			LocalDateTime startHour, LocalDateTime endHour, int status) {
 		log.info(this.getClass().getName() + " - " + "logEvent");
 
 		String url = api.getSecurityUrl() + api.getSaveThirdLogData();
@@ -118,6 +118,7 @@ public class TrazabilidadSecurityApi {
 		logRequest.setUrl(serviceUrl);
 		logRequest.setStartHour(startHour);
 		logRequest.setEndHour(endHour);
+		logRequest.setStatus(status);
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

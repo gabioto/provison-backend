@@ -25,23 +25,29 @@ public class ProductOrderResponse {
 	private String statusReason;
 	private String statusChangeDate;
 	private String source;
-	private List<RelatedParty> relatedParty = new ArrayList<>();
-	private List<Channel> channel = new ArrayList<>();
+	private List<RelatedParty> relatedParty = new ArrayList<RelatedParty>();
+	private List<Channel> channel = new ArrayList<Channel>();
 
 	@Getter
 	@Setter
 	@AllArgsConstructor
-	public class RelatedParty {
+	public static class RelatedParty {
 		private String id;
 		private String href;
+		
+		public RelatedParty() {			
+		}
 	}
 
 	@Getter
 	@Setter
 	@AllArgsConstructor
-	public class Channel {
+	public static class Channel {
 		private String id;
 		private String href;
+		
+		public Channel() {
+		}
 	}
 
 	public Order fromThis(String publicId) {

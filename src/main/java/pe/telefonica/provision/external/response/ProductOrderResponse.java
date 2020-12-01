@@ -53,7 +53,7 @@ public class ProductOrderResponse {
 	public Order fromThis(String publicId) {
 		Order order = new Order();
 		order.setCommercialOp(productOrderType);
-		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(orderDate, Constants.TIMESTAMP_FORMAT_CMS_ATIS));
+		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(orderDate, Constants.TIMESTAMP_FORMAT_PSI));
 		order.setCmsRequest(id);
 		order.setServiceCode(publicId);
 		order.setStatusOrderCode(status);

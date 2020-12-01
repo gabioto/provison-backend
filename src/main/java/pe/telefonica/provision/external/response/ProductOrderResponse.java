@@ -3,6 +3,7 @@ package pe.telefonica.provision.external.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
@@ -24,21 +25,29 @@ public class ProductOrderResponse {
 	private String statusReason;
 	private String statusChangeDate;
 	private String source;
-	private List<RelatedParty> relatedParty = new ArrayList<>();
-	private List<Channel> channel = new ArrayList<>();
+	private List<RelatedParty> relatedParty = new ArrayList<RelatedParty>();
+	private List<Channel> channel = new ArrayList<Channel>();
 
 	@Getter
 	@Setter
-	public class RelatedParty {
+	@AllArgsConstructor
+	public static class RelatedParty {
 		private String id;
 		private String href;
+		
+		public RelatedParty() {			
+		}
 	}
 
 	@Getter
 	@Setter
-	public class Channel {
+	@AllArgsConstructor
+	public static class Channel {
 		private String id;
 		private String href;
+		
+		public Channel() {
+		}
 	}
 
 	public Order fromThis(String publicId) {

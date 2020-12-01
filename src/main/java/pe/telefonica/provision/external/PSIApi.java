@@ -199,7 +199,6 @@ public class PSIApi extends ConfigRestTemplate {
 					oAuthTokenRepository.insertToken(responseEntity.getBody().getBody());
 				} else {
 					updated = oAuthTokenRepository.updateToken(responseEntity.getBody());
-
 					// updated = updateTokenInCollection(responseEntity.getBody());
 				}
 			} else {
@@ -215,49 +214,6 @@ public class PSIApi extends ConfigRestTemplate {
 		}
 	}
 	
-	private String getTokenFromOnPremise(String customerName, boolean toInsert) {
-		RestTemplate restTemplate = new RestTemplate();
-		boolean updated = true;
-		String urlToken = api.getSecurityUrl() + api.getOauthTokenOnPremise();
-
-		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
-		headersMap.add("Content-Type", "application/json");
-		headersMap.add("Authorization", security.getAuth());
-		headersMap.add("X-IBM-Client-Id", security.getClientId());
-		headersMap.add("X-IBM-Client-Secret", security.getClientSecret());
-
-		ApiRequest<Object> request = new ApiRequest<Object>(Constants.APP_NAME_PROVISION, customerName,
-				Constants.OPER_GET_OAUTH_TOKEN, null);
-
-		HttpEntity<ApiRequest<Object>> entityToken = new HttpEntity<ApiRequest<Object>>(request, headersMap);
-
-		try {
-			ParameterizedTypeReference<ApiResponse<OAuthToken>> parameterizedTypeReference = new ParameterizedTypeReference<ApiResponse<OAuthToken>>() {
-			};
-			ResponseEntity<ApiResponse<OAuthToken>> responseEntity = restTemplate.exchange(urlToken, HttpMethod.POST,
-					entityToken, parameterizedTypeReference);
-
-			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-				if (toInsert) {
-					// insertToken(responseEntity.getBody().getBody());
-					oAuthTokenRepository.insertToken(responseEntity.getBody().getBody());
-				} else {
-					updated = oAuthTokenRepository.updateToken(responseEntity.getBody());
-
-					// updated = updateTokenInCollection(responseEntity.getBody());
-				}
-			} else {
-				return "";
-			}
-
-			log.info("responseEntity: " + responseEntity.getBody());
-
-			return updated ? ((OAuthToken) responseEntity.getBody().getBody()).getAccessToken() : "";
-		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
-			return "";
-		}
-	}
 
 	// Util
 	private String generateAuthString() {
@@ -283,28 +239,6 @@ public class PSIApi extends ConfigRestTemplate {
 
 		} else {
 			psiTokenGenerated = getTokenFromPSI(customerName, true);
-		}
-
-		return psiTokenGenerated;
-	}
-	
-	private String getAuthTokenOnPremise(String customerName) {
-		String psiTokenGenerated = "";
-		Optional<OAuthToken> optionalAuthToken = oAuthTokenRepository.getOAuthTokeOnPremise();
-
-		if (optionalAuthToken.isPresent()) {
-			OAuthToken oAuthToken = optionalAuthToken.get();
-			Date now = new Date();
-			long timeDiff = now.getTime() - (Long.parseLong(oAuthToken.getConsentedOn()) * 1000);
-
-			if (timeDiff >= ((Integer.parseInt(oAuthToken.getExpiresIn()) - 5) * 1000)) {
-				psiTokenGenerated = getTokenFromOnPremise(customerName, false);
-			} else {
-				psiTokenGenerated = oAuthToken.getAccessToken();
-			}
-
-		} else {
-			psiTokenGenerated = getTokenFromOnPremise(customerName, true);
 		}
 
 		return psiTokenGenerated;
@@ -365,7 +299,7 @@ public class PSIApi extends ConfigRestTemplate {
 			Gson gson = new Gson();
 			input = gson.toJson(jsonBody);
 			//getAuthToken(request.getBodyUpdateClient().getNombre_completo());
-			oAuthToken = getAuthTokenOnPremise("OAUTH_TOKEN_ON_PREMISE");
+			oAuthToken = getAuthToken("PARAM_KEY_OAUTH_TOKEN"); //getAuthTokenOnPremise("OAUTH_TOKEN_ON_PREMISE");
 
 			if (oAuthToken.isEmpty()) {
 				return false;

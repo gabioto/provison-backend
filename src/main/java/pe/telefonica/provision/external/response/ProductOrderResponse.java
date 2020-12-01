@@ -54,7 +54,7 @@ public class ProductOrderResponse {
 	public Order fromThis(String publicId) {
 		Order order = new Order();
 		order.setCommercialOp(productOrderType);
-		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(orderDate, Constants.TIMESTAMP_FORMAT_CMS_RESP));
+		order.setRegisterOrderDate(DateUtil.stringToLocalDate(orderDate, Constants.TIMESTAMP_FORMAT_CMS_RESP));
 		order.setCmsRequest(id);
 		order.setServiceCode(publicId);
 		order.setStatusOrderCode(status);

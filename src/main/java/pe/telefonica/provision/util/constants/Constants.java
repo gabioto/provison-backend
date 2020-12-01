@@ -43,6 +43,7 @@ public final class Constants {
 	public static final String TIMESTAMP_FORMAT_ORDERS = "dd/MM/yyyy HH:mm:ss";
 	public static final String TIMESTAMP_FORMAT_CMS_ATIS = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+	public static final String TIMESTAMP_FORMAT_CMS_RESP = "yyyy-MM-dd";
 	public static final String TIME_ZONE_LOCALE = "-05:00";
 
 	public static final String ENVIROMENT_PROD = "prod";

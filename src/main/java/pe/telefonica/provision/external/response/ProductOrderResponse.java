@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.util.DateUtil;
@@ -12,6 +13,8 @@ import pe.telefonica.provision.util.constants.Constants;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductOrderResponse {
 
 	private String id;
@@ -31,23 +34,21 @@ public class ProductOrderResponse {
 	@Getter
 	@Setter
 	@AllArgsConstructor
-	public static class RelatedParty {
+	@NoArgsConstructor
+	private static class RelatedParty {
 		private String id;
 		private String href;
-		
-		public RelatedParty() {			
-		}
+
 	}
 
 	@Getter
 	@Setter
 	@AllArgsConstructor
-	public static class Channel {
+	@NoArgsConstructor
+	private static class Channel {
 		private String id;
 		private String href;
-		
-		public Channel() {
-		}
+
 	}
 
 	public Order fromThis(String publicId) {

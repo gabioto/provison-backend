@@ -307,7 +307,7 @@ public class PSIApi extends ConfigRestTemplate {
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.set("X-IBM-Client-Id", api.getCustomerSearchClient());
+			headers.set("X-IBM-Client-Id", api.getCustomerSearchClientOnPremise());
 			//headers.set("X-IBM-Client-Secret", api.getCustomerSearchSecret());
 			headers.set("Authorization", "Bearer " + oAuthToken);
 

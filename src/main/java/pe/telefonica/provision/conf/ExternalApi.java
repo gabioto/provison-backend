@@ -42,9 +42,19 @@ public class ExternalApi {
 	String securityGetOAuthToken;
 	String simpliGetUrl;
 	String simpliBaseUrl;
+	
 	String oauthTokenOnPremise;
+	String customerSearchClientOnPremise;
+
 	
-	
+	public String getCustomerSearchClientOnPremise() {
+		return customerSearchClientOnPremise;
+	}
+
+	public void setCustomerSearchClientOnPremise(String customerSearchClientOnPremise) {
+		this.customerSearchClientOnPremise = customerSearchClientOnPremise;
+	}
+
 	public String getOauthTokenOnPremise() {
 		return oauthTokenOnPremise;
 	}

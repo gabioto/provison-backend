@@ -3,7 +3,9 @@ package pe.telefonica.provision.external.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.util.DateUtil;
@@ -11,6 +13,8 @@ import pe.telefonica.provision.util.constants.Constants;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductOrderResponse {
 
 	private String id;
@@ -24,27 +28,33 @@ public class ProductOrderResponse {
 	private String statusReason;
 	private String statusChangeDate;
 	private String source;
-	private List<RelatedParty> relatedParty = new ArrayList<>();
-	private List<Channel> channel = new ArrayList<>();
+	private List<RelatedParty> relatedParty = new ArrayList<RelatedParty>();
+	private List<Channel> channel = new ArrayList<Channel>();
 
 	@Getter
 	@Setter
-	public class RelatedParty {
+	@AllArgsConstructor
+	@NoArgsConstructor
+	private static class RelatedParty {
 		private String id;
 		private String href;
+
 	}
 
 	@Getter
 	@Setter
-	public class Channel {
+	@AllArgsConstructor
+	@NoArgsConstructor
+	private static class Channel {
 		private String id;
 		private String href;
+
 	}
 
 	public Order fromThis(String publicId) {
 		Order order = new Order();
 		order.setCommercialOp(productOrderType);
-		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(orderDate, Constants.TIMESTAMP_FORMAT_CMS_ATIS));
+		order.setRegisterOrderDate(DateUtil.stringToLocalDate(orderDate, Constants.TIMESTAMP_FORMAT_CMS_RESP));
 		order.setCmsRequest(id);
 		order.setServiceCode(publicId);
 		order.setStatusOrderCode(status);

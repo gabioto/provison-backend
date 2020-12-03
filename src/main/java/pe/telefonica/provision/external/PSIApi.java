@@ -298,7 +298,7 @@ public class PSIApi extends ConfigRestTemplate {
 			Gson gson = new Gson();
 			input = gson.toJson(jsonBody);
 			//getAuthToken(request.getBodyUpdateClient().getNombre_completo());
-			oAuthToken = getAuthToken("PARAM_KEY_OAUTH_TOKEN"); //getAuthTokenOnPremise("OAUTH_TOKEN_ON_PREMISE");
+			oAuthToken = getAuthToken("PARAM_KEY_OAUTH_TOKEN");
 
 			if (oAuthToken.isEmpty()) {
 				return false;

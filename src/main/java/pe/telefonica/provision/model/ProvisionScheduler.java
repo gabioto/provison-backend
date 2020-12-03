@@ -56,7 +56,4 @@ public class ProvisionScheduler implements Serializable {
 		this.scheduleType = scheduleType;
 	}
 	
-	
-	
-	
 }

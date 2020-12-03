@@ -49,7 +49,8 @@ public class OrderServiceImpl implements OrderService {
 			}
 
 			if (orderSaved != null) {
-				if (order.getSource().equals(Constants.SOURCE_ORDERS_VENTAS_FIJA)
+				if ((order.getSource().equals(Constants.SOURCE_ORDERS_VENTAS_FIJA)
+						|| order.getSource().equals(Constants.SOURCE_ORDERS_ORDENES))
 						&& orderSaved.getStatus().equals(order.getStatus())) {
 					return new ResponseEntity<Object>(
 							new ErrorResponse("SVC1000", "Duplicate status field",

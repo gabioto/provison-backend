@@ -588,7 +588,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		update.set("back", getData[1]);
 		update.set("product_name", getData[10]);
 		update.set("xa_request", getData[11]);
-		update.set("origin_code", request.getDataOrigin());
+		//update.set("origin_code", request.getDataOrigin());
 		update.set("commercial_op", getData[12].toUpperCase());
 		update.set("product_code", getData[14]);
 		update.set("product_name_source", getData[15]);
@@ -633,7 +633,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 		update.set("customer.name", getData[3]);
 		update.set("customer.document_type", getData[13]);
 		update.set("customer.document_number", getData[4]);
-		update.set("customer.phone_number", getData[5]);
+		boolean isUpdate = true;
+		if(getData[16].toString().equalsIgnoreCase(Status.CAIDA.getStatusName()) || getData[16].toString().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
+			isUpdate = false;
+		}
+		if (isUpdate) {
+			
+			update.set("customer.phone_number", getData[5]);
+			
+		}
+
 		update.set("customer.mail", getData[20]);
 		update.set("customer.carrier", false);
 		update.set("customer.address", getData[6]);
@@ -1853,6 +1862,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 			listLog.add(statusLog);
 			update.set("log_status", listLog);
 
+			
+			
+			/**/
+			// Validar si tiene INGRESADO y actualizar agenda
+			if (provision.getLastTrackingStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
+
+				ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
+				updateFicRequest.setOrderCode(provision.getXaRequest());
+				updateFicRequest.setOriginCode(request.getOriginCode());
+				updateFicRequest.setSaleCode(provision.getSaleCode());
+				updateFicRequest.setFictitiousCode(request.getDummyXaRequest());
+				updateFicRequest.setRequestName(provision.getProductName());
+				updateFicRequest.setRequestId(provision.getIdProvision());
+				System.out.println("UPDATE SCHEDULE FICTITIOUS ==>");
+				update.set("is_update_dummy_st_psi_code", true);
+				trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+			}
+			/**/
+			
 			provisionRepository.updateProvision(provision, update);
 
 			/**/
@@ -2168,7 +2196,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", appointment.getDescription().toLowerCase());
 					update.set("work_zone", appointment.getAdditionalData().get(2).getValue());
 					// update.set("send_notify", false);
-					update.set("notifications.intoa_send_notify", false);
+					update.set("notifications.into_send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
@@ -2199,7 +2227,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", appointment.getDescription().toLowerCase());
 					update.set("work_zone", appointment.getAdditionalData().get(1).getValue());
 					// update.set("send_notify", false);
-					update.set("notifications.intoa_send_notify", false);
+					update.set("notifications.into_send_notify", false);
 					update.set("show_location", false);
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);
@@ -2367,7 +2395,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				//woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-				if (nowDate.getHour() > 8 && nowDate.getHour() < 23) {
+				if (nowDate.getHour() >= 07 && nowDate.getHour() <= 19) {
 
 					// SMS
 					sendSMSWoPrestartHolder(provision);

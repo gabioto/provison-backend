@@ -409,7 +409,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		).and("customer").ne(null).and("notifications").ne(null);
 
-		Query query = new Query(criteria).limit(5);
+		Query query = new Query(criteria).limit(15);
 
 		query.with(new Sort(new Order(Direction.ASC, "_id")));
 
@@ -545,8 +545,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
-		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
-		today = today.minusDays(1);
+		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00")).minusDays(1);
 		LocalDate yesterday = today.minusDays(1);
 
 		List<Provision> provisions = this.mongoOperations

@@ -50,7 +50,7 @@ public class SimpliController {
 			
 			responseError = new ErrorResponse();
 			responseError.setExceptionId("SVC1000");
-			responseError.setExceptionText("Missing mandatory parameter: : Tracking");
+			responseError.setExceptionText("Missing mandatory parameter: Tracking");
 			responseError.setMoreInfo("API Request without mandatory field");			
 			responseError.setUserMessage("Missing mandatory parameter");
 			
@@ -77,7 +77,7 @@ public class SimpliController {
 			
 			responseError = new ErrorResponse();
 			responseError.setExceptionId("SVC1000");
-			responseError.setExceptionText("Missing mandatory parameter: : xa_peticion");
+			responseError.setExceptionText("Missing mandatory parameter: xa_peticion");
 			responseError.setMoreInfo("API Request without mandatory field");			
 			responseError.setUserMessage("Missing mandatory parameter");
 			
@@ -104,9 +104,34 @@ public class SimpliController {
 			
 			responseError = new ErrorResponse();
 			responseError.setExceptionId("SVC1000");
-			responseError.setExceptionText("Missing mandatory parameter: : xa_activity_type");
+			responseError.setExceptionText("Missing mandatory parameter: xa_activity_type");
 			responseError.setMoreInfo("API Request without mandatory field");			
 			responseError.setUserMessage("Missing mandatory parameter");
+			
+			apiErrorResponse = new ApiErrorResponse<ErrorResponse>(responseError);
+			
+			Gson gson = new Gson();
+		    String json = gson.toJson(apiErrorResponse);
+		    String cadena = "{\"body\":";
+		    int posicion = json.indexOf(cadena);
+		    if (posicion > -1) {
+		    	json = json.substring(posicion + cadena.length());
+		    	json = json.substring(0, json.length() - 1);	    
+		    }
+		    
+		    return ResponseEntity.status(status)
+					.header("UNICA-ServiceId", UNICA_ServiceId)
+					.header("UNICA-PID", UNICA_PID)
+					.header("Content-Type", "application/json;charset=UTF-8")
+					.body(json);
+		} else if (!request.getXa_activity_type().equals("Provision")) {
+			status = HttpStatus.BAD_REQUEST;
+			
+			responseError = new ErrorResponse();
+			responseError.setExceptionId("SVC1001");
+			responseError.setExceptionText("Invalid parameter: " + request.getXa_activity_type());
+			responseError.setMoreInfo("API Request with an element not conforming to Swagger definitions or to a list of allowed Query Parameters.");
+			responseError.setUserMessage("Invalid parameter");
 			
 			apiErrorResponse = new ApiErrorResponse<ErrorResponse>(responseError);
 			
@@ -131,7 +156,7 @@ public class SimpliController {
 			
 			responseError = new ErrorResponse();
 			responseError.setExceptionId("SVC1000");
-			responseError.setExceptionText("Missing mandatory parameter: : xa_requirement_number");
+			responseError.setExceptionText("Missing mandatory parameter: xa_requirement_number");
 			responseError.setMoreInfo("API Request without mandatory field");			
 			responseError.setUserMessage("Missing mandatory parameter");
 			
@@ -158,7 +183,7 @@ public class SimpliController {
 			
 			responseError = new ErrorResponse();
 			responseError.setExceptionId("SVC1000");
-			responseError.setExceptionText("Missing mandatory parameter: : ApptNumber");
+			responseError.setExceptionText("Missing mandatory parameter: ApptNumber");
 			responseError.setMoreInfo("API Request without mandatory field");			
 			responseError.setUserMessage("Missing mandatory parameter");
 			
@@ -185,7 +210,7 @@ public class SimpliController {
 			
 			responseError = new ErrorResponse();
 			responseError.setExceptionId("SVC1000");
-			responseError.setExceptionText("Missing mandatory parameter: : ETA");
+			responseError.setExceptionText("Missing mandatory parameter: ETA");
 			responseError.setMoreInfo("API Request without mandatory field");			
 			responseError.setUserMessage("Missing mandatory parameter");
 			
@@ -208,23 +233,59 @@ public class SimpliController {
 		}
 		
 		try {			
-			simpliUrlResponse = new ApiSimpliResponse<SimpliUrlResponse>(simpliService.setSimpliUrl(request));
-			status = HttpStatus.OK;
-			
-			Gson gson = new Gson();
-		    String json = gson.toJson(simpliUrlResponse);
-		    String cadena = "{\"body\":{\"body\":";
-		    int posicion = json.indexOf(cadena);
-		    if (posicion > -1) {
-		    	json = json.substring(posicion + cadena.length());
-		    	json = json.substring(0, json.length() - 2);	    
-		    }
-		    
-			return ResponseEntity.status(status)
-					.header("UNICA-ServiceId", UNICA_ServiceId)
-					.header("UNICA-PID", UNICA_PID)
-					.header("Content-Type", "application/json;charset=UTF-8")
-					.body(json);		
+			SimpliUrlResponse objSimpliUrlResponse = simpliService.setSimpliUrl(request);
+			if (objSimpliUrlResponse.getBody().getStatus().equals("OK")) {			
+				simpliUrlResponse = new ApiSimpliResponse<SimpliUrlResponse>(objSimpliUrlResponse);
+				status = HttpStatus.OK;
+				
+				Gson gson = new Gson();
+			    String json = gson.toJson(simpliUrlResponse);
+			    String cadena = "{\"body\":{\"body\":";
+			    int posicion = json.indexOf(cadena);
+			    if (posicion > -1) {
+			    	json = json.substring(posicion + cadena.length());
+			    	json = json.substring(0, json.length() - 2);	    
+			    }
+			    
+			    return ResponseEntity.status(status)
+						.header("UNICA-ServiceId", UNICA_ServiceId)
+						.header("UNICA-PID", UNICA_PID)
+						.header("Content-Type", "application/json;charset=UTF-8")
+						.body(json);
+			} else {
+				responseError = new ErrorResponse();
+				if (objSimpliUrlResponse.getBody().getStatus().equals("NOT_FOUND")) {			
+					status = HttpStatus.NOT_FOUND;
+				
+					responseError.setExceptionId("SVC1006");
+					responseError.setExceptionText("Resource " + request.getXa_requirement_number() + " does not exist");
+					responseError.setMoreInfo("Reference to a resource identifier which does not exist in the collection/repository referred");
+					responseError.setUserMessage("Not existing Resource Id");					
+				} else {
+					status = HttpStatus.BAD_REQUEST;
+					
+					responseError.setExceptionId("SVC0001");
+					responseError.setExceptionText("Generic Client Error");
+					responseError.setMoreInfo("API Generic wildcard fault response");
+					responseError.setUserMessage("Generic Client Error");
+				}
+				apiErrorResponse = new ApiErrorResponse<ErrorResponse>(responseError);
+				
+				Gson gson = new Gson();
+			    String json = gson.toJson(apiErrorResponse);
+			    String cadena = "{\"body\":";
+			    int posicion = json.indexOf(cadena);
+			    if (posicion > -1) {
+			    	json = json.substring(posicion + cadena.length());
+			    	json = json.substring(0, json.length() - 1);	    
+			    }
+			    
+			    return ResponseEntity.status(status)
+						.header("UNICA-ServiceId", UNICA_ServiceId)
+						.header("UNICA-PID", UNICA_PID)
+						.header("Content-Type", "application/json;charset=UTF-8")
+						.body(json);
+			}
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			

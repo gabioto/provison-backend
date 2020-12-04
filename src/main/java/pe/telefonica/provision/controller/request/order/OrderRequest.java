@@ -1,13 +1,15 @@
 package pe.telefonica.provision.controller.request.order;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.util.DateUtil;
 import pe.telefonica.provision.util.constants.Constants;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderRequest {
 
 	private String source;

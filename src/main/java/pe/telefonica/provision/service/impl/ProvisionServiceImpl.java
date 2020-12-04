@@ -2209,6 +2209,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("has_schedule", false);
 					}
 
+
+					//update.set("wo_prestart.available_tracking", false);
+					//update.set("wo_prestart.tracking_url", null);
+
 					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
@@ -2365,7 +2369,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				// Job Woprestart
-				woPreStart.setAvailableTracking(false);
+
+
+				//woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 				if (nowDate.getHour() >= 07 && nowDate.getHour() <= 19) {
 
@@ -2373,6 +2379,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					sendSMSWoPrestartHolder(provision);
 					update.set("notifications.prestart_send_notify", true);
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+
 
 					String tokenExternal = trazabilidadSecurityApi.gerateToken();
 					// validate TechAvailable

@@ -72,13 +72,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<ProvisionTrazaDto>> findAllTraza(String documentType, String documentNumber) {
-		LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
-
-		List<ProvisionTrazaDto> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
-								Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))),
-				ProvisionTrazaDto.class);
+		//LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		int diasVidaProvision= Integer.parseInt(api.getNroDiasVidaProvision())+1;
+		diasVidaProvision  = diasVidaProvision * -1;		
+		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
+		String formattedDateTime01 = dateStart.format(formatter);
+		System.out.println("formattedDateTime01: "+formattedDateTime01);
+		
+		Query query =new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
+				.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
+						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart))).limit(3);
+		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		
+		List<ProvisionTrazaDto> provisions = this.mongoOperations.find(query, ProvisionTrazaDto.class);
 		Optional<List<ProvisionTrazaDto>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}

@@ -174,6 +174,7 @@ public class TrazabilidadSecurityApi {
 		return false;
 
 	}
+	
 	@Async
 	public ApiResponse<SMSByIdResponse> sendSMS(List<Contact> contacts, String msgKey, MsgParameter[] msgParameters,
 			String webURL, String webContactURL) {

@@ -493,13 +493,9 @@ public class ProvisionController {
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
 		
-		
 		Boolean provisions = false;
 
 		try {
-			
-
-		
 				provisions = provisionService.provisionUpdateFromTOA(request.getBody());
 			
 			if (provisions) {

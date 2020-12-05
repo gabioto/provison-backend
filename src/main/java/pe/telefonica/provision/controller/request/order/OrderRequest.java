@@ -91,7 +91,8 @@ public class OrderRequest {
 		order.setCmsRequest(cmsRequest);
 		order.setStatusOrderCode(statusOrderCode);
 		order.setStatusOrderDescription(
-				source.equals(Constants.SOURCE_ORDERS_ATIS) ? Constants.ATIS_CMS_STATUS.get(statusOrderCode)
+				(source.equals(Constants.SOURCE_ORDERS_ATIS) || source.equals(Constants.SOURCE_ORDERS_ORDENES))
+						? Constants.ATIS_CMS_STATUS.get(statusOrderCode)
 						: statusOrderDescription);
 		order.setRegisterOrderDate(DateUtil.stringToLocalDateTime(registerOrderDate));
 		order.setReleaseOrderDate(DateUtil.stringToLocalDateTime(releaseOrderDate));

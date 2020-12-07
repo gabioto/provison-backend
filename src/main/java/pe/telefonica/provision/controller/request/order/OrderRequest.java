@@ -66,6 +66,8 @@ public class OrderRequest {
 
 	private String oldResult;
 
+	private String flagMT;
+
 	public Order fromThis() {
 		Order order = new Order();
 		order.setSource(source);
@@ -97,6 +99,8 @@ public class OrderRequest {
 		order.setReleaseOrderDate(DateUtil.stringToLocalDateTime(releaseOrderDate));
 		order.setNote2(note2);
 		order.setIdResult(oldResult);
+		order.setFlagMT(flagMT);
+		order.setCommercialOpAtis(source.equals(Constants.SOURCE_ORDERS_ATIS) ? commercialOp : "");
 
 		return order;
 	}

@@ -117,9 +117,13 @@ public class OrderServiceImpl implements OrderService {
 		update.set("note2", StringUtil.getValue(order.getNote2(), orderSaved.getNote2()));
 		update.set("idResult", StringUtil.getValue(order.getIdResult(), orderSaved.getIdResult()));
 		update.set("lastUpdateDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		update.set("flagMT", StringUtil.getValue(order.getFlagMT(), orderSaved.getFlagMT()));
 
 		if (!order.getSource().equals(Constants.SOURCE_ORDERS_ATIS)) {
-			update.set("commercialOp", order.getCommercialOp());
+			update.set("commercialOp", StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOp()));
+		} else {
+			update.set("commercialOpAtis",
+					StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOpAtis()));
 		}
 
 		return update;

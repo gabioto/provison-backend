@@ -19,10 +19,17 @@ public class OrderNotificationResponse {
 
 	private String contactMail;
 
+	private String commercialOpAtis;
+
+	private String flagMT;
+
 	public OrderNotificationResponse fromOrder(Order order) {
 
 		contactPhone = order.getContactCellphone() != null ? order.getContactCellphone() : order.getContactPhone();
 		contactMail = order.getContactMail();
+		commercialOpAtis = order.getCommercialOpAtis();
+		flagMT = order.getFlagMT();
+
 		return this;
 	}
 

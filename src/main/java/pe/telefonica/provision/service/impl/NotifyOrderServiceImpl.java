@@ -1,6 +1,7 @@
 package pe.telefonica.provision.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +36,17 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 		headers.add("UNICA-PID", uPid);
 
 		List<Order> orders = orderRepository.getOrdersToNotify();
+
+		orders = orders.stream().filter(order -> {
+			if (order.getNote1() != null) {
+				if (order.getCommercialOp().equals("SUSPENSION APC")
+						&& !order.getNote1().toUpperCase().contains("BAJA")) {
+					return true;
+				}
+			}
+
+			return false;
+		}).collect(Collectors.toList());
 
 		return evaluateOrders(orders);
 	}

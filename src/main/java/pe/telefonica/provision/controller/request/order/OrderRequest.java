@@ -81,7 +81,9 @@ public class OrderRequest {
 		order.setExecRecoxDate(DateUtil.stringToLocalDateTime(execRecoxDate));
 		order.setNote1(note1);
 		order.setApplication(application);
-		order.setCommercialOp(commercialOp);
+		order.setCommercialOp(source.equals(Constants.SOURCE_ORDERS_ATIS)
+				? (Constants.ATIS_COMMERCIAL_OP.getOrDefault(commercialOp, commercialOp))
+				: commercialOp);
 		order.setContactPhone(contactPhone);
 		order.setContactCellphone(contactCellphone);
 		order.setContactMail(contactMail);

@@ -1,10 +1,13 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Repository;
 
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
+import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.constants.Status;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
@@ -77,6 +82,36 @@ public class OrderRepositoryImpl implements OrderRepository {
 		return mongoOperations.find(new Query(criteria), Order.class);
 	}
 
+	@Override
+	public List<Order> getOrdersToNotify() {
+
+		return mongoOperations.find(getNotificationQueryCriteria(), Order.class);
+	}
+
+	@Override
+	public void updateFlagDateNotify() {
+
+		Update update = new Update();
+		update.set("notifications.finalizadoSendNotify", true);
+		update.set("notifications.finalizadoSendDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+
+		this.mongoOperations.updateMulti(getNotificationQueryCriteria(), update, Order.class);
+	}
+
+	private Query getNotificationQueryCriteria() {
+
+		Criteria criteria = Criteria.where("source").is(Constants.SOURCE_ORDERS_ORDENES).and("status")
+				.is(Status.FINALIZADO.getStatusName())
+				.andOperator(Criteria.where("commercialOp").is("ALTA MIGRACION"),
+						Criteria.where("commercialOp").is("ALTA MIGRACION TRASLADO CIS"),
+						Criteria.where("commercialOp").is("ALTA MIGRACION TRASLADO SIS"),
+						Criteria.where("commercialOp").is("SUSPENSION APC"),
+						Criteria.where("commercialOp").is("ALTA MIGRACION DE P/S"))
+				.and("notifications").ne(null).and("notifications.finalizadoSendNotify").is(false);
+
+		return new Query(criteria).limit(15).with(new Sort(Direction.ASC, "_id"));
+	}
+
 	private Criteria validateFilterBetweenDates(Criteria criteria, LocalDateTime startDate, LocalDateTime endDate) {
 
 		if (startDate != null && endDate != null) {
@@ -86,4 +121,5 @@ public class OrderRepositoryImpl implements OrderRepository {
 
 		return criteria;
 	}
+
 }

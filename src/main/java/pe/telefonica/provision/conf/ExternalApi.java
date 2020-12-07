@@ -41,9 +41,36 @@ public class ExternalApi {
 	String simpliGetUrl;
 	String simpliBaseUrl;
 	
+	String simpliGetUrlAzure;
+	String simpliBaseUrlAzure;
+	String apiClientKeyAzure;
+	
 	String oauthTokenOnPremise;
 	String customerSearchClientOnPremise;
 	
+	public String getApiClientKeyAzure() {
+		return apiClientKeyAzure;
+	}
+
+	public void setApiClientKeyAzure(String apiClientKeyAzure) {
+		this.apiClientKeyAzure = apiClientKeyAzure;
+	}
+
+	public String getSimpliGetUrlAzure() {
+		return simpliGetUrlAzure;
+	}
+
+	public void setSimpliGetUrlAzure(String simpliGetUrlAzure) {
+		this.simpliGetUrlAzure = simpliGetUrlAzure;
+	}
+
+	public String getSimpliBaseUrlAzure() {
+		return simpliBaseUrlAzure;
+	}
+
+	public void setSimpliBaseUrlAzure(String simpliBaseUrlAzure) {
+		this.simpliBaseUrlAzure = simpliBaseUrlAzure;
+	}
 
 	public String getCustomerSearchClientOnPremise() {
 		return customerSearchClientOnPremise;

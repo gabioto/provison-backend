@@ -67,7 +67,22 @@ public class ReportRepositoryImpl implements ReportRepository{
 	public List<Provision> getAllProvision(ReportByRegisterDateRequest request) {
 		Query query = new Query(Criteria.where("status_change_date").gte(request.getStartDate()).andOperator(
 				Criteria.where("status_change_date").lte(request.getEndDate())));
-		
+		query.fields().include("xa_request");
+		query.fields().include("xa_id_st");
+		query.fields().include("activity_type");
+		query.fields().include("sale_source");
+		query.fields().include("sale_code");		
+		query.fields().include("origin_code");
+		query.fields().include("sale_request_date");
+		query.fields().include("product_name");
+		query.fields().include("commercial_op");
+		query.fields().include("active_status");		
+		query.fields().include("register_date");
+		query.fields().include("last_tracking_status");
+		query.fields().include("log_status");
+		query.fields().include("is_up_front");
+		query.fields().include("customer");
+		query.fields().include("notifications");		
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 		return provisions;
 	}

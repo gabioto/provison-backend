@@ -30,7 +30,7 @@ import pe.telefonica.provision.util.constants.Constants;
 @Service
 public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
-	private static final Log log = LogFactory.getLog(OrderServiceImpl.class);
+	private static final Log log = LogFactory.getLog(RetrieveOrderServiceImpl.class);
 
 	@Autowired
 	private OrderRepository orderRepository;

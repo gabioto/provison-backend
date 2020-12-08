@@ -120,8 +120,7 @@ public class OrderServiceImpl implements OrderService {
 		update.set("flagMT", StringUtil.getValue(order.getFlagMT(), orderSaved.getFlagMT()));
 
 		if (!order.getSource().equals(Constants.SOURCE_ORDERS_ATIS)) {
-			String commercialOp = StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOp());
-			update.set("commercialOp", Constants.ATIS_COMMERCIAL_OP.getOrDefault(commercialOp, commercialOp));
+			update.set("commercialOp", StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOp()));
 		} else {
 			update.set("commercialOpAtis",
 					StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOpAtis()));

@@ -38,14 +38,17 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 		List<Order> orders = orderRepository.getOrdersToNotify();
 
 		orders = orders.stream().filter(order -> {
-			if (order.getNote1() != null) {
-				if (order.getCommercialOp().equals("SUSPENSION APC")
-						&& !order.getNote1().toUpperCase().contains("BAJA")) {
+
+			if (order.getCommercialOp().equals("SUSPENSION APC")) {
+				if (order.getNote1() != null && !order.getNote1().toUpperCase().contains("BAJA")) {
 					return true;
+				} else {
+					return false;
 				}
+			} else {
+				return true;
 			}
 
-			return false;
 		}).collect(Collectors.toList());
 
 		return evaluateOrders(orders);

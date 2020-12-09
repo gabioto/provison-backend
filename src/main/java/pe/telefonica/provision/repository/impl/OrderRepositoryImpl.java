@@ -100,7 +100,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 	private Query getNotificationQueryCriteria() {
 
 		Criteria criteria = Criteria.where("statusOrderCode").is("FI")
-				.andOperator(Criteria.where("commercialOpAtis").is("ALTA MIGRACION"),
+				.orOperator(Criteria.where("commercialOpAtis").is("ALTA MIGRACION"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO CIS"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO SIS"),
 						Criteria.where("commercialOpAtis").is("SUSPENSION APC"),

@@ -36,23 +36,35 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 		headers.add("UNICA-PID", uPid);
 
 		List<Order> orders = orderRepository.getOrdersToNotify();
-		orderRepository.updateFlagDateNotify();
+		
+		orderRepository.updateFlagDateNotify(orders);
 
 		orders = orders.stream().filter(order -> {
-
-			if (order.getCommercialOp().equals("SUSPENSION APC")) {
-				if (order.getNote1() != null && !order.getNote1().toUpperCase().contains("BAJA")) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return true;
-			}
-
+			return validateOrder(order);
 		}).collect(Collectors.toList());
 
 		return evaluateOrders(orders);
+	}
+
+	private boolean validateOrder(Order order) {
+		boolean isPhoneValid = validatePhoneNumber(order.getContactCellphone()) || validatePhoneNumber(order.getContactPhone());
+		
+		if (order.getCommercialOpAtis().equals("SUSPENSION APC")) {
+			if (order.getNote1() != null && !order.getNote1().toUpperCase().contains("BAJA")) {
+				
+				return isPhoneValid;
+			} else {
+				return false;
+			}
+		} else {
+			return isPhoneValid;
+		}
+
+	}
+
+	private boolean validatePhoneNumber(String phone) {
+
+		return phone.matches("[0-9]+") && phone.length() == 9 && phone.substring(0, 1).equals("9");
 	}
 
 	private ResponseEntity<Object> evaluateOrders(List<Order> orders) {

@@ -14,6 +14,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.client.result.UpdateResult;
+
+import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.util.constants.Constants;
@@ -88,13 +91,17 @@ public class OrderRepositoryImpl implements OrderRepository {
 	}
 
 	@Override
-	public void updateFlagDateNotify() {
+	public void updateFlagDateNotify(List<Order> orders) {
 
 		Update update = new Update();
 		update.set("notifications.finalizadoSendNotify", true);
 		update.set("notifications.finalizadoSendDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		
+		for (Order item : orders) {
+			this.mongoOperations.updateFirst(new Query(Criteria.where("idOrder").is(new ObjectId(item.getIdOrder()))),
+					update, Order.class);
+		}
 
-		this.mongoOperations.updateMulti(getNotificationQueryCriteria(), update, Order.class);
 	}
 
 	private Query getNotificationQueryCriteria() {

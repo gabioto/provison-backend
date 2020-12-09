@@ -100,13 +100,19 @@ public class OrderRepositoryImpl implements OrderRepository {
 
 	private Query getNotificationQueryCriteria() {
 
-		Criteria criteria = Criteria.where("status")
-				.is(Status.FINALIZADO.getStatusName())
+		Criteria criteria = Criteria.where("status").is(Status.FINALIZADO.getStatusName())
 				.andOperator(Criteria.where("commercialOpAtis").is("ALTA MIGRACION"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO CIS"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO SIS"),
 						Criteria.where("commercialOpAtis").is("SUSPENSION APC"),
-						Criteria.where("commercialOpAtis").is("ALTA MIGRACION DE P/S"))
+						Criteria.where("commercialOpAtis").is("ALTA MIGRACION DE P/S"),
+						Criteria.where("commercialOpAtis").is("MIGRACION"),
+						Criteria.where("commercialOpAtis").is("MIGRACION CON CAMBIO DE CUENTA"),
+						Criteria.where("commercialOpAtis").is("MIGRACION CON TRASLADO CIS"),
+						Criteria.where("commercialOpAtis").is("MIGRACION CON TRASLADO SIS"),
+						Criteria.where("commercialOpAtis").is("MIGRACION DE CABECERA"),
+						Criteria.where("commercialOpAtis").is("MODIFICACION"),
+						Criteria.where("commercialOpAtis").is("MODIFICACION DE CARACTERISTICAS DE P/S"))
 				.and("notifications").ne(null).and("notifications.finalizadoSendNotify").is(false);
 
 		return new Query(criteria).limit(15).with(new Sort(Direction.ASC, "_id"));

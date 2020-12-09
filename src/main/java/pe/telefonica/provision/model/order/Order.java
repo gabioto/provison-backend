@@ -88,6 +88,6 @@ public class Order {
 
 	private LocalDateTime lastUpdateDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
 
-	private OrderNotifications notifications;
+	private OrderNotifications notifications = new OrderNotifications();
 
 }

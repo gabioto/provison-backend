@@ -36,6 +36,7 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 		headers.add("UNICA-PID", uPid);
 
 		List<Order> orders = orderRepository.getOrdersToNotify();
+		orderRepository.updateFlagDateNotify();
 
 		orders = orders.stream().filter(order -> {
 

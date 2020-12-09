@@ -123,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
 			update.set("commercialOp", StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOp()));
 		} else {
 			update.set("commercialOpAtis",
-					StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOpAtis()));
+					StringUtil.getValue(order.getCommercialOpAtis(), orderSaved.getCommercialOpAtis()));
 		}
 
 		return update;

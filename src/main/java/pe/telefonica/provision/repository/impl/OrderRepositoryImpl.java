@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.util.constants.Constants;
-import pe.telefonica.provision.util.constants.Status;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
@@ -100,7 +99,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
 	private Query getNotificationQueryCriteria() {
 
-		Criteria criteria = Criteria.where("status").is(Status.FINALIZADO.getStatusName())
+		Criteria criteria = Criteria.where("statusOrderCode").is("FI")
 				.andOperator(Criteria.where("commercialOpAtis").is("ALTA MIGRACION"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO CIS"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO SIS"),

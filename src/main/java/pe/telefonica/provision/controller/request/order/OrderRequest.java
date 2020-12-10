@@ -66,6 +66,8 @@ public class OrderRequest {
 
 	private String oldResult;
 
+	private String flagMT;
+
 	public Order fromThis() {
 		Order order = new Order();
 		order.setSource(source);
@@ -79,7 +81,9 @@ public class OrderRequest {
 		order.setExecRecoxDate(DateUtil.stringToLocalDateTime(execRecoxDate));
 		order.setNote1(note1);
 		order.setApplication(application);
-		order.setCommercialOp(commercialOp);
+		order.setCommercialOp(source.equals(Constants.SOURCE_ORDERS_ATIS)
+				? (Constants.ATIS_COMMERCIAL_OP.getOrDefault(commercialOp, commercialOp))
+				: commercialOp);
 		order.setContactPhone(contactPhone);
 		order.setContactCellphone(contactCellphone);
 		order.setContactMail(contactMail);
@@ -98,6 +102,8 @@ public class OrderRequest {
 		order.setReleaseOrderDate(DateUtil.stringToLocalDateTime(releaseOrderDate));
 		order.setNote2(note2);
 		order.setIdResult(oldResult);
+		order.setFlagMT(flagMT);
+		order.setCommercialOpAtis(source.equals(Constants.SOURCE_ORDERS_ATIS) ? commercialOp : "");
 
 		return order;
 	}

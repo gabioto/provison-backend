@@ -37,18 +37,36 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 
 		List<Order> orders = orderRepository.getOrdersToNotify();
 
-		orders = orders.stream().filter(order -> {
-			if (order.getNote1() != null) {
-				if (order.getCommercialOp().equals("SUSPENSION APC")
-						&& !order.getNote1().toUpperCase().contains("BAJA")) {
-					return true;
-				}
-			}
+		orderRepository.updateFlagDateNotify(orders);
 
-			return false;
+		orders = orders.stream().filter(order -> {
+			return validateOrder(order);
 		}).collect(Collectors.toList());
 
 		return evaluateOrders(orders);
+	}
+
+	private boolean validateOrder(Order order) {
+
+		boolean isPhoneValid = validatePhoneNumber(order.getContactCellphone())
+				|| validatePhoneNumber(order.getContactPhone());
+
+		if ((order.getCommercialOpAtis().equals("SUSPENSION APC")
+				|| order.getCommercialOpAtis().equals("RECONEXION APC"))) {
+			if (order.getNote1() != null && !order.getNote1().toUpperCase().contains("BAJA")) {
+
+				return isPhoneValid;
+			} else {
+				return false;
+			}
+		} else {
+			return isPhoneValid;
+		}
+	}
+
+	private boolean validatePhoneNumber(String phone) {
+
+		return phone.matches("[0-9]+") && phone.length() == 9 && phone.substring(0, 1).equals("9");
 	}
 
 	private ResponseEntity<Object> evaluateOrders(List<Order> orders) {
@@ -58,7 +76,7 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 
 		log.info("Orders - " + (orders != null ? orders.toString() : "null"));
 
-		if (orders != null) {
+		if (orders != null && orders.size() > 0) {
 			status = HttpStatus.OK;
 			response = new OrderNotificationResponse().fromOrderList(orders);
 		} else {

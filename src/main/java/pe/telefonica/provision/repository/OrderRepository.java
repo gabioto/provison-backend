@@ -25,7 +25,7 @@ public interface OrderRepository {
 
 	List<Order> getOrdersByPhone(String publicId, LocalDateTime startDate, LocalDateTime endDate);
 	
-	void updateFlagDateNotify();
+	void updateFlagDateNotify(List<Order> order);
 	
 	List<Order> getOrdersToNotify();
 }

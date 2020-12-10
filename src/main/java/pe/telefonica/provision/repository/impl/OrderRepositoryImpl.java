@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.util.constants.Constants;
-import pe.telefonica.provision.util.constants.Status;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
@@ -89,24 +88,35 @@ public class OrderRepositoryImpl implements OrderRepository {
 	}
 
 	@Override
-	public void updateFlagDateNotify() {
+	public void updateFlagDateNotify(List<Order> orders) {
 
 		Update update = new Update();
 		update.set("notifications.finalizadoSendNotify", true);
 		update.set("notifications.finalizadoSendDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
-		this.mongoOperations.updateMulti(getNotificationQueryCriteria(), update, Order.class);
+		for (Order item : orders) {
+			this.mongoOperations.updateFirst(new Query(Criteria.where("idOrder").is(new ObjectId(item.getIdOrder()))),
+					update, Order.class);
+		}
+
 	}
 
 	private Query getNotificationQueryCriteria() {
 
-		Criteria criteria = Criteria.where("source").is(Constants.SOURCE_ORDERS_ORDENES).and("status")
-				.is(Status.FINALIZADO.getStatusName())
-				.andOperator(Criteria.where("commercialOp").is("ALTA MIGRACION"),
-						Criteria.where("commercialOp").is("ALTA MIGRACION TRASLADO CIS"),
-						Criteria.where("commercialOp").is("ALTA MIGRACION TRASLADO SIS"),
-						Criteria.where("commercialOp").is("SUSPENSION APC"),
-						Criteria.where("commercialOp").is("ALTA MIGRACION DE P/S"))
+		Criteria criteria = Criteria.where("statusOrderCode").is("FI")
+				.orOperator(Criteria.where("commercialOpAtis").is("ALTA MIGRACION"),
+						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO CIS"),
+						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO SIS"),
+						Criteria.where("commercialOpAtis").is("SUSPENSION APC"),
+						Criteria.where("commercialOpAtis").is("RECONEXION APC"),
+						Criteria.where("commercialOpAtis").is("ALTA MIGRACION DE P/S"),
+						Criteria.where("commercialOpAtis").is("MIGRACION"),
+						Criteria.where("commercialOpAtis").is("MIGRACION CON CAMBIO DE CUENTA"),
+						Criteria.where("commercialOpAtis").is("MIGRACION CON TRASLADO CIS"),
+						Criteria.where("commercialOpAtis").is("MIGRACION CON TRASLADO SIS"),
+						Criteria.where("commercialOpAtis").is("MIGRACION DE CABECERA"),
+						Criteria.where("commercialOpAtis").is("MODIFICACION"),
+						Criteria.where("commercialOpAtis").is("MODIFICACION DE CARACTERISTICAS DE P/S"))
 				.and("notifications").ne(null).and("notifications.finalizadoSendNotify").is(false);
 
 		return new Query(criteria).limit(15).with(new Sort(Direction.ASC, "_id"));

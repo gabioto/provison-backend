@@ -43,12 +43,6 @@ public class ExternalApi {
 	String simpliGetUrl;
 	String simpliBaseUrl;
 	
-<<<<<<< HEAD
-	String oauthTokenOnPremise;
-	String customerSearchClientOnPremise;
-
-	
-=======
 	String simpliGetUrlAzure;
 	String simpliBaseUrlAzure;
 	String apiClientKeyAzure;
@@ -56,319 +50,240 @@ public class ExternalApi {
 	String oauthTokenOnPremise;
 	String customerSearchClientOnPremise;
 	String securityGetOAuthTokenAzure;
-	
-
+	public String getSecurityUrl() {
+		return securityUrl;
+	}
+	public void setSecurityUrl(String securityUrl) {
+		this.securityUrl = securityUrl;
+	}
+	public String getScheduleUrl() {
+		return scheduleUrl;
+	}
+	public void setScheduleUrl(String scheduleUrl) {
+		this.scheduleUrl = scheduleUrl;
+	}
+	public String getProvisionUrl() {
+		return provisionUrl;
+	}
+	public void setProvisionUrl(String provisionUrl) {
+		this.provisionUrl = provisionUrl;
+	}
+	public String getBoUrl() {
+		return boUrl;
+	}
+	public void setBoUrl(String boUrl) {
+		this.boUrl = boUrl;
+	}
+	public String getPsiUrl() {
+		return psiUrl;
+	}
+	public void setPsiUrl(String psiUrl) {
+		this.psiUrl = psiUrl;
+	}
+	public String getCustomerUrl() {
+		return customerUrl;
+	}
+	public void setCustomerUrl(String customerUrl) {
+		this.customerUrl = customerUrl;
+	}
+	public String getCustomerUrlOnPremise() {
+		return customerUrlOnPremise;
+	}
+	public void setCustomerUrlOnPremise(String customerUrlOnPremise) {
+		this.customerUrlOnPremise = customerUrlOnPremise;
+	}
+	public String getOauthToken() {
+		return oauthToken;
+	}
+	public void setOauthToken(String oauthToken) {
+		this.oauthToken = oauthToken;
+	}
+	public String getCustomerSearchClient() {
+		return customerSearchClient;
+	}
+	public void setCustomerSearchClient(String customerSearchClient) {
+		this.customerSearchClient = customerSearchClient;
+	}
+	public String getCustomerSearchSecret() {
+		return customerSearchSecret;
+	}
+	public void setCustomerSearchSecret(String customerSearchSecret) {
+		this.customerSearchSecret = customerSearchSecret;
+	}
+	public String getApiClient() {
+		return apiClient;
+	}
+	public void setApiClient(String apiClient) {
+		this.apiClient = apiClient;
+	}
+	public String getSendSMS() {
+		return sendSMS;
+	}
+	public void setSendSMS(String sendSMS) {
+		this.sendSMS = sendSMS;
+	}
+	public String getSendMail() {
+		return sendMail;
+	}
+	public void setSendMail(String sendMail) {
+		this.sendMail = sendMail;
+	}
+	public String getSendRequestToBO() {
+		return sendRequestToBO;
+	}
+	public void setSendRequestToBO(String sendRequestToBO) {
+		this.sendRequestToBO = sendRequestToBO;
+	}
+	public String getPsiUpdateClient() {
+		return psiUpdateClient;
+	}
+	public void setPsiUpdateClient(String psiUpdateClient) {
+		this.psiUpdateClient = psiUpdateClient;
+	}
+	public String getUpdateSchedule() {
+		return updateSchedule;
+	}
+	public void setUpdateSchedule(String updateSchedule) {
+		this.updateSchedule = updateSchedule;
+	}
+	public String getScheduleUpdateFicticious() {
+		return scheduleUpdateFicticious;
+	}
+	public void setScheduleUpdateFicticious(String scheduleUpdateFicticious) {
+		this.scheduleUpdateFicticious = scheduleUpdateFicticious;
+	}
+	public String getScheduleUpdatePSICodeReal() {
+		return scheduleUpdatePSICodeReal;
+	}
+	public void setScheduleUpdatePSICodeReal(String scheduleUpdatePSICodeReal) {
+		this.scheduleUpdatePSICodeReal = scheduleUpdatePSICodeReal;
+	}
+	public String getGetPSIToken() {
+		return getPSIToken;
+	}
+	public void setGetPSIToken(String getPSIToken) {
+		this.getPSIToken = getPSIToken;
+	}
+	public String getSecuritySaveLogData() {
+		return securitySaveLogData;
+	}
+	public void setSecuritySaveLogData(String securitySaveLogData) {
+		this.securitySaveLogData = securitySaveLogData;
+	}
+	public String getSaveThirdLogData() {
+		return saveThirdLogData;
+	}
+	public void setSaveThirdLogData(String saveThirdLogData) {
+		this.saveThirdLogData = saveThirdLogData;
+	}
+	public String getSendSMSById() {
+		return sendSMSById;
+	}
+	public void setSendSMSById(String sendSMSById) {
+		this.sendSMSById = sendSMSById;
+	}
+	public String getBucketsByProduct() {
+		return bucketsByProduct;
+	}
+	public void setBucketsByProduct(String bucketsByProduct) {
+		this.bucketsByProduct = bucketsByProduct;
+	}
+	public String getUpdateScheduleDate() {
+		return updateScheduleDate;
+	}
+	public void setUpdateScheduleDate(String updateScheduleDate) {
+		this.updateScheduleDate = updateScheduleDate;
+	}
+	public String getCancelLocalSchedule() {
+		return cancelLocalSchedule;
+	}
+	public void setCancelLocalSchedule(String cancelLocalSchedule) {
+		this.cancelLocalSchedule = cancelLocalSchedule;
+	}
+	public String getSearchCustomer() {
+		return searchCustomer;
+	}
+	public void setSearchCustomer(String searchCustomer) {
+		this.searchCustomer = searchCustomer;
+	}
+	public String getProductOrders() {
+		return productOrders;
+	}
+	public void setProductOrders(String productOrders) {
+		this.productOrders = productOrders;
+	}
+	public String getSearchCustomerOnPremise() {
+		return searchCustomerOnPremise;
+	}
+	public void setSearchCustomerOnPremise(String searchCustomerOnPremise) {
+		this.searchCustomerOnPremise = searchCustomerOnPremise;
+	}
+	public String getNroDiasVidaProvision() {
+		return nroDiasVidaProvision;
+	}
+	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
+		this.nroDiasVidaProvision = nroDiasVidaProvision;
+	}
+	public String getScheduleGetTechAvailable() {
+		return scheduleGetTechAvailable;
+	}
+	public void setScheduleGetTechAvailable(String scheduleGetTechAvailable) {
+		this.scheduleGetTechAvailable = scheduleGetTechAvailable;
+	}
+	public String getSecurityGetOAuthToken() {
+		return securityGetOAuthToken;
+	}
+	public void setSecurityGetOAuthToken(String securityGetOAuthToken) {
+		this.securityGetOAuthToken = securityGetOAuthToken;
+	}
+	public String getSimpliGetUrl() {
+		return simpliGetUrl;
+	}
+	public void setSimpliGetUrl(String simpliGetUrl) {
+		this.simpliGetUrl = simpliGetUrl;
+	}
+	public String getSimpliBaseUrl() {
+		return simpliBaseUrl;
+	}
+	public void setSimpliBaseUrl(String simpliBaseUrl) {
+		this.simpliBaseUrl = simpliBaseUrl;
+	}
+	public String getSimpliGetUrlAzure() {
+		return simpliGetUrlAzure;
+	}
+	public void setSimpliGetUrlAzure(String simpliGetUrlAzure) {
+		this.simpliGetUrlAzure = simpliGetUrlAzure;
+	}
+	public String getSimpliBaseUrlAzure() {
+		return simpliBaseUrlAzure;
+	}
+	public void setSimpliBaseUrlAzure(String simpliBaseUrlAzure) {
+		this.simpliBaseUrlAzure = simpliBaseUrlAzure;
+	}
+	public String getApiClientKeyAzure() {
+		return apiClientKeyAzure;
+	}
+	public void setApiClientKeyAzure(String apiClientKeyAzure) {
+		this.apiClientKeyAzure = apiClientKeyAzure;
+	}
+	public String getOauthTokenOnPremise() {
+		return oauthTokenOnPremise;
+	}
+	public void setOauthTokenOnPremise(String oauthTokenOnPremise) {
+		this.oauthTokenOnPremise = oauthTokenOnPremise;
+	}
+	public String getCustomerSearchClientOnPremise() {
+		return customerSearchClientOnPremise;
+	}
+	public void setCustomerSearchClientOnPremise(String customerSearchClientOnPremise) {
+		this.customerSearchClientOnPremise = customerSearchClientOnPremise;
+	}
 	public String getSecurityGetOAuthTokenAzure() {
 		return securityGetOAuthTokenAzure;
 	}
-
 	public void setSecurityGetOAuthTokenAzure(String securityGetOAuthTokenAzure) {
 		this.securityGetOAuthTokenAzure = securityGetOAuthTokenAzure;
 	}
 
-	public String getApiClientKeyAzure() {
-		return apiClientKeyAzure;
-	}
-
-	public void setApiClientKeyAzure(String apiClientKeyAzure) {
-		this.apiClientKeyAzure = apiClientKeyAzure;
-	}
-
-	public String getSimpliGetUrlAzure() {
-		return simpliGetUrlAzure;
-	}
-
-	public void setSimpliGetUrlAzure(String simpliGetUrlAzure) {
-		this.simpliGetUrlAzure = simpliGetUrlAzure;
-	}
-
-	public String getSimpliBaseUrlAzure() {
-		return simpliBaseUrlAzure;
-	}
-
-	public void setSimpliBaseUrlAzure(String simpliBaseUrlAzure) {
-		this.simpliBaseUrlAzure = simpliBaseUrlAzure;
-	}
-
->>>>>>> PI5-Sprint-5/feat/SAQ-1264-1266
-	public String getCustomerSearchClientOnPremise() {
-		return customerSearchClientOnPremise;
-	}
-
-	public void setCustomerSearchClientOnPremise(String customerSearchClientOnPremise) {
-		this.customerSearchClientOnPremise = customerSearchClientOnPremise;
-	}
-
-	public String getOauthTokenOnPremise() {
-		return oauthTokenOnPremise;
-	}
-
-	public void setOauthTokenOnPremise(String oauthTokenOnPremise) {
-		this.oauthTokenOnPremise = oauthTokenOnPremise;
-	}
-
-	public String getNroDiasVidaProvision() {
-		return nroDiasVidaProvision;
-	}
-
-	public void setNroDiasVidaProvision(String nroDiasVidaProvision) {
-		this.nroDiasVidaProvision = nroDiasVidaProvision;
-	}
-
-	public String getSecurityUrl() {
-		return securityUrl;
-	}
-
-	public String getScheduleUrl() {
-		return scheduleUrl;
-	}
-
-	public String getProvisionUrl() {
-		return provisionUrl;
-	}
-
-	public String getBoUrl() {
-		return boUrl;
-	}
-
-	public String getPsiUrl() {
-		return psiUrl;
-	}
-
-	public String getCustomerUrl() {
-		return customerUrl;
-	}
-
-	public String getOauthToken() {
-		return oauthToken;
-	}
-
-	public String getCustomerSearchClient() {
-		return customerSearchClient;
-	}
-
-	public String getCustomerSearchSecret() {
-		return customerSearchSecret;
-	}
-
-	public String getApiClient() {
-		return apiClient;
-	}
-
-	public String getSendSMS() {
-		return sendSMS;
-	}
-
-	public String getSendMail() {
-		return sendMail;
-	}
-
-	public String getSendRequestToBO() {
-		return sendRequestToBO;
-	}
-
-	public String getPsiUpdateClient() {
-		return psiUpdateClient;
-	}
-
-	public String getUpdateSchedule() {
-		return updateSchedule;
-	}
-
-	public String getScheduleUpdateFicticious() {
-		return scheduleUpdateFicticious;
-	}
-
-	public String getScheduleUpdatePSICodeReal() {
-		return scheduleUpdatePSICodeReal;
-	}
-
-	public String getGetPSIToken() {
-		return getPSIToken;
-	}
-
-	public String getSecuritySaveLogData() {
-		return securitySaveLogData;
-	}
-
-	public String getSaveThirdLogData() {
-		return saveThirdLogData;
-	}
-
-	public String getSendSMSById() {
-		return sendSMSById;
-	}
-
-	public String getBucketsByProduct() {
-		return bucketsByProduct;
-	}
-
-	public String getUpdateScheduleDate() {
-		return updateScheduleDate;
-	}
-
-	public String getCancelLocalSchedule() {
-		return cancelLocalSchedule;
-	}
-
-	public String getSearchCustomer() {
-		return searchCustomer;
-	}
-
-	public String getScheduleGetTechAvailable() {
-		return scheduleGetTechAvailable;
-	}
-
-	public String getSecurityGetOAuthToken() {
-		return securityGetOAuthToken;
-	}
-
-	public String getSimpliGetUrl() {
-		return simpliGetUrl;
-	}
-
-	public String getSimpliBaseUrl() {
-		return simpliBaseUrl;
-	}
-
-	public void setSecurityUrl(String securityUrl) {
-		this.securityUrl = securityUrl;
-	}
-
-	public void setScheduleUrl(String scheduleUrl) {
-		this.scheduleUrl = scheduleUrl;
-	}
-
-	public void setProvisionUrl(String provisionUrl) {
-		this.provisionUrl = provisionUrl;
-	}
-
-	public void setBoUrl(String boUrl) {
-		this.boUrl = boUrl;
-	}
-
-	public void setPsiUrl(String psiUrl) {
-		this.psiUrl = psiUrl;
-	}
-
-	public void setCustomerUrl(String customerUrl) {
-		this.customerUrl = customerUrl;
-	}
-
-	public void setOauthToken(String oauthToken) {
-		this.oauthToken = oauthToken;
-	}
-
-	public void setCustomerSearchClient(String customerSearchClient) {
-		this.customerSearchClient = customerSearchClient;
-	}
-
-	public void setCustomerSearchSecret(String customerSearchSecret) {
-		this.customerSearchSecret = customerSearchSecret;
-	}
-
-	public void setApiClient(String apiClient) {
-		this.apiClient = apiClient;
-	}
-
-	public void setSendSMS(String sendSMS) {
-		this.sendSMS = sendSMS;
-	}
-
-	public void setSendMail(String sendMail) {
-		this.sendMail = sendMail;
-	}
-
-	public void setSendRequestToBO(String sendRequestToBO) {
-		this.sendRequestToBO = sendRequestToBO;
-	}
-
-	public void setPsiUpdateClient(String psiUpdateClient) {
-		this.psiUpdateClient = psiUpdateClient;
-	}
-
-	public void setUpdateSchedule(String updateSchedule) {
-		this.updateSchedule = updateSchedule;
-	}
-
-	public void setScheduleUpdateFicticious(String scheduleUpdateFicticious) {
-		this.scheduleUpdateFicticious = scheduleUpdateFicticious;
-	}
-
-	public void setScheduleUpdatePSICodeReal(String scheduleUpdatePSICodeReal) {
-		this.scheduleUpdatePSICodeReal = scheduleUpdatePSICodeReal;
-	}
-
-	public void setGetPSIToken(String getPSIToken) {
-		this.getPSIToken = getPSIToken;
-	}
-
-	public void setSecuritySaveLogData(String securitySaveLogData) {
-		this.securitySaveLogData = securitySaveLogData;
-	}
-
-	public void setSaveThirdLogData(String saveThirdLogData) {
-		this.saveThirdLogData = saveThirdLogData;
-	}
-
-	public void setSendSMSById(String sendSMSById) {
-		this.sendSMSById = sendSMSById;
-	}
-
-	public void setBucketsByProduct(String bucketsByProduct) {
-		this.bucketsByProduct = bucketsByProduct;
-	}
-
-	public void setUpdateScheduleDate(String updateScheduleDate) {
-		this.updateScheduleDate = updateScheduleDate;
-	}
-
-	public void setCancelLocalSchedule(String cancelLocalSchedule) {
-		this.cancelLocalSchedule = cancelLocalSchedule;
-	}
-
-	public void setSearchCustomer(String searchCustomer) {
-		this.searchCustomer = searchCustomer;
-	}
-
-	public void setScheduleGetTechAvailable(String scheduleGetTechAvailable) {
-		this.scheduleGetTechAvailable = scheduleGetTechAvailable;
-	}
-
-	public void setSecurityGetOAuthToken(String securityGetOAuthToken) {
-		this.securityGetOAuthToken = securityGetOAuthToken;
-	}
-
-	public void setSimpliGetUrl(String simpliGetUrl) {
-		this.simpliGetUrl = simpliGetUrl;
-	}
-
-	public void setSimpliBaseUrl(String simpliBaseUrl) {
-		this.simpliBaseUrl = simpliBaseUrl;
-	}
-
-	public String getCustomerUrlOnPremise() {
-		return customerUrlOnPremise;
-	}
-
-	public void setCustomerUrlOnPremise(String customerUrlOnPremise) {
-		this.customerUrlOnPremise = customerUrlOnPremise;
-	}
-
-	public String getSearchCustomerOnPremise() {
-		return searchCustomerOnPremise;
-	}
-
-	public void setSearchCustomerOnPremise(String searchCustomerOnPremise) {
-		this.searchCustomerOnPremise = searchCustomerOnPremise;
-	}
-	
-	public String getProductOrders() {
-		return productOrders;
-	}
-
-	public void setProductOrders(String productOrders) {
-		this.productOrders = productOrders;
-	}
 
 }

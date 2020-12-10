@@ -1623,7 +1623,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 						Contacts contacts = new Contacts();
 						contacts.setFullName(listContact.get(a).getFullName());
 						contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
-						boolean isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
+						boolean isMovistar = false;
+						
+						String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
+						if (switchOnPremise.equals("true")) {
+							isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
+						} else {
+							isMovistar = restPSI.getCarrierOld(listContact.get(a).getPhoneNumber().toString());
+						}
+						
 						contacts.setCarrier(isMovistar);
 						contactsList.add(contacts);
 
@@ -2376,7 +2384,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 					
 					if (Boolean.valueOf(System.getenv("TDP_SIMPLI_ENABLE"))) {
-						String tokenExternal = trazabilidadSecurityApi.gerateToken();
+						
+						String switchAzure = System.getenv("TDP_SWITCH_AZURE");
+						String tokenExternal = "";
+						if (switchAzure.equals("true")) {
+							tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
+						} else {
+							tokenExternal = trazabilidadSecurityApi.gerateToken();
+						}						
 						// validate TechAvailable
 						GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
 						getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
@@ -2401,7 +2416,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("Simpli Attempt #" + count);
 
 								String urlSimpli="";
-								String switchAzure = System.getenv("TDP_SWITCH_AZURE");
 								if (switchAzure.equals("true")) {
 									urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
 								} else {
@@ -2850,7 +2864,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	private boolean getCarrier(String phoneNumber) {
-		return restPSI.getCarrier(phoneNumber);
+		
+		boolean isMovistar = false;		
+		String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
+		if (switchOnPremise.equals("true")) {
+			isMovistar = restPSI.getCarrier(phoneNumber);
+		} else {
+			isMovistar = restPSI.getCarrierOld(phoneNumber);
+		}
+		return isMovistar;
 	}
 
 	@Override

@@ -47,7 +47,17 @@ public class ExternalApi {
 	
 	String oauthTokenOnPremise;
 	String customerSearchClientOnPremise;
+	String securityGetOAuthTokenAzure;
 	
+
+	public String getSecurityGetOAuthTokenAzure() {
+		return securityGetOAuthTokenAzure;
+	}
+
+	public void setSecurityGetOAuthTokenAzure(String securityGetOAuthTokenAzure) {
+		this.securityGetOAuthTokenAzure = securityGetOAuthTokenAzure;
+	}
+
 	public String getApiClientKeyAzure() {
 		return apiClientKeyAzure;
 	}

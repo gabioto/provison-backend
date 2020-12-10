@@ -79,8 +79,15 @@ public class Order {
 	private String note2;
 
 	private String idResult;
+	
+	private String commercialOpAtis;
+	
+	private String flagMT;
 
 	private LocalDateTime registerLocalDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
 
 	private LocalDateTime lastUpdateDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
+
+	private OrderNotifications notifications = new OrderNotifications();
+
 }

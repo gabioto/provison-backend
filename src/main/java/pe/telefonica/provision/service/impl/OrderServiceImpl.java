@@ -49,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
 			}
 
 			if (orderSaved != null) {
-				if (order.getSource().equals(Constants.SOURCE_ORDERS_ORDENES)
+				if (order.getSource().equals(Constants.SOURCE_ORDERS_VENTAS_FIJA)
 						&& orderSaved.getStatus().equals(order.getStatus())) {
 					return new ResponseEntity<Object>(
 							new ErrorResponse("SVC1000", "Duplicate status field",
@@ -117,9 +117,13 @@ public class OrderServiceImpl implements OrderService {
 		update.set("note2", StringUtil.getValue(order.getNote2(), orderSaved.getNote2()));
 		update.set("idResult", StringUtil.getValue(order.getIdResult(), orderSaved.getIdResult()));
 		update.set("lastUpdateDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		update.set("flagMT", StringUtil.getValue(order.getFlagMT(), orderSaved.getFlagMT()));
 
 		if (!order.getSource().equals(Constants.SOURCE_ORDERS_ATIS)) {
-			update.set("commercialOp", order.getCommercialOp());
+			update.set("commercialOp", StringUtil.getValue(order.getCommercialOp(), orderSaved.getCommercialOp()));
+		} else {
+			update.set("commercialOpAtis",
+					StringUtil.getValue(order.getCommercialOpAtis(), orderSaved.getCommercialOpAtis()));
 		}
 
 		return update;

@@ -153,4 +153,14 @@ public final class Constants {
 					{ "TE", "COMPLETADO" }, { "CG", "CANCELADO" } })
 			.collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
+	public static final Map<String, String> ATIS_COMMERCIAL_OP = Stream.of(new String[][] {
+			{ "MIGRACION", "MIGRACION ATIS" }, { "MIGRACION CON CAMBIO DE CUENTA", "MIGRACION ATIS" },
+			{ "MIGRACION CON TRASLADO CIS", "MIGRACION ATIS" }, { "MIGRACION CON TRASLADO SIS", "MIGRACION ATIS" },
+			{ "MIGRACION DE CABECERA", "MIGRACION ATIS" }, { "SUSPENSION APC", "Suspension APC ATIS" },
+			{ "ALTA MIGRACION", "MIGRACION ATIS" }, { "ALTA MIGRACION TRASLADO CIS", "MIGRACION ATIS" },
+			{ "ALTA MIGRACION TRASLADO SIS", "MIGRACION ATIS" }, { "MODIFICACION", "MIGRACION ATIS" },
+			{ "MODIFICACION DE CARACTERISTICAS DE P/S", "MIGRACION ATIS" },
+			{ "ALTA MIGRACION DE P/S", "MIGRACION ATIS" }, { "RECONEXION APC", "Suspension APC ATIS" } })
+			.collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 
 import pe.telefonica.provision.controller.request.order.OrderRequest;
+import pe.telefonica.provision.service.NotifyOrderService;
 import pe.telefonica.provision.service.OrderService;
 import pe.telefonica.provision.service.RetreiveOrderService;
 
@@ -33,12 +34,15 @@ import pe.telefonica.provision.service.RetreiveOrderService;
 public class OrderController {
 
 	private static final Log log = LogFactory.getLog(OrderController.class);
-	
+
 	@Autowired
 	private OrderService orderService;
 
 	@Autowired
 	private RetreiveOrderService retrieveOrderService;
+
+	@Autowired
+	private NotifyOrderService notifyOrderService;
 
 	// Creación de ordenes
 	@PostMapping
@@ -67,5 +71,16 @@ public class OrderController {
 
 		return retrieveOrderService.getOrder(uServiceId, uPid, code, originSystem, publicId, order, orderCode,
 				customerCode, startDate, endDate);
+	}
+
+	@GetMapping("/getOrdersToNotify")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<Object> getOrdersToNotify(
+			@RequestHeader(value = "UNICA-ServiceId", required = false) String uServiceId,
+			@RequestHeader(value = "UNICA-Application", required = false) String uApplication,
+			@RequestHeader(value = "UNICA-PID", required = false) String uPid,
+			@RequestHeader(value = "UNICA-User", required = false) String uUser) throws Exception {
+
+		return notifyOrderService.getOrders(uServiceId, uPid);
 	}
 }

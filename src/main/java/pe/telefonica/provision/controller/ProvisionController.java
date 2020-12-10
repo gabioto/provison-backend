@@ -492,25 +492,13 @@ public class ProvisionController {
 			@RequestBody @Valid ApiRequest<UpdateFromToaRequest> request) {
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
-		String separador = Pattern.quote(Constants.BARRA_VERTICAL);
-		String[] parts = request.getBody().getData().split(separador);
+
+		
 		Boolean provisions = false;
 
 		try {
-			// Lógica diferencia Averias - Provision
-			Object[] obj = new Object[2];
-			obj = validateActivityType(parts);
-
-			boolean provision = (boolean) obj[0];
-			String xaRequest = (String) obj[1];
-			String xaRequirementNumber = (String) obj[2];
-
-			if (provision) {
-				provisions = provisionService.provisionUpdateFromTOA(request.getBody(), xaRequest, xaRequirementNumber);
-			} else {
-				// Averia
-			}
-
+				provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+			
 			if (provisions) {
 				log.info("provision fin");
 				status = HttpStatus.OK;

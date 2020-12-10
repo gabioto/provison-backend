@@ -10,3 +10,5 @@ applications:
     env:
       TDP_FUNCTIONS_PROVISION_ENABLE: true
       TDP_FUNCTIONS_FAULT_ENABLE: true
+      TDP_SWITCH_AZURE: true
+      TDP_SWITCH_ON_PREMISE: true

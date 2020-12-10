@@ -7,7 +7,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -22,8 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.gson.Gson;
-
 import pe.telefonica.provision.conf.ProvisionTexts;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
@@ -34,13 +31,10 @@ import pe.telefonica.provision.controller.request.ContactRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
-import pe.telefonica.provision.controller.request.KafkaTOARequest;
 import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
-import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
-import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -53,8 +47,6 @@ import pe.telefonica.provision.external.SimpliConnectApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
-import pe.telefonica.provision.external.request.schedule.GetTechnicianAvailableRequest;
-import pe.telefonica.provision.external.request.simpli.SimpliRequest;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.HomePhone;
@@ -62,7 +54,6 @@ import pe.telefonica.provision.model.Internet;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
-import pe.telefonica.provision.model.ReturnedProvision;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.provision.Configurada;
@@ -70,12 +61,7 @@ import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.Notifications;
 import pe.telefonica.provision.model.provision.PendienteDeAprobacion;
 import pe.telefonica.provision.model.provision.PendienteDeValidacion;
-import pe.telefonica.provision.model.provision.WoCancel;
-import pe.telefonica.provision.model.provision.WoCompleted;
-import pe.telefonica.provision.model.provision.WoInit;
-import pe.telefonica.provision.model.provision.WoNotdone;
 import pe.telefonica.provision.model.provision.WoPreStart;
-import pe.telefonica.provision.model.provision.WoReshedule;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
@@ -101,6 +87,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private SimpliConnectApi simpliConnectApi;
+
 	@Autowired
 	private TrazabilidadSecurityApi trazabilidadSecurityApi;
 
@@ -1629,7 +1616,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 						Contacts contacts = new Contacts();
 						contacts.setFullName(listContact.get(a).getFullName());
 						contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
-						boolean isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
+						boolean isMovistar = false;
+
+						String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
+						if (switchOnPremise.equals("true")) {
+							isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
+						} else {
+							isMovistar = restPSI.getCarrierOld(listContact.get(a).getPhoneNumber().toString());
+						}
+
 						contacts.setCarrier(isMovistar);
 						contactsList.add(contacts);
 
@@ -2209,6 +2204,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 						update.set("has_schedule", false);
 					}
 
+					//update.set("wo_prestart.available_tracking", false);
+					//update.set("wo_prestart.tracking_url", null);
+
 					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
@@ -2365,7 +2363,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				// Job Woprestart
-				woPreStart.setAvailableTracking(false);
+				//woPreStart.setAvailableTracking(false);
+
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 				if (nowDate.getHour() >= 07 && nowDate.getHour() <= 19) {
 					// SMS
@@ -2373,10 +2372,55 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("notifications.prestart_send_notify", true);
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 
-					String tokenExternal = trazabilidadSecurityApi.gerateToken();
-					// validate TechAvailable
-					GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
-					getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
+					if (Boolean.valueOf(System.getenv("TDP_SIMPLI_ENABLE"))) {
+						
+						String switchAzure = System.getenv("TDP_SWITCH_AZURE");
+						String tokenExternal = "";
+						if (switchAzure.equals("true")) {
+							tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
+						} else {
+							tokenExternal = trazabilidadSecurityApi.gerateToken();
+						}						
+						// validate TechAvailable
+						GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
+						getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
+
+						String isAvailableTech = trazabilidadScheduleApi
+								.getTechAvailable(getTechnicianAvailableRequest);
+						if (isAvailableTech != null) {
+							sendEmailToCustomer(provision.getCustomer(), woPreStart);
+
+							SimpliRequest simpliRequest = new SimpliRequest();
+							simpliRequest.setLatitude(woPreStart.getLatitude());
+							simpliRequest.setLongitude(woPreStart.getLongitude());
+							simpliRequest.setVisitTitle(woPreStart.getFullName());
+							simpliRequest.setVisitAddress(provision.getCustomer().getAddress());
+							simpliRequest.setDriverUserName(isAvailableTech);
+							simpliRequest.setToken(tokenExternal);
+
+							int count = 0;
+							int maxTries = 2;
+							boolean needSend = true;
+							while (needSend) {
+								log.info("Simpli Attempt #" + count);
+
+								String urlSimpli="";
+								if (switchAzure.equals("true")) {
+									urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+								} else {
+									urlSimpli = simpliConnectApi.getUrlTrakingOld(simpliRequest);
+								}
+								if (urlSimpli != null) {
+									// SEND SMS BY CONTACTS
+									woPreStart.setTrackingUrl(urlSimpli);
+									provision.setWoPreStart(woPreStart);
+									sendSMSWoPrestartContact(provision);
+
+									woPreStart.setAvailableTracking(true);
+								} else {
+									if (++count == maxTries)
+										break;
+								}
 
 					String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
 					if (isAvailableTech != null) {
@@ -2822,9 +2866,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 		return false;
 	}
+			}
+}
 
 	private boolean getCarrier(String phoneNumber) {
-		return restPSI.getCarrier(phoneNumber);
+
+		boolean isMovistar = false;
+		String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
+		if (switchOnPremise.equals("true")) {
+			isMovistar = restPSI.getCarrier(phoneNumber);
+		} else {
+			isMovistar = restPSI.getCarrierOld(phoneNumber);
+		}
+		return isMovistar;
 	}
 
 	@Override

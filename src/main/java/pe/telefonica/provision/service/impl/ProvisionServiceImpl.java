@@ -2400,8 +2400,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 							while (true) {
 								log.info("Simpli Attempt #" + count);
 
-								String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
-
+								String urlSimpli="";
+								String switchAzure = System.getenv("TDP_SWITCH_AZURE");
+								if (switchAzure.equals("true")) {
+									urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+								} else {
+									urlSimpli = simpliConnectApi.getUrlTrakingOld(simpliRequest);
+								}
 								if (urlSimpli != null) {
 									// SEND SMS BY CONTACTS
 									woPreStart.setTrackingUrl(urlSimpli);

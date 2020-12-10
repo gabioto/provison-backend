@@ -295,5 +295,58 @@ public class TrazabilidadSecurityApi {
 		}
 
 	}
+	
+	public String gerateTokenAzure() {
+
+		log.info(this.getClass().getName() + " - " + "gerateToken");
+		// RestTemplate restTemplate = new
+		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		// restTemplate.getMessageConverters().add(new
+		// MappingJackson2HttpMessageConverter());
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String requestUrl = api.getSecurityUrl() + api.getSecurityGetOAuthTokenAzure();
+		
+		GetTokenExternalRequest getTokenExternalRequest = new  GetTokenExternalRequest();
+		
+		getTokenExternalRequest.setTokenKey("");
+		
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
+		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
+
+		ApiRequest<GetTokenExternalRequest> apiRequest = new ApiRequest<GetTokenExternalRequest>(Constants.APP_NAME_PROVISION,
+				Constants.USER_SEGURIDAD, Constants.OPER_GET_TOKEN_EXTERNAL, getTokenExternalRequest);
+
+		HttpEntity<ApiRequest<GetTokenExternalRequest>> entity = new HttpEntity<ApiRequest<GetTokenExternalRequest>>(apiRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrl, entity, String.class);
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString().replaceAll("\"",
+						"");
+				
+				System.out.println(responseEntity);
+				return token;
+			} else {
+				return null;
+			}
+		} catch (HttpClientErrorException e) {
+			log.info("HttpClientErrorException = " + e.getMessage());
+			log.info("HttpClientErrorException = " + e.getResponseBodyAsString());
+			return null;
+		
+		} catch (Exception ex) {
+
+			System.out.println(ex.getMessage());
+			return null;
+		}
+
+	}
 
 }

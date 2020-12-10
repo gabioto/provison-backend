@@ -43,10 +43,54 @@ public class ExternalApi {
 	String simpliGetUrl;
 	String simpliBaseUrl;
 	
+<<<<<<< HEAD
 	String oauthTokenOnPremise;
 	String customerSearchClientOnPremise;
 
 	
+=======
+	String simpliGetUrlAzure;
+	String simpliBaseUrlAzure;
+	String apiClientKeyAzure;
+	
+	String oauthTokenOnPremise;
+	String customerSearchClientOnPremise;
+	String securityGetOAuthTokenAzure;
+	
+
+	public String getSecurityGetOAuthTokenAzure() {
+		return securityGetOAuthTokenAzure;
+	}
+
+	public void setSecurityGetOAuthTokenAzure(String securityGetOAuthTokenAzure) {
+		this.securityGetOAuthTokenAzure = securityGetOAuthTokenAzure;
+	}
+
+	public String getApiClientKeyAzure() {
+		return apiClientKeyAzure;
+	}
+
+	public void setApiClientKeyAzure(String apiClientKeyAzure) {
+		this.apiClientKeyAzure = apiClientKeyAzure;
+	}
+
+	public String getSimpliGetUrlAzure() {
+		return simpliGetUrlAzure;
+	}
+
+	public void setSimpliGetUrlAzure(String simpliGetUrlAzure) {
+		this.simpliGetUrlAzure = simpliGetUrlAzure;
+	}
+
+	public String getSimpliBaseUrlAzure() {
+		return simpliBaseUrlAzure;
+	}
+
+	public void setSimpliBaseUrlAzure(String simpliBaseUrlAzure) {
+		this.simpliBaseUrlAzure = simpliBaseUrlAzure;
+	}
+
+>>>>>>> PI5-Sprint-5/feat/SAQ-1264-1266
 	public String getCustomerSearchClientOnPremise() {
 		return customerSearchClientOnPremise;
 	}

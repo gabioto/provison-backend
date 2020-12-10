@@ -14,9 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.client.result.UpdateResult;
-
-import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.util.constants.Constants;
@@ -96,7 +93,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Update update = new Update();
 		update.set("notifications.finalizadoSendNotify", true);
 		update.set("notifications.finalizadoSendDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
-		
+
 		for (Order item : orders) {
 			this.mongoOperations.updateFirst(new Query(Criteria.where("idOrder").is(new ObjectId(item.getIdOrder()))),
 					update, Order.class);
@@ -111,6 +108,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO CIS"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION TRASLADO SIS"),
 						Criteria.where("commercialOpAtis").is("SUSPENSION APC"),
+						Criteria.where("commercialOpAtis").is("RECONEXION APC"),
 						Criteria.where("commercialOpAtis").is("ALTA MIGRACION DE P/S"),
 						Criteria.where("commercialOpAtis").is("MIGRACION"),
 						Criteria.where("commercialOpAtis").is("MIGRACION CON CAMBIO DE CUENTA"),

@@ -36,7 +36,7 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 		headers.add("UNICA-PID", uPid);
 
 		List<Order> orders = orderRepository.getOrdersToNotify();
-		
+
 		orderRepository.updateFlagDateNotify(orders);
 
 		orders = orders.stream().filter(order -> {
@@ -47,11 +47,14 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 	}
 
 	private boolean validateOrder(Order order) {
-		boolean isPhoneValid = validatePhoneNumber(order.getContactCellphone()) || validatePhoneNumber(order.getContactPhone());
-		
-		if (order.getCommercialOpAtis().equals("SUSPENSION APC")) {
+
+		boolean isPhoneValid = validatePhoneNumber(order.getContactCellphone())
+				|| validatePhoneNumber(order.getContactPhone());
+
+		if ((order.getCommercialOpAtis().equals("SUSPENSION APC")
+				|| order.getCommercialOpAtis().equals("RECONEXION APC"))) {
 			if (order.getNote1() != null && !order.getNote1().toUpperCase().contains("BAJA")) {
-				
+
 				return isPhoneValid;
 			} else {
 				return false;
@@ -59,7 +62,6 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 		} else {
 			return isPhoneValid;
 		}
-
 	}
 
 	private boolean validatePhoneNumber(String phone) {

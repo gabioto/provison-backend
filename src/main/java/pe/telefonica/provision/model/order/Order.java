@@ -83,6 +83,7 @@ public class Order {
 	private LocalDateTime registerLocalDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
 
 	private LocalDateTime lastUpdateDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
-	
-	private LocalDateTime auxDate;
+
+	private OrderNotifications notifications;
+
 }

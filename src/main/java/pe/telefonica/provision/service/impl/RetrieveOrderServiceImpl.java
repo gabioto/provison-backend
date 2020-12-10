@@ -30,7 +30,7 @@ import pe.telefonica.provision.util.constants.Constants;
 @Service
 public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
-	private static final Log log = LogFactory.getLog(OrderServiceImpl.class);
+	private static final Log log = LogFactory.getLog(RetrieveOrderServiceImpl.class);
 
 	@Autowired
 	private OrderRepository orderRepository;
@@ -174,23 +174,21 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
 	private Order getLastOrder(List<Order> orders) {
 
-		List<Order> orderDates = orders.stream().map(order -> {
-			if (order.getRegisterDate() != null) {
-				order.setAuxDate(order.getRegisterDate());
-			} else if (order.getRegisterOrderDate() != null) {
-				order.setAuxDate(order.getRegisterOrderDate());
-			} else {
-				order.setAuxDate(order.getRegisterLocalDate());
-			}
+		List<Order> registerDates = orders.stream().filter(order -> order.getRegisterDate() != null)
+				.collect(Collectors.toList());
 
-			return order;
-		}).collect(Collectors.toList());
+		if (orders.size() == registerDates.size()) {
+			orders.stream().max(Comparator.comparing(Order::getRegisterDate)).get();
+		}
 
-		Comparator<Order> comparator = Comparator.comparing(Order::getAuxDate);
+		registerDates = orders.stream().filter(order -> order.getRegisterOrderDate() != null)
+				.collect(Collectors.toList());
 
-		Order maxDatedOrder = orderDates.stream().filter(emp -> emp.getAuxDate() != null).max(comparator).get();
+		if (orders.size() == registerDates.size()) {
+			return orders.stream().max(Comparator.comparing(Order::getRegisterOrderDate)).get();
+		}
 
-		return maxDatedOrder;
+		return orders.stream().max(Comparator.comparing(Order::getRegisterLocalDate)).get();
 	}
 
 	private ResponseEntity<Object> validateDates(LocalDateTime startDate, LocalDateTime endDate, boolean haveValue) {

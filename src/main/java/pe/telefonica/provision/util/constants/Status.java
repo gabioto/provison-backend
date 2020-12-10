@@ -48,9 +48,9 @@ public enum Status {
 	PENDIENTE_PAGO("PENDIENTE-PAGO", 15, "PENDIENTE DE PAGO", "", "", "Pendiente de pago"),
 	PAGADO("PAGADO", 16, "PAGADO", "", "", "Pagado"),
 	
-	FINALIZADO("FINALIZADO", 17, "FINALIZADO", "generic speech", "", "Finalizado"),
-	TERMINADA("TERMINADA", 18, "TERMINADA", "generic speech", "", "Terminado"),
-	CANCELADA_ATIS("CANCELADA_ATIS", 19, "CANCELADA_ATIS", "generic speech", "", "Cancelada atis"),
+	FINALIZADO("FINALIZADO", 17, "FINALIZADO", "generic speech", "", "Tu nuevo servicio ya está disponible"),
+	TERMINADA("TERMINADA", 18, "TERMINADA", "generic speech", "", "Tu nuevo servicio ya está disponible"),
+	CANCELADA_ATIS("CANCELADA_ATIS", 19, "CANCELADA_ATIS", "generic speech", "", "Tu pedido ha sido cancelado"),
 	PENDIENTE_DE_VALIDACION("PENDIENTE_DE_VALIDACION", 20, "PENDIENTE DE VALIDACION", "", "", "Pendiente de validacion"),
 	CONFIGURADA("CONFIGURADA", 21, "CONFIGURADA", "", "", "Configurada"),
 	PENDIENTE_DE_APROBACION("PENDIENTE_DE_APROBACION", 22, "PENDIENTE DE APROBACION", "", "", "Pendiente de aprovacion");

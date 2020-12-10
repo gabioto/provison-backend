@@ -3,6 +3,7 @@ package pe.telefonica.provision.util;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -55,11 +56,19 @@ public class DateUtil {
 
 	public static String localDateTimeToString(LocalDateTime date) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_CMS_ATIS);
-
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE);
 			ZonedDateTime zone = ZonedDateTime.of(date, ZoneOffset.of("-05:00"));
-
 			return zone.format(formatter);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static LocalDateTime stringToLocalDate(String stringDate, String format) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+			LocalDate dateTime = LocalDate.parse(stringDate, formatter);
+			return dateTime.atStartOfDay();
 		} catch (Exception e) {
 			return null;
 		}

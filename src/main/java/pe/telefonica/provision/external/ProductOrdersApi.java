@@ -71,8 +71,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-//		String requestUrl = api.getPsiUrl() + api.getProductOrders();
-		String requestUrl = "https://apisd.telefonica.com.pe/vp-tecnologia/bss/ri/productordermanagement/v3/productOrders";
+		String requestUrl = api.getProductOrders();
 		log.info("updatePSIClient - URL: " + requestUrl);
 
 		oAuthToken = getAuthToken();

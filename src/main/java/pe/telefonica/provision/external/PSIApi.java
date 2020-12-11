@@ -284,7 +284,7 @@ public class PSIApi extends ConfigRestTemplate {
 			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
 			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
 			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
-			jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
+			jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE));
 			jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
 			jsonTefHeaderReq.addProperty("version", "1.0");
 

@@ -2388,48 +2388,72 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("log_status", listLog);
 
 				// Job Woprestart
-				woPreStart.setAvailableTracking(false);
+				//woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-				if (nowDate.getHour() > 8 && nowDate.getHour() < 23) {
+				if (nowDate.getHour() >= 07 && nowDate.getHour() <= 19) {
 
 					// SMS
 					sendSMSWoPrestartHolder(provision);
 					update.set("notifications.prestart_send_notify", true);
 					update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 
-					String tokenExternal = trazabilidadSecurityApi.gerateToken();
-					// validate TechAvailable
-					GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
-					getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
+					if (Boolean.valueOf(System.getenv("TDP_SIMPLI_ENABLE"))) {
+						
+						String switchAzure = System.getenv("TDP_SWITCH_AZURE");
+						String tokenExternal = "";
+						if (switchAzure.equals("true")) {
+							tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
+						} else {
+							tokenExternal = trazabilidadSecurityApi.gerateToken();
+						}						
+						// validate TechAvailable
+						GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
+						getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
 
-					String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
-					if (isAvailableTech != null) {
-						sendEmailToCustomer(provision.getCustomer(), woPreStart);
+						String isAvailableTech = trazabilidadScheduleApi
+								.getTechAvailable(getTechnicianAvailableRequest);
+						if (isAvailableTech != null) {
+							sendEmailToCustomer(provision.getCustomer(), woPreStart);
 
-						SimpliRequest simpliRequest = new SimpliRequest();
-						simpliRequest.setLatitude(woPreStart.getLatitude());
-						simpliRequest.setLongitude(woPreStart.getLongitude());
-						simpliRequest.setVisitTitle(woPreStart.getFullName());
-						simpliRequest.setVisitAddress(provision.getCustomer().getAddress());
-						simpliRequest.setDriverUserName(isAvailableTech);
-						simpliRequest.setToken(tokenExternal);
+							SimpliRequest simpliRequest = new SimpliRequest();
+							simpliRequest.setLatitude(woPreStart.getLatitude());
+							simpliRequest.setLongitude(woPreStart.getLongitude());
+							simpliRequest.setVisitTitle(woPreStart.getFullName());
+							simpliRequest.setVisitAddress(provision.getCustomer().getAddress());
+							simpliRequest.setDriverUserName(isAvailableTech);
+							simpliRequest.setToken(tokenExternal);
 
-						String urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+							int count = 0;
+							int maxTries = 2;
+							boolean needSend = true;
+							while (needSend) {
+								log.info("Simpli Attempt #" + count);
 
-						woPreStart.setTrackingUrl(urlSimpli);
+								String urlSimpli="";
+								if (switchAzure.equals("true")) {
+									urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
+								} else {
+									urlSimpli = simpliConnectApi.getUrlTrakingOld(simpliRequest);
+								}
+								if (urlSimpli != null) {
+									// SEND SMS BY CONTACTS
+									woPreStart.setTrackingUrl(urlSimpli);
+									provision.setWoPreStart(woPreStart);
+									sendSMSWoPrestartContact(provision);
 
-						if (urlSimpli != null) {
-							// SEND SMS BY cONTACTS
-							woPreStart.setTrackingUrl(urlSimpli);
-							provision.setWoPreStart(woPreStart);
-							sendSMSWoPrestartContact(provision);
+									woPreStart.setAvailableTracking(true);
+								} else {
+									if (++count == maxTries)
+										break;
+								}
 
-							woPreStart.setAvailableTracking(true);
+							}
+							
+							needSend = false;
 						}
-
 					}
-
 				}
+
 				update.set("wo_prestart", woPreStart);
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionRepository.updateProvision(provision, update);

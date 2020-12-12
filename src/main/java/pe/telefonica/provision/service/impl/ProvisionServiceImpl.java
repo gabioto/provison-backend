@@ -2230,7 +2230,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);
 					}
-
+					
+					update.set("wo_prestart.tracking_url", null);
+					update.set("wo_prestart.available_tracking", false);
+					
 					log.info("JEAN 1");
 					InToa inToa = new InToa();
 
@@ -2352,10 +2355,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
-				WoPreStart woPreStart = new WoPreStart();
+				WoPreStart woPreStart = provision.getWoPreStart() != null ? provision.getWoPreStart() : new WoPreStart();
 
 				//String[] technicianInfo = getData[3].split("-");
-
+				
 				woPreStart.setNameResource(appointment.getRelatedParty().get(1).getName());
 				woPreStart.setDate(appointment.getStatusChangeDate());
 				woPreStart.setTechnicalId(appointment.getRelatedParty().get(1).getId());
@@ -2364,7 +2367,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				woPreStart.setPhoneNumber(appointment.getRelatedParty().get(1).getContactMedium().get(0).getNumber());
 				woPreStart.setLatitude(appointment.getRelatedPlace().getCoordinates().getLatitude());
 				woPreStart.setLongitude(appointment.getRelatedPlace().getCoordinates().getLongitude());
-
+				
 				update.set("activity_type", appointment.getDescription().toLowerCase());
 				update.set("xa_id_st", getXaIdSt);
 				update.set("show_location", false);

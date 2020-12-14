@@ -2438,6 +2438,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 								} else {
 									urlSimpli = simpliConnectApi.getUrlTrakingOld(simpliRequest);
 								}
+								
 								if (urlSimpli != null) {
 									// SEND SMS BY CONTACTS
 									woPreStart.setTrackingUrl(urlSimpli);

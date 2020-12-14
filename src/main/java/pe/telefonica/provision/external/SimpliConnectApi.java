@@ -72,7 +72,7 @@ public class SimpliConnectApi {
 		HttpEntity<SimpliConnectRequest> requestEntity = new HttpEntity<SimpliConnectRequest>(requestConnect, headers);
 
 		System.out.println(requestEntity);
-
+		int statusRequest = 0;
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -82,8 +82,8 @@ public class SimpliConnectApi {
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity),
-					new Gson().toJson(result), url, startHour, endHour, 0);
-
+					new Gson().toJson(result), url, startHour, endHour, result.getStatusCodeValue());
+			statusRequest = result.getStatusCodeValue();
 			if (result.getStatusCode().equals(HttpStatus.OK)) {
 
 				JsonObject jsonObject = new JsonParser().parse(result.getBody().toString()).getAsJsonObject();
@@ -98,7 +98,7 @@ public class SimpliConnectApi {
 			LOGGER.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity),
-					new Gson().toJson(ex.getMessage()), url, startHour, endHour, 0);
+					new Gson().toJson(ex.getMessage()), url, startHour, endHour, statusRequest);
 
 			// String urlSimpli = simpliRouteApi.getUrlTraking(availableTechnician,
 			// technician, schedule);

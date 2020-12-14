@@ -2429,8 +2429,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 							int count = 0;
 							int maxTries = 2;
 							boolean needSend = true;
-							while (needSend) {
-								
+							while (needSend) {								
 								log.info("Simpli Attempt #" + count);
 								String urlSimpli="";
 								if (switchAzure.equals("true")) {
@@ -2446,14 +2445,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 									sendSMSWoPrestartContact(provision);
 
 									woPreStart.setAvailableTracking(true);
+									needSend = false;
 								} else {
-									if (++count == maxTries)
+									if (++count == maxTries) {
 										break;
+									}
 								}
-
 							}
-							
-							needSend = false;
 						}
 					}
 				}

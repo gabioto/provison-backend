@@ -2430,8 +2430,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 							int maxTries = 2;
 							boolean needSend = true;
 							while (needSend) {
+								
 								log.info("Simpli Attempt #" + count);
-
 								String urlSimpli="";
 								if (switchAzure.equals("true")) {
 									urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);

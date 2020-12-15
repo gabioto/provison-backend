@@ -492,25 +492,20 @@ public class ProvisionController {
 			@RequestBody @Valid ApiRequest<UpdateFromToaRequest> request) {
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
-		
-		
+
 		Boolean provisions = false;
 
 		try {
-			
 
-		
-				provisions = provisionService.provisionUpdateFromTOA(request.getBody());
-			
+			provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+
 			if (provisions) {
-				log.info("provision fin");
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()),
 						status.getReasonPhrase(), null);
 				apiResponse.setBody(null);
 			} else {
-				log.info("provision jean");
 				status = HttpStatus.NOT_FOUND;
 
 				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
@@ -519,8 +514,6 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-
-			log.info("provision catch");
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()), ex.getMessage(), null);
@@ -1740,7 +1733,7 @@ public class ProvisionController {
 		log.info("timeStamp => " + timeStamp);
 		return timeStamp;
 	}
-	
+
 	public Object[] validateActivityType(String[] parts) {
 		Object[] obj = new Object[3];
 		String status = parts[0] == null ? "" : parts[0], xaRequest = "", xaRequirementNumber = "";
@@ -1826,7 +1819,7 @@ public class ProvisionController {
 		obj[2] = xaRequirementNumber;
 		return obj;
 	}
-	
+
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
 		log.info("ProvisionController.getOrderToNotify()");

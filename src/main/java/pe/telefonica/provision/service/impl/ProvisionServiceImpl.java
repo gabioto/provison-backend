@@ -2431,11 +2431,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 								log.info("Simpli Attempt #" + count);
 
 								String urlSimpli = "";
+
 								if (switchAzure.equals("true")) {
 									urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest);
 								} else {
 									urlSimpli = simpliConnectApi.getUrlTrakingOld(simpliRequest);
 								}
+
 								if (urlSimpli != null) {
 									// SEND SMS BY CONTACTS
 									woPreStart.setTrackingUrl(urlSimpli);
@@ -2443,11 +2445,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 									sendSMSWoPrestartContact(provision);
 
 									woPreStart.setAvailableTracking(true);
+									needSend = false;
 								} else {
-									if (++count == maxTries)
+									if (++count == maxTries) {
 										break;
+									}
 								}
-
 							}
 
 							needSend = false;

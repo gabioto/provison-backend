@@ -24,25 +24,20 @@ public interface ProvisionService {
 	Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest);
 
 	Provision getProvisionBySaleCode(String saleCode);
-	
 
 	List<ProvisionDto> getAll(ApiRequest<ProvisionRequest> provisionRequest);
-	
+
 	List<ProvisionTrazaDto> getAllTraza(ApiRequest<ProvisionRequest> provisionRequest);
 
 	ProvisionResponse<String> getStatus(String provisionId);
 
 	ApiResponse<List<Contacts>> getContactList(String provisionId);
 
-	//List<Provision> insertProvisionList(List<Provision> provisionList);
-
 	boolean insertProvision(InsertOrderRequest request);
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request)
-			throws Exception;
+	boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception;
 
 	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
 

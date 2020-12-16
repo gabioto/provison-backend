@@ -24,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
 import pe.telefonica.provision.controller.common.ApiRequest;
@@ -96,7 +95,7 @@ public class TrazabilidadSecurityApi {
 		}
 
 	}
-	
+
 	@Async
 	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
 			LocalDateTime startHour, LocalDateTime endHour, int status) {
@@ -174,7 +173,7 @@ public class TrazabilidadSecurityApi {
 		return false;
 
 	}
-	
+
 	@Async
 	public ApiResponse<SMSByIdResponse> sendSMS(List<Contact> contacts, String msgKey, MsgParameter[] msgParameters,
 			String webURL, String webContactURL) {
@@ -196,28 +195,8 @@ public class TrazabilidadSecurityApi {
 		message.setMsgParameters(msgParameters);
 		message.setWebURL(webURL);
 		message.setWebContactURL(webContactURL);
-		
 
 		System.out.println(webURL);
-
-		// List<Contact> contacts = new ArrayList<>();
-
-		/*
-		 * Contact contactCustomer = new Contact();
-		 * contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); //
-		 * TODO: Cambiar integer a string
-		 * contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
-		 */
-
-		/*
-		 * if (customer.getContactPhoneNumber() != null) { Contact contactContact = new
-		 * Contact();
-		 * contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString());
-		 * contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
-		 * contacts.add(contactContact); }
-		 */
-
-		// contacts.add(contactCustomer);
 
 		smsByIdRequest.setContacts(contacts.toArray(new Contact[0]));
 		smsByIdRequest.setMessage(message);
@@ -242,23 +221,20 @@ public class TrazabilidadSecurityApi {
 		}
 
 	}
-	
+
 	public String gerateToken() {
 
 		log.info(this.getClass().getName() + " - " + "gerateToken");
-		// RestTemplate restTemplate = new
-		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		// restTemplate.getMessageConverters().add(new
-		// MappingJackson2HttpMessageConverter());
+
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getSecurityUrl() + api.getSecurityGetOAuthToken();
-		
-		GetTokenExternalRequest getTokenExternalRequest = new  GetTokenExternalRequest();
+
+		GetTokenExternalRequest getTokenExternalRequest = new GetTokenExternalRequest();
 
 		getTokenExternalRequest.setTokenKey("");
-		
+
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 
 		headersMap.add("Content-Type", "application/json");
@@ -266,18 +242,20 @@ public class TrazabilidadSecurityApi {
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
 		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
 
-		ApiRequest<GetTokenExternalRequest> apiRequest = new ApiRequest<GetTokenExternalRequest>(Constants.APP_NAME_PROVISION,
-				Constants.USER_SEGURIDAD, Constants.OPER_GET_TOKEN_EXTERNAL, getTokenExternalRequest);
+		ApiRequest<GetTokenExternalRequest> apiRequest = new ApiRequest<GetTokenExternalRequest>(
+				Constants.APP_NAME_PROVISION, Constants.USER_SEGURIDAD, Constants.OPER_GET_TOKEN_EXTERNAL,
+				getTokenExternalRequest);
 
-		HttpEntity<ApiRequest<GetTokenExternalRequest>> entity = new HttpEntity<ApiRequest<GetTokenExternalRequest>>(apiRequest, headersMap);
+		HttpEntity<ApiRequest<GetTokenExternalRequest>> entity = new HttpEntity<ApiRequest<GetTokenExternalRequest>>(
+				apiRequest, headersMap);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrl, entity, String.class);
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString().replaceAll("\"",
-						"");
-				
+				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString()
+						.replaceAll("\"", "");
+
 				System.out.println(responseEntity);
 				return token;
 			} else {
@@ -287,7 +265,7 @@ public class TrazabilidadSecurityApi {
 			log.info("HttpClientErrorException = " + e.getMessage());
 			log.info("HttpClientErrorException = " + e.getResponseBodyAsString());
 			return null;
-		
+
 		} catch (Exception ex) {
 
 			System.out.println(ex.getMessage());
@@ -295,23 +273,20 @@ public class TrazabilidadSecurityApi {
 		}
 
 	}
-	
+
 	public String gerateTokenAzure() {
 
 		log.info(this.getClass().getName() + " - " + "gerateToken");
-		// RestTemplate restTemplate = new
-		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		// restTemplate.getMessageConverters().add(new
-		// MappingJackson2HttpMessageConverter());
+
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getSecurityUrl() + api.getSecurityGetOAuthTokenAzure();
-		
-		GetTokenExternalRequest getTokenExternalRequest = new  GetTokenExternalRequest();
-		
+
+		GetTokenExternalRequest getTokenExternalRequest = new GetTokenExternalRequest();
+
 		getTokenExternalRequest.setTokenKey("");
-		
+
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 
 		headersMap.add("Content-Type", "application/json");
@@ -319,18 +294,20 @@ public class TrazabilidadSecurityApi {
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
 		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
 
-		ApiRequest<GetTokenExternalRequest> apiRequest = new ApiRequest<GetTokenExternalRequest>(Constants.APP_NAME_PROVISION,
-				Constants.USER_SEGURIDAD, Constants.OPER_GET_TOKEN_EXTERNAL, getTokenExternalRequest);
+		ApiRequest<GetTokenExternalRequest> apiRequest = new ApiRequest<GetTokenExternalRequest>(
+				Constants.APP_NAME_PROVISION, Constants.USER_SEGURIDAD, Constants.OPER_GET_TOKEN_EXTERNAL,
+				getTokenExternalRequest);
 
-		HttpEntity<ApiRequest<GetTokenExternalRequest>> entity = new HttpEntity<ApiRequest<GetTokenExternalRequest>>(apiRequest, headersMap);
+		HttpEntity<ApiRequest<GetTokenExternalRequest>> entity = new HttpEntity<ApiRequest<GetTokenExternalRequest>>(
+				apiRequest, headersMap);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrl, entity, String.class);
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString().replaceAll("\"",
-						"");
-				
+				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString()
+						.replaceAll("\"", "");
+
 				System.out.println(responseEntity);
 				return token;
 			} else {
@@ -340,7 +317,7 @@ public class TrazabilidadSecurityApi {
 			log.info("HttpClientErrorException = " + e.getMessage());
 			log.info("HttpClientErrorException = " + e.getResponseBodyAsString());
 			return null;
-		
+
 		} catch (Exception ex) {
 
 			System.out.println(ex.getMessage());

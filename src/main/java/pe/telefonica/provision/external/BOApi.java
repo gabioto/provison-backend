@@ -80,8 +80,7 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 			
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendRequestBO, entityBO, String.class);
 			
-			//ResponseEntity<String> responseEntity = getRestTemplate().postForEntity(sendRequestBO, entityBO, String.class);
-			
+	
 			log.info("sendRequestToBO - BO - Response: " + responseEntity.getBody());
 
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {

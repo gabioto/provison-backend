@@ -41,8 +41,7 @@ public class SimpliConnectApi {
 
 		LOGGER.info(this.getClass().getName() + " - " + "generateMapUrl");
 
-		// System.getenv("TDP_URL_OFFICE_TRACK"); //old
-		// String url = System.getenv("TDP_URL_OAUTH_SIMPLI");
+		
 		String url = externalApi.getSimpliBaseUrlAzure() + externalApi.getSimpliGetUrlAzure();
 		
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -101,8 +100,7 @@ public class SimpliConnectApi {
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect),
 					new Gson().toJson(ex.getMessage()), url, startHour, endHour, statusRequest);
 
-			// String urlSimpli = simpliRouteApi.getUrlTraking(availableTechnician,
-			// technician, schedule);
+			
 
 			return null;
 
@@ -114,8 +112,7 @@ public class SimpliConnectApi {
 
 		LOGGER.info(this.getClass().getName() + " - " + "generateMapUrl");
 
-		// System.getenv("TDP_URL_OFFICE_TRACK");//old
-		// String url = System.getenv("TDP_URL_OAUTH_SIMPLI");
+		
 		String url = externalApi.getSimpliBaseUrl() + externalApi.getSimpliGetUrl();
 		
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -173,8 +170,7 @@ public class SimpliConnectApi {
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity.getBody()),
 					new Gson().toJson(ex.getMessage()), url, startHour, endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-			// String urlSimpli = simpliRouteApi.getUrlTraking(availableTechnician,
-			// technician, schedule);
+			
 
 			return null;
 

@@ -257,8 +257,6 @@ public class ProvisionController {
 					request.getHeader().getAppName());
 		}
 		return ResponseEntity.status(status).body(apiResponse);
-		// return ResponseEntity.ok(provisionService.getAll(new
-		// ProvisionRequest(documentType, documentNumber)));
 	}
 
 	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
@@ -375,8 +373,6 @@ public class ProvisionController {
 					request.getHeader().getAppName());
 		}
 		return ResponseEntity.status(status).body(apiResponse);
-		// return ResponseEntity.ok(provisionService.getAll(new
-		// ProvisionRequest(documentType, documentNumber)));
 	}
 
 	/**
@@ -389,36 +385,6 @@ public class ProvisionController {
 			@RequestParam(value = "provisionId", required = true) String provisionId) {
 		return ResponseEntity.ok(provisionService.getStatus(provisionId));
 	}
-
-	/*
-	 * @RequestMapping(value = "/insertOrdersOld", method = RequestMethod.POST)
-	 * public ResponseEntity<ApiResponse<List<Provision>>> insertOrdersOld(
-	 * 
-	 * @RequestBody @Valid ApiRequest<List<Provision>> provisionListReq) {
-	 * ApiResponse<List<Provision>> apiResponse; HttpStatus status;
-	 * 
-	 * try { List<Provision> provisions =
-	 * provisionService.insertProvisionList(provisionListReq.getBody());
-	 * 
-	 * if (provisions != null) { status = HttpStatus.OK; apiResponse = new
-	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_INSERT_PROVISION, String.valueOf(status.value()),
-	 * status.getReasonPhrase(), null); apiResponse.setBody(provisions); } else {
-	 * status = HttpStatus.NOT_FOUND;
-	 * 
-	 * apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_INSERT_PROVISION, String.valueOf(status.value()),
-	 * "No se encontraron provisiones", null); apiResponse.setBody(null); } } catch
-	 * (Exception ex) {
-	 * 
-	 * status = HttpStatus.INTERNAL_SERVER_ERROR; apiResponse = new
-	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()),
-	 * ex.getMessage().toString(), null);
-	 * 
-	 * } return ResponseEntity.status(status).body(apiResponse); // return //
-	 * ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq)); }
-	 */
 
 	@RequestMapping(value = "/getProvisionBySaleCode", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> getCustomerByOrderCode(
@@ -483,8 +449,6 @@ public class ProvisionController {
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
-		// return
-		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 
 	@RequestMapping(value = "/updateOrderFromTOA", method = RequestMethod.POST)
@@ -520,8 +484,6 @@ public class ProvisionController {
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
-		// return
-		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 
 	@RequestMapping(value = "/provisionInsertCodeFictitious", method = RequestMethod.POST)
@@ -556,8 +518,6 @@ public class ProvisionController {
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
-		// return
-		// ResponseEntity.ok(provisionService.insertProvisionList(provisionListReq));
 	}
 
 	/**
@@ -595,19 +555,6 @@ public class ProvisionController {
 						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 						request.getHeader().getAppName());
 
-				/*
-				 * List<Provision> provisions = new ArrayList<>(); provisions.add(result);
-				 * response.setHeader( new
-				 * ProvisionHeaderResponse().generateHeader(HttpStatus.OK.value(),
-				 * HttpStatus.OK.name())); response.setData(provisions);
-				 * 
-				 * restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
-				 * request.getDocumentType(), request.getOrderCode(), request.getBucket(), "OK",
-				 * new Gson().toJson(request), new Gson().toJson(response),
-				 * ConstantsLogData.PROVISION_VALIDATE_DATA);
-				 */
-
-				// return ResponseEntity.ok(response);
 			} else {
 				status = HttpStatus.BAD_REQUEST;
 				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
@@ -622,18 +569,6 @@ public class ProvisionController {
 						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
 						request.getBody().getActivityType(), request.getHeader().getAppName());
 
-				/*
-				 * response.setHeader(new
-				 * ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(),
-				 * HttpStatus.BAD_REQUEST.name()));
-				 * 
-				 * restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
-				 * request.getDocumentType(), request.getOrderCode(), request.getBucket(),
-				 * "ERROR", new Gson().toJson(request), new Gson().toJson(response),
-				 * ConstantsLogData.PROVISION_VALIDATE_DATA);
-				 * 
-				 * return ResponseEntity.badRequest().body(response);
-				 */
 			}
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -649,17 +584,6 @@ public class ProvisionController {
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 
-			/*
-			 * restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
-			 * request.getDocumentType(), request.getOrderCode(), request.getBucket(),
-			 * "ERROR", new Gson().toJson(request), new Gson().toJson(ex.getMessage()),
-			 * ConstantsLogData.PROVISION_VALIDATE_DATA);
-			 * 
-			 * response.setHeader(new
-			 * ProvisionHeaderResponse().generateHeader(HttpStatus.BAD_REQUEST.value(),
-			 * HttpStatus.BAD_REQUEST.name())); return
-			 * ResponseEntity.badRequest().body(response);
-			 */
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
@@ -668,87 +592,6 @@ public class ProvisionController {
 	 * 
 	 * @param request
 	 * @return
-	 */
-	/*
-	 * @RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
-	 * public ResponseEntity<ApiResponse<List<Provision>>> setContactInfoUpdate(
-	 * 
-	 * @RequestBody ApiRequest<SetContactInfoUpdateRequest> request) {
-	 * log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
-	 * 
-	 * ApiResponse<List<Provision>> apiResponse; HttpStatus status; try {
-	 * 
-	 * Provision result =
-	 * provisionService.setContactInfoUpdate(request.getBody().getProvisionId(),
-	 * request.getBody().getContactFullname(),
-	 * request.getBody().getContactCellphone(),
-	 * request.getBody().getContactCellphoneIsMovistar());
-	 * 
-	 * if (result != null) {
-	 * 
-	 * List<Provision> provisions = new ArrayList<>(); provisions.add(result);
-	 * 
-	 * status = HttpStatus.OK; apiResponse = new
-	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()),
-	 * status.getReasonPhrase(), null); apiResponse.setBody(provisions);
-	 * 
-	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-	 * request.getBody().getBucket(), "OK", new Gson().toJson(request), new
-	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-	 * "", "", "");
-	 * 
-	 * } else { status = HttpStatus.BAD_REQUEST; apiResponse = new
-	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()),
-	 * "No existe registro", null);
-	 * 
-	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-	 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
-	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-	 * "", "", "");
-	 * 
-	 * }
-	 * 
-	 * } catch (Exception ex) { if (ex instanceof FunctionalErrorException) {
-	 * 
-	 * status = HttpStatus.BAD_REQUEST;
-	 * 
-	 * String errorCode = ((FunctionalErrorException)
-	 * ex).getErrorCode().replace("\"", ""); if (errorCode.equals("ERR10") ||
-	 * errorCode.equals("ERR11") || errorCode.equals("ERR02")) { status =
-	 * HttpStatus.BAD_REQUEST; } else if (errorCode.equals("ERR15")) { status =
-	 * HttpStatus.UNAUTHORIZED; } else if (errorCode.equals("ERR03")) { status =
-	 * HttpStatus.NOT_FOUND; } else if (errorCode.equals("ERR19")) { status =
-	 * HttpStatus.CONFLICT; }
-	 * 
-	 * errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT +
-	 * errorCode.replace("\"", "")).toString();
-	 * 
-	 * apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_CONTACT_INFO_UPDATE, errorCode, ((FunctionalErrorException)
-	 * ex).getMessage().replace("\"", ""), null);
-	 * 
-	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-	 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
-	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-	 * "", "", "");
-	 * 
-	 * } else { status = HttpStatus.INTERNAL_SERVER_ERROR; apiResponse = new
-	 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()),
-	 * ex.getMessage().toString(), null);
-	 * 
-	 * restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
-	 * request.getBody().getDocumentType(), request.getBody().getOrderCode(),
-	 * request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new
-	 * Gson().toJson(apiResponse), ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-	 * "", "", ""); } }
-	 * 
-	 * return ResponseEntity.status(status).body(apiResponse); }
 	 */
 
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
@@ -1002,16 +845,6 @@ public class ProvisionController {
 						request.getHeader().getAppName());
 			}
 		}
-
-		/*
-		 * restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "",
-		 * "", "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-		 * ConstantsLogData.PROVISION_UPDATE_CONTACT_INFO,
-		 * request.getHeader().getMessageId(), request.getHeader().getTimestamp(),
-		 * timestamp, request.getBody().getActivityType(),
-		 * request.getHeader().getAppName());
-		 */
-
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
@@ -1118,8 +951,6 @@ public class ProvisionController {
 
 				for (ContactRequest list : contact) {
 					if (list.getFullName() == null) {
-						// contactFullname;
-						// contactCellphone;
 						errorInternal = InternalError.TRZ01.toString();
 						errorInternal = ErrorCode
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
@@ -1196,15 +1027,6 @@ public class ProvisionController {
 
 				return ResponseEntity.status(status).body(apiResponse);
 			}
-
-			/*
-			 * if(request.getBody().getContacts() instanceof List) {
-			 * 
-			 * status = HttpStatus.BAD_REQUEST; apiResponse = new
-			 * ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-			 * Constants.OPER_CONTACT_INFO_UPDATE,
-			 * String.valueOf(status.value()),"Array de contactos", null); }
-			 */
 
 			Boolean result = provisionService.apiContactInfoUpdate(request.getBody());
 
@@ -1629,52 +1451,6 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
-	/*
-	 * @RequestMapping(value = "/updateTrackingStatus", method = RequestMethod.POST)
-	 * public ResponseEntity<ApiResponse<Boolean>> updateTrackingStatus(
-	 * 
-	 * @RequestBody @Valid ApiRequest<UpdateStatusRequest> request) {
-	 * 
-	 * ApiResponse<Boolean> apiResponse; StatusProvision statusProvision = null;
-	 * boolean updated = false; HttpStatus status;
-	 * 
-	 * try { if (request.getBody().getXaRequest() != null &&
-	 * request.getBody().getXaIdSt() != null) { statusProvision = new
-	 * StatusProvision();
-	 * statusProvision.setXaRequest(request.getBody().getXaRequest());
-	 * statusProvision.setXaIdSt(request.getBody().getXaIdSt());
-	 * statusProvision.setLabel(request.getBody().getStatus()); } else if
-	 * (request.getBody().getStatus() != null) { switch
-	 * (request.getBody().getStatus().toUpperCase()) { case "WO_PRESTART":
-	 * WoPreStartProvision woPreStartProvision = new WoPreStartProvision();
-	 * woPreStartProvision.mapObject(request.getBody().getStringSource());
-	 * statusProvision = woPreStartProvision; break; case "WO_INIT": WoInitProvision
-	 * woInitProvision = new WoInitProvision();
-	 * woInitProvision.mapObject(request.getBody().getStringSource());
-	 * statusProvision = woInitProvision; break; case "WO_COMPLETED":
-	 * WoCompletedProvision woCompletedProvision = new WoCompletedProvision();
-	 * woCompletedProvision.mapObject(request.getBody().getStringSource());
-	 * statusProvision = woCompletedProvision; break; default: break; } }
-	 * 
-	 * if (statusProvision != null) { updated =
-	 * provisionService.updateTrackingStatus(statusProvision.getXaRequest(),
-	 * statusProvision.getXaIdSt(), request.getBody().getStatus(),
-	 * false,null,null,null);
-	 * 
-	 * status = updated ? HttpStatus.OK : HttpStatus.NOT_FOUND; } else { status =
-	 * HttpStatus.BAD_REQUEST; }
-	 * 
-	 * apiResponse = new ApiResponse<Boolean>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_UPDATE_STATUS, String.valueOf(status.value()),
-	 * status.getReasonPhrase(), updated); } catch (Exception e) { status =
-	 * HttpStatus.INTERNAL_SERVER_ERROR; apiResponse = new
-	 * ApiResponse<Boolean>(Constants.APP_NAME_PROVISION,
-	 * Constants.OPER_UPDATE_STATUS, String.valueOf(status.value()), e.getMessage(),
-	 * null); }
-	 * 
-	 * return ResponseEntity.status(status).body(apiResponse); }
-	 */
-
 	@RequestMapping(value = "/getProvisionByOrderCode", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> getProvisionByOrderCode(
 			@RequestBody ApiRequest<GetProvisionByOrderCodeRequest> request) {
@@ -1732,92 +1508,6 @@ public class ProvisionController {
 		String timeStamp = dateNow.format(formatter);
 		log.info("timeStamp => " + timeStamp);
 		return timeStamp;
-	}
-
-	public Object[] validateActivityType(String[] parts) {
-		Object[] obj = new Object[3];
-		String status = parts[0] == null ? "" : parts[0], xaRequest = "", xaRequirementNumber = "";
-		boolean provision = false;
-		if (Constants.STATUS_WO_INIT.equalsIgnoreCase(status)) {
-			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[5].trim().equals("0") ? parts[8].trim() : parts[5].trim();
-				provision = true;
-				xaRequirementNumber = parts[8].trim();
-			} else {
-				provision = false;
-				xaRequest = "";
-				xaRequirementNumber = "";
-			}
-		} else if (Constants.STATUS_WO_COMPLETED.equalsIgnoreCase(status)) {
-			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[13])) {
-				xaRequest = parts[6].trim().equals("0") ? parts[9].trim() : parts[6].trim();
-				provision = true;
-				xaRequirementNumber = parts[9].trim();
-			} else {
-				provision = false;
-				xaRequest = "";
-				xaRequirementNumber = "";
-			}
-		} else if (Constants.STATUS_WO_NOTDONE.equalsIgnoreCase(status)) {
-			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[14])) {
-				xaRequest = parts[7].trim().equals("0") ? parts[10].trim() : parts[7].trim();
-				provision = true;
-				xaRequirementNumber = parts[10].trim();
-			} else {
-				provision = false;
-				xaRequest = "";
-				xaRequirementNumber = "";
-			}
-		} else if (Constants.STATUS_WO_PRESTART.equalsIgnoreCase(status)) {
-			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[5])) {
-				xaRequest = parts[2].trim().equals("0") ? parts[7].trim() : parts[2].trim();
-				provision = true;
-				xaRequirementNumber = parts[7].trim();
-			} else {
-				provision = false;
-				xaRequest = "";
-				xaRequirementNumber = "";
-			}
-		} else if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status)) {
-			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
-				provision = true;
-				xaRequirementNumber = parts[5].trim();
-			} else {
-				provision = false;
-				xaRequest = "";
-				xaRequirementNumber = "";
-			}
-		} else if (Constants.STATUS_WO_RESCHEDULE.equalsIgnoreCase(status)) {
-			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
-				provision = true;
-				xaRequirementNumber = parts[5].trim();
-			} else {
-				provision = false;
-				xaRequest = "";
-				xaRequirementNumber = "";
-			}
-		} else if (Constants.STATUS_WO_CANCEL.equalsIgnoreCase(status)) {
-			if (Constants.ACTIVITY_TYPE_PROVISION.equalsIgnoreCase(parts[8])) {
-				xaRequest = parts[2].trim().equals("0") ? parts[5].trim() : parts[2].trim();
-				provision = true;
-				xaRequirementNumber = parts[5].trim();
-			} else {
-				provision = false;
-				xaRequest = "";
-				xaRequirementNumber = "";
-			}
-		} else {
-			provision = false;
-			xaRequest = "";
-			xaRequirementNumber = "";
-		}
-
-		obj[0] = provision;
-		obj[1] = xaRequest;
-		obj[2] = xaRequirementNumber;
-		return obj;
 	}
 
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)

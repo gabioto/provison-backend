@@ -28,25 +28,22 @@ public class MonitoringRepositoryImpl implements MonitoringRepository {
 
 	@Override
 	public long getQuantityRegisterByStatus(LocalDateTime startDate, LocalDateTime endDate, String status) {
-		//Query query = new Query();
-		//query.addCriteria(Criteria.where("active_status").is(status));
-		if(status.equals(ConstantsStatusMonitoring.INGRESADO)) {
-			Query query = new Query(Criteria.where("active_status").is("ingresado")
-					.andOperator(Criteria.where("register_date_update").gte(startDate), Criteria.where("register_date_update").lt(endDate)));
-			
-			//List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+
+		if (status.equals(ConstantsStatusMonitoring.INGRESADO)) {
+			Query query = new Query(Criteria.where("active_status").is("ingresado").andOperator(
+					Criteria.where("register_date_update").gte(startDate),
+					Criteria.where("register_date_update").lt(endDate)));
+
 			long quantity = this.mongoOperations.count(query, Provision.class);
 			return quantity;
 		} else {
-			Query query = new Query(Criteria.where("active_status").is("active")
-					.andOperator(Criteria.where("in_toa.register_date").gte(startDate), Criteria.where("in_toa.register_date").lt(endDate)));
-			
-			//List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+			Query query = new Query(Criteria.where("active_status").is("active").andOperator(
+					Criteria.where("in_toa.register_date").gte(startDate),
+					Criteria.where("in_toa.register_date").lt(endDate)));
+
 			long quantity = this.mongoOperations.count(query, Provision.class);
 			return quantity;
 		}
-		
-		
 
 	}
 

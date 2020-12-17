@@ -80,7 +80,6 @@ public class SimpliConnectApi {
 			LOGGER.info("request = " + new Gson().toJson(request));
 			ResponseEntity<String> result = restTemplate.postForEntity(url, requestEntity, String.class);
 
-			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect),
 					new Gson().toJson(result.getBody()), url, startHour, endHour, result.getStatusCodeValue());

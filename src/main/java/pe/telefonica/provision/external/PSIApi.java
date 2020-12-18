@@ -315,7 +315,8 @@ public class PSIApi extends ConfigRestTemplate {
 			ResponseEntity<String> output = restTemplate.postForEntity(requestUrl, entity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, output.getBody(), requestUrl, startHour, endHour, 0);
+			loggerApi.thirdLogEvent("PSI", "getCarrierOnPremise", new Gson().toJson(entity.getBody()), new Gson().toJson(output.getBody()), requestUrl, startHour, 
+					endHour, output.getStatusCodeValue());
 
 			JsonElement jsonElement = gson.fromJson(output.getBody(), JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
@@ -329,8 +330,8 @@ public class PSIApi extends ConfigRestTemplate {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", input, e.getLocalizedMessage(), requestUrl, startHour,
-					endHour, 0);
+			loggerApi.thirdLogEvent("PSI", "getCarrierOnPremise", input, e.getLocalizedMessage(), requestUrl, startHour,
+					endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return false;
 		}
 	}
@@ -384,7 +385,8 @@ public class PSIApi extends ConfigRestTemplate {
 			ResponseEntity<String> output = restTemplate.postForEntity(requestUrl, entity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", entity.getBody(), output.getBody(), requestUrl, startHour, endHour, output.getStatusCodeValue());
+			loggerApi.thirdLogEvent("PSI", "getCarrier", new Gson().toJson(entity.getBody()), new Gson().toJson(output.getBody()), requestUrl, startHour, 
+					endHour, output.getStatusCodeValue());
 
 			JsonElement jsonElement = gson.fromJson(output.getBody(), JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
@@ -398,7 +400,7 @@ public class PSIApi extends ConfigRestTemplate {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", entity.getBody(), e.getLocalizedMessage(), requestUrl, startHour,
+			loggerApi.thirdLogEvent("PSI", "getCarrier", new Gson().toJson(entity.getBody()), e.getLocalizedMessage(), requestUrl, startHour,
 					endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return false;
 		}

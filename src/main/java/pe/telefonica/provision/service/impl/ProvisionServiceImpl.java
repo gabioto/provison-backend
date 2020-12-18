@@ -1888,7 +1888,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", appointment.getDescription().toLowerCase());
 					update.set("work_zone", appointment.getAdditionalData().get(2).getValue());
 					// update.set("send_notify", false);
-					update.set("notifications.intoa_send_notify", false);
+					update.set("notifications.into_send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
@@ -1916,7 +1916,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", appointment.getDescription().toLowerCase());
 					update.set("work_zone", appointment.getAdditionalData().get(1).getValue());
 					// update.set("send_notify", false);
-					update.set("notifications.intoa_send_notify", false);
+					update.set("notifications.into_send_notify", false);
 					update.set("show_location", false);
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);

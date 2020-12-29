@@ -45,6 +45,7 @@ import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
@@ -2729,5 +2730,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		trazabilidadSecurityApi.sendMail("192826", mailParameters.toArray(new MailParameter[mailParameters.size()]));
 	}
+
+	@Override
+	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
+		
+		return provisionRepository.getProvisionDetailById(request.getIdProvision());
+	}
+
 
 }

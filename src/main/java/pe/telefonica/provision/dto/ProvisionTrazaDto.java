@@ -13,10 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import pe.telefonica.provision.model.Contacts;
-
-import pe.telefonica.provision.model.UpFront;
-import pe.telefonica.provision.model.rating.Rating;
 
 @Document(collection = "collProvision")
 @JsonPropertyOrder({ "idProvision" })

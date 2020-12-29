@@ -37,6 +37,7 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.external.request.LogDataRequest;
 import pe.telefonica.provision.external.request.security.GetTokenExternalRequest;
+import pe.telefonica.provision.external.request.security.TokenRequest;
 import pe.telefonica.provision.util.constants.Constants;
 
 @Component
@@ -218,6 +219,36 @@ public class TrazabilidadSecurityApi {
 
 		} catch (Exception e) {
 			return null;
+		}
+
+	}
+
+	@Async
+	public void sendLoginToken(TokenRequest tokenRequest) {
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
+		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
+		headersMap.add("Content-Type", "application/json");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String url = api.getSecurityUrl() + api.getLoginToken();
+
+		log.info(url);
+
+		ApiRequest<TokenRequest> apiRequest = new ApiRequest<>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION,
+				Constants.OPER_SEND_TOKEN, tokenRequest);
+
+		HttpEntity<ApiRequest<TokenRequest>> entity = new HttpEntity<>(apiRequest, headersMap);
+
+		try {
+
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
+
+		} catch (Exception e) {
+			throw e;
 		}
 
 	}

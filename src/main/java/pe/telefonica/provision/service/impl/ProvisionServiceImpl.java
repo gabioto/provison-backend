@@ -1889,7 +1889,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", appointment.getDescription().toLowerCase());
 					update.set("work_zone", appointment.getAdditionalData().get(2).getValue());
 					// update.set("send_notify", false);
-					update.set("notifications.intoa_send_notify", false);
+					update.set("notifications.into_send_notify", false);
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 					update.set("last_tracking_status", Status.IN_TOA.getStatusName());
@@ -1917,7 +1917,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("activity_type", appointment.getDescription().toLowerCase());
 					update.set("work_zone", appointment.getAdditionalData().get(1).getValue());
 					// update.set("send_notify", false);
-					update.set("notifications.intoa_send_notify", false);
+					update.set("notifications.into_send_notify", false);
 					update.set("show_location", false);
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);
@@ -2071,6 +2071,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// woPreStart.setAvailableTracking(false);
 				LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 				if (nowDate.getHour() >= 07 && nowDate.getHour() <= 19) {
+//				if (nowDate.getHour() >= 0 && nowDate.getHour() <= 23) {
 
 					// SMS
 					sendSMSWoPrestartHolder(provision);
@@ -2310,115 +2311,105 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				return true;
 			}
-			
-			/*if (request.getStatus().equalsIgnoreCase(Status.WO_RESCHEDULE.getStatusName())
-					&& !provision.getXaIdSt().isEmpty()) {
-				pe.telefonica.provision.model.Status rescheduleStatus = getInfoStatus(Status.SCHEDULED.getStatusName(),
-						statusList);
 
-				String identificadorSt = getXaIdSt.toString();
-
-				Update update = new Update();
-				WoReshedule woReshedule = new WoReshedule();
-				String range = "AM";
-
-				if (appointment.getTimeSlot().trim().equals("09-13")
-						|| appointment.getTimeSlot().toString().trim().equals("9-13")) {
-					range = "AM";
-				} else {
-					range = "PM";
-				}
-				String rangeFinal = range;
-
-				String dateString = appointment.getScheduledDate().substring(0, 10);
-
-				if ((identificadorSt == null || identificadorSt.isEmpty())
-						&& (rangeFinal == null || rangeFinal.isEmpty())
-						&& (dateString == null || dateString.isEmpty())) {
-					return false;
-				}
-
-				List<StatusLog> listLogx = listLog.stream()
-						.filter(x -> "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()))
-						.collect(Collectors.toList());
-
-				if (listLogx.size() > 0) {
-					if (listLogx.get(listLogx.size() - 1).getScheduledDate().contentEquals(dateString.toString())
-							&& listLogx.get(listLogx.size() - 1).getScheduledRange().contentEquals(rangeFinal)) {
-						return true;
-					}
-
-				}
-
-				woReshedule.setXaAppointmentScheduler(appointment.getScheduler());
-				woReshedule.setTimeSlot(range);
-				update.set("wo_schedule", woReshedule);
-				update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
-
-				update.set("xa_id_st", getXaIdSt);
-				update.set("xa_requirement_number", getXaRequirementNumber);
-				update.set("appt_number", appointment.getId());
-				update.set("activity_type", appointment.getDescription().toLowerCase());
-
-				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(Status.SCHEDULED.getStatusName());
-				statusLog.setScheduledRange(rangeFinal);
-				statusLog.setScheduledDate(dateString.toString());
-				statusLog.setXaidst(provision.getXaIdSt());
-
-				update.set("date", appointment.getScheduledDate());
-				update.set("send_notify", false);
-				update.set("time_slot", range);
-				update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
-				update.set("generic_speech", rescheduleStatus != null ? rescheduleStatus.getGenericSpeech()
-						: Status.SCHEDULED.getGenericSpeech());
-				update.set("description_status", rescheduleStatus != null ? rescheduleStatus.getDescription()
-						: Status.SCHEDULED.getDescription());
-				update.set("front_speech",
-						rescheduleStatus != null ? rescheduleStatus.getFront() : Status.SCHEDULED.getFrontSpeech());
-				listLog.add(statusLog);
-				update.set("log_status", listLog);
-
-				update.set("show_location", false);
-				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-
-				// Actualizar provision
-				provisionRepository.updateProvision(provision, update);
-
-				// el que parsea
-				SimpleDateFormat parseador2 = new SimpleDateFormat("yyyy-MM-dd");
-				// el que formatea
-				SimpleDateFormat formateador2 = new SimpleDateFormat("dd/MM/yyyy");
-
-				Date date2 = parseador2.parse(appointment.getScheduledDate());// ("31-03-2016");
-				System.out.println("Fecha de reschedule => " + formateador2.format(date2));
-				String dateString2 = formateador2.format(date2);
-
-				Customer customer = new Customer();
-				customer.setDocumentNumber(provision.getCustomer().getDocumentNumber());
-				customer.setDocumentType(provision.getCustomer().getDocumentType());
-				ScheduleRequest scheduleRequest = new ScheduleRequest();
-				scheduleRequest.setBucket(provision.getWorkZone());
-				scheduleRequest.setPilot(false);
-				// scheduleRequest.setOrderCode(provision.getXaRequest());
-				scheduleRequest.setXaOrderCode(provision.getXaRequest());
-				scheduleRequest.setRequestId(provision.getIdProvision());
-				scheduleRequest.setRequestType(provision.getActivityType());
-				scheduleRequest.setSelectedDate(dateString2);
-				scheduleRequest.setSelectedRange(range);
-				scheduleRequest.setStpsiCode(getXaIdSt);
-				scheduleRequest.setCustomer(customer);
-
-				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
-				scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
-				scheduleRequest.setOrderCode(provision.getXaRequest());
-				scheduleRequest.setBucket(provision.getWorkZone());
-
-				// Actualiza el agendamiento
-				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
-
-				return true;
-			}*/
+			/*
+			 * if
+			 * (request.getStatus().equalsIgnoreCase(Status.WO_RESCHEDULE.getStatusName())
+			 * && !provision.getXaIdSt().isEmpty()) { pe.telefonica.provision.model.Status
+			 * rescheduleStatus = getInfoStatus(Status.SCHEDULED.getStatusName(),
+			 * statusList);
+			 * 
+			 * String identificadorSt = getXaIdSt.toString();
+			 * 
+			 * Update update = new Update(); WoReshedule woReshedule = new WoReshedule();
+			 * String range = "AM";
+			 * 
+			 * if (appointment.getTimeSlot().trim().equals("09-13") ||
+			 * appointment.getTimeSlot().toString().trim().equals("9-13")) { range = "AM"; }
+			 * else { range = "PM"; } String rangeFinal = range;
+			 * 
+			 * String dateString = appointment.getScheduledDate().substring(0, 10);
+			 * 
+			 * if ((identificadorSt == null || identificadorSt.isEmpty()) && (rangeFinal ==
+			 * null || rangeFinal.isEmpty()) && (dateString == null ||
+			 * dateString.isEmpty())) { return false; }
+			 * 
+			 * List<StatusLog> listLogx = listLog.stream() .filter(x ->
+			 * "SCHEDULED".equals(x.getStatus()) && identificadorSt.equals(x.getXaidst()))
+			 * .collect(Collectors.toList());
+			 * 
+			 * if (listLogx.size() > 0) { if (listLogx.get(listLogx.size() -
+			 * 1).getScheduledDate().contentEquals(dateString.toString()) &&
+			 * listLogx.get(listLogx.size() -
+			 * 1).getScheduledRange().contentEquals(rangeFinal)) { return true; }
+			 * 
+			 * }
+			 * 
+			 * woReshedule.setXaAppointmentScheduler(appointment.getScheduler());
+			 * woReshedule.setTimeSlot(range); update.set("wo_schedule", woReshedule);
+			 * update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+			 * 
+			 * update.set("xa_id_st", getXaIdSt); update.set("xa_requirement_number",
+			 * getXaRequirementNumber); update.set("appt_number", appointment.getId());
+			 * update.set("activity_type", appointment.getDescription().toLowerCase());
+			 * 
+			 * StatusLog statusLog = new StatusLog();
+			 * statusLog.setStatus(Status.SCHEDULED.getStatusName());
+			 * statusLog.setScheduledRange(rangeFinal);
+			 * statusLog.setScheduledDate(dateString.toString());
+			 * statusLog.setXaidst(provision.getXaIdSt());
+			 * 
+			 * update.set("date", appointment.getScheduledDate()); update.set("send_notify",
+			 * false); update.set("time_slot", range); update.set("last_tracking_status",
+			 * Status.SCHEDULED.getStatusName()); update.set("generic_speech",
+			 * rescheduleStatus != null ? rescheduleStatus.getGenericSpeech() :
+			 * Status.SCHEDULED.getGenericSpeech()); update.set("description_status",
+			 * rescheduleStatus != null ? rescheduleStatus.getDescription() :
+			 * Status.SCHEDULED.getDescription()); update.set("front_speech",
+			 * rescheduleStatus != null ? rescheduleStatus.getFront() :
+			 * Status.SCHEDULED.getFrontSpeech()); listLog.add(statusLog);
+			 * update.set("log_status", listLog);
+			 * 
+			 * update.set("show_location", false); update.set("statusChangeDate",
+			 * LocalDateTime.now(ZoneOffset.of("-05:00")));
+			 * 
+			 * // Actualizar provision provisionRepository.updateProvision(provision,
+			 * update);
+			 * 
+			 * // el que parsea SimpleDateFormat parseador2 = new
+			 * SimpleDateFormat("yyyy-MM-dd"); // el que formatea SimpleDateFormat
+			 * formateador2 = new SimpleDateFormat("dd/MM/yyyy");
+			 * 
+			 * Date date2 = parseador2.parse(appointment.getScheduledDate());//
+			 * ("31-03-2016"); System.out.println("Fecha de reschedule => " +
+			 * formateador2.format(date2)); String dateString2 = formateador2.format(date2);
+			 * 
+			 * Customer customer = new Customer();
+			 * customer.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+			 * customer.setDocumentType(provision.getCustomer().getDocumentType());
+			 * ScheduleRequest scheduleRequest = new ScheduleRequest();
+			 * scheduleRequest.setBucket(provision.getWorkZone());
+			 * scheduleRequest.setPilot(false); //
+			 * scheduleRequest.setOrderCode(provision.getXaRequest());
+			 * scheduleRequest.setXaOrderCode(provision.getXaRequest());
+			 * scheduleRequest.setRequestId(provision.getIdProvision());
+			 * scheduleRequest.setRequestType(provision.getActivityType());
+			 * scheduleRequest.setSelectedDate(dateString2);
+			 * scheduleRequest.setSelectedRange(range);
+			 * scheduleRequest.setStpsiCode(getXaIdSt);
+			 * scheduleRequest.setCustomer(customer);
+			 * 
+			 * scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber()
+			 * );
+			 * scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
+			 * scheduleRequest.setOrderCode(provision.getXaRequest());
+			 * scheduleRequest.setBucket(provision.getWorkZone());
+			 * 
+			 * // Actualiza el agendamiento
+			 * trazabilidadScheduleApi.updateSchedule(scheduleRequest);
+			 * 
+			 * return true; }
+			 */
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_NOTDONE.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {

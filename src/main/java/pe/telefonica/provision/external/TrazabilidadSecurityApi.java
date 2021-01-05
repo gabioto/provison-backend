@@ -21,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -38,6 +39,8 @@ import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.external.request.LogDataRequest;
 import pe.telefonica.provision.external.request.security.GetTokenExternalRequest;
 import pe.telefonica.provision.external.request.security.TokenRequest;
+import pe.telefonica.provision.external.response.TokenResponse;
+import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.util.constants.Constants;
 
 @Component
@@ -223,8 +226,7 @@ public class TrazabilidadSecurityApi {
 
 	}
 
-	@Async
-	public void sendLoginToken(TokenRequest tokenRequest) {
+	public TokenResponse sendLoginToken(Customer customer) {
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
 		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
@@ -237,25 +239,39 @@ public class TrazabilidadSecurityApi {
 		String url = api.getSecurityUrl() + api.getLoginToken();
 
 		log.info(url);
+		
+		TokenRequest tokenRequest = new TokenRequest();
+		tokenRequest.setCarrier(String.valueOf(customer.getCarrier()));
+		tokenRequest.setCustomerIDNumber(customer.getDocumentNumber());
+		tokenRequest.setCustomerIDType(customer.getDocumentType());
+		tokenRequest.setCustomerName(customer.getName());
+		tokenRequest.setPhoneNumber(customer.getPhoneNumber());
+		tokenRequest.setRequestType("provision");
 
 		ApiRequest<TokenRequest> apiRequest = new ApiRequest<>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION,
 				Constants.OPER_SEND_TOKEN, tokenRequest);
+		
+		log.info(new Gson().toJson(apiRequest));
 
 		HttpEntity<ApiRequest<TokenRequest>> entity = new HttpEntity<>(apiRequest, headersMap);
 
 		try {
-
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
 
+			JsonObject object = new Gson().fromJson(responseEntity.getBody(), JsonObject.class);
+			JsonObject body = object.getAsJsonObject("body");
+			JsonObject content = body.getAsJsonObject("content");
+			TokenResponse response = new Gson().fromJson(content.toString(), TokenResponse.class);
+			
+			return response;
 		} catch (Exception e) {
 			throw e;
 		}
-
 	}
 
-	public String gerateToken() {
+	public String generateToken() {
 
-		log.info(this.getClass().getName() + " - " + "gerateToken");
+		log.info(this.getClass().getName() + " - " + "generateToken");
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

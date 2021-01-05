@@ -13,6 +13,7 @@ import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Contacts;
@@ -28,6 +29,8 @@ public interface ProvisionService {
 	List<ProvisionDto> getAll(ApiRequest<ProvisionRequest> provisionRequest);
 
 	List<ProvisionTrazaDto> getAllTraza(ApiRequest<ProvisionRequest> provisionRequest);
+
+	ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request);
 
 	ProvisionResponse<String> getStatus(String provisionId);
 

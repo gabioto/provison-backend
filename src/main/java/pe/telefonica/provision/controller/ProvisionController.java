@@ -47,6 +47,7 @@ import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
@@ -258,7 +259,77 @@ public class ProvisionController {
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
+	
+	@RequestMapping(value = "/getProvisionDetailById", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> getProvisionDetailById(
+			@RequestBody ApiRequest<ProvisionRequest> request) {
 
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
+		HttpStatus status;
+		String errorInternal = "";
+		String timestamp = "";
+
+		
+
+		try {
+			ProvisionDetailTrazaDto provisions = provisionService.getProvisionDetailById(request.getBody());
+
+			if (provisions != null) {
+
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.PROVISION_GET_PROVISION_DETAIL, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
+
+			} else {
+				status = HttpStatus.NOT_FOUND;
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()),
+						"No se encontraron provisiones", null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_PROVISION_DETAIL,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
+			}
+
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
+
+			timestamp = getTimestamp();
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_GET_PROVISION_DETAIL, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
+		}
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+	
 	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<ProvisionDto>>> getOrders(
 			@RequestBody ApiRequest<ProvisionRequest> request) {

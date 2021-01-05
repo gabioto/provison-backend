@@ -94,6 +94,7 @@ public final class Constants {
 
 	public static final String OPER_SEND_SMS_BY_ID = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID = "OPER_SEND_MAIL_BY_ID";
+	public static final String OPER_SEND_TOKEN = "OPER_SEND_TOKEN";
 
 	public static final String OPER_CONTACT_INFO_UPDATE = "OPER_CONTACT_INFO_UPDATE";
 	public static final String OPER_UPDATE_ADDRESS = "OPER_UPDATE_ADDRESS";
@@ -103,6 +104,7 @@ public final class Constants {
 	public static final String OPER_MONITORING_PROVISION = "OPER_MONITORING_PROVISION";
 	public static final String OPER_GET_SALE_CODE = "OPER_GET_SALE_CODE";
 	public static final String OPER_GET_PROVISION_ALL = "OPER_GET_PROVISION_ALL";
+	public static final String OPER_GET_PROVISION_DETAIL = "OPER_GET_PROVISION_DETAIL";
 	public static final String OPER_GET_PROVISION_BY_REGISTER_DATE = "OPER_GET_PROVISION_BY_REGISTER_DATE";
 	public static final String OPER_INSERT_PROVISION = "OPER_INSERT_PROVISION";
 	public static final String OPER_PROVISION_UPDATE_FROM_TOA = "OPER_PROVISION_UPDATE_FROM_TOA";

@@ -72,7 +72,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getProductOrders();
-		log.info("updatePSIClient - URL: " + requestUrl);
+		//log.info("updatePSIClient - URL: " + requestUrl);
 
 		oAuthToken = getAuthToken();
 
@@ -86,7 +86,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 		headers.set("migrationIndicator", "2");
 		headers.set("originSystem", "2");
 
-		log.info("updatePSIClient - headers: " + headers.toString());
+		//log.info("updatePSIClient - headers: " + headers.toString());
 
 		if (!order.isEmpty()) {
 			builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParam("id", order);
@@ -107,15 +107,15 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour,
 					LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)), responseEntity.getStatusCodeValue());
 
-			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
+			//log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
 
 			return responseEntity.getBody().parallelStream().map(response -> {
 				return response.fromThis(publicId);
 			}).collect(Collectors.toList());
 
 		} catch (HttpClientErrorException ex) {
-			log.info("HttpClientErrorException = " + ex.getMessage());
-			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
+			log.error("HttpClientErrorException = " + ex.getMessage());
+			log.error("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getResponseBodyAsString(),
 					requestUrl, startHour, LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)),
@@ -132,7 +132,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 			throw new FunctionalErrorException(message, ex, codeError);
 
 		} catch (Exception ex) {
-			log.info("Exception = " + ex.getMessage());
+			log.error("Exception = " + ex.getMessage());
 			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getMessage(), requestUrl,
 					startHour, LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)),
 					HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -175,11 +175,11 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 				return "";
 			}
 
-			log.info("responseEntity: " + responseEntity.getBody());
+			//log.info("responseEntity: " + responseEntity.getBody());
 
 			return updated ? ((OAuthToken) responseEntity.getBody().getBody()).getAccessToken() : "";
 		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
+			log.error("Exception = " + e.getMessage());
 			return "";
 		}
 	}

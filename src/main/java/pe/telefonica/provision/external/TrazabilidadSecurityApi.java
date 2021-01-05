@@ -75,8 +75,6 @@ public class TrazabilidadSecurityApi {
 
 		String saveLogDataUrl = api.getSecurityUrl() + api.getSecuritySaveLogData();
 
-		System.out.println(saveLogDataUrl);
-
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
 		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
@@ -86,13 +84,11 @@ public class TrazabilidadSecurityApi {
 		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logDataRequest, headersMap);
 
 		try {
-
 //			ResponseEntity<String> responseEntity = 
 			restTemplate.postForEntity(saveLogDataUrl, entity, String.class);
 
 		} catch (Exception ex) {
-
-			System.out.println(ex.getMessage());
+			log.error(ex.getMessage());
 		}
 
 	}
@@ -100,7 +96,7 @@ public class TrazabilidadSecurityApi {
 	@Async
 	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
 			LocalDateTime startHour, LocalDateTime endHour, int status) {
-		log.info(this.getClass().getName() + " - " + "logEvent");
+		//log.info(this.getClass().getName() + " - " + "logEvent");
 
 		String url = api.getSecurityUrl() + api.getSaveThirdLogData();
 
@@ -128,13 +124,13 @@ public class TrazabilidadSecurityApi {
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
 
-			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-				log.info(this.getClass().getName() + " - " + "logEvent - OK");
-			} else {
-				log.info(this.getClass().getName() + " - " + "logEvent - ERR");
-			}
+//			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+//				log.info(this.getClass().getName() + " - " + "logEvent - OK");
+//			} else {
+//				log.info(this.getClass().getName() + " - " + "logEvent - ERR");
+//			}
 		} catch (Exception e) {
-			log.info(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
+			log.error(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
 		}
 	}
 
@@ -168,8 +164,7 @@ public class TrazabilidadSecurityApi {
 				return false;
 			}
 		} catch (Exception ex) {
-
-			System.out.println(ex);
+			log.error(ex.getMessage());
 		}
 		return false;
 
@@ -196,9 +191,6 @@ public class TrazabilidadSecurityApi {
 		message.setMsgParameters(msgParameters);
 		message.setWebURL(webURL);
 		message.setWebContactURL(webContactURL);
-		
-
-		System.out.println(webURL);
 
 		// List<Contact> contacts = new ArrayList<>();
 
@@ -238,6 +230,7 @@ public class TrazabilidadSecurityApi {
 			return responseEntity.getBody();
 
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			return null;
 		}
 
@@ -245,7 +238,7 @@ public class TrazabilidadSecurityApi {
 	
 	public String gerateToken() {
 
-		log.info(this.getClass().getName() + " - " + "gerateToken");
+		//log.info(this.getClass().getName() + " - " + "gerateToken");
 		// RestTemplate restTemplate = new
 		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		// restTemplate.getMessageConverters().add(new
@@ -277,20 +270,17 @@ public class TrazabilidadSecurityApi {
 				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
 				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString().replaceAll("\"",
 						"");
-				
-				System.out.println(responseEntity);
 				return token;
 			} else {
 				return null;
 			}
 		} catch (HttpClientErrorException e) {
-			log.info("HttpClientErrorException = " + e.getMessage());
-			log.info("HttpClientErrorException = " + e.getResponseBodyAsString());
+			log.error("HttpClientErrorException = " + e.getMessage());
+			log.error("HttpClientErrorException = " + e.getResponseBodyAsString());
 			return null;
 		
 		} catch (Exception ex) {
-
-			System.out.println(ex.getMessage());
+			log.error("Exception = " + ex.getMessage());
 			return null;
 		}
 
@@ -298,7 +288,7 @@ public class TrazabilidadSecurityApi {
 	
 	public String gerateTokenAzure() {
 
-		log.info(this.getClass().getName() + " - " + "gerateToken");
+		//log.info(this.getClass().getName() + " - " + "gerateToken");
 		// RestTemplate restTemplate = new
 		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		// restTemplate.getMessageConverters().add(new
@@ -307,9 +297,7 @@ public class TrazabilidadSecurityApi {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getSecurityUrl() + api.getSecurityGetOAuthTokenAzure();
-		
 		GetTokenExternalRequest getTokenExternalRequest = new  GetTokenExternalRequest();
-		
 		getTokenExternalRequest.setTokenKey("");
 		
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
@@ -330,20 +318,17 @@ public class TrazabilidadSecurityApi {
 				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
 				String token = jsonObject.get("body").getAsJsonObject().get("accessToken").toString().toString().replaceAll("\"",
 						"");
-				
-				System.out.println(responseEntity);
 				return token;
 			} else {
 				return null;
 			}
 		} catch (HttpClientErrorException e) {
-			log.info("HttpClientErrorException = " + e.getMessage());
-			log.info("HttpClientErrorException = " + e.getResponseBodyAsString());
+			log.error("HttpClientErrorException = " + e.getMessage());
+			log.error("HttpClientErrorException = " + e.getResponseBodyAsString());
 			return null;
 		
 		} catch (Exception ex) {
-
-			System.out.println(ex.getMessage());
+			log.error("Exception = " + ex.getMessage());
 			return null;
 		}
 

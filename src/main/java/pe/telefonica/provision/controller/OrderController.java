@@ -33,7 +33,7 @@ import pe.telefonica.provision.service.RetreiveOrderService;
 
 public class OrderController {
 
-	private static final Log log = LogFactory.getLog(OrderController.class);
+	//private static final Log log = LogFactory.getLog(OrderController.class);
 
 	@Autowired
 	private OrderService orderService;
@@ -48,7 +48,7 @@ public class OrderController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<Object> createOrder(@Valid @RequestBody OrderRequest request) throws Exception {
-		log.info(new Gson().toJson(request));
+		//log.info(new Gson().toJson(request));
 		return orderService.createOrder(request);
 	}
 

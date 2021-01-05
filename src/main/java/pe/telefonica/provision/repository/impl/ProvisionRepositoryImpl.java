@@ -56,7 +56,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
 		String formattedDateTime01 = dateStart.format(formatter);
-		System.out.println("formattedDateTime01: " + formattedDateTime01);
 
 		// LocalDateTime dateStart = LocalDateTime.parse("2020-02-21T18:00:00");
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
@@ -79,7 +78,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		diasVidaProvision  = diasVidaProvision * -1;		
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
 		String formattedDateTime01 = dateStart.format(formatter);
-		System.out.println("formattedDateTime01: "+formattedDateTime01);
 		
 		Query query =new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
 				.is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
@@ -112,12 +110,12 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime = dateStart.format(formatter);
-		System.out.println("formattedDateTime: " + formattedDateTime);
+		//String formattedDateTime = dateStart.format(formatter);
+		//System.out.println("formattedDateTime: " + formattedDateTime);
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
@@ -175,7 +173,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 							Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 					Provision.class);
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 		}
 
 		Optional<Provision> optionalSchedule = Optional.ofNullable(provision);
@@ -200,7 +198,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		try {
 			queue = this.mongoOperations.findOne(new Query(Criteria.where("idContingencia").is("1")), Queue.class);
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 		}
 
 		Optional<Queue> optionalQueue = Optional.ofNullable(queue);
@@ -429,7 +427,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public void updateFlagDateNotify(List<Provision> listProvision) {
-		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
+		//log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
 		
 		for (int i = 0; i < listProvision.size(); i++) {
@@ -568,7 +566,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public void updateUpFrontProvisionRead(List<Provision> provisions) {
-		log.info("ProvisionRepositoryImpl.updateUpFrontProvisionRead()");
+		//log.info("ProvisionRepositoryImpl.updateUpFrontProvisionRead()");
 		Update update = new Update();
 		update.set("up_front_read", true);
 

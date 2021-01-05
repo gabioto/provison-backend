@@ -18,7 +18,7 @@ import pe.telefonica.provision.repository.MonitoringRepository;
 @Repository
 public class MonitoringRepositoryImpl implements MonitoringRepository {
 
-	private static final Log log = LogFactory.getLog(MonitoringRepositoryImpl.class);
+	//private static final Log log = LogFactory.getLog(MonitoringRepositoryImpl.class);
 	private final MongoOperations mongoOperations;
 
 	@Autowired

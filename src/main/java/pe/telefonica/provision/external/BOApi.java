@@ -35,8 +35,7 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String sendRequestBO = api.getBoUrl() + api.getSendRequestToBO();
-
-		log.info("sendRequestToBO - BO - URL: " + sendRequestBO);
+		//log.info("sendRequestToBO - BO - URL: " + sendRequestBO);
 
 		String formattedDate = "";
 		Date scheduledDate = new Date();
@@ -82,7 +81,7 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 			
 			//ResponseEntity<String> responseEntity = getRestTemplate().postForEntity(sendRequestBO, entityBO, String.class);
 			
-			log.info("sendRequestToBO - BO - Response: " + responseEntity.getBody());
+			//log.info("sendRequestToBO - BO - Response: " + responseEntity.getBody());
 
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				return true;
@@ -90,7 +89,7 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 				return false;
 			}
 		} catch (Exception ex) {
-			log.info("Exception = " + ex.getMessage());
+			log.error("Exception = " + ex.getMessage());
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}

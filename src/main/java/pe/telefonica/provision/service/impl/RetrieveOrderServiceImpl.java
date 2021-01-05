@@ -225,7 +225,7 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 		HttpStatus status;
 		Object response;
 
-		log.info("Orders - " + (order != null ? order.toString() : "null"));
+		//log.info("Orders - " + (order != null ? order.toString() : "null"));
 
 		if (order != null) {
 			status = HttpStatus.OK;

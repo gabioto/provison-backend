@@ -82,7 +82,7 @@ public class ScheduleApi {
 
 		String oAuthToken = getAuthToken(requestx.getBodyUpdateClient().getNombre_completo());
 
-		log.info("modifyWork - URL: " + url);
+		//log.info("modifyWork - URL: " + url);
 
 		Calendar calendar = Calendar.getInstance();
 		Date now = calendar.getTime();
@@ -107,7 +107,7 @@ public class ScheduleApi {
 
 		try {
 
-			log.info("modifyWork - requestUrl: " + new Gson().toJson(request));
+			//log.info("modifyWork - requestUrl: " + new Gson().toJson(request));
 
 			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
 					PSIWorkResponse.class);
@@ -116,7 +116,7 @@ public class ScheduleApi {
 			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
 					startHour, endHour, responseEntity.getStatusCodeValue());
 
-			log.info("modifyWork - Body: " + responseEntity.getBody().toString());
+			//log.info("modifyWork - Body: " + responseEntity.getBody().toString());
 
 //			return responseEntity.getBody().getBodyOut().getCapacity();
 
@@ -124,8 +124,8 @@ public class ScheduleApi {
 
 		} catch (HttpClientErrorException ex) {
 
-			log.info("HttpClientErrorException = " + ex.getMessage());
-			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
+			log.error("HttpClientErrorException = " + ex.getMessage());
+			log.error("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getResponseBodyAsString(), url,
@@ -142,7 +142,7 @@ public class ScheduleApi {
 			throw new FunctionalErrorException(message, ex, codeError);
 
 		} catch (Exception ex) {
-			log.info("Exception = " + ex.getMessage());
+			log.error("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getMessage(), url, startHour,
 					endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -218,11 +218,11 @@ public class ScheduleApi {
 				return "";
 			}
 
-			log.info("responseEntity: " + responseEntity.getBody());
+			//log.info("responseEntity: " + responseEntity.getBody());
 
 			return updated ? ((OAuthToken) responseEntity.getBody().getBody()).getAccessToken() : "";
 		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
+			log.error("Exception = " + e.getMessage());
 			return "";
 		}
 	}

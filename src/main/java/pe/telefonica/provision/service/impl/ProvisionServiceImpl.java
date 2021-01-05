@@ -235,9 +235,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 			}
 
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -1560,8 +1558,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 			String frontSpeech) {
 		boolean updated = false;
 		Optional<Provision> optionalProvision = provisionRepository.getProvisionByXaRequestAndSt(xaRequest, xaIdSt);
-		log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
-				+ ", xaIdSt =" + xaIdSt + ", status = " + status);
+		//log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: xaRequest = " + xaRequest
+		//		+ ", xaIdSt =" + xaIdSt + ", status = " + status);
 
 		if (optionalProvision.isPresent()) {
 			Provision provision = optionalProvision.get();
@@ -1588,7 +1586,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 			updated = provisionRepository.updateTrackingStatus(optionalProvision.get(), logStatus, description, speech,
 					frontSpeech, comesFromSchedule);
-			log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
+			//log.info(ProvisionServiceImpl.class.getCanonicalName() + " - updateTrackingStatus: updated = " + updated);
 		}
 
 		return updated;
@@ -1609,7 +1607,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		while (true) {
 			try {
-				log.info("Attempt times: " + (count + 1));
+				//log.info("Attempt times: " + (count + 1));
 
 				if (provision != null) {
 					List<ContactRequest> listContact = request.getContacts();
@@ -1983,16 +1981,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private boolean validateBuckectProduct(KafkaTOARequest kafkaTOARequest, Provision provision) throws Exception {
 		boolean errorBucket = false; // validar IN_TOA
 		// Valida DNI
-		log.info("validateBuckectProduct");
+		//log.info("validateBuckectProduct");
 		if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
 				&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
 			errorBucket = true;
-			log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
-					+ provision.getCustomer().getDocumentNumber());
+//			log.info("No es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
+//					+ provision.getCustomer().getDocumentNumber());
 			return errorBucket;
 		} else {
-			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
-					+ provision.getCustomer().getDocumentNumber());
+//			log.info("Es persona natural. Documento: " + provision.getCustomer().getDocumentType() + " NumDoc: "
+//					+ provision.getCustomer().getDocumentNumber());
 		}
 		if (Constants.STATUS_IN_TOA
 				.equalsIgnoreCase(kafkaTOARequest.getEventType() == null ? "" : kafkaTOARequest.getEventType())) { // validate
@@ -2108,9 +2106,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provision = provisionRepository.getByOrderCodeForUpdateFicticious(getXaRequirementNumber);
 		}
 
-		log.info("Antes de update provision");
+		//log.info("Antes de update provision");
 		bool = updateProvision(provision, kafkaTOARequest, request, fromSale);
-		log.info("Depues de update provision");
+		//log.info("Depues de update provision");
 		return bool;
 	}
 
@@ -2129,12 +2127,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
 		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
-		log.info("ProvisionServiceImpl.updateProvision()");
+		//log.info("ProvisionServiceImpl.updateProvision()");
 
 		if (provision != null) {
-			log.info("Provision != null");
+			//log.info("Provision != null");
 			List<StatusLog> listLog = provision.getLogStatus();
-			log.info("Provision statuslog");
+			//log.info("Provision statuslog");
 			// valida Bucket x Producto
 			boolean boolBucket = validateBuckectProduct(kafkaTOARequest, provision);
 
@@ -2142,7 +2140,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return false;
 			}
 
-			log.info("Provision boolBucket");
+			//log.info("Provision boolBucket");
 			pe.telefonica.provision.model.Status dummyInToa = getInfoStatus(Status.DUMMY_IN_TOA.getStatusName(),
 					statusList);
 
@@ -2428,7 +2426,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 							int maxTries = 2;
 							boolean needSend = true;
 							while (needSend) {
-								log.info("Simpli Attempt #" + count);
+								//log.info("Simpli Attempt #" + count);
 
 								String urlSimpli = "";
 
@@ -2911,7 +2909,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public boolean getBucketByProduct(String channel, String product, String bucket) throws Exception {
 
-		log.info("ScheduleServiceImpl.getBucketByProduct()");
+		//log.info("ScheduleServiceImpl.getBucketByProduct()");
 
 		try {
 			boolean responseBucket = restPSI.getBucketByProduct(bucket, product, channel);

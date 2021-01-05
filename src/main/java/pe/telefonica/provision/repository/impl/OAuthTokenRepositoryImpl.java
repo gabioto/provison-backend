@@ -34,7 +34,7 @@ public class OAuthTokenRepositoryImpl implements OAuthTokenRepository {
 			oAuthToken = this.mongoOperations
 					.findOne(new Query(Criteria.where("token_key").is("PARAM_KEY_OAUTH_TOKEN")), OAuthToken.class);
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 		}
 
 		Optional<OAuthToken> optionalPsiToken = Optional.ofNullable(oAuthToken);

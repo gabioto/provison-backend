@@ -569,7 +569,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/setProvisionValidated", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<Provision>>> setProvisionValidated(
 			@RequestBody ApiRequest<ValidateDataRequest> request) {
-		log.info(this.getClass().getName() + " - " + "setProvisionValidated");
+		//log.info(this.getClass().getName() + " - " + "setProvisionValidated");
 
 		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
@@ -754,7 +754,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> setContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
-		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+		//log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
 
 		ApiResponse<Provision> apiResponse;
 		HttpStatus status;
@@ -929,8 +929,8 @@ public class ProvisionController {
 				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "No existe registro", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
-				log.info("timestamp => " + timestamp);
-				log.info("MessageId => " + request.getHeader().getMessageId());
+				//log.info("timestamp => " + timestamp);
+				//log.info("MessageId => " + request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
@@ -1018,7 +1018,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/update-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<String>> apiTrazaSetContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
-		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+		//log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
 
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
@@ -1234,8 +1234,8 @@ public class ProvisionController {
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
 						errorInternal, "No existe registro", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
-				log.info("timestamp => " + timestamp);
-				log.info("MessageId => " + request.getHeader().getMessageId());
+				//log.info("timestamp => " + timestamp);
+				//log.info("MessageId => " + request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
@@ -1320,7 +1320,7 @@ public class ProvisionController {
 	public ResponseEntity<ApiResponse<List<Provision>>> requestAddressUpdate(
 			@RequestBody ApiRequest<AddressUpdateRequest> request) {
 		System.out.println("CORS NO FUNCTION");
-		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
+		//log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
 		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
@@ -1392,8 +1392,8 @@ public class ProvisionController {
 	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Object>> receiveAddressUpdateBO(
 			@RequestBody ApiRequest<ReceiveAddressUpdateBORequest> request) {
-		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO error 405  ");
-		log.info(this.getClass().getName() + " - " + request.toString());
+		//log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO error 405  ");
+		//log.info(this.getClass().getName() + " - " + request.toString());
 
 		String timestamp;
 		ApiResponse<Object> apiResponse;
@@ -1462,7 +1462,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<Provision>>> orderCancellation(
 			@RequestBody ApiRequest<CancelOrderRequest> request) {
-		log.info(this.getClass().getName() + " - " + "orderCancellation");
+		//log.info(this.getClass().getName() + " - " + "orderCancellation");
 
 		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
@@ -1726,11 +1726,11 @@ public class ProvisionController {
 	}
 
 	public String getTimestamp() {
-		log.info("ProvisionController.getTimestamp()");
+		//log.info("ProvisionController.getTimestamp()");
 		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
 		String timeStamp = dateNow.format(formatter);
-		log.info("timeStamp => " + timeStamp);
+		//log.info("timeStamp => " + timeStamp);
 		return timeStamp;
 	}
 
@@ -1822,7 +1822,7 @@ public class ProvisionController {
 
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
-		log.info("ProvisionController.getOrderToNotify()");
+		//log.info("ProvisionController.getOrderToNotify()");
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 
@@ -1899,7 +1899,7 @@ public class ProvisionController {
 
 	@RequestMapping(value = "/getUpFrontProvisions", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getUpFrontProvisions() {
-		log.info("ProvisionController.getUpFrontProvisions()");
+		//log.info("ProvisionController.getUpFrontProvisions()");
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 

@@ -39,7 +39,7 @@ public class SimpliConnectApi {
 	
 	public String getUrlTraking(SimpliRequest request) {
 
-		LOGGER.info(this.getClass().getName() + " - " + "generateMapUrl");
+		//LOGGER.info(this.getClass().getName() + " - " + "generateMapUrl");
 
 		// System.getenv("TDP_URL_OFFICE_TRACK"); //old
 		// String url = System.getenv("TDP_URL_OAUTH_SIMPLI");
@@ -71,13 +71,13 @@ public class SimpliConnectApi {
 
 		HttpEntity<SimpliConnectRequest> requestEntity = new HttpEntity<SimpliConnectRequest>(requestConnect, headers);
 
-		System.out.println(requestEntity);
+		
 		int statusRequest = 0;
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			// System.out.println(new Gson().toJson(request));
-			LOGGER.info("request = " + new Gson().toJson(request));
+			//LOGGER.info("request = " + new Gson().toJson(request));
 			ResponseEntity<String> result = restTemplate.postForEntity(url, requestEntity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -88,14 +88,13 @@ public class SimpliConnectApi {
 
 				JsonObject jsonObject = new JsonParser().parse(result.getBody().toString()).getAsJsonObject();
 				String urlSimpli = jsonObject.get("BodyOut").getAsJsonObject().get("url").toString().replaceAll("\"",
-						"");
-				System.out.println(urlSimpli);
+						"");				
 				return urlSimpli;
 				// return result.getBody().toString();
 			}
 			return null;
 		} catch (Exception ex) {
-			LOGGER.info("Exception = " + ex.getMessage());
+			LOGGER.error("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect),
 					new Gson().toJson(ex.getMessage()), url, startHour, endHour, statusRequest);

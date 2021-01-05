@@ -74,7 +74,7 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 		HttpStatus status;
 		Object response;
 
-		log.info("Orders - " + (orders != null ? orders.toString() : "null"));
+		//log.info("Orders - " + (orders != null ? orders.toString() : "null"));
 
 		if (orders != null && orders.size() > 0) {
 			status = HttpStatus.OK;

@@ -26,6 +26,7 @@ import com.mongodb.client.result.UpdateResult;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Provision;
@@ -539,5 +540,16 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update, Provision.class);
 		}
 
+	}
+
+	@Override
+	public ProvisionDetailTrazaDto getProvisionDetailById(String provisionId) {
+		
+		
+			ProvisionDetailTrazaDto provision = this.mongoOperations.findOne(
+					new Query(Criteria.where("_id").is(new ObjectId(provisionId))),
+					ProvisionDetailTrazaDto.class);
+		
+		return provision;
 	}
 }

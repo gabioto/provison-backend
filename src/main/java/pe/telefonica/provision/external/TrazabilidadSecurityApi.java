@@ -42,6 +42,8 @@ import pe.telefonica.provision.external.request.security.TokenRequest;
 import pe.telefonica.provision.external.response.TokenResponse;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.exception.FunctionalErrorException;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @Component
 public class TrazabilidadSecurityApi {
@@ -238,8 +240,6 @@ public class TrazabilidadSecurityApi {
 
 		String url = api.getSecurityUrl() + api.getLoginToken();
 
-		log.info(url);
-		
 		TokenRequest tokenRequest = new TokenRequest();
 		tokenRequest.setCarrier(String.valueOf(customer.getCarrier()));
 		tokenRequest.setCustomerIDNumber(customer.getDocumentNumber());
@@ -251,21 +251,32 @@ public class TrazabilidadSecurityApi {
 		ApiRequest<TokenRequest> apiRequest = new ApiRequest<>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION,
 				Constants.OPER_SEND_TOKEN, tokenRequest);
 		
-		log.info(new Gson().toJson(apiRequest));
-
 		HttpEntity<ApiRequest<TokenRequest>> entity = new HttpEntity<>(apiRequest, headersMap);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
 
 			JsonObject object = new Gson().fromJson(responseEntity.getBody(), JsonObject.class);
-			JsonObject body = object.getAsJsonObject("body");
-			JsonObject content = body.getAsJsonObject("content");
+			JsonObject content = object.getAsJsonObject("body").getAsJsonObject("content");
 			TokenResponse response = new Gson().fromJson(content.toString(), TokenResponse.class);
 			
 			return response;
-		} catch (Exception e) {
-			throw e;
+			
+		} catch (HttpClientErrorException ex) {
+			if (ex.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
+				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+				JsonObject appDetail = jsonDecode.getAsJsonObject("header");
+				
+				String message = appDetail.get("message").toString();
+				String codeError = appDetail.get("resultCode").toString();
+
+				throw new FunctionalErrorException(message, ex, codeError);
+			}else {
+				throw new ServerNotFoundException(ex.getMessage());
+			}
+			
+		} catch (Exception ex) {
+			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
 

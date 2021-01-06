@@ -289,7 +289,7 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
-						ConstantsLogData.PROVISION_GET_PROVISION_DETAIL, request.getHeader().getMessageId(),
+						ConstantsLogData.ACCESS_APP_TYPE_ORDER, request.getHeader().getMessageId(),
 						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 						request.getHeader().getAppName());
 
@@ -307,7 +307,7 @@ public class ProvisionController {
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
-						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_GET_PROVISION_DETAIL,
+						new Gson().toJson(apiResponse), ConstantsLogData.ACCESS_APP_TYPE_ORDER,
 						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
 						request.getBody().getActivityType(), request.getHeader().getAppName());
 			}
@@ -315,7 +315,7 @@ public class ProvisionController {
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
+					Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), ex.getMessage().toString(), null);
 
 			timestamp = getTimestamp();
 			apiResponse.getHeader().setTimestamp(timestamp);
@@ -323,7 +323,7 @@ public class ProvisionController {
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
 					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
 					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
-					ConstantsLogData.PROVISION_GET_PROVISION_DETAIL, request.getHeader().getMessageId(),
+					ConstantsLogData.ACCESS_APP_TYPE_ORDER, request.getHeader().getMessageId(),
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 		}

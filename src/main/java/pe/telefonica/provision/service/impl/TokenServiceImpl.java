@@ -14,6 +14,7 @@ import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.TokenService;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.exception.FunctionalErrorException;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -28,15 +29,23 @@ public class TokenServiceImpl implements TokenService {
 	public ResponseEntity<Object> sendToken(String code) {
 		Optional<Provision> optProvision = provisionRepository.getProvisionById(code);
 
-		if (optProvision.isPresent()) {
-			TokenResponse response = trazabilidadSecurityApi.sendLoginToken(optProvision.get().getCustomer());
-			return new ResponseEntity<Object>(new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_SEND_TOKEN, String.valueOf(HttpStatus.OK.value()), "OK", response), HttpStatus.OK);
-		} else {
+		try {
+			if (optProvision.isPresent()) {
+				TokenResponse response = trazabilidadSecurityApi.sendLoginToken(optProvision.get().getCustomer());
+				return new ResponseEntity<Object>(new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_SEND_TOKEN, String.valueOf(HttpStatus.OK.value()), "OK", response),
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<Object>(
+						new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_SEND_TOKEN,
+								String.valueOf(HttpStatus.NO_CONTENT.value()), "No se encontró la provision", null),
+						HttpStatus.NO_CONTENT);
+			}
+		} catch (FunctionalErrorException e) {
 			return new ResponseEntity<Object>(
 					new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_SEND_TOKEN,
-							String.valueOf(HttpStatus.NO_CONTENT.value()), "No se encontró la provision", null),
-					HttpStatus.NO_CONTENT);
+							String.valueOf(HttpStatus.FORBIDDEN.value()), e.getMessage(), null),
+					HttpStatus.FORBIDDEN);
 		}
 	}
 

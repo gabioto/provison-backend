@@ -250,7 +250,7 @@ public class TrazabilidadSecurityApi {
 
 		ApiRequest<TokenRequest> apiRequest = new ApiRequest<>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION,
 				Constants.OPER_SEND_TOKEN, tokenRequest);
-		
+
 		HttpEntity<ApiRequest<TokenRequest>> entity = new HttpEntity<>(apiRequest, headersMap);
 
 		try {
@@ -259,22 +259,23 @@ public class TrazabilidadSecurityApi {
 			JsonObject object = new Gson().fromJson(responseEntity.getBody(), JsonObject.class);
 			JsonObject content = object.getAsJsonObject("body").getAsJsonObject("content");
 			TokenResponse response = new Gson().fromJson(content.toString(), TokenResponse.class);
-			
+			response.setPhone(customer.getPhoneNumber());
+
 			return response;
-			
+
 		} catch (HttpClientErrorException ex) {
 			if (ex.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
 				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 				JsonObject appDetail = jsonDecode.getAsJsonObject("header");
-				
+
 				String message = appDetail.get("message").toString();
 				String codeError = appDetail.get("resultCode").toString();
 
 				throw new FunctionalErrorException(message, ex, codeError);
-			}else {
+			} else {
 				throw new ServerNotFoundException(ex.getMessage());
 			}
-			
+
 		} catch (Exception ex) {
 			throw new ServerNotFoundException(ex.getMessage());
 		}

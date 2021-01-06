@@ -94,6 +94,7 @@ public final class Constants {
 
 	public static final String OPER_SEND_SMS_BY_ID = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID = "OPER_SEND_MAIL_BY_ID";
+	public static final String OPER_SEND_TOKEN = "OPER_SEND_TOKEN";
 
 	public static final String OPER_CONTACT_INFO_UPDATE = "OPER_CONTACT_INFO_UPDATE";
 	public static final String OPER_UPDATE_ADDRESS = "OPER_UPDATE_ADDRESS";

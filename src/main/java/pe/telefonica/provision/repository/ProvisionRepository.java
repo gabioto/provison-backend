@@ -51,6 +51,8 @@ public interface ProvisionRepository {
 	Boolean resetProvision(Provision provisionRequest);
 
 	Optional<Provision> getProvisionById(String provisionId);
+	
+	Optional<Provision> getAllProvisionById(String provisionId);
 
 	Provision getProvisionByIdNotFilter(String provisionId);
 

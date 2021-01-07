@@ -27,7 +27,7 @@ public class TokenServiceImpl implements TokenService {
 
 	@Override
 	public ResponseEntity<Object> sendToken(String code) {
-		Optional<Provision> optProvision = provisionRepository.getProvisionById(code);
+		Optional<Provision> optProvision = provisionRepository.getAllProvisionById(code);
 
 		try {
 			if (optProvision.isPresent()) {

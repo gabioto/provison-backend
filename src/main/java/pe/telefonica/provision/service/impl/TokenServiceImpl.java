@@ -38,8 +38,8 @@ public class TokenServiceImpl implements TokenService {
 			} else {
 				return new ResponseEntity<Object>(
 						new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION, Constants.OPER_SEND_TOKEN,
-								String.valueOf(HttpStatus.NO_CONTENT.value()), "No se encontró la provision", null),
-						HttpStatus.NO_CONTENT);
+								String.valueOf(HttpStatus.BAD_REQUEST.value()), "No se encontró la provision", null),
+						HttpStatus.BAD_REQUEST);
 			}
 		} catch (FunctionalErrorException e) {
 			return new ResponseEntity<Object>(

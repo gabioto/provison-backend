@@ -7,7 +7,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -40,7 +39,6 @@ import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
-import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -75,7 +73,6 @@ import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoNotdone;
 import pe.telefonica.provision.model.provision.WoPreStart;
-import pe.telefonica.provision.model.provision.WoReshedule;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
@@ -1952,43 +1949,42 @@ public class ProvisionServiceImpl implements ProvisionService {
 					listLog.add(statusLog);
 
 					// Regularizar Agenda Ficticia
-					if (provision.getXaIdSt() == null) {
-						if (provision.getDummyStPsiCode() != null) {
-							List<StatusLog> listLogx = listLog.stream()
-									.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
-									.collect(Collectors.toList());
+					if (provision.getXaIdSt() == null && provision.getDummyStPsiCode() != null) {
+						List<StatusLog> listLogx = listLog.stream()
+								.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
+								.collect(Collectors.toList());
 
-							List<StatusLog> listLogCancelled = listLog.stream()
-									.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
-									.collect(Collectors.toList());
+						List<StatusLog> listLogCancelled = listLog.stream()
+								.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
+								.collect(Collectors.toList());
 
-							if (listLogx.size() > 0 && listLogCancelled.size() == 0) {
-								pe.telefonica.provision.model.Status scheduled = getInfoStatus(
-										Status.SCHEDULED.getStatusName(), statusList);
+						if (listLogx.size() > 0 && listLogCancelled.size() == 0
+								&& isAValidSchedule(listLogx.get(0).getScheduledDate())) {
 
-								StatusLog statusSchedule = new StatusLog();
-								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
-								statusSchedule.setXaidst(getXaIdSt);
-								statusSchedule.setScheduledDate(listLogx.get(0).getScheduledDate());
-								statusSchedule.setScheduledRange(listLogx.get(0).getScheduledRange());
-								listLog.add(statusSchedule);
+							pe.telefonica.provision.model.Status scheduled = getInfoStatus(
+									Status.SCHEDULED.getStatusName(), statusList);
 
-								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
-								update.set("generic_speech", scheduled != null ? scheduled.getGenericSpeech()
-										: Status.SCHEDULED.getGenericSpeech());
-								update.set("description_status", scheduled != null ? scheduled.getDescription()
-										: Status.SCHEDULED.getDescription());
-								update.set("front_speech",
-										scheduled != null ? scheduled.getFront() : Status.SCHEDULED.getFrontSpeech());
+							StatusLog statusSchedule = new StatusLog();
+							statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
+							statusSchedule.setXaidst(getXaIdSt);
+							statusSchedule.setScheduledDate(listLogx.get(0).getScheduledDate());
+							statusSchedule.setScheduledRange(listLogx.get(0).getScheduledRange());
+							listLog.add(statusSchedule);
 
-								// update psiCode by schedule
-								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getXaIdSt, appointment.getDescription().toLowerCase(),
-										provision.getCustomer());
+							update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
+							update.set("generic_speech", scheduled != null ? scheduled.getGenericSpeech()
+									: Status.SCHEDULED.getGenericSpeech());
+							update.set("description_status",
+									scheduled != null ? scheduled.getDescription() : Status.SCHEDULED.getDescription());
+							update.set("front_speech",
+									scheduled != null ? scheduled.getFront() : Status.SCHEDULED.getFrontSpeech());
 
-							}
+							// update psiCode by schedule
+							trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
+									provision.getXaRequest(), getXaIdSt, appointment.getDescription().toLowerCase(),
+									provision.getCustomer());
+
 						}
-
 					}
 
 					update.set("log_status", listLog);
@@ -2719,6 +2715,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 		mailParameters.add(mailParameter5);
 
 		trazabilidadSecurityApi.sendMail("192826", mailParameters.toArray(new MailParameter[mailParameters.size()]));
+	}
+
+	private boolean isAValidSchedule(String scheduleDate) {
+		LocalDate lScheduleDate = LocalDate.parse(scheduleDate);
+		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
+
+		return lScheduleDate.compareTo(today) > 0;
 	}
 
 }

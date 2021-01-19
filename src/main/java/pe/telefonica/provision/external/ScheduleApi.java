@@ -143,7 +143,7 @@ public class ScheduleApi {
 
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
-			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" ") - 1);
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
 					endHour, Integer.parseInt(message));

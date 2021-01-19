@@ -133,7 +133,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
-			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" ") - 1);
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(builder.toUriString()), ex.getLocalizedMessage(), requestUrl,
 					startHour, LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)),
 					Integer.parseInt(message));

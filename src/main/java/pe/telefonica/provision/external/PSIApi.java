@@ -158,7 +158,7 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" ") - 1);
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(),
 					requestUrl, startHour, endHour, Integer.parseInt(message));
 			throw new ServerNotFoundException(ex.getMessage());
@@ -324,7 +324,7 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception e) {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());			
-			String message = e.getLocalizedMessage().substring(0, e.getLocalizedMessage().indexOf(" ") - 1);
+			String message = e.getLocalizedMessage().substring(0, e.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "getCarrierOnPremise", entity.getBody(), e.getLocalizedMessage(), requestUrl, startHour,
 					endHour, Integer.parseInt(message));
@@ -395,7 +395,7 @@ public class PSIApi extends ConfigRestTemplate {
 		} catch (Exception e) {
 			// Se detecta error, por lo tanto se considera otro operador.
 			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
-			String message = e.getLocalizedMessage().substring(0, e.getLocalizedMessage().indexOf(" ") - 1);
+			String message = e.getLocalizedMessage().substring(0, e.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "getCarrier", entity.getBody(), e.getLocalizedMessage(),
 					requestUrl, startHour, endHour, Integer.parseInt(message));

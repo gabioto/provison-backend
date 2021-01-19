@@ -96,7 +96,7 @@ public class SimpliConnectApi {
 			return null;
 		} catch (Exception ex) {
 			LOGGER.info("Exception = " + ex.getMessage());
-			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" ") - 1);
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect.getBodyIn()),
 					ex.getLocalizedMessage(), url, startHour, endHour, Integer.parseInt(message));
@@ -163,7 +163,7 @@ public class SimpliConnectApi {
 			return null;
 		} catch (Exception ex) {
 			LOGGER.info("Exception = " + ex.getMessage());
-			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" ") - 1);
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity.getBody()),
 					ex.getLocalizedMessage(), url, startHour, endHour, Integer.parseInt(message));

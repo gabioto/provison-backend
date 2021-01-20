@@ -2,6 +2,8 @@ package pe.telefonica.provision.controller;
 
 import javax.validation.Valid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ import pe.telefonica.provision.util.constants.Constants;
 @CrossOrigin(origins = "*")
 @RequestMapping("rating")
 public class RatingController {
-	// private static final Log log = LogFactory.getLog(RatingController.class);
+	private static final Log log = LogFactory.getLog(RatingController.class);
 
 	@Autowired
 	private RatingService ratingService;
@@ -44,7 +46,8 @@ public class RatingController {
 			apiResponse.setBody(provison);
 
 		} catch (Exception ex) {
-
+			log.error("Exception: "+ ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_INSERT_RATING,
 					String.valueOf(status.value()), status.getReasonPhrase(), null);

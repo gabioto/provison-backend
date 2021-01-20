@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,8 @@ import pe.telefonica.provision.util.constants.Constants;
 @RequestMapping("report")
 @EnableAsync
 public class ReportController {
-
+	private static final Log log = LogFactory.getLog(RatingController.class);
+	
 	@Autowired
 	private ReportService reportService;
 	
@@ -46,6 +49,8 @@ public class ReportController {
 				apiResponse.setBody(provisions);			
 			
 		} catch (Exception ex) {
+			log.error("Exception: "+ ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -70,6 +75,8 @@ public class ReportController {
 			
 			
 		} catch (Exception ex) {
+			log.error("Exception: "+ ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			//apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
 			//		Constants.OPER_GET_PROVISION_BY_REGISTER_DATE, String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -100,6 +107,8 @@ public class ReportController {
 				apiResponse.setBody(null);
 			}			
 		} catch (Exception ex) {
+			log.error("Exception: "+ ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,

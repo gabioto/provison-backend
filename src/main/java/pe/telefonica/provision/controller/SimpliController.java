@@ -27,7 +27,7 @@ import pe.telefonica.provision.service.SimpliService;
 @CrossOrigin(origins = "*")
 @RequestMapping("provision")
 public class SimpliController {
-	//private static final Log log = LogFactory.getLog(SimpliController.class);
+	private static final Log log = LogFactory.getLog(SimpliController.class);
 
 	@Autowired
 	private SimpliService simpliService;
@@ -36,7 +36,6 @@ public class SimpliController {
 	public ResponseEntity<Object> setSimpliUrl(@RequestBody @Valid SetSimpliUrlRequest request,
 			@RequestHeader(value = "UNICA-ServiceId", required=false) String UNICA_ServiceId,			
 			@RequestHeader(value = "UNICA-PID", required=false) String UNICA_PID) {
-		//log.info(this.getClass().getName() + " - " + "liveTrackingTBX");
 		
 		ApiSimpliResponse<SimpliUrlResponse> simpliUrlResponse;
 		
@@ -287,6 +286,8 @@ public class SimpliController {
 						.body(json);
 			}
 		} catch (Exception ex) {
+			log.error("Exception: "+ ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			
 			responseError = new ErrorResponse();

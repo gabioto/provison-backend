@@ -53,7 +53,7 @@ public interface ProvisionService {
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);
 
-	public Provision orderCancellation(String provisionId, String cause, String detail);
+	ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail);
 
 	ProvisionResponse<Boolean> validateQueue();
 

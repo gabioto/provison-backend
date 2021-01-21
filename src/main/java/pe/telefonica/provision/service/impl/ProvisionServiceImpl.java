@@ -1119,7 +1119,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision orderCancellation(String provisionId, String cause, String detail) {
+	public ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail) {
 		boolean sentBOCancellation;
 		boolean provisionUpdated;
 		boolean scheduleUpdated;
@@ -1179,7 +1179,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 			}
 
-			return provision;
+			return new ProvisionDetailTrazaDto().fromProvision(provision);
 		} else {
 			return null;
 		}

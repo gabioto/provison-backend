@@ -259,23 +259,19 @@ public class ProvisionController {
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
-	
+
 	@RequestMapping(value = "/getProvisionDetailById", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> getProvisionDetailById(
 			@RequestBody ApiRequest<ProvisionRequest> request) {
 
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
-		String errorInternal = "";
 		String timestamp = "";
-
-		
 
 		try {
 			ProvisionDetailTrazaDto provisions = provisionService.getProvisionDetailById(request.getBody());
 
 			if (provisions != null) {
-
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), status.getReasonPhrase(),
@@ -315,7 +311,8 @@ public class ProvisionController {
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), ex.getMessage().toString(), null);
+					Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), ex.getMessage().toString(),
+					null);
 
 			timestamp = getTimestamp();
 			apiResponse.getHeader().setTimestamp(timestamp);
@@ -329,7 +326,7 @@ public class ProvisionController {
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
-	
+
 	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<ProvisionDto>>> getOrders(
 			@RequestBody ApiRequest<ProvisionRequest> request) {
@@ -1210,26 +1207,23 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> requestAddressUpdate(
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> requestAddressUpdate(
 			@RequestBody ApiRequest<AddressUpdateRequest> request) {
 		System.out.println("CORS NO FUNCTION");
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
 		String timestamp;
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 		try {
 
-			Provision result = provisionService.requestAddressUpdate(request.getBody().getProvisionId());
+			ProvisionDetailTrazaDto result = provisionService.requestAddressUpdate(request.getBody().getProvisionId());
 
 			if (result != null) {
 
-				List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
-				apiResponse.setBody(provisions);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody(result);
 
 				timestamp = getTimestamp();
 
@@ -1243,8 +1237,8 @@ public class ProvisionController {
 			} else {
 				status = HttpStatus.OK;
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(null);
 
 				timestamp = getTimestamp();
@@ -1260,7 +1254,7 @@ public class ProvisionController {
 		} catch (Exception ex) {
 
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 
 			timestamp = getTimestamp();

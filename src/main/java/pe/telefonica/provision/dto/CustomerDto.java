@@ -1,10 +1,13 @@
 package pe.telefonica.provision.dto;
 
 import java.io.Serializable;
+
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import pe.telefonica.provision.model.Customer;
+
 public class CustomerDto implements Serializable {
-	
+
 	private static final long serialVersionUID = -8640547575248724968L;
 
 	@Field("document_type")
@@ -39,22 +42,6 @@ public class CustomerDto implements Serializable {
 
 	@Field("reference")
 	private String reference;
-
-	@Field("product_name")
-	private String productName;
-
-	@Field("contact_carrier")
-	private String contactCarrier;
-	
-	@Field("contact_name")
-	private String contactName;
-	
-	@Field("contact_phone_number")
-	private String contactPhoneNumber;
-	
-	private Boolean hasProvisions;
-	
-	private Boolean hasFaults;
 
 	public String getDocumentType() {
 		return documentType;
@@ -98,30 +85,6 @@ public class CustomerDto implements Serializable {
 
 	public String getReference() {
 		return reference;
-	}
-
-	public String getProductName() {
-		return productName;
-	}
-
-	public String getContactCarrier() {
-		return contactCarrier;
-	}
-
-	public String getContactName() {
-		return contactName;
-	}
-
-	public String getContactPhoneNumber() {
-		return contactPhoneNumber;
-	}
-
-	public Boolean getHasProvisions() {
-		return hasProvisions;
-	}
-
-	public Boolean getHasFaults() {
-		return hasFaults;
 	}
 
 	public void setDocumentType(String documentType) {
@@ -168,28 +131,18 @@ public class CustomerDto implements Serializable {
 		this.reference = reference;
 	}
 
-	public void setProductName(String productName) {
-		this.productName = productName;
+	public CustomerDto fromCustomer(Customer customer) {
+		this.documentType = customer.getDocumentType();
+		this.documentNumber = customer.getDocumentNumber();
+		this.name = customer.getName();
+		this.carrier = customer.getCarrier();
+		this.mail = customer.getMail();
+		this.phoneNumber = customer.getPhoneNumber();
+		this.district = customer.getDistrict();
+		this.province = customer.getProvince();
+		this.department = customer.getDepartment();
+		this.address = customer.getAddress();
+		this.reference = customer.getReference();
+		return this;
 	}
-
-	public void setContactCarrier(String contactCarrier) {
-		this.contactCarrier = contactCarrier;
-	}
-
-	public void setContactName(String contactName) {
-		this.contactName = contactName;
-	}
-
-	public void setContactPhoneNumber(String contactPhoneNumber) {
-		this.contactPhoneNumber = contactPhoneNumber;
-	}
-
-	public void setHasProvisions(Boolean hasProvisions) {
-		this.hasProvisions = hasProvisions;
-	}
-
-	public void setHasFaults(Boolean hasFaults) {
-		this.hasFaults = hasFaults;
-	}
-		
 }

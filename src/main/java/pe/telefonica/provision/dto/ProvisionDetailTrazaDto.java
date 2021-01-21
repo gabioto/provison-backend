@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import pe.telefonica.provision.model.Contacts;
+import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.rating.Rating;
 
@@ -288,4 +289,31 @@ public class ProvisionDetailTrazaDto implements Serializable {
 		this.xaRequest = xaRequest;
 	}
 
+	public ProvisionDetailTrazaDto fromProvision(Provision provision) {
+		this.idProvision = provision.getIdProvision();
+		this.actionNotDone = provision.getActionNotDone();
+		this.activeStatus = provision.getActiveStatus();
+		this.activityType = provision.getActivityType();
+		this.components.addAll(provision.getComponents());
+		this.contacts.addAll(provision.getContacts());
+		this.customer = new CustomerDto().fromCustomer(provision.getCustomer());
+		this.dummyStPsiCode = provision.getDummyStPsiCode();
+		this.frontSpeech = provision.getFrontSpeech();
+		this.genericSpeech = provision.getGenericSpeech();
+		this.isUpFront = provision.getIsUpFront();
+		this.isUpdatedummyStPsiCode = provision.getIsUpdatedummyStPsiCode();
+		this.productName = provision.getProductName();
+		this.productType = provision.getProductType();
+		this.rating.addAll(provision.getRating());
+		this.registerDate = provision.getRegisterDate();
+		this.saleCode = provision.getSaleCode();
+		this.showLocation = provision.getShowLocation();
+		this.subReasonNotDone = provision.getSubReasonNotDone();
+		this.upFront = provision.getUpFront();
+		this.woPreStart = new WoPreStartDto().fromWoPrestart(provision.getWoPreStart());
+		this.workZone = provision.getWorkZone();
+		this.xaIdSt = provision.getXaIdSt();
+		this.xaRequest = provision.getXaRequest();
+		return this;
+	}
 }

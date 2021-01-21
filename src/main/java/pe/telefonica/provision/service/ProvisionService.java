@@ -48,7 +48,7 @@ public interface ProvisionService {
 
 	public Provision setProvisionIsValidated(String provisionId);
 
-	public Provision requestAddressUpdate(String provisionId);
+	public ProvisionDetailTrazaDto requestAddressUpdate(String provisionId);
 
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);

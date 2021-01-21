@@ -936,7 +936,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision requestAddressUpdate(String provisionId) {
+	public ProvisionDetailTrazaDto requestAddressUpdate(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
@@ -951,7 +951,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (updated) {
 				boolean sent = bOApi.sendRequestToBO(provision, "3");
 				// boolean sent = sendAddressChangeRequest(provision);
-				return sent ? provision : null;
+				return sent ? new ProvisionDetailTrazaDto().fromProvision(provision) : null;
 			} else {
 				return null;
 			}
@@ -2730,5 +2730,4 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return lScheduleDate.compareTo(today) > 0;
 	}
-
 }

@@ -1347,28 +1347,24 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> orderCancellation(
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> orderCancellation(
 			@RequestBody ApiRequest<CancelOrderRequest> request) {
 		log.info(this.getClass().getName() + " - " + "orderCancellation");
 
 		String timestamp;
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 
 		try {
-			Provision result = provisionService.orderCancellation(request.getBody().getProvisionId(),
+			ProvisionDetailTrazaDto result = provisionService.orderCancellation(request.getBody().getProvisionId(),
 					request.getBody().getCause(), request.getBody().getDetail());
 
 			if (result != null) {
-
-				List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
-				apiResponse.setBody(provisions);
+				apiResponse.setBody(result);
 
 				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
@@ -1381,7 +1377,7 @@ public class ProvisionController {
 			} else {
 
 				status = HttpStatus.BAD_REQUEST;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
 
@@ -1415,7 +1411,7 @@ public class ProvisionController {
 					status = HttpStatus.CONFLICT;
 				}
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorCode[1], ((FunctionalErrorException) ex).getMessage(),
 						null);
 
@@ -1432,7 +1428,7 @@ public class ProvisionController {
 				System.out.println(ex.getMessage());
 
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
 

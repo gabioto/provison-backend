@@ -7,11 +7,11 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
@@ -40,7 +40,6 @@ import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
-import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -63,6 +62,7 @@ import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.ReturnedProvision;
+import pe.telefonica.provision.model.StatusAtis;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.provision.Configurada;
@@ -75,7 +75,6 @@ import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoNotdone;
 import pe.telefonica.provision.model.provision.WoPreStart;
-import pe.telefonica.provision.model.provision.WoReshedule;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
@@ -631,20 +630,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public boolean insertProvision(InsertOrderRequest request) {
+	public boolean insertProvision(String message) {
 
-		String getData[] = request.getData().split("\\|");
+		String speech = "";
+		String getData[];
 		Provision provisionx = null;
-		if (request.getDataOrigin().equalsIgnoreCase("ATIS")) {
-			provisionx = provisionRepository.getProvisionByXaRequest(getData[1]);
-		} else {
-			provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
+		InsertOrderRequest request = formatProvision(message);
+
+		if (request == null) {
+			return false;
 		}
+
+		getData = request.getData().split("\\|");
+		provisionx = request.getDataOrigin().equalsIgnoreCase("ATIS")
+				? provisionRepository.getProvisionByXaRequest(getData[1])
+				: provisionRepository.getProvisionBySaleCode(getData[2]);
 
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
 		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
-		String speech = "";
 
 		if (provisionx != null) {
 
@@ -917,6 +921,62 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionRepository.insertProvision(provision);
 			return true;
 		}
+	}
+
+	private InsertOrderRequest formatProvision(String message) {
+		String separador = Pattern.quote(Constants.BARRA_VERTICAL);
+		String[] parts = message.split(separador);
+
+		if ((parts[0] == null ? "" : parts[0]).equalsIgnoreCase(Constants.STATUS_FIJA_PARKOUR)
+				|| (parts[0] == null ? "" : parts[0]).equalsIgnoreCase(Constants.STATUS_ATIS)) {
+
+			String estado = parts[16] == null ? "" : parts[16];
+			String dataOrigin = parts[0] == null ? "" : parts[0];
+
+			if (dataOrigin.equalsIgnoreCase("ATIS")) {
+				dataOrigin = "ATIS";
+				estado = parts[3];
+			} else {
+				dataOrigin = parts[2].substring(0, 2);
+				dataOrigin = dataOrigin.startsWith("MT") ? "MT" : "VF";
+			}
+
+			try {
+				if (estado != null) {
+					estado = estado.trim();
+					if (estado.trim().equalsIgnoreCase(Constants.STATUS_PENDIENTE)
+							|| estado.trim().equalsIgnoreCase(Constants.STATUS_INGRESADO)
+							|| estado.trim().equalsIgnoreCase(Constants.STATUS_CAIDA)
+							|| estado.trim().equalsIgnoreCase(Constants.STATUS_PENDIENTE_PAGO)
+							|| estado.trim().equalsIgnoreCase(Constants.STATUS_PAGADO)) {
+
+						return new InsertOrderRequest(message, estado, dataOrigin);
+
+					} else if (estado.equalsIgnoreCase(StatusAtis.FINALIZADO.getStatusNameAtis())
+							|| estado.equalsIgnoreCase(StatusAtis.TERMINADA.getStatusNameAtis())
+							|| estado.equalsIgnoreCase(StatusAtis.CANCELADA_ATIS.getStatusNameAtis())
+							|| estado.equalsIgnoreCase(StatusAtis.PENDIENTE_DE_VALIDACION.getStatusNameAtis())
+							|| estado.equalsIgnoreCase(StatusAtis.CONFIGURADA.getStatusNameAtis())
+							|| estado.equalsIgnoreCase(StatusAtis.PENDIENTE_DE_APROBACION.getStatusNameAtis())) {
+
+						for (StatusAtis item : StatusAtis.values()) {
+
+							if (item.getStatusNameAtis().equalsIgnoreCase(estado)) {
+								estado = item.getStatusNameTraza();
+							}
+						}
+
+						return new InsertOrderRequest(message, estado, dataOrigin);
+					}
+				}
+			} catch (Exception e) {
+				log.error("Exception => " + e.getMessage());
+			}
+		} else {
+			log.error("Message => " + message);
+		}
+
+		return null;
 	}
 
 	@Override

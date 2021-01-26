@@ -1,35 +1,15 @@
 package pe.telefonica.provision.controller.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
 public class InsertOrderRequest {
 
 	private String data;
 	private String dataOrigin;
 	private String status;
-
-	public String getData() {
-		return data;
-	}
-
-	public void setData(String data) {
-		this.data = data;
-	}
-
-	
-
-	public String getDataOrigin() {
-		return dataOrigin;
-	}
-
-	public void setDataOrigin(String dataOrigin) {
-		this.dataOrigin = dataOrigin;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
 }

@@ -1,28 +1,18 @@
 package pe.telefonica.provision.controller;
 
-import javax.validation.Valid;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
-import pe.telefonica.provision.controller.request.order.OrderRequest;
 import pe.telefonica.provision.service.NotifyOrderService;
-import pe.telefonica.provision.service.OrderService;
 import pe.telefonica.provision.service.RetreiveOrderService;
 
 @RestController
@@ -33,10 +23,10 @@ import pe.telefonica.provision.service.RetreiveOrderService;
 
 public class OrderController {
 
-	private static final Log log = LogFactory.getLog(OrderController.class);
+//	private static final Log log = LogFactory.getLog(OrderController.class);
 
-	@Autowired
-	private OrderService orderService;
+//	@Autowired
+//	private OrderService orderService;
 
 	@Autowired
 	private RetreiveOrderService retrieveOrderService;
@@ -45,12 +35,12 @@ public class OrderController {
 	private NotifyOrderService notifyOrderService;
 
 	// Creación de ordenes
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<Object> createOrder(@Valid @RequestBody OrderRequest request) throws Exception {
-		log.info(new Gson().toJson(request));
-		return orderService.createOrder(request);
-	}
+//	@PostMapping
+//	@ResponseStatus(HttpStatus.CREATED)
+//	public ResponseEntity<Object> createOrder(@Valid @RequestBody OrderRequest request) throws Exception {
+//		log.info(new Gson().toJson(request));
+//		return orderService.createOrder(request);
+//	}
 
 	@GetMapping("/getProvision")
 	@ResponseStatus(HttpStatus.OK)

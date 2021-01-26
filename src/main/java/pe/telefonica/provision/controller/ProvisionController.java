@@ -55,6 +55,7 @@ import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.ProvisionScheduler;
+import pe.telefonica.provision.service.OrderService;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
@@ -71,17 +72,13 @@ public class ProvisionController {
 	private static final Log log = LogFactory.getLog(ProvisionController.class);
 
 	@Autowired
-	ProvisionService contactService;
+	private ProvisionService provisionService;
 
 	@Autowired
-	TrazabilidadSecurityApi restSecuritySaveLogData;
-
-	private final ProvisionService provisionService;
+	private OrderService orderService;
 
 	@Autowired
-	public ProvisionController(ProvisionService provisionService) {
-		this.provisionService = provisionService;
-	}
+	private TrazabilidadSecurityApi restSecuritySaveLogData;
 
 	@RequestMapping(value = "/getCustomerByDocument", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Customer>> getCustomerByDocument(
@@ -494,8 +491,7 @@ public class ProvisionController {
 		HttpStatus status;
 
 		try {
-
-			Boolean provisions = provisionService.insertProvision(request.getBody());
+			boolean provisions = processMessage(request.getBody().getData());
 
 			if (provisions) {
 				status = HttpStatus.OK;
@@ -517,6 +513,15 @@ public class ProvisionController {
 
 		}
 		return ResponseEntity.status(status).body(apiResponse);
+	}
+
+	private boolean processMessage(String message) {
+
+		// Insertar en colección de Ordenes
+		orderService.createOrder(message);
+
+		// Insertar en colección de Provisión
+		return provisionService.insertProvision(message);
 	}
 
 	@RequestMapping(value = "/updateOrderFromTOA", method = RequestMethod.POST)

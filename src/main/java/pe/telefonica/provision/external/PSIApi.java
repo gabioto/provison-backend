@@ -319,7 +319,6 @@ public class PSIApi extends ConfigRestTemplate {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getCustomerUrl() + api.getSearchCustomer();
-		log.info("getCarrier - URL: " + requestUrl);
 
 		String input = "";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));

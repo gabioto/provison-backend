@@ -72,7 +72,7 @@ public class SimpliConnectApi {
 			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT_AZURE", "getUrl", new Gson().toJson(requestEntity.getBody()),
-					result.getBody().replace("\\r\\n", ""), url, startHour, endHour, result.getStatusCodeValue());
+					result.getBody().replace("\r\n", ""), url, startHour, endHour, result.getStatusCodeValue());
 			
 			if (result.getStatusCode().equals(HttpStatus.OK)) {
 				JsonObject jsonObject = new JsonParser().parse(result.getBody().toString()).getAsJsonObject();

@@ -8,7 +8,7 @@ applications:
     buildpack: liberty-for-java
     health-check-type: process
     disk_quota: 2GB
-    instances: 3
+    instances: 4
     env:
       TDP_MESSAGE_PROVISION_ENABLE: true
       TDP_MESSAGE_FAULT_ENABLE: true  

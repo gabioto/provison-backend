@@ -56,7 +56,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
 		String formattedDateTime01 = dateStart.format(formatter);
-		System.out.println("formattedDateTime01: " + formattedDateTime01);
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
@@ -76,8 +75,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime01 = dateStart.format(formatter);
-		System.out.println("formattedDateTime01: " + formattedDateTime01);
+		String formattedDateTime01 = dateStart.format(formatter);		
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
@@ -115,8 +113,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime = dateStart.format(formatter);
-		System.out.println("formattedDateTime: " + formattedDateTime);
+		String formattedDateTime = dateStart.format(formatter);		
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
@@ -174,7 +171,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 							Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 					Provision.class);
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 		}
 
 		Optional<Provision> optionalSchedule = Optional.ofNullable(provision);
@@ -184,7 +181,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public boolean updateProvision(Provision provision, Update update) {
-
 		UpdateResult result = this.mongoOperations.updateFirst(
 				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
 				Provision.class);
@@ -198,7 +194,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		try {
 			queue = this.mongoOperations.findOne(new Query(Criteria.where("idContingencia").is("1")), Queue.class);
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 		}
 
 		Optional<Queue> optionalQueue = Optional.ofNullable(queue);
@@ -208,7 +204,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-
 		Query query = new Query(Criteria.where("productName").ne(null).and("xa_request").ne(null).and("xa_id_st")
 				.ne(null).andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
 						Criteria.where("notifications.into_send_date").lte(endDate)));
@@ -299,7 +294,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			Provision provision = provisions.get(0);
 			return provision;
 		}
-
 		return null;
 	}
 
@@ -357,8 +351,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		Criteria criteria = new Criteria();
 		criteria.orOperator(
-
-				// Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
 				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status")
 						.is(Status.PAGADO.getStatusName()),
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status")
@@ -391,11 +383,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public void updateFlagDateNotify(List<Provision> listProvision) {
-		log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
-
+		
 		for (int i = 0; i < listProvision.size(); i++) {
-
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.caida_send_notify", true);
 				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
@@ -529,7 +519,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public void updateUpFrontProvisionRead(List<Provision> provisions) {
-		log.info("ProvisionRepositoryImpl.updateUpFrontProvisionRead()");
 		Update update = new Update();
 		update.set("up_front_read", true);
 

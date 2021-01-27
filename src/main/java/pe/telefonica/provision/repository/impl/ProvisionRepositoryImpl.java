@@ -109,14 +109,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
-
-		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		//String formattedDateTime = dateStart.format(formatter);
-		//System.out.println("formattedDateTime: " + formattedDateTime);
-
+		
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
@@ -173,7 +169,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 							Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS))),
 					Provision.class);
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 		}
 
 		Optional<Provision> optionalSchedule = Optional.ofNullable(provision);
@@ -183,8 +179,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public boolean updateProvision(Provision provision, Update update) {
-		// BasicQuery query = new BasicQuery("");
-
 		UpdateResult result = this.mongoOperations.updateFirst(
 				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
 				Provision.class);
@@ -198,7 +192,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		try {
 			queue = this.mongoOperations.findOne(new Query(Criteria.where("idContingencia").is("1")), Queue.class);
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 		}
 
 		Optional<Queue> optionalQueue = Optional.ofNullable(queue);
@@ -208,32 +202,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
-		/*
-		 * Query query = new Query(Criteria.where("productName").ne(null)
-		 * .andOperator(Criteria.where("updatedDate").gte(startDate),
-		 * Criteria.where("updatedDate").lt(endDate))); List<Provision> provisions =
-		 * this.mongoOperations.find(query, Provision.class);
-		 */
-
 		Query query = new Query(Criteria.where("productName").ne(null).and("xa_request").ne(null).and("xa_id_st")
 				.ne(null).andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
 						Criteria.where("notifications.into_send_date").lte(endDate)));
-
-		/*
-		 * query.fields().include("xa_request"); query.fields().include("sale_code");
-		 * query.fields().include("commercial_op");
-		 * query.fields().include("customer.province");
-		 * query.fields().include("customer.department");
-		 * query.fields().include("customer.district");
-		 * query.fields().include("customer.document_type");
-		 * query.fields().include("customer.document_number");
-		 * query.fields().include("customer.phone_number");
-		 * query.fields().include("product_name");
-		 * query.fields().include("notifications.into_send_Date");
-		 * query.fields().include("register_date");
-		 * query.fields().include("origin_code");
-		 * query.fields().include("last_tracking_status");
-		 */
 
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 		
@@ -321,10 +292,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			Provision provision = provisions.get(0);
 			return provision;
 		}
-		// Provision provision = this.mongoOperations.findOne(new
-		// Query(Criteria.where("xaRequest").is(request.getOrdercode()).with( new
-		// Sort.Direction.DESC, "sortField"))), Provision.class);
-
 		return null;
 	}
 
@@ -380,21 +347,8 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		status.add(Status.WO_NOTDONE.getStatusName());
 		status.add(Status.PAGADO.getStatusName());
 
-		/*
-		 * Query query = new Query(
-		 * Criteria.where("send_notify").is(false).and("last_tracking_status").in(status
-		 * ).and("customer").ne(null)) .limit(5);
-		 */
-
-//		Query query_old = new Query(Criteria.where("notifications.caida_send_notify").is(false)
-//				.and("notifications.pagado_send_notify").is(false).and("notifications.into_send_notify").is(false)
-//				.and("notifications.notdone_send_notify").is(false).and("last_tracking_status").in(status)
-//				.and("customer").ne(null)).limit(5);
-
 		Criteria criteria = new Criteria();
 		criteria.orOperator(
-
-				// Criteria.where("notifications.caida_send_notify").is(false).and("last_tracking_status").is(Status.CAIDA.getStatusName()),
 				Criteria.where("notifications.pagado_send_notify").is(false).and("last_tracking_status")
 						.is(Status.PAGADO.getStatusName()),
 				Criteria.where("notifications.into_send_notify").is(false).and("last_tracking_status")
@@ -427,11 +381,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public void updateFlagDateNotify(List<Provision> listProvision) {
-		//log.info("ProvisionRepositoryImpl.updateFlagDateNotify()");
 		Update update = new Update();
 		
 		for (int i = 0; i < listProvision.size(); i++) {
-
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.caida_send_notify", true);
 				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
@@ -494,7 +446,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				}
 			}
 			
-
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
 					update, Provision.class);
@@ -566,7 +517,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public void updateUpFrontProvisionRead(List<Provision> provisions) {
-		//log.info("ProvisionRepositoryImpl.updateUpFrontProvisionRead()");
 		Update update = new Update();
 		update.set("up_front_read", true);
 

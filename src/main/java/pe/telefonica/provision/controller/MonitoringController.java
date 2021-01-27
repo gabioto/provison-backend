@@ -47,7 +47,7 @@ public class MonitoringController {
 			apiResponse.setBody(response);
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<GetProvisionByStatusResponse>(Constants.APP_NAME_PROVISION,

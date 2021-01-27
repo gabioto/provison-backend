@@ -46,7 +46,7 @@ public class RatingController {
 			apiResponse.setBody(provison);
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_INSERT_RATING,

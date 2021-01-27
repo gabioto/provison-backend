@@ -68,7 +68,8 @@ public class OrderServiceImpl implements OrderService {
 			status = HttpStatus.OK;
 
 		} catch (Exception e) {
-			log.error(e.getLocalizedMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			success = false;
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}

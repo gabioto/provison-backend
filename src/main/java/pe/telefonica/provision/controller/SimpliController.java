@@ -286,7 +286,7 @@ public class SimpliController {
 						.body(json);
 			}
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			

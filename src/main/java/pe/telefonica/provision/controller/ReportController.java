@@ -49,7 +49,7 @@ public class ReportController {
 				apiResponse.setBody(provisions);			
 			
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
@@ -75,7 +75,7 @@ public class ReportController {
 			
 			
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			//apiResponse = new ApiResponse<Long>(Constants.APP_NAME_PROVISION,
@@ -107,7 +107,7 @@ public class ReportController {
 				apiResponse.setBody(null);
 			}			
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			

@@ -135,6 +135,8 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 			}
 
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			return setInternalError(e.getLocalizedMessage());
 		}
 	}
@@ -224,8 +226,6 @@ public class RetrieveOrderServiceImpl implements RetreiveOrderService {
 
 		HttpStatus status;
 		Object response;
-
-		//log.info("Orders - " + (order != null ? order.toString() : "null"));
 
 		if (order != null) {
 			status = HttpStatus.OK;

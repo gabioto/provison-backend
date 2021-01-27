@@ -41,8 +41,7 @@ public class TrazabilidadScheduleApi {
 	@Autowired
 	private ExternalApi api;
 
-	public boolean cancelLocalSchedule(ScheduleNotDoneRequest scheduleNotDoneRequest) {
-		//log.info("updateSchedule");
+	public boolean cancelLocalSchedule(ScheduleNotDoneRequest scheduleNotDoneRequest) {		
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getCancelLocalSchedule();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -61,13 +60,11 @@ public class TrazabilidadScheduleApi {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
 			
-			//log.info("responseEntity: " + responseEntity.getBody());
-
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
-			log.error("Exception = " + ex.getMessage());
-			log.error("Exception = " + ex.getResponseBodyAsString());
-			if(ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
+			if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
 				throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode().value() +"_"+ "401" ));
 			} else {
 				
@@ -77,17 +74,15 @@ public class TrazabilidadScheduleApi {
 				String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
 				
 				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
-				
-			}
-			
+			}			
 		} catch (Exception ex) {
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
 	
-	public boolean updateSchedule(ScheduleRequest scheduleRequest) {
-		//log.info("updateSchedule");
+	public boolean updateSchedule(ScheduleRequest scheduleRequest) {	
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getUpdateScheduleDate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -106,33 +101,28 @@ public class TrazabilidadScheduleApi {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
 			
-			//log.info("responseEntity: " + responseEntity.getBody());
-
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
-			log.error("Exception = " + ex.getMessage());
-			log.error("Exception = " + ex.getResponseBodyAsString());
-			if(ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
+			if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
 				throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode().value() +"_"+ "401" ));
-			} else {
-				
+			} else {			
 				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
 				
 				String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
 				String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
 				
-				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
-				
-			}
-			
+				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));				
+			}			
 		} catch (Exception ex) {
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
 	
 	public boolean updateCancelSchedule(CancelRequest cancelRequest) {
-		//log.info("updateCancelSchedule");
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getUpdateSchedule();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -153,12 +143,10 @@ public class TrazabilidadScheduleApi {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
 
-			//log.info("responseEntity: " + responseEntity.getBody());
-
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
-			log.error("Exception = " + ex.getMessage());
-			log.error("Exception = " + ex.getResponseBodyAsString());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
 				throw new FunctionalErrorException(ex.getMessage(), ex,
 						String.valueOf(ex.getStatusCode().value() + "_" + "401"));
@@ -170,16 +158,15 @@ public class TrazabilidadScheduleApi {
 
 				throw new FunctionalErrorException(message, ex,
 						String.valueOf(ex.getStatusCode().value() + "_" + errorCode));
-
 			}
 		} catch (Exception ex) {
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
 
-	public boolean updateFicticious(ScheduleUpdateFicticiousRequest request) {
-		//log.info("updateCancelSchedule");
+	public boolean updateFicticious(ScheduleUpdateFicticiousRequest request) {		
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getScheduleUpdateFicticious();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -201,23 +188,19 @@ public class TrazabilidadScheduleApi {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
 
-			//log.info("responseEntity: " + responseEntity.getBody());
-
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
-			log.error("Exception = " + ex.getMessage());
-			log.error("Exception = " + ex.getResponseBodyAsString());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 
 			return false;
 		} catch (Exception ex) {
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			return false;
 		}
 	}
 
 	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode, String requestType, Customer customer) {
-
-		//log.info("updatePSICodeReal");
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getScheduleUpdatePSICodeReal();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -247,28 +230,19 @@ public class TrazabilidadScheduleApi {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
 
-			//log.info("responseEntity: " + responseEntity.getBody());
-
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
-			log.error("Exception = " + ex.getMessage());
-			log.error("Exception = " + ex.getResponseBodyAsString());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 
 			return false;
-
 		} catch (Exception ex) {
-
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			return false;
 		}
-
 	}
 	
-	
 	public String getTechAvailable(GetTechnicianAvailableRequest request) {
-		//log.info("updateCancelSchedule");
-		
-		
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getScheduleGetTechAvailable();
 		
@@ -291,8 +265,7 @@ public class TrazabilidadScheduleApi {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
 
-			//log.info("responseEntity: " + responseEntity.getBody());
-			if(responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
 				String driverUserName = jsonObject.get("body").getAsJsonObject().get("driverUsername").toString().replaceAll("\"",
 						"");
@@ -301,12 +274,12 @@ public class TrazabilidadScheduleApi {
 			}
 			return null;
 		} catch (HttpClientErrorException ex) {
-			log.error("Exception = " + ex.getMessage());
-			log.error("Exception = " + ex.getResponseBodyAsString());
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			return null;
 		} catch (Exception ex) {
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			return null;
 		}
 	}

@@ -122,7 +122,7 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			timestamp = getTimestamp();
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -244,7 +244,7 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
@@ -362,7 +362,7 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
@@ -446,7 +446,7 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
@@ -479,7 +479,7 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_INSERT_PROVISION,
@@ -516,7 +516,7 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
@@ -550,7 +550,7 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
@@ -636,7 +636,7 @@ public class ProvisionController {
 				 */
 			}
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_DATA,
@@ -940,7 +940,7 @@ public class ProvisionController {
 			}
 
 		} catch (BadRequest ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.BAD_REQUEST;
 
@@ -956,7 +956,7 @@ public class ProvisionController {
 					request.getHeader().getAppName());
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			if (ex instanceof FunctionalErrorException) {
 
@@ -1245,7 +1245,7 @@ public class ProvisionController {
 			}
 
 		} catch (BadRequest ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.BAD_REQUEST;
 
@@ -1262,7 +1262,7 @@ public class ProvisionController {
 		}
 
 		catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			if (ex instanceof FunctionalErrorException) {
 
@@ -1366,7 +1366,7 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
@@ -1436,7 +1436,7 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Object>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESSBO,
@@ -1508,7 +1508,7 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			if (ex instanceof FunctionalErrorException) {
 
@@ -1577,7 +1577,7 @@ public class ProvisionController {
 			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), scheduledDate,
 					request.getScheduleRange(), request.getScheduleType());
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ProvisionResponse<Boolean>().setData(null);
@@ -1612,7 +1612,7 @@ public class ProvisionController {
 					Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), status.getReasonPhrase(),
 					response);
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
@@ -1696,7 +1696,7 @@ public class ProvisionController {
 					request.getHeader().getAppName());
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
@@ -1874,7 +1874,7 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-			log.error("Exception: "+ ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,

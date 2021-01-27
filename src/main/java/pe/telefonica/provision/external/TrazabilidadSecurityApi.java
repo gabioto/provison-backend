@@ -84,20 +84,16 @@ public class TrazabilidadSecurityApi {
 		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logDataRequest, headersMap);
 
 		try {
-//			ResponseEntity<String> responseEntity = 
 			restTemplate.postForEntity(saveLogDataUrl, entity, String.class);
 
 		} catch (Exception ex) {
-			log.error(ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 		}
-
 	}
 	
 	@Async
 	public void thirdLogEvent(String third, String operation, String request, String response, String serviceUrl,
 			LocalDateTime startHour, LocalDateTime endHour, int status) {
-		//log.info(this.getClass().getName() + " - " + "logEvent");
-
 		String url = api.getSecurityUrl() + api.getSaveThirdLogData();
 
 		HttpHeaders headers = new HttpHeaders();
@@ -122,15 +118,9 @@ public class TrazabilidadSecurityApi {
 		HttpEntity<LogDataRequest> entity = new HttpEntity<LogDataRequest>(logRequest, headers);
 
 		try {
-			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
-
-//			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-//				log.info(this.getClass().getName() + " - " + "logEvent - OK");
-//			} else {
-//				log.info(this.getClass().getName() + " - " + "logEvent - ERR");
-//			}
+			restTemplate.postForEntity(url, entity, String.class);
 		} catch (Exception e) {
-			log.error(this.getClass().getName() + " - " + "logEvent - EXCEPTION : " + e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 		}
 	}
 
@@ -164,10 +154,9 @@ public class TrazabilidadSecurityApi {
 				return false;
 			}
 		} catch (Exception ex) {
-			log.error(ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 		}
 		return false;
-
 	}
 	
 	@Async
@@ -192,25 +181,6 @@ public class TrazabilidadSecurityApi {
 		message.setWebURL(webURL);
 		message.setWebContactURL(webContactURL);
 
-		// List<Contact> contacts = new ArrayList<>();
-
-		/*
-		 * Contact contactCustomer = new Contact();
-		 * contactCustomer.setPhoneNumber(customer.getPhoneNumber().toString()); //
-		 * TODO: Cambiar integer a string
-		 * contactCustomer.setIsMovistar(Boolean.valueOf(customer.getCarrier()));
-		 */
-
-		/*
-		 * if (customer.getContactPhoneNumber() != null) { Contact contactContact = new
-		 * Contact();
-		 * contactContact.setPhoneNumber(customer.getContactPhoneNumber().toString());
-		 * contactContact.setIsMovistar(Boolean.valueOf(customer.getContactCarrier()));
-		 * contacts.add(contactContact); }
-		 */
-
-		// contacts.add(contactCustomer);
-
 		smsByIdRequest.setContacts(contacts.toArray(new Contact[0]));
 		smsByIdRequest.setMessage(message);
 
@@ -223,26 +193,18 @@ public class TrazabilidadSecurityApi {
 		};
 
 		try {
-
 			ResponseEntity<ApiResponse<SMSByIdResponse>> responseEntity = restTemplate.exchange(url, HttpMethod.POST,
 					entity, parameterizedTypeReference);
 
 			return responseEntity.getBody();
-
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			return null;
 		}
-
 	}
 	
 	public String gerateToken() {
-
-		//log.info(this.getClass().getName() + " - " + "gerateToken");
-		// RestTemplate restTemplate = new
-		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		// restTemplate.getMessageConverters().add(new
-		// MappingJackson2HttpMessageConverter());
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -275,24 +237,17 @@ public class TrazabilidadSecurityApi {
 				return null;
 			}
 		} catch (HttpClientErrorException e) {
-			log.error("HttpClientErrorException = " + e.getMessage());
-			log.error("HttpClientErrorException = " + e.getResponseBodyAsString());
-			return null;
-		
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
+			return null;		
 		} catch (Exception ex) {
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			return null;
 		}
-
 	}
 	
 	public String gerateTokenAzure() {
-
-		//log.info(this.getClass().getName() + " - " + "gerateToken");
-		// RestTemplate restTemplate = new
-		// RestTemplate(SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
-		// restTemplate.getMessageConverters().add(new
-		// MappingJackson2HttpMessageConverter());
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -323,15 +278,14 @@ public class TrazabilidadSecurityApi {
 				return null;
 			}
 		} catch (HttpClientErrorException e) {
-			log.error("HttpClientErrorException = " + e.getMessage());
-			log.error("HttpClientErrorException = " + e.getResponseBodyAsString());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			return null;
-		
 		} catch (Exception ex) {
-			log.error("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			return null;
 		}
-
 	}
 
 }

@@ -71,7 +71,7 @@ public class SimpliConnectApi {
 			ResponseEntity<String> result = restTemplate.postForEntity(url, requestEntity, String.class);
 			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("SIMPLI_APICONNECT_AZURE", "getUrl", new Gson().toJson(requestEntity.getBody()),
+			loggerApi.thirdLogEvent("SIMPLI_APICONNECT_AZURE", "getUrlTraking", new Gson().toJson(requestEntity.getBody()),
 					result.getBody().replace("\r\n", ""), url, startHour, endHour, result.getStatusCodeValue());
 			
 			if (result.getStatusCode().equals(HttpStatus.OK)) {
@@ -85,7 +85,7 @@ public class SimpliConnectApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("SIMPLI_APICONNECT_AZURE", "getUrl", new Gson().toJson(requestConnect),
+			loggerApi.thirdLogEvent("SIMPLI_APICONNECT_AZURE", "getUrlTraking", new Gson().toJson(requestConnect),
 					ex.getLocalizedMessage(), url, startHour, endHour, Integer.parseInt(error));
 			return null;
 		}
@@ -125,7 +125,7 @@ public class SimpliConnectApi {
 			ResponseEntity<String> result = restTemplate.postForEntity(url, requestEntity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity.getBody()),
+			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrlTraking", new Gson().toJson(requestEntity.getBody()),
 					result.getBody(), url, startHour, endHour, result.getStatusCodeValue());
 
 			if (result.getStatusCode().equals(HttpStatus.OK)) {
@@ -139,7 +139,7 @@ public class SimpliConnectApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity.getBody()),
+			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrlTraking", new Gson().toJson(requestEntity.getBody()),
 					ex.getLocalizedMessage(), url, startHour, endHour, Integer.parseInt(error));
 
 			return null;

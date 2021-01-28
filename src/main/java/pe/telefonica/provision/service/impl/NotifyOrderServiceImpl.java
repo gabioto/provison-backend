@@ -3,8 +3,6 @@ package pe.telefonica.provision.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +18,6 @@ import pe.telefonica.provision.service.NotifyOrderService;
 
 @Service
 public class NotifyOrderServiceImpl implements NotifyOrderService {
-
-	private static final Log log = LogFactory.getLog(NotifyOrderServiceImpl.class);
 
 	@Autowired
 	OrderRepository orderRepository;
@@ -73,8 +69,6 @@ public class NotifyOrderServiceImpl implements NotifyOrderService {
 
 		HttpStatus status;
 		Object response;
-
-		log.info("Orders - " + (orders != null ? orders.toString() : "null"));
 
 		if (orders != null && orders.size() > 0) {
 			status = HttpStatus.OK;

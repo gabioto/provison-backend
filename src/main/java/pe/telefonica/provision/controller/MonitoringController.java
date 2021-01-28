@@ -2,6 +2,8 @@ package pe.telefonica.provision.controller;
 
 import javax.validation.Valid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ import pe.telefonica.provision.util.constants.Constants;
 @CrossOrigin(origins = "*")
 @RequestMapping("monitoring")
 public class MonitoringController {
-	// private static final Log log = LogFactory.getLog(MonitoringController.class);
+	private static final Log log = LogFactory.getLog(MonitoringController.class);
 
 	@Autowired
 	MonitoringService monitoringService;
@@ -45,7 +47,8 @@ public class MonitoringController {
 			apiResponse.setBody(response);
 
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<GetProvisionByStatusResponse>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_MONITORING_PROVISION, String.valueOf(status.value()), status.getReasonPhrase(),

@@ -78,8 +78,7 @@ public class PSIApi extends ConfigRestTemplate {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getPsiUrl() + api.getPsiUpdateClient();
-		log.info("updatePSIClient - URL: " + requestUrl);
-
+		
 		PSIUpdateClientRequest request = requestx;
 		request.getHeaderIn().setCountry("PE");
 		request.getHeaderIn().setLang("es");
@@ -98,14 +97,10 @@ public class PSIApi extends ConfigRestTemplate {
 		request.getHeaderIn().setTimestamp(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
 		request.getHeaderIn().setMsgType("REQUEST");
 
-		System.out.println(generateAuthString());
-
 		request.getBodyUpdateClient().getUser().setNow(DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_USER));
 		request.getBodyUpdateClient().getUser().setLogin("appmovistar");
 		request.getBodyUpdateClient().getUser().setCompany("telefonica-pe");
 		request.getBodyUpdateClient().getUser().setAuth_string(generateAuthString());
-
-		log.info("updatePSIClient - request: " + request.toString());
 
 		oAuthToken = getAuthToken(request.getBodyUpdateClient().getNombre_completo());
 
@@ -118,11 +113,8 @@ public class PSIApi extends ConfigRestTemplate {
 		headers.set("Authorization", "Bearer " + oAuthToken);
 		headers.set("X-IBM-Client-Id", api.getApiClient());
 
-		log.info("updatePSIClient - headers: " + headers.toString());
-
 		HttpEntity<PSIUpdateClientRequest> entity = new HttpEntity<PSIUpdateClientRequest>(request, headers);
 
-		System.out.println(entity);
 		try {
 
 			ResponseEntity<PSIUpdateClientResponse> responseEntity = restTemplate.postForEntity(requestUrl, entity,
@@ -133,21 +125,16 @@ public class PSIApi extends ConfigRestTemplate {
 					new Gson().toJson(responseEntity.getBody()).toString(), requestUrl, startHour, endHour,
 					responseEntity.getStatusCodeValue());
 
-			log.info("updatePSIClient - responseEntity.Body: " + responseEntity.getBody().toString());
-
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
-
-			log.info("HttpClientErrorException = " + ex.getMessage());
-			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(entity.getBody()),
-					ex.getResponseBodyAsString(), requestUrl, startHour, endHour, ex.getStatusCode().value());
+					ex.getLocalizedMessage(), requestUrl, startHour, endHour, ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
-			System.out.println(jsonDecode);
-
+			
 			JsonObject appDetail = jsonDecode.getAsJsonObject("BodyOut").getAsJsonObject("ClientException")
 					.getAsJsonObject("appDetail");
 			String message = appDetail.get("exceptionAppMessage").toString();
@@ -156,10 +143,11 @@ public class PSIApi extends ConfigRestTemplate {
 			throw new FunctionalErrorException(message, ex, codeError);
 
 		} catch (Exception ex) {
-			log.info("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(entity.getBody()), ex.getMessage(),
-					requestUrl, startHour, endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
+			loggerApi.thirdLogEvent("PSI", "updatePSIClient", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(),
+					requestUrl, startHour, endHour, Integer.parseInt(error));
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
@@ -188,21 +176,18 @@ public class PSIApi extends ConfigRestTemplate {
 
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				if (toInsert) {
-
 					oAuthTokenRepository.insertToken(responseEntity.getBody().getBody());
 				} else {
 					updated = oAuthTokenRepository.updateToken(responseEntity.getBody());
-
 				}
 			} else {
 				return "";
 			}
 
-			log.info("responseEntity: " + responseEntity.getBody());
-
 			return updated ? ((OAuthToken) responseEntity.getBody().getBody()).getAccessToken() : "";
 		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			return "";
 		}
 	}
@@ -246,71 +231,68 @@ public class PSIApi extends ConfigRestTemplate {
 			}
 			return sb.toString();
 		} catch (java.security.NoSuchAlgorithmException e) {
-			log.error(e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 		}
 		return null;
 	}
-
+	
 	public boolean getCarrier(String phoneNumber) {
 
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getCustomerUrlOnPremise() + api.getSearchCustomerOnPremise();
-		log.info("getCarrier - URL: " + requestUrl);
 
 		String input = "";
 		String oAuthToken;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
+		
+		JsonObject jsonBody = new JsonObject();
+		JsonObject jsonTefHeaderReq = new JsonObject();
+		JsonObject jsonSearchCustomer = new JsonObject();
+		JsonObject jsonCustomerId = new JsonObject();
+		JsonObject jsonTelephoneNumber = new JsonObject();
+		jsonTefHeaderReq.addProperty("userLogin", "10223928");
+		jsonTefHeaderReq.addProperty("serviceChannel", "MS");
+		jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
+		jsonTefHeaderReq.addProperty("application", "COLTRA");
+		jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
+		jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
+		jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
+		jsonTefHeaderReq.addProperty("transactionTimestamp",
+				DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE));
+		jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
+		jsonTefHeaderReq.addProperty("version", "1.0");
 
+		jsonTelephoneNumber.addProperty("number", phoneNumber);
+		jsonCustomerId.add("telephoneNumber", jsonTelephoneNumber);
+		jsonSearchCustomer.add("customerIdentification", jsonCustomerId);
+
+		jsonBody.add("TefHeaderReq", jsonTefHeaderReq);
+		jsonBody.add("SearchCustomerRequestData", jsonSearchCustomer);
+
+		Gson gson = new Gson();
+		input = gson.toJson(jsonBody);
+		oAuthToken = getAuthToken("PARAM_KEY_OAUTH_TOKEN");
+
+		if (oAuthToken.isEmpty()) {
+			return false;
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("X-IBM-Client-Id", api.getCustomerSearchClientOnPremise());
+		headers.set("Authorization", "Bearer " + oAuthToken);
+
+		HttpEntity<String> entity = new HttpEntity<>(input, headers);
+		
 		try {
-			JsonObject jsonBody = new JsonObject();
-			JsonObject jsonTefHeaderReq = new JsonObject();
-			JsonObject jsonSearchCustomer = new JsonObject();
-			JsonObject jsonCustomerId = new JsonObject();
-			JsonObject jsonTelephoneNumber = new JsonObject();
-			jsonTefHeaderReq.addProperty("userLogin", "10223928");
-			jsonTefHeaderReq.addProperty("serviceChannel", "MS");
-			jsonTefHeaderReq.addProperty("sessionCode", "83e478c1-84a4-496d-8497-582657011f80");
-			jsonTefHeaderReq.addProperty("application", "COLTRA");
-			jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
-			jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
-			jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
-			jsonTefHeaderReq.addProperty("transactionTimestamp",
-					DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE));
-			jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
-			jsonTefHeaderReq.addProperty("version", "1.0");
-
-			jsonTelephoneNumber.addProperty("number", phoneNumber);
-			jsonCustomerId.add("telephoneNumber", jsonTelephoneNumber);
-			jsonSearchCustomer.add("customerIdentification", jsonCustomerId);
-
-			jsonBody.add("TefHeaderReq", jsonTefHeaderReq);
-			jsonBody.add("SearchCustomerRequestData", jsonSearchCustomer);
-
-			Gson gson = new Gson();
-			input = gson.toJson(jsonBody);
-			// getAuthToken(request.getBodyUpdateClient().getNombre_completo());
-			oAuthToken = getAuthToken("PARAM_KEY_OAUTH_TOKEN");
-
-			if (oAuthToken.isEmpty()) {
-				return false;
-			}
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.set("X-IBM-Client-Id", api.getCustomerSearchClientOnPremise());
-
-			headers.set("Authorization", "Bearer " + oAuthToken);
-
-			HttpEntity<String> entity = new HttpEntity<>(input, headers);
-
 			ResponseEntity<String> output = restTemplate.postForEntity(requestUrl, entity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrierOnPremise", new Gson().toJson(entity.getBody()),
-					new Gson().toJson(output.getBody()), requestUrl, startHour, endHour, output.getStatusCodeValue());
+			loggerApi.thirdLogEvent("SEARCH_CUSTOMER_ONPREMISE", "getCarrierOnPremise", entity.getBody(),
+					output.getBody(), requestUrl, startHour, endHour, output.getStatusCodeValue());
 
 			JsonElement jsonElement = gson.fromJson(output.getBody(), JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
@@ -322,10 +304,11 @@ public class PSIApi extends ConfigRestTemplate {
 			return jaCustomerResults.size() > 0;
 		} catch (Exception e) {
 			// Se detecta error, por lo tanto se considera otro operador.
-			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());			
+			String message = e.getLocalizedMessage().substring(0, e.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrierOnPremise", input, e.getLocalizedMessage(), requestUrl, startHour,
-					endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
+			loggerApi.thirdLogEvent("SEARCH_CUSTOMER_ONPREMISE", "getCarrierOnPremise", entity.getBody(), e.getLocalizedMessage(), requestUrl, startHour,
+					endHour, Integer.parseInt(message));
 			return false;
 		}
 	}
@@ -336,7 +319,6 @@ public class PSIApi extends ConfigRestTemplate {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = api.getCustomerUrl() + api.getSearchCustomer();
-		log.info("getCarrier - URL: " + requestUrl);
 
 		String input = "";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -354,7 +336,7 @@ public class PSIApi extends ConfigRestTemplate {
 		jsonTefHeaderReq.addProperty("idMessage", "57f33f81-57f3-57f3-57f3-57f33f811e0b");
 		jsonTefHeaderReq.addProperty("ipAddress", "169.54.245.69");
 		jsonTefHeaderReq.addProperty("functionalityCode", "CustomerService");
-		jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_PSI));
+		jsonTefHeaderReq.addProperty("transactionTimestamp", DateUtil.getNowPsi(Constants.TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE));
 		jsonTefHeaderReq.addProperty("serviceName", "searchCustomer");
 		jsonTefHeaderReq.addProperty("version", "1.0");
 
@@ -372,15 +354,15 @@ public class PSIApi extends ConfigRestTemplate {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("X-IBM-Client-Id", api.getCustomerSearchClient());
 		headers.set("X-IBM-Client-Secret", api.getCustomerSearchSecret());
-
+			
 		HttpEntity<String> entity = new HttpEntity<>(input, headers);
 
 		try {
 			ResponseEntity<String> output = restTemplate.postForEntity(requestUrl, entity, String.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", new Gson().toJson(entity.getBody()),
-					new Gson().toJson(output.getBody()), requestUrl, startHour, endHour, output.getStatusCodeValue());
+			loggerApi.thirdLogEvent("SEARCH_CUSTOMER", "getCarrier", entity.getBody(),
+					output.getBody(), requestUrl, startHour, endHour, output.getStatusCodeValue());
 
 			JsonElement jsonElement = gson.fromJson(output.getBody(), JsonElement.class);
 			JsonObject jsonOutput = jsonElement.getAsJsonObject();
@@ -392,17 +374,16 @@ public class PSIApi extends ConfigRestTemplate {
 			return jaCustomerResults.size() > 0;
 		} catch (Exception e) {
 			// Se detecta error, por lo tanto se considera otro operador.
-			System.out.println("Se detecta error, por lo tanto se considera otro operador, error: " + e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			String message = e.getLocalizedMessage().substring(0, e.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "getCarrier", new Gson().toJson(entity.getBody()), e.getLocalizedMessage(),
-					requestUrl, startHour, endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
+			loggerApi.thirdLogEvent("SEARCH_CUSTOMER", "getCarrier", entity.getBody(), e.getLocalizedMessage(),
+					requestUrl, startHour, endHour, Integer.parseInt(message));
 			return false;
 		}
 	}
 
 	public boolean getBucketByProduct(String bucket, String product, String channel) {
-		log.info("PSIApi.getBucketByProduct()");
-
 		RestTemplate restTemplate = new RestTemplate();
 		BucketRequest bucketRequest = new BucketRequest();
 
@@ -411,8 +392,6 @@ public class PSIApi extends ConfigRestTemplate {
 		bucketRequest.setProduct(product);
 
 		String bucketUrl = api.getSecurityUrl() + api.getBucketsByProduct();
-
-		System.out.println(bucketUrl);
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("Content-Type", "application/json");
@@ -431,10 +410,9 @@ public class PSIApi extends ConfigRestTemplate {
 					return responseEntity.getBody().getBody().isContent();
 				}
 			}
-
 			return false;
 		} catch (Exception ex) {
-			log.error(ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			throw ex;
 		}
 	}

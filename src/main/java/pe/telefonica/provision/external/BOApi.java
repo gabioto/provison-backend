@@ -35,9 +35,7 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String sendRequestBO = api.getBoUrl() + api.getSendRequestToBO();
-
-		log.info("sendRequestToBO - BO - URL: " + sendRequestBO);
-
+		
 		String formattedDate = "";
 		Date scheduledDate = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_BO);
@@ -46,7 +44,7 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 			dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 			formattedDate = dateFormat.format(scheduledDate);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
+			log.error(this.getClass().getName() + " - Exception: " + e1.getMessage());
 			e1.printStackTrace();
 		}
 
@@ -80,16 +78,13 @@ public class BOApi /*extends ConfigRestTemplate*/ {
 			
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(sendRequestBO, entityBO, String.class);
 			
-	
-			log.info("sendRequestToBO - BO - Response: " + responseEntity.getBody());
-
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				return true;
 			} else {
 				return false;
 			}
 		} catch (Exception ex) {
-			log.info("Exception = " + ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}

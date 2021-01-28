@@ -1420,14 +1420,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
+	public ProvisionDetailTrazaDto setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
 		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
 
 		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
 		int count = 0;
 		int maxTries = 2;
 
-		while (true) {
+		while (count < maxTries) {
 			try {
 				log.info("Attempt times: " + (count + 1));
 
@@ -1511,7 +1511,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						throw new Exception();
 					}
 
-					return provision;
+					return new ProvisionDetailTrazaDto().fromProvision(provision);
 
 				} else {
 					return null;
@@ -1522,6 +1522,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 			}
 		}
+		
+		throw new Exception("Maxima cantidad de intentos permitidos");
 	}
 
 	@Override

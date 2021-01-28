@@ -41,7 +41,7 @@ public interface ProvisionService {
 
 	boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception;
 
-	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
+	public ProvisionDetailTrazaDto setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
 
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);
 

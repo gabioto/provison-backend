@@ -85,7 +85,7 @@ public class SimpliConnectApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect),
+			loggerApi.thirdLogEvent("SIMPLI_APICONNECT_AZURE", "getUrl", new Gson().toJson(requestConnect),
 					ex.getLocalizedMessage(), url, startHour, endHour, Integer.parseInt(error));
 			return null;
 		}

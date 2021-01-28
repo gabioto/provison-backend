@@ -2394,7 +2394,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("xa_id_st", getXaIdSt);
 				update.set("xa_requirement_number", getXaRequirementNumber);
 				update.set("appt_number", appointment.getId());
-				update.set("activity_type", appointment.getDescription());
+				update.set("activity_type", appointment.getDescription().toLowerCase());
 
 				update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
 

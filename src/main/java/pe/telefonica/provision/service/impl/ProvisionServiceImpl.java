@@ -1874,7 +1874,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("appt_number", appointment.getId());
 					update.set("activity_type", appointment.getDescription().toLowerCase());
 					update.set("work_zone", appointment.getAdditionalData().get(1).getValue());
-					update.set("notifications.intoa_send_notify", false);
+					update.set("notifications.into_send_notify", false);
 					update.set("show_location", false);
 					if (provision.getXaIdSt() != null) {
 						update.set("has_schedule", false);

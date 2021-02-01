@@ -3,6 +3,7 @@ package pe.telefonica.provision.service.impl;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -14,9 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+
 import pe.telefonica.provision.controller.request.order.OrderRequest;
 import pe.telefonica.provision.controller.response.ErrorResponse;
 import pe.telefonica.provision.controller.response.order.OrderCreateResponse;
+import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.order.Order;
 import pe.telefonica.provision.repository.OrderRepository;
 import pe.telefonica.provision.service.OrderService;
@@ -30,6 +34,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
+	
+	@Autowired
+	private TrazabilidadSecurityApi restSecuritySaveLogData;
 
 	@Async
 	@Override
@@ -40,6 +47,13 @@ public class OrderServiceImpl implements OrderService {
 		HttpStatus status;
 		boolean success;
 
+		restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
+				request.getDocumentType(), "code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(),
+				"", "", new Gson().toJson(request),
+				"", "INSERT ORDER REQUEST",
+				"", "", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
+				order.getSource(), "ORDERS_BACK");
+		
 		try {
 			switch (order.getSource()) {
 			case Constants.SOURCE_ORDERS_ORDENES:
@@ -71,13 +85,27 @@ public class OrderServiceImpl implements OrderService {
 
 			success = true;
 			status = HttpStatus.OK;
+			
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
+					request.getDocumentType(), "code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(),
+					"", "OK", new Gson().toJson(request),
+					"", "INSERT ORDER RESPONSE",
+					"", "", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
+					order.getSource(), "ORDERS_BACK");
 
 		} catch (Exception e) {
 			log.error(e.getLocalizedMessage());
 			success = false;
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
+					request.getDocumentType(), "code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(),
+					"", "ERROR", new Gson().toJson(request),
+					e.getLocalizedMessage(), "INSERT ORDER RESPONSE",
+					"", "", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
+					order.getSource(), "ORDERS_BACK");
 		}
-
+		
 		return new ResponseEntity<Object>(new OrderCreateResponse(order.getSource(),
 				order.getSource().equals(Constants.SOURCE_ORDERS_ATIS) ? order.getAtisOrder() : order.getCode(),
 				success), status);

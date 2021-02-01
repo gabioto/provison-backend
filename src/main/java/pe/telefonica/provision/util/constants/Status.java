@@ -53,7 +53,8 @@ public enum Status {
 	CANCELADA_ATIS("CANCELADA_ATIS", 19, "CANCELADA_ATIS", "generic speech", "", "Tu pedido ha sido cancelado"),
 	PENDIENTE_DE_VALIDACION("PENDIENTE_DE_VALIDACION", 20, "PENDIENTE DE VALIDACION", "", "", "Pendiente de validacion"),
 	CONFIGURADA("CONFIGURADA", 21, "CONFIGURADA", "", "", "Configurada"),
-	PENDIENTE_DE_APROBACION("PENDIENTE_DE_APROBACION", 22, "PENDIENTE DE APROBACION", "", "", "Pendiente de aprovacion");
+	PENDIENTE_DE_APROBACION("PENDIENTE_DE_APROBACION", 22, "PENDIENTE DE APROBACION", "", "", "Pendiente de aprovacion"),
+	PETICION_PENDIENTE("PETICION_PENDIENTE", 23, "PETICION PENDIENTE", "", "", "Peticion Pendiente");
 	
 	private String statusName;
 	private int statusId;

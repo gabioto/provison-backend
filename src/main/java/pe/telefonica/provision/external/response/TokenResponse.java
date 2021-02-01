@@ -1,5 +1,7 @@
 package pe.telefonica.provision.external.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,9 +11,8 @@ import lombok.ToString;
 @ToString
 public class TokenResponse {
 
-	private String idParam;
-
-	private String key;
-
+	@JsonProperty("sendCount")
 	private String value;
+
+	private String phone;
 }

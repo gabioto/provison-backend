@@ -117,7 +117,7 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 			log.info("HttpClientErrorException = " + ex.getMessage());
 			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
 
-			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getResponseBodyAsString(),
+			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(builder.toUriString()), ex.getLocalizedMessage(),
 					requestUrl, startHour, LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)),
 					ex.getStatusCode().value());
 
@@ -133,9 +133,10 @@ public class ProductOrdersApi extends ConfigRestTemplate {
 
 		} catch (Exception ex) {
 			log.info("Exception = " + ex.getMessage());
-			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(""), ex.getMessage(), requestUrl,
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
+			loggerApi.thirdLogEvent("CMS", "getProductOrders", new Gson().toJson(builder.toUriString()), ex.getLocalizedMessage(), requestUrl,
 					startHour, LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)),
-					HttpStatus.INTERNAL_SERVER_ERROR.value());
+					Integer.parseInt(message));
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}

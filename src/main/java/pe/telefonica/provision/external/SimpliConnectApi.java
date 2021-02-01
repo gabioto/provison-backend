@@ -70,22 +70,19 @@ public class SimpliConnectApi {
 
 		HttpEntity<SimpliConnectRequest> requestEntity = new HttpEntity<SimpliConnectRequest>(requestConnect, headers);
 
-		System.out.println(requestEntity);
-		int statusRequest = 0;
+		System.out.println(requestEntity);		
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			// System.out.println(new Gson().toJson(request));
 			LOGGER.info("request = " + new Gson().toJson(request));
 			ResponseEntity<String> result = restTemplate.postForEntity(url, requestEntity, String.class);
-
 			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect),
-					new Gson().toJson(result.getBody()), url, startHour, endHour, result.getStatusCodeValue());
-			statusRequest = result.getStatusCodeValue();
+			loggerApi.thirdLogEvent("SIMPLI_APICONNECT_AZURE", "getUrl", new Gson().toJson(requestEntity.getBody()),
+					result.getBody().replace("\\r\\n", ""), url, startHour, endHour, result.getStatusCodeValue());
+			
 			if (result.getStatusCode().equals(HttpStatus.OK)) {
-
 				JsonObject jsonObject = new JsonParser().parse(result.getBody().toString()).getAsJsonObject();
 				String urlSimpli = jsonObject.get("BodyOut").getAsJsonObject().get("url").toString().replaceAll("\"",
 						"");
@@ -96,16 +93,13 @@ public class SimpliConnectApi {
 			return null;
 		} catch (Exception ex) {
 			LOGGER.info("Exception = " + ex.getMessage());
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect),
-					new Gson().toJson(ex.getMessage()), url, startHour, endHour, statusRequest);
-
-			
+			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestConnect.getBodyIn()),
+					ex.getLocalizedMessage(), url, startHour, endHour, Integer.parseInt(message));
 
 			return null;
-
 		}
-
 	}
 
 	public String getUrlTrakingOld(SimpliRequest request) {
@@ -152,7 +146,7 @@ public class SimpliConnectApi {
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity.getBody()),
-					new Gson().toJson(result), url, startHour, endHour, result.getStatusCodeValue());
+					result.getBody(), url, startHour, endHour, result.getStatusCodeValue());
 
 			if (result.getStatusCode().equals(HttpStatus.OK)) {
 
@@ -166,15 +160,12 @@ public class SimpliConnectApi {
 			return null;
 		} catch (Exception ex) {
 			LOGGER.info("Exception = " + ex.getMessage());
+			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("SIMPLI_APICONNECT", "getUrl", new Gson().toJson(requestEntity.getBody()),
-					new Gson().toJson(ex.getMessage()), url, startHour, endHour, HttpStatus.INTERNAL_SERVER_ERROR.value());
-
+					ex.getLocalizedMessage(), url, startHour, endHour, Integer.parseInt(message));
 			
-
 			return null;
-
 		}
-
 	}
 }

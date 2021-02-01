@@ -1002,7 +1002,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision requestAddressUpdate(String provisionId) {
+	public ProvisionDetailTrazaDto requestAddressUpdate(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
@@ -1017,7 +1017,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (updated) {
 				boolean sent = bOApi.sendRequestToBO(provision, "3");
 				// boolean sent = sendAddressChangeRequest(provision);
-				return sent ? provision : null;
+				return sent ? new ProvisionDetailTrazaDto().fromProvision(provision) : null;
 			} else {
 				return null;
 			}
@@ -1185,7 +1185,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision orderCancellation(String provisionId, String cause, String detail) {
+	public ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail) {
 		boolean sentBOCancellation;
 		boolean provisionUpdated;
 		boolean scheduleUpdated;
@@ -1245,7 +1245,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				log.info(ProvisionServiceImpl.class.getCanonicalName() + ": " + e.getMessage());
 			}
 
-			return provision;
+			return new ProvisionDetailTrazaDto().fromProvision(provision);
 		} else {
 			return null;
 		}
@@ -1423,14 +1423,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
+	public ProvisionDetailTrazaDto setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
 		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
 
 		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
 		int count = 0;
 		int maxTries = 2;
 
-		while (true) {
+		while (count < maxTries) {
 			try {
 				log.info("Attempt times: " + (count + 1));
 
@@ -1514,7 +1514,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						throw new Exception();
 					}
 
-					return provision;
+					return new ProvisionDetailTrazaDto().fromProvision(provision);
 
 				} else {
 					return null;
@@ -1525,6 +1525,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 			}
 		}
+		
+		throw new Exception("Maxima cantidad de intentos permitidos");
 	}
 
 	@Override
@@ -2016,43 +2018,42 @@ public class ProvisionServiceImpl implements ProvisionService {
 					listLog.add(statusLog);
 
 					// Regularizar Agenda Ficticia
-					if (provision.getXaIdSt() == null) {
-						if (provision.getDummyStPsiCode() != null) {
-							List<StatusLog> listLogx = listLog.stream()
-									.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
-									.collect(Collectors.toList());
+					if (provision.getXaIdSt() == null && provision.getDummyStPsiCode() != null) {
+						List<StatusLog> listLogx = listLog.stream()
+								.filter(x -> Status.FICTICIOUS_SCHEDULED.getStatusName().equals(x.getStatus()))
+								.collect(Collectors.toList());
 
-							List<StatusLog> listLogCancelled = listLog.stream()
-									.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
-									.collect(Collectors.toList());
+						List<StatusLog> listLogCancelled = listLog.stream()
+								.filter(x -> Status.WO_CANCEL.getStatusName().equals(x.getStatus()))
+								.collect(Collectors.toList());
 
-							if (listLogx.size() > 0 && listLogCancelled.size() == 0) {
-								pe.telefonica.provision.model.Status scheduled = getInfoStatus(
-										Status.SCHEDULED.getStatusName(), statusList);
+						if (listLogx.size() > 0 && listLogCancelled.size() == 0
+								&& isAValidSchedule(listLogx.get(0).getScheduledDate())) {
 
-								StatusLog statusSchedule = new StatusLog();
-								statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
-								statusSchedule.setXaidst(getXaIdSt);
-								statusSchedule.setScheduledDate(listLogx.get(0).getScheduledDate());
-								statusSchedule.setScheduledRange(listLogx.get(0).getScheduledRange());
-								listLog.add(statusSchedule);
+							pe.telefonica.provision.model.Status scheduled = getInfoStatus(
+									Status.SCHEDULED.getStatusName(), statusList);
 
-								update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
-								update.set("generic_speech", scheduled != null ? scheduled.getGenericSpeech()
-										: Status.SCHEDULED.getGenericSpeech());
-								update.set("description_status", scheduled != null ? scheduled.getDescription()
-										: Status.SCHEDULED.getDescription());
-								update.set("front_speech",
-										scheduled != null ? scheduled.getFront() : Status.SCHEDULED.getFrontSpeech());
+							StatusLog statusSchedule = new StatusLog();
+							statusSchedule.setStatus(Status.SCHEDULED.getStatusName());
+							statusSchedule.setXaidst(getXaIdSt);
+							statusSchedule.setScheduledDate(listLogx.get(0).getScheduledDate());
+							statusSchedule.setScheduledRange(listLogx.get(0).getScheduledRange());
+							listLog.add(statusSchedule);
 
-								// update psiCode by schedule
-								trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
-										provision.getXaRequest(), getXaIdSt, appointment.getDescription().toLowerCase(),
-										provision.getCustomer());
+							update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
+							update.set("generic_speech", scheduled != null ? scheduled.getGenericSpeech()
+									: Status.SCHEDULED.getGenericSpeech());
+							update.set("description_status",
+									scheduled != null ? scheduled.getDescription() : Status.SCHEDULED.getDescription());
+							update.set("front_speech",
+									scheduled != null ? scheduled.getFront() : Status.SCHEDULED.getFrontSpeech());
 
-							}
+							// update psiCode by schedule
+							trazabilidadScheduleApi.updatePSICodeReal(provision.getIdProvision(),
+									provision.getXaRequest(), getXaIdSt, appointment.getDescription().toLowerCase(),
+									provision.getCustomer());
+
 						}
-
 					}
 
 					update.set("log_status", listLog);
@@ -2787,9 +2788,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
-		
+
 		return provisionRepository.getProvisionDetailById(request.getIdProvision());
 	}
 
+	private boolean isAValidSchedule(String scheduleDate) {
+		LocalDate lScheduleDate = LocalDate.parse(scheduleDate);
+		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00"));
 
+		return lScheduleDate.compareTo(today) > 0;
+	}
 }

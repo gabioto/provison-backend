@@ -256,23 +256,19 @@ public class ProvisionController {
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
-	
+
 	@RequestMapping(value = "/getProvisionDetailById", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> getProvisionDetailById(
 			@RequestBody ApiRequest<ProvisionRequest> request) {
 
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
-		String errorInternal = "";
 		String timestamp = "";
-
-		
 
 		try {
 			ProvisionDetailTrazaDto provisions = provisionService.getProvisionDetailById(request.getBody());
 
 			if (provisions != null) {
-
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), status.getReasonPhrase(),
@@ -312,7 +308,8 @@ public class ProvisionController {
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), ex.getMessage().toString(), null);
+					Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), ex.getMessage().toString(),
+					null);
 
 			timestamp = getTimestamp();
 			apiResponse.getHeader().setTimestamp(timestamp);
@@ -326,7 +323,7 @@ public class ProvisionController {
 		}
 		return ResponseEntity.status(status).body(apiResponse);
 	}
-	
+
 	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<ProvisionDto>>> getOrders(
 			@RequestBody ApiRequest<ProvisionRequest> request) {
@@ -671,11 +668,11 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<Provision>> setContactInfoUpdate(
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> setContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
 
-		ApiResponse<Provision> apiResponse;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
@@ -693,7 +690,7 @@ public class ProvisionController {
 						.toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode obligatorio", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -708,7 +705,7 @@ public class ProvisionController {
 					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
 							.toString();
 					timestamp = getTimestamp();
-					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode maximo 11 caracteres", null);
 					apiResponse.getHeader().setTimestamp(timestamp);
 					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -721,7 +718,7 @@ public class ProvisionController {
 					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
 							.toString();
 					timestamp = getTimestamp();
-					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode debe ser una cadena", null);
 					apiResponse.getHeader().setTimestamp(timestamp);
 					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -746,7 +743,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "fullName obligatorio", null);
 
 						apiResponse.getHeader().setTimestamp(timestamp);
@@ -760,7 +757,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber obligatorio", null);
 						apiResponse.getHeader().setTimestamp(timestamp);
 						apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -775,7 +772,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber debe ser numerico",
 								null);
 						apiResponse.getHeader().setTimestamp(timestamp);
@@ -791,7 +788,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber maximo 9 caracteres",
 								null);
 						apiResponse.getHeader().setTimestamp(timestamp);
@@ -812,7 +809,7 @@ public class ProvisionController {
 						.toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal,
 						"Minimo 1 y maximo 4 datos datos de contacto", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
@@ -821,11 +818,11 @@ public class ProvisionController {
 				return ResponseEntity.status(status).body(apiResponse);
 			}
 
-			Provision result = provisionService.setContactInfoUpdate(request.getBody());
+			ProvisionDetailTrazaDto result = provisionService.setContactInfoUpdate(request.getBody());
 
 			if (result != null) {
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), status.getReasonPhrase(),
 						result);
 
@@ -845,7 +842,7 @@ public class ProvisionController {
 						.toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "No existe registro", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				log.info("timestamp => " + timestamp);
@@ -864,7 +861,7 @@ public class ProvisionController {
 			status = HttpStatus.BAD_REQUEST;
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -893,7 +890,7 @@ public class ProvisionController {
 				errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorCode,
 						((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
 				apiResponse.getHeader().setTimestamp(timestamp);
@@ -908,7 +905,7 @@ public class ProvisionController {
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
 				apiResponse.getHeader().setTimestamp(timestamp);
@@ -1215,26 +1212,23 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> requestAddressUpdate(
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> requestAddressUpdate(
 			@RequestBody ApiRequest<AddressUpdateRequest> request) {
 		System.out.println("CORS NO FUNCTION");
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
 		String timestamp;
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 		try {
 
-			Provision result = provisionService.requestAddressUpdate(request.getBody().getProvisionId());
+			ProvisionDetailTrazaDto result = provisionService.requestAddressUpdate(request.getBody().getProvisionId());
 
 			if (result != null) {
 
-				List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
-				apiResponse.setBody(provisions);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody(result);
 
 				timestamp = getTimestamp();
 
@@ -1248,8 +1242,8 @@ public class ProvisionController {
 			} else {
 				status = HttpStatus.OK;
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(null);
 
 				timestamp = getTimestamp();
@@ -1265,7 +1259,7 @@ public class ProvisionController {
 		} catch (Exception ex) {
 
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 
 			timestamp = getTimestamp();
@@ -1358,28 +1352,24 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> orderCancellation(
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> orderCancellation(
 			@RequestBody ApiRequest<CancelOrderRequest> request) {
 		log.info(this.getClass().getName() + " - " + "orderCancellation");
 
 		String timestamp;
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 
 		try {
-			Provision result = provisionService.orderCancellation(request.getBody().getProvisionId(),
+			ProvisionDetailTrazaDto result = provisionService.orderCancellation(request.getBody().getProvisionId(),
 					request.getBody().getCause(), request.getBody().getDetail());
 
 			if (result != null) {
-
-				List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
-				apiResponse.setBody(provisions);
+				apiResponse.setBody(result);
 
 				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
@@ -1392,7 +1382,7 @@ public class ProvisionController {
 			} else {
 
 				status = HttpStatus.BAD_REQUEST;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
 
@@ -1426,7 +1416,7 @@ public class ProvisionController {
 					status = HttpStatus.CONFLICT;
 				}
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorCode[1], ((FunctionalErrorException) ex).getMessage(),
 						null);
 
@@ -1443,7 +1433,7 @@ public class ProvisionController {
 				System.out.println(ex.getMessage());
 
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
 

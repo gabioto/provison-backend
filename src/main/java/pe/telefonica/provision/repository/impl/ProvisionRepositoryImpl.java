@@ -184,6 +184,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
+	public Optional<Provision> getAllProvisionById(String provisionId) {
+		Provision provision = null;
+		try {
+			provision = this.mongoOperations
+					.findOne(new Query(Criteria.where("idProvision").is(new ObjectId(provisionId))), Provision.class);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+		}
+
+		Optional<Provision> optionalSchedule = Optional.ofNullable(provision);
+
+		return optionalSchedule;
+	}
+
+	@Override
 	public boolean updateProvision(Provision provision, Update update) {
 
 		UpdateResult result = this.mongoOperations.updateFirst(
@@ -544,12 +559,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(String provisionId) {
-		
-		
-			ProvisionDetailTrazaDto provision = this.mongoOperations.findOne(
-					new Query(Criteria.where("_id").is(new ObjectId(provisionId))),
-					ProvisionDetailTrazaDto.class);
-		
+
+		ProvisionDetailTrazaDto provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), ProvisionDetailTrazaDto.class);
+
 		return provision;
 	}
 }

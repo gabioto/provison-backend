@@ -42,18 +42,18 @@ public interface ProvisionService {
 
 	boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception;
 
-	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
+	public ProvisionDetailTrazaDto setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
 
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);
 
 	public Provision setProvisionIsValidated(String provisionId);
 
-	public Provision requestAddressUpdate(String provisionId);
+	public ProvisionDetailTrazaDto requestAddressUpdate(String provisionId);
 
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);
 
-	public Provision orderCancellation(String provisionId, String cause, String detail);
+	ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail);
 
 	ProvisionResponse<Boolean> validateQueue();
 

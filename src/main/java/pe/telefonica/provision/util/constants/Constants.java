@@ -148,6 +148,25 @@ public final class Constants {
 	public static final String SOURCE_ORDERS_ATIS = "ATIS";
 	public static final String SOURCE_ORDERS_CMS = "CMS";
 
+	// Provision
+	public static final String STATUS_PENDIENTE = "PENDIENTE";
+	public static final String STATUS_INGRESADO = "INGRESADO";
+	public static final String STATUS_CAIDA = "CAIDA";
+	public static final String STATUS_PENDIENTE_PAGO = "PENDIENTE-PAGO";
+	public static final String STATUS_PAGADO = "PAGADO";
+
+	// Estados ATIS
+	public static final String STATUS_FINALIZADO = "FI";
+	public static final String STATUS_TERMINADA = "TE";
+	public static final String STATUS_CANCELADA = "CG";
+
+	public static final String STATUS_PENDIENTE_DE_VALIDACION = "PV";
+	public static final String STATUS_CONFIGURADA = "CE";
+	public static final String STATUS_PENDIENTE_DE_APROBACION = "PD";
+
+	public static final String STATUS_FIJA_PARKOUR = "VENTASFIJA_PARKUR";
+	public static final String STATUS_ATIS = "ATIS";
+
 	public static final Map<String, String> ATIS_CMS_STATUS = Stream
 			.of(new String[][] { { "new", "EN PROCESO" }, { "rejeted", "EN PROCESO" }, { "pending", "EN PROCESO" },
 					{ "completed", "COMPLETADO" }, { "rejected", "CANCELADO" }, { "CE", "EN PROCESO" },

@@ -808,7 +808,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return isUpdate ? true : false;
 
 			} else {
-
+				
+				if(request.getStatus().equalsIgnoreCase(Status.PETICION_PENDIENTE.getStatusName())){
+					return false;
+				}
 				Update update = new Update();
 
 				update.set("commercial_op_atis", getData[11]);

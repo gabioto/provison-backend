@@ -630,17 +630,20 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public boolean insertProvision(String message) {
+	public boolean insertProvision(InsertOrderRequest request) {
 
 		String speech = "";
 		String getData[];
 		Provision provisionx = null;
-		InsertOrderRequest request = formatProvision(message);
+		//InsertOrderRequest request = formatProvision(message);
 
-		if (request == null) {
+//		if (request == null) {
+//			return false;
+//		}
+		
+		if(request.getDataOrigin().equalsIgnoreCase("ORDENES")) {
 			return false;
 		}
-
 		getData = request.getData().split("\\|");
 		provisionx = request.getDataOrigin().equalsIgnoreCase("ATIS")
 				? provisionRepository.getProvisionByXaRequest(getData[1])

@@ -9,6 +9,7 @@ import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.request.ApiTrazaSetContactInfoUpdateRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
+import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -32,7 +33,7 @@ public interface ProvisionService {
 
 	ApiResponse<List<Contacts>> getContactList(String provisionId);
 
-	boolean insertProvision(String message);
+	boolean insertProvision(InsertOrderRequest request);
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 

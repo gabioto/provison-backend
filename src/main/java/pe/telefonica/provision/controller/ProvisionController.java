@@ -423,7 +423,7 @@ public class ProvisionController {
 		HttpStatus status;
 
 		try {
-			boolean provisions = processMessage(request.getBody().getData());
+			boolean provisions = processMessage(request.getBody());
 
 			if (provisions) {
 				status = HttpStatus.OK;
@@ -447,13 +447,13 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
-	private boolean processMessage(String message) {
+	private boolean processMessage(InsertOrderRequest request) {
 
 		// Insertar en colección de Ordenes
-		orderService.createOrder(message);
+		orderService.createOrder(request.getData());
 
 		// Insertar en colección de Provisión
-		return provisionService.insertProvision(message);
+		return provisionService.insertProvision(request);
 	}
 
 	@RequestMapping(value = "/updateOrderFromTOA", method = RequestMethod.POST)

@@ -2057,6 +2057,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
+				if (provision.getCommercialOp().equals("MIGRACION")) {
+					update.set("text_return", "Ayúdanos a reciclar! Al migrar a una nueva tecnología, te instalaremos nuevo equipamiento y podrás entregar el antiguo");
+				}
+				
 				WoPreStart woPreStart = provision.getWoPreStart() != null ? provision.getWoPreStart()
 						: new WoPreStart();
 

@@ -209,7 +209,6 @@ public class TrazabilidadSecurityApi {
 		}
 	}
 
-<<<<<<< HEAD
 	public TokenResponse sendLoginToken(Customer customer) {
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
 		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
@@ -267,9 +266,6 @@ public class TrazabilidadSecurityApi {
 
 		log.info(this.getClass().getName() + " - " + "generateToken");
 
-=======
-	public String gerateToken() {
->>>>>>> refs/heads/P6-Sprint-2/feat/SAQR-1423
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

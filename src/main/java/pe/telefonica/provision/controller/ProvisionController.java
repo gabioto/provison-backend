@@ -680,17 +680,11 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
-<<<<<<< HEAD
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> setContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
 
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
-=======
-	public ResponseEntity<ApiResponse<Provision>> setContactInfoUpdate(
-			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {		
-		ApiResponse<Provision> apiResponse;
->>>>>>> refs/heads/P6-Sprint-2/feat/SAQR-1423
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
@@ -1231,16 +1225,10 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
-<<<<<<< HEAD
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> requestAddressUpdate(
 			@RequestBody ApiRequest<AddressUpdateRequest> request) {
 		System.out.println("CORS NO FUNCTION");
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
-=======
-	public ResponseEntity<ApiResponse<List<Provision>>> requestAddressUpdate(
-			@RequestBody ApiRequest<AddressUpdateRequest> request) {		
-
->>>>>>> refs/heads/P6-Sprint-2/feat/SAQR-1423
 		String timestamp;
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;

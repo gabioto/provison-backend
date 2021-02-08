@@ -155,6 +155,10 @@ public final class Constants {
 	public static final String STATUS_PENDIENTE_PAGO = "PENDIENTE-PAGO";
 	public static final String STATUS_PAGADO = "PAGADO";
 
+	// Mensaje devolución de equipos
+	public static final String MESSAGE_RETURN = "MESSAGE_RETURN";
+	public static final String OP_COMMERCIAL_MIGRACION = "MIGRACION";
+	
 	// Estados ATIS
 	public static final String STATUS_FINALIZADO = "FI";
 	public static final String STATUS_TERMINADA = "TE";

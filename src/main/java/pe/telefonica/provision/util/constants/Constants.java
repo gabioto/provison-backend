@@ -148,6 +148,10 @@ public final class Constants {
 	public static final String SOURCE_ORDERS_ATIS = "ATIS";
 	public static final String SOURCE_ORDERS_CMS = "CMS";
 
+	// TEXTO DEVOLUCION
+	public static final String OP_COMMERCIAL_MIGRACION = "MIGRACION";
+	public static final String MESSAGE_RETURN = "MESSAGE_RETURN";
+	
 	public static final Map<String, String> ATIS_CMS_STATUS = Stream
 			.of(new String[][] { { "new", "EN PROCESO" }, { "rejeted", "EN PROCESO" }, { "pending", "EN PROCESO" },
 					{ "completed", "COMPLETADO" }, { "rejected", "CANCELADO" }, { "CE", "EN PROCESO" },

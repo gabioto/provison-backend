@@ -64,6 +64,7 @@ import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.ReturnedProvision;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
+import pe.telefonica.provision.model.params.Parameter;
 import pe.telefonica.provision.model.provision.Configurada;
 import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.Notifications;
@@ -75,6 +76,7 @@ import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoNotdone;
 import pe.telefonica.provision.model.provision.WoPreStart;
 import pe.telefonica.provision.repository.ProvisionRepository;
+import pe.telefonica.provision.repository.impl.ParamsRepositoryImpl;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
@@ -88,6 +90,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 	private static final Log log = LogFactory.getLog(ProvisionServiceImpl.class);
 	private ProvisionRepository provisionRepository;
 
+	@Autowired
+	private ParamsRepositoryImpl paramsRepository;
+	
 	@Autowired
 	private ProvisionTexts provisionTexts;
 
@@ -1846,10 +1851,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 					: speech;
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-
+				Update update = new Update();
+				if (provision.getCommercialOp().equals(Constants.OP_COMMERCIAL_MIGRACION)) {
+					Parameter objParams = paramsRepository.getMessage(Constants.MESSAGE_RETURN);
+					if (objParams != null) {
+						update.set("text_return", objParams.getValue());
+					}
+				}		
+				
 				if (fromSale) {
-					// IN_TOA fictitious
-					Update update = new Update();
+					// IN_TOA fictitious					
 					// NO SMS
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
@@ -1876,7 +1887,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					speechInToa = hasCustomerInfo(provision.getCustomer()) ? speechInToa.replace(
 							Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0]) : speechInToa;
 
-					Update update = new Update();
 					// SI SMS
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.IN_TOA.getStatusName());
@@ -1907,8 +1917,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				} else {
 					pe.telefonica.provision.model.Status inToaStatus = getInfoStatus(Status.IN_TOA.getStatusName(),
 							statusList);
-
-					Update update = new Update();
 
 					update.set("xa_id_st", getXaIdSt);
 					update.set("xa_requirement_number", getXaRequirementNumber);

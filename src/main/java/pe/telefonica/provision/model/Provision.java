@@ -289,6 +289,9 @@ public class Provision implements Serializable {
 	@Field("status_change_date")
 	private LocalDateTime statusChangeDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 	
+	@Field("text_return")
+	private String textReturn;
+	
 	public LocalDateTime getStatusChangeDate() {
 		return statusChangeDate;
 	}
@@ -1071,6 +1074,14 @@ public class Provision implements Serializable {
 
 	public void setNotifications(Notifications notifications) {
 		this.notifications = notifications;
+	}
+
+	public String getTextReturn() {
+		return textReturn;
+	}
+
+	public void setTextReturn(String textReturn) {
+		this.textReturn = textReturn;
 	}
 
 }

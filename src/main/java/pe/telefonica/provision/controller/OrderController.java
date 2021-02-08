@@ -23,11 +23,6 @@ import pe.telefonica.provision.service.RetreiveOrderService;
 
 public class OrderController {
 
-//	private static final Log log = LogFactory.getLog(OrderController.class);
-
-//	@Autowired
-//	private OrderService orderService;
-
 	@Autowired
 	private RetreiveOrderService retrieveOrderService;
 
@@ -35,12 +30,13 @@ public class OrderController {
 	private NotifyOrderService notifyOrderService;
 
 	// Creación de ordenes
-//	@PostMapping
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public ResponseEntity<Object> createOrder(@Valid @RequestBody OrderRequest request) throws Exception {
-//		log.info(new Gson().toJson(request));
-//		return orderService.createOrder(request);
-//	}
+	// @PostMapping
+	// @ResponseStatus(HttpStatus.CREATED)
+	// public ResponseEntity<Object> createOrder(@Valid @RequestBody OrderRequest
+	// request) throws Exception {
+	// log.info(new Gson().toJson(request));
+	// return orderService.createOrder(request);
+	// }
 
 	@GetMapping("/getProvision")
 	@ResponseStatus(HttpStatus.OK)

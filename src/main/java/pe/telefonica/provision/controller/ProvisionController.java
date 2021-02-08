@@ -120,6 +120,8 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			timestamp = getTimestamp();
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
@@ -240,6 +242,8 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -254,7 +258,7 @@ public class ProvisionController {
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 		}
-		return ResponseEntity.status(status).body(apiResponse);
+		return ResponseEntity.status(status).body(apiResponse);		
 	}
 
 	@RequestMapping(value = "/getProvisionDetailById", method = RequestMethod.POST)
@@ -423,6 +427,8 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -437,7 +443,7 @@ public class ProvisionController {
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 		}
-		return ResponseEntity.status(status).body(apiResponse);
+		return ResponseEntity.status(status).body(apiResponse);		
 	}
 
 	/**
@@ -475,7 +481,8 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_BY_SALE_CODE, String.valueOf(status.value()),
@@ -506,7 +513,8 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_INSERT_PROVISION,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -551,6 +559,8 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()), ex.getMessage(), null);
@@ -583,7 +593,8 @@ public class ProvisionController {
 				apiResponse.setBody(null);
 			}
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_INSERT_PROVISION_CODE_FICT, String.valueOf(status.value()),
@@ -602,8 +613,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/setProvisionValidated", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<Provision>>> setProvisionValidated(
 			@RequestBody ApiRequest<ValidateDataRequest> request) {
-		log.info(this.getClass().getName() + " - " + "setProvisionValidated");
-
+		
 		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
@@ -644,6 +654,8 @@ public class ProvisionController {
 
 			}
 		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_DATA,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -668,11 +680,17 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
+<<<<<<< HEAD
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> setContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
 
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
+=======
+	public ResponseEntity<ApiResponse<Provision>> setContactInfoUpdate(
+			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {		
+		ApiResponse<Provision> apiResponse;
+>>>>>>> refs/heads/P6-Sprint-2/feat/SAQR-1423
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
@@ -845,8 +863,6 @@ public class ProvisionController {
 				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "No existe registro", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
-				log.info("timestamp => " + timestamp);
-				log.info("MessageId => " + request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
@@ -857,7 +873,8 @@ public class ProvisionController {
 			}
 
 		} catch (BadRequest ex) {
-			System.out.println(ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.BAD_REQUEST;
 
 			timestamp = getTimestamp();
@@ -872,6 +889,8 @@ public class ProvisionController {
 					request.getHeader().getAppName());
 
 		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
@@ -924,7 +943,6 @@ public class ProvisionController {
 	@RequestMapping(value = "/update-customer", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<String>> apiTrazaSetContactInfoUpdate(
 			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
-		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
 
 		ApiResponse<String> apiResponse;
 		HttpStatus status;
@@ -1129,8 +1147,6 @@ public class ProvisionController {
 				apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
 						errorInternal, "No existe registro", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
-				log.info("timestamp => " + timestamp);
-				log.info("MessageId => " + request.getHeader().getMessageId());
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
 						new Gson().toJson(request), new Gson().toJson(apiResponse),
@@ -1141,7 +1157,8 @@ public class ProvisionController {
 			}
 
 		} catch (BadRequest ex) {
-			System.out.println(ex.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.BAD_REQUEST;
 
 			timestamp = getTimestamp();
@@ -1157,6 +1174,8 @@ public class ProvisionController {
 		}
 
 		catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
@@ -1212,10 +1231,16 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
+<<<<<<< HEAD
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> requestAddressUpdate(
 			@RequestBody ApiRequest<AddressUpdateRequest> request) {
 		System.out.println("CORS NO FUNCTION");
 		log.info(this.getClass().getName() + " - " + "requestAddressUpdate");
+=======
+	public ResponseEntity<ApiResponse<List<Provision>>> requestAddressUpdate(
+			@RequestBody ApiRequest<AddressUpdateRequest> request) {		
+
+>>>>>>> refs/heads/P6-Sprint-2/feat/SAQR-1423
 		String timestamp;
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
@@ -1257,7 +1282,8 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -1284,9 +1310,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Object>> receiveAddressUpdateBO(
 			@RequestBody ApiRequest<ReceiveAddressUpdateBORequest> request) {
-		log.info(this.getClass().getName() + " - " + "receiveAddressUpdateBO error 405  ");
-		log.info(this.getClass().getName() + " - " + request.toString());
-
+		
 		String timestamp;
 		ApiResponse<Object> apiResponse;
 		HttpStatus status;
@@ -1328,7 +1352,8 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Object>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESSBO,
 					String.valueOf(status.value()), ex.getMessage(), null);
@@ -1354,8 +1379,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> orderCancellation(
 			@RequestBody ApiRequest<CancelOrderRequest> request) {
-		log.info(this.getClass().getName() + " - " + "orderCancellation");
-
+		
 		String timestamp;
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
@@ -1380,7 +1404,6 @@ public class ProvisionController {
 						request.getHeader().getAppName());
 
 			} else {
-
 				status = HttpStatus.BAD_REQUEST;
 				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
@@ -1397,12 +1420,12 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
-				System.out.println(ex.getMessage());
-
+			
 				String errorCode[] = ((FunctionalErrorException) ex).getErrorCode().split("_");
 				Integer htttCode = Integer.parseInt(errorCode[0]);
 
@@ -1429,15 +1452,10 @@ public class ProvisionController {
 						request.getBody().getActivityType(), request.getHeader().getAppName());
 
 			} else {
-
-				System.out.println(ex.getMessage());
-
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
 				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
-
-				System.out.println(apiResponse);
 
 				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
@@ -1446,7 +1464,6 @@ public class ProvisionController {
 						new Gson().toJson(apiResponse), ConstantsLogData.PROVISION_CANCEL,
 						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
 						request.getBody().getActivityType(), request.getHeader().getAppName());
-
 			}
 		}
 
@@ -1462,20 +1479,18 @@ public class ProvisionController {
 	public ResponseEntity<ProvisionResponse<Boolean>> updateOrderSchedule(@RequestBody ProvisionScheduler request)
 			throws ParseException {
 
-		// log.info("idProvision:" + request.getIdProvision());
 		ProvisionResponse<Boolean> apiResponse;
 		HttpStatus status = null;
 		try {
 			status = HttpStatus.OK;
-			// log.info("Date Schedule:" + request.getScheduleDate());
 			String[] scheduledDateStrArr = request.getScheduleDate().split("/");
 			LocalDate scheduledDate = LocalDate.of(Integer.parseInt(scheduledDateStrArr[2]),
 					Integer.parseInt(scheduledDateStrArr[1]), Integer.parseInt(scheduledDateStrArr[0]));
 			apiResponse = provisionService.updateOrderSchedule(request.getIdProvision(), scheduledDate,
 					request.getScheduleRange(), request.getScheduleType());
-		} catch (Exception e) {
-			log.info("Date Schedule:" + request.getScheduleDate());
-			log.info("Error:" + e.getMessage());
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ProvisionResponse<Boolean>().setData(null);
 		}
@@ -1508,10 +1523,12 @@ public class ProvisionController {
 			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), status.getReasonPhrase(),
 					response);
-		} catch (Exception e) {
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), e.getMessage(), null);
+					Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), ex.getMessage(), null);
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);
@@ -1544,10 +1561,12 @@ public class ProvisionController {
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 
-		} catch (Exception e) {
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), e.getMessage(), null);
+					Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), ex.getMessage(), null);
 
 			timestamp = getTimestamp();
 			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
@@ -1568,17 +1587,15 @@ public class ProvisionController {
 	}
 
 	public String getTimestamp() {
-		log.info("ProvisionController.getTimestamp()");
 		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
 		String timeStamp = dateNow.format(formatter);
-		log.info("timeStamp => " + timeStamp);
 		return timeStamp;
 	}
 
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
-		log.info("ProvisionController.getOrderToNotify()");
+		
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 
@@ -1637,6 +1654,8 @@ public class ProvisionController {
 			}
 
 		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
 					String.valueOf(status.value()), ex.getMessage(), null);
@@ -1655,7 +1674,7 @@ public class ProvisionController {
 
 	@RequestMapping(value = "/getUpFrontProvisions", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getUpFrontProvisions() {
-		log.info("ProvisionController.getUpFrontProvisions()");
+
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 

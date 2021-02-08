@@ -2,6 +2,8 @@ package pe.telefonica.provision.controller;
 
 import javax.validation.Valid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ import pe.telefonica.provision.util.constants.Constants;
 @CrossOrigin(origins = "*")
 @RequestMapping("provision")
 public class TemporaryController {
-	// private static final Log log = LogFactory.getLog(MonitoringController.class);
+	private static final Log log = LogFactory.getLog(MonitoringController.class);
 
 	@Autowired
 	TemporaryService temporaryService;
@@ -44,7 +46,8 @@ public class TemporaryController {
 			apiResponse.setBody(response);
 
 		} catch (Exception ex) {
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_SALE_CODE, String.valueOf(status.value()), status.getReasonPhrase(),

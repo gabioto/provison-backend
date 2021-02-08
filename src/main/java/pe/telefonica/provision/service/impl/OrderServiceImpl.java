@@ -94,7 +94,8 @@ public class OrderServiceImpl implements OrderService {
 					order.getSource(), "ORDERS_BACK");
 
 		} catch (Exception e) {
-			log.error(e.getLocalizedMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			success = false;
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			

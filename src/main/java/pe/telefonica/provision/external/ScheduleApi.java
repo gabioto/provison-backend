@@ -82,8 +82,6 @@ public class ScheduleApi {
 
 		String oAuthToken = getAuthToken(requestx.getBodyUpdateClient().getNombre_completo());
 
-		log.info("modifyWork - URL: " + url);
-
 		Calendar calendar = Calendar.getInstance();
 		Date now = calendar.getTime();
 		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIMESTAMP_FORMAT_USER);
@@ -106,9 +104,6 @@ public class ScheduleApi {
 		HttpEntity<PSIWorkRequest> entity = new HttpEntity<>(request, headers);
 
 		try {
-
-			log.info("modifyWork - requestUrl: " + new Gson().toJson(request));
-
 			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
 					PSIWorkResponse.class);
 
@@ -116,37 +111,27 @@ public class ScheduleApi {
 			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
 					startHour, endHour, responseEntity.getStatusCodeValue());
 
-			log.info("modifyWork - Body: " + responseEntity.getBody().toString());
-
-//			return responseEntity.getBody().getBodyOut().getCapacity();
-
 			return null;
-
 		} catch (HttpClientErrorException ex) {
-
-			log.info("HttpClientErrorException = " + ex.getMessage());
-			log.info("getResponseBodyAsString = " + ex.getResponseBodyAsString());
-
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
 					startHour, endHour, ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
-			System.out.println(jsonDecode);
-
 			JsonObject appDetail = jsonDecode.getAsJsonObject("BodyOut").getAsJsonObject("ClientException")
 					.getAsJsonObject("appDetail");
 			String message = appDetail.get("exceptionAppMessage").toString();
 			String codeError = appDetail.get("exceptionAppCode").toString();
 
 			throw new FunctionalErrorException(message, ex, codeError);
-
 		} catch (Exception ex) {
-			log.info("Exception = " + ex.getMessage());
-			String message = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
-					endHour, Integer.parseInt(message));
+					endHour, Integer.parseInt(error));
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
@@ -208,22 +193,16 @@ public class ScheduleApi {
 
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				if (toInsert) {
-					// insertToken(responseEntity.getBody().getBody());
 					oAuthTokenRepository.insertToken(responseEntity.getBody().getBody());
 				} else {
 					updated = oAuthTokenRepository.updateToken(responseEntity.getBody());
-
-					// updated = updateTokenInCollection(responseEntity.getBody());
 				}
 			} else {
 				return "";
 			}
-
-			log.info("responseEntity: " + responseEntity.getBody());
-
 			return updated ? ((OAuthToken) responseEntity.getBody().getBody()).getAccessToken() : "";
 		} catch (Exception e) {
-			log.info("Exception = " + e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 			return "";
 		}
 	}
@@ -244,7 +223,7 @@ public class ScheduleApi {
 			}
 			return sb.toString();
 		} catch (java.security.NoSuchAlgorithmException e) {
-			log.error(e.getMessage());
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 		}
 		return null;
 	}

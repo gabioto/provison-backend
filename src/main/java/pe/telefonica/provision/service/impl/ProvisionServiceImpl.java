@@ -65,6 +65,7 @@ import pe.telefonica.provision.model.ReturnedProvision;
 import pe.telefonica.provision.model.StatusAtis;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
+import pe.telefonica.provision.model.params.Params;
 import pe.telefonica.provision.model.provision.Configurada;
 import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.Notifications;
@@ -75,6 +76,7 @@ import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoNotdone;
 import pe.telefonica.provision.model.provision.WoPreStart;
+import pe.telefonica.provision.repository.ParamsRepository;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
@@ -88,6 +90,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private static final Log log = LogFactory.getLog(ProvisionServiceImpl.class);
 	private ProvisionRepository provisionRepository;
+	private ParamsRepository paramsRepository;
 
 	@Autowired
 	private ProvisionTexts provisionTexts;
@@ -2057,8 +2060,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
-				if (provision.getCommercialOp().equals("MIGRACION")) {
-					update.set("text_return", "Ayúdanos a reciclar! Al migrar a una nueva tecnología, te instalaremos nuevo equipamiento y podrás entregar el antiguo");
+				if (provision.getCommercialOp().equals(Constants.OP_COMMERCIAL_MIGRACION)) {
+					Params objParams = paramsRepository.getMessage(Constants.MESSAGE_RETURN);
+					if (objParams != null) {
+						update.set("text_return", objParams.getValue());
+					}
 				}
 				
 				WoPreStart woPreStart = provision.getWoPreStart() != null ? provision.getWoPreStart()

@@ -66,7 +66,7 @@ import pe.telefonica.provision.model.ReturnedProvision;
 import pe.telefonica.provision.model.StatusAtis;
 import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
-import pe.telefonica.provision.model.params.Params;
+import pe.telefonica.provision.model.params.Parameter;
 import pe.telefonica.provision.model.provision.Configurada;
 import pe.telefonica.provision.model.provision.InToa;
 import pe.telefonica.provision.model.provision.Notifications;
@@ -91,10 +91,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private static final Log log = LogFactory.getLog(ProvisionServiceImpl.class);
 	private ProvisionRepository provisionRepository;
-
-	@Autowired
-	private ParamsRepositoryImpl paramsRepository;
 	
+	@Autowired
+	private ParamsRepository paramsRepository;
+
 	@Autowired
 	private ProvisionTexts provisionTexts;
 
@@ -641,7 +641,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
 		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
-		String speech = "";		
+		String speech = "";
 
 		if (provisionx != null) {
 
@@ -1882,7 +1882,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (objParams != null) {
 						update.set("text_return", objParams.getValue());
 					}
-				}
+				}		
 				
 				if (fromSale) {
 					// IN_TOA fictitious					
@@ -2061,13 +2061,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				// update.set("xa_request", getData[2]);
 				update.set("active_status", Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS);
 
-				if (provision.getCommercialOp().equals(Constants.OP_COMMERCIAL_MIGRACION)) {
-					Params objParams = paramsRepository.getMessage(Constants.MESSAGE_RETURN);
-					if (objParams != null) {
-						update.set("text_return", objParams.getValue());
-					}
-				}
-				
 				WoPreStart woPreStart = provision.getWoPreStart() != null ? provision.getWoPreStart()
 						: new WoPreStart();
 

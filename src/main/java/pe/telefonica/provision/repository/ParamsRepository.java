@@ -1,7 +1,7 @@
 package pe.telefonica.provision.repository;
 
-import pe.telefonica.provision.model.params.Params;
+import pe.telefonica.provision.model.params.Parameter;
 
 public interface ParamsRepository {
-	Params getMessage(String key);
+	Parameter getMessage(String key);
 }

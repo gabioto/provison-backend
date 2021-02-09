@@ -91,8 +91,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	private static final Log log = LogFactory.getLog(ProvisionServiceImpl.class);
 	private ProvisionRepository provisionRepository;
-	private ParamsRepository paramsRepository;
 
+	@Autowired
+	private ParamsRepositoryImpl paramsRepository;
+	
 	@Autowired
 	private ProvisionTexts provisionTexts;
 
@@ -628,26 +630,18 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public boolean insertProvision(InsertOrderRequest request) {
 
-		String speech = "";
-		String getData[];
+		String getData[] = request.getData().split("\\|");
 		Provision provisionx = null;
-		//InsertOrderRequest request = formatProvision(message);
-
-//		if (request == null) {
-//			return false;
-//		}
-		
-		if(request.getDataOrigin().equalsIgnoreCase("ORDENES")) {
-			return false;
+		if (request.getDataOrigin().equalsIgnoreCase("ATIS")) {
+			provisionx = provisionRepository.getProvisionByXaRequest(getData[1]);
+		} else {
+			provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
 		}
-		getData = request.getData().split("\\|");
-		provisionx = request.getDataOrigin().equalsIgnoreCase("ATIS")
-				? provisionRepository.getProvisionByXaRequest(getData[1])
-				: provisionRepository.getProvisionBySaleCode(getData[2]);
 
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
 		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
+		String speech = "";		
 
 		if (provisionx != null) {
 
@@ -1882,9 +1876,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 					: speech;
 
 			if (request.getStatus().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
+				Update update = new Update();
+				if (provision.getCommercialOp().equals(Constants.OP_COMMERCIAL_MIGRACION)) {
+					Parameter objParams = paramsRepository.getMessage(Constants.MESSAGE_RETURN);
+					if (objParams != null) {
+						update.set("text_return", objParams.getValue());
+					}
+				}
+				
 				if (fromSale) {
-					// IN_TOA fictitious
-					Update update = new Update();
+					// IN_TOA fictitious					
 					// NO SMS
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.DUMMY_IN_TOA.getStatusName());
@@ -1911,7 +1912,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					speechInToa = hasCustomerInfo(provision.getCustomer()) ? speechInToa.replace(
 							Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0]) : speechInToa;
 
-					Update update = new Update();
 					// SI SMS
 					StatusLog statusLog = new StatusLog();
 					statusLog.setStatus(Status.IN_TOA.getStatusName());
@@ -1941,8 +1941,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				} else {
 					pe.telefonica.provision.model.Status inToaStatus = getInfoStatus(Status.IN_TOA.getStatusName(),
 							statusList);
-
-					Update update = new Update();
 
 					update.set("xa_id_st", getXaIdSt);
 					update.set("xa_requirement_number", getXaRequirementNumber);

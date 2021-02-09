@@ -97,6 +97,9 @@ public class ProvisionDetailTrazaDto implements Serializable {
 	@Field("xa_request")
 	private String xaRequest;
 
+	@Field("text_return")
+	private String textReturn;
+	
 	public String getIdProvision() {
 		return idProvision;
 	}
@@ -314,6 +317,15 @@ public class ProvisionDetailTrazaDto implements Serializable {
 		this.workZone = provision.getWorkZone();
 		this.xaIdSt = provision.getXaIdSt();
 		this.xaRequest = provision.getXaRequest();
+		this.textReturn = provision.getTextReturn();
 		return this;
+	}
+
+	public String getTextReturn() {
+		return textReturn;
+	}
+
+	public void setTextReturn(String textReturn) {
+		this.textReturn = textReturn;
 	}
 }

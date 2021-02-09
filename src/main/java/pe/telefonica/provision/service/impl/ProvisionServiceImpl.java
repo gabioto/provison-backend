@@ -7,6 +7,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -40,6 +41,7 @@ import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
+import pe.telefonica.provision.controller.request.ScheduleRequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
@@ -78,6 +80,7 @@ import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoNotdone;
 import pe.telefonica.provision.model.provision.WoPreStart;
 import pe.telefonica.provision.repository.ParamsRepository;
+import pe.telefonica.provision.model.provision.WoReshedule;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
@@ -2339,7 +2342,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return true;
 			}
 			
-			/*if (request.getStatus().equalsIgnoreCase(Status.WO_RESCHEDULE.getStatusName())
+			if (request.getStatus().equalsIgnoreCase(Status.WO_RESCHEDULE.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {
 				pe.telefonica.provision.model.Status rescheduleStatus = getInfoStatus(Status.SCHEDULED.getStatusName(),
 						statusList);
@@ -2445,7 +2448,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
 
 				return true;
-			}*/
+			}
 
 			if (request.getStatus().equalsIgnoreCase(Status.WO_NOTDONE.getStatusName())
 					&& !provision.getXaIdSt().isEmpty()) {

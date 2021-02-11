@@ -1363,6 +1363,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return null;
 	}
+	
+	@Override
+	public List<Provision> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
+		Optional<List<Provision>> optional = provisionRepository.getAllResendNotification(startDate, endDate);
+
+		if (optional.isPresent()) {
+			return optional.get();
+		}
+
+		return null;
+	}
 
 	@Override
 	public Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,

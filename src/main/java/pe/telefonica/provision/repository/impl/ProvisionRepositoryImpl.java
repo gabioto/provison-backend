@@ -485,6 +485,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update, Provision.class);
 		}
 	}
+	
+	@Override
+	public void updateResendNotification(List<Provision> listProvision) {
+		Update update = null;
+		
+		for (int i = 0; i < listProvision.size(); i++) {
+			update = new Update();
+			update.set("notifications.finalizado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+			this.mongoOperations.updateFirst(
+					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+					update, Provision.class);
+			
+		}
+		
+	}
 
 	@Override
 	public boolean updateShowLocation(Provision provision) {

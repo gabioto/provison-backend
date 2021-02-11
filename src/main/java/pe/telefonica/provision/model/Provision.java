@@ -189,6 +189,9 @@ public class Provision implements Serializable {
 
 	@Field("contacts")
 	private List<Contacts> contacts = new ArrayList<>();
+	
+	@Field("contacts")
+	private List<Contacts> resendIntoa = new ArrayList<>();
 
 	@Field("work_zone")
 	private String workZone;

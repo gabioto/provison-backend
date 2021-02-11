@@ -1540,14 +1540,14 @@ public class ProvisionController {
 
 			status = HttpStatus.OK;
 			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_ALL_RESEND_NOTIFICACION, String.valueOf(status.value()), status.getReasonPhrase(),
+					Constants.OPER_GET_ALL_RESEND_NOTIFICATION, String.valueOf(status.value()), status.getReasonPhrase(),
 					response);
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
-					Constants.OPER_GET_ALL_RESEND_NOTIFICACION, String.valueOf(status.value()), ex.getMessage(), null);
+					Constants.OPER_GET_ALL_RESEND_NOTIFICATION, String.valueOf(status.value()), ex.getMessage(), null);
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);

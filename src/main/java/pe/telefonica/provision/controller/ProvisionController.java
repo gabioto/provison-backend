@@ -1457,6 +1457,38 @@ public class ProvisionController {
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}
+	
+	@RequestMapping(value = "/getAllResendNotification", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<GetAllInTimeRangeResponse>> getAllResendNotification(
+			@RequestBody ApiRequest<GetAllInTimeRangeRequest> request) {
+
+		ApiResponse<GetAllInTimeRangeResponse> apiResponse;
+		HttpStatus status;
+
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime startDate = LocalDateTime.parse(request.getBody().getStartDateStr(), formatter);
+			LocalDateTime endDate = LocalDateTime.parse(request.getBody().getEndDateStr(), formatter);
+
+			List<Provision> provisions = provisionService.getAllResendNotification(startDate, endDate);
+			GetAllInTimeRangeResponse response = new GetAllInTimeRangeResponse();
+			response.setProvisions(provisions);
+
+			status = HttpStatus.OK;
+			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_ALL_RESEND_NOTIFICACION, String.valueOf(status.value()), status.getReasonPhrase(),
+					response);
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_ALL_RESEND_NOTIFICACION, String.valueOf(status.value()), ex.getMessage(), null);
+		}
+
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+	
 
 	@RequestMapping(value = "/getProvisionByOrderCode", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Provision>> getProvisionByOrderCode(

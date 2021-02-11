@@ -65,6 +65,8 @@ public interface ProvisionRepository {
 	// idTemplate, String cancellationReason);
 
 	Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
+	
+	Optional<List<Provision>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate);
 
 	Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 

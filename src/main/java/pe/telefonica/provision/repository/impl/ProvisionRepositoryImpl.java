@@ -213,6 +213,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
+	
+	@Override
+	public Optional<List<Provision>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
+		
+		Query query = new Query(Criteria.where("log_status.status").ne("SCHEDULED").and("active_status").is("active").
+				and("notifications.into_send_notify").is(true).
+				and("resend_intoa.intoa_count").exists(false).
+				andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
+						Criteria.where("notifications.into_send_date").lte(endDate)));
+
+		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+
+		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
+		
+	}
 
 	@Override
 	public Provision getProvisionByXaRequest(String xaRequest) {

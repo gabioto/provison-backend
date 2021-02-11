@@ -58,6 +58,8 @@ public interface ProvisionService {
 			String scheduledRange, Integer scheduledType);
 
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
+	
+	public List<Provision> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate);
 
 	Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,
 			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description, String speech,

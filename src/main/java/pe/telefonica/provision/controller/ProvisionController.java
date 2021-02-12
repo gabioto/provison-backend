@@ -140,7 +140,6 @@ public class ProvisionController {
 	}
 
 	/**
-	 * 
 	 * @param provisionRequest
 	 * @return ProvisionResponse<Provision>
 	 * @description get all provisions related to type and number of the document
@@ -338,7 +337,6 @@ public class ProvisionController {
 		String errorInternal = "";
 		String timestamp = "";
 
-		// Validate documentType
 		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
 
 			status = HttpStatus.BAD_REQUEST;
@@ -355,7 +353,6 @@ public class ProvisionController {
 			return ResponseEntity.status(status).body(apiResponse);
 		}
 
-		// Validate documentNumber
 		if (request.getBody().getDocumentNumber() == null || request.getBody().getDocumentNumber().equals("")) {
 
 			status = HttpStatus.BAD_REQUEST;
@@ -448,7 +445,6 @@ public class ProvisionController {
 	}
 
 	/**
-	 * 
 	 * @param provisionId
 	 * @return
 	 */

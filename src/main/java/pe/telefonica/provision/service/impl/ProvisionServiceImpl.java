@@ -47,6 +47,7 @@ import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
 import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
@@ -1365,12 +1366,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 	
 	@Override
-	public List<Provision> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
-		Optional<List<Provision>> optional = provisionRepository.getAllResendNotification(startDate, endDate);
+	public List<ProvisionCustomerDto> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
+		Optional<List<ProvisionCustomerDto>> optional = provisionRepository.getAllResendNotification(startDate, endDate);
 		
+		//Agrego registro al objecto resend_intoa
+		provisionRepository.updateResendNotification(optional.get());
 		
-		
-
 		if (optional.isPresent()) {
 			return optional.get();
 		}

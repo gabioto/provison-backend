@@ -190,9 +190,6 @@ public class Provision implements Serializable {
 	@Field("contacts")
 	private List<Contacts> contacts = new ArrayList<>();
 	
-	@Field("contacts")
-	private List<Contacts> resendIntoa = new ArrayList<>();
-
 	@Field("work_zone")
 	private String workZone;
 
@@ -264,6 +261,9 @@ public class Provision implements Serializable {
 
 	@Field("notifications")
 	private Notifications notifications;
+	
+	@Field("resend_intoa")
+	private List<ResendNotification> resendIntoa= new ArrayList<ResendNotification>();
 
 	@Field("cod_cliente_atis")
 	private String codClienteAtis;
@@ -292,9 +292,18 @@ public class Provision implements Serializable {
 	@Field("status_change_date")
 	private LocalDateTime statusChangeDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
 	
+
 	@Field("text_return")
 	private String textReturn;
-	
+
+	public List<ResendNotification> getResendIntoa() {
+		return resendIntoa;
+	}
+
+	public void setResendIntoa(List<ResendNotification> resendIntoa) {
+		this.resendIntoa = resendIntoa;
+	}
+
 	public LocalDateTime getStatusChangeDate() {
 		return statusChangeDate;
 	}
@@ -950,6 +959,38 @@ public class Provision implements Serializable {
 	public Provision() {
 
 	}
+	
+
+//	@Override
+//	public String toString() {
+//		return "Provision [idProvision=" + idProvision + ", externalId=" + externalId + ", xaRequest=" + xaRequest
+//				+ ", dummyXaRequest=" + dummyXaRequest + ", xaRequirementNumber=" + xaRequirementNumber
+//				+ ", apptNumber=" + apptNumber + ", xaNumberServiceOrder=" + xaNumberServiceOrder
+//				+ ", xaNumberWorkOrder=" + xaNumberWorkOrder + ", activityType=" + activityType + ", xaIdSt=" + xaIdSt
+//				+ ", dummyStPsiCode=" + dummyStPsiCode + ", isUpdatedummyStPsiCode=" + isUpdatedummyStPsiCode
+//				+ ", back=" + back + ", saleSource=" + saleSource + ", saleCode=" + saleCode + ", originCode="
+//				+ originCode + ", saleRequestDate=" + saleRequestDate + ", saleRegisterDate=" + saleRegisterDate
+//				+ ", channelEntered=" + channelEntered + ", protectedData=" + protectedData + ", codePsCode="
+//				+ codePsCode + ", kafkaDateSend=" + kafkaDateSend + ", productName=" + productName
+//				+ ", productNameSource=" + productNameSource + ", productType=" + productType + ", productSub="
+//				+ productSub + ", productInternalEquipment=" + productInternalEquipment + ", productSignal="
+//				+ productSignal + ", productPsAdmin=" + productPsAdmin + ", svaCode=" + svaCode + ", legacies="
+//				+ legacies + ", commercialOp=" + commercialOp + ", productCode=" + productCode + ", paymentMethod="
+//				+ paymentMethod + ", campaign=" + campaign + ", regularPrice=" + regularPrice + ", promoPrice="
+//				+ promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency=" + currency + ", installPrice="
+//				+ installPrice + ", installPriceMonth=" + installPriceMonth + ", activeStatus=" + activeStatus
+//				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
+//				+ registerDate + ", registerDateUpdate=" + registerDateUpdate + ", hasSchedule=" + hasSchedule
+//				+ ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail + ", homePhoneDetail="
+//				+ homePhoneDetail + ", customer=" + customer + ", contacts=" + contacts + ", workZone=" + workZone
+//				+ ", updatedDate=" + updatedDate + ", inviteMessageDate=" + inviteMessageDate + ", lastTrackingStatus="
+//				+ lastTrackingStatus + ", descriptionStatus=" + descriptionStatus + ", genericSpeech=" + genericSpeech
+//				+ ", frontSpeech=" + frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart="
+//				+ woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause="
+//				+ cancellationCause + ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation
+//				+ ", sendNotify=" + sendNotify + ", components=" + components + ", rating=" + rating + "]";
+//	}
+	
 
 	@Override
 	public String toString() {
@@ -965,21 +1006,30 @@ public class Provision implements Serializable {
 				+ ", productNameSource=" + productNameSource + ", productType=" + productType + ", productSub="
 				+ productSub + ", productInternalEquipment=" + productInternalEquipment + ", productSignal="
 				+ productSignal + ", productPsAdmin=" + productPsAdmin + ", svaCode=" + svaCode + ", legacies="
-				+ legacies + ", commercialOp=" + commercialOp + ", productCode=" + productCode + ", paymentMethod="
-				+ paymentMethod + ", campaign=" + campaign + ", regularPrice=" + regularPrice + ", promoPrice="
-				+ promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency=" + currency + ", installPrice="
-				+ installPrice + ", installPriceMonth=" + installPriceMonth + ", activeStatus=" + activeStatus
-				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
-				+ registerDate + ", registerDateUpdate=" + registerDateUpdate + ", hasSchedule=" + hasSchedule
-				+ ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail + ", homePhoneDetail="
-				+ homePhoneDetail + ", customer=" + customer + ", contacts=" + contacts + ", workZone=" + workZone
-				+ ", updatedDate=" + updatedDate + ", inviteMessageDate=" + inviteMessageDate + ", lastTrackingStatus="
-				+ lastTrackingStatus + ", descriptionStatus=" + descriptionStatus + ", genericSpeech=" + genericSpeech
-				+ ", frontSpeech=" + frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart="
-				+ woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause="
-				+ cancellationCause + ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation
-				+ ", sendNotify=" + sendNotify + ", components=" + components + ", rating=" + rating + "]";
+				+ legacies + ", commercialOp=" + commercialOp + ", commercialOpAtis=" + commercialOpAtis
+				+ ", productCode=" + productCode + ", paymentMethod=" + paymentMethod + ", campaign=" + campaign
+				+ ", regularPrice=" + regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice
+				+ ", currency=" + currency + ", installPrice=" + installPrice + ", installPriceMonth="
+				+ installPriceMonth + ", activeStatus=" + activeStatus + ", statusToa=" + statusToa
+				+ ", validatedAddress=" + validatedAddress + ", registerDate=" + registerDate + ", registerDateUpdate="
+				+ registerDateUpdate + ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail
+				+ ", tvDetail=" + tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer
+				+ ", contacts=" + contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate
+				+ ", inviteMessageDate=" + inviteMessageDate + ", lastTrackingStatus=" + lastTrackingStatus
+				+ ", descriptionStatus=" + descriptionStatus + ", genericSpeech=" + genericSpeech + ", frontSpeech="
+				+ frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart=" + woPreStart
+				+ ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause=" + cancellationCause
+				+ ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation + ", sendNotify="
+				+ sendNotify + ", components=" + components + ", rating=" + rating + ", upFront=" + upFront
+				+ ", isUpFront=" + isUpFront + ", upFrontRead=" + upFrontRead + ", subReasonNotDone=" + subReasonNotDone
+				+ ", actionNotDone=" + actionNotDone + ", notifications=" + notifications + ", resendIntoa="
+				+ resendIntoa + ", codClienteAtis=" + codClienteAtis + ", codCuentaAtis=" + codCuentaAtis
+				+ ", technology=" + technology + ", canceladoMotivoAtis=" + canceladoMotivoAtis
+				+ ", canceladoSubmotivoAtis=" + canceladoSubmotivoAtis + ", pendienteDeValidacion="
+				+ pendienteDeValidacion + ", pendienteDeAproacion=" + pendienteDeAproacion + ", configurada="
+				+ configurada + ", statusChangeDate=" + statusChangeDate + "]";
 	}
+
 
 	public static class StatusLog {
 

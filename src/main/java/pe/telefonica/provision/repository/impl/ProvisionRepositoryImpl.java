@@ -27,11 +27,13 @@ import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
+import pe.telefonica.provision.model.ResendNotification;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.Status;
@@ -231,7 +233,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 	
 	@Override
-	public Optional<List<Provision>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
+	public Optional<List<ProvisionCustomerDto>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
 		
 		Query query = new Query(Criteria.where("log_status.status").ne("SCHEDULED").and("active_status").is("active").
 				and("notifications.into_send_notify").is(true).
@@ -239,9 +241,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
 						Criteria.where("notifications.into_send_date").lte(endDate)));
 
-		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
+		List<ProvisionCustomerDto> provisions = this.mongoOperations.find(query, ProvisionCustomerDto.class);
 
-		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		Optional<List<ProvisionCustomerDto>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 		
 	}
@@ -487,16 +489,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 	
 	@Override
-	public void updateResendNotification(List<Provision> listProvision) {
-		Update update = null;
-		
+	public void updateResendNotification(List<ProvisionCustomerDto> listProvision) {
+		Update update = new Update();
+		ResendNotification resendNotification= new ResendNotification();
+		List<ResendNotification> listResendNotification=new ArrayList<ResendNotification>();
 		for (int i = 0; i < listProvision.size(); i++) {
-			update = new Update();
-			update.set("notifications.finalizado_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
+			resendNotification= new ResendNotification();	
+			listResendNotification=new ArrayList<ResendNotification>();					
+			resendNotification.setIntoaCount(1);
+			resendNotification.setIntoaSendDate(LocalDateTime.now(ZoneOffset.of("-05:00")));
+			resendNotification.setIntoaSendNotify(true);
+			listResendNotification.add(resendNotification);
+			update.set("resend_intoa", listResendNotification);
+			
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
 					update, Provision.class);
-			
 		}
 		
 	}

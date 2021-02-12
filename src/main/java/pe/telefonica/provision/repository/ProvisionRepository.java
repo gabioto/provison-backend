@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Provision;
@@ -66,7 +67,7 @@ public interface ProvisionRepository {
 
 	Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 	
-	Optional<List<Provision>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate);
+	Optional<List<ProvisionCustomerDto>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate);
 
 	Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 
@@ -77,7 +78,9 @@ public interface ProvisionRepository {
 	Optional<List<Provision>> getOrderToNotify();
 
 	void updateFlagDateNotify(List<Provision> listProvision);
-
+	
+	void updateResendNotification(List<ProvisionCustomerDto> listProvision);
+	
 	boolean updateShowLocation(Provision provision);
 
 	Optional<Status> getInfoStatus(String statusName);

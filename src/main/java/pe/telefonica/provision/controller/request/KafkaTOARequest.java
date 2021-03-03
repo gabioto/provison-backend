@@ -1,8 +1,5 @@
 package pe.telefonica.provision.controller.request;
 
-
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,19 +13,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class KafkaTOARequest {
-	
+
 	private String eventId;
 	private String eventTime;
 	private String eventType;
-	private Event event; 
-	
+	private Event event;
+
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@EqualsAndHashCode(callSuper = false)
 	public static class Event {
 		private Appointment appointment;
-		
+
 		@Data
 		@NoArgsConstructor
 		@AllArgsConstructor
@@ -38,6 +35,7 @@ public class KafkaTOARequest {
 			private String href;
 			private String creationDate;
 			private String description;
+			private String type;
 			private String timeSlot;
 			private String scheduledDate;
 			private String scheduler;
@@ -46,113 +44,127 @@ public class KafkaTOARequest {
 			private String status;
 			private String statusReason;
 			private String statusChangeDate;
+			private String priority;
 			private List<ContactMedium> contactMedium = new ArrayList<>();
 			private List<Note> note = new ArrayList<>();
 			private List<RelatedParty> relatedParty = new ArrayList<>();
 			private RelatedPlace relatedPlace;
 			private List<RelatedObject> relatedObject = new ArrayList<>();
 			private List<AdditionalData> additionalData = new ArrayList<>();
-			
+
 			@Data
 			@NoArgsConstructor
 			@AllArgsConstructor
 			@EqualsAndHashCode(callSuper = false)
-			public static class ContactMedium{
+			public static class ContactMedium {
+				private String aType;
+				private String type;
 				private String number;
-				
-				
+				private String email;
 			}
-			
+
 			@Data
 			@NoArgsConstructor
 			@AllArgsConstructor
 			@EqualsAndHashCode(callSuper = false)
-			public static class Note{
+			public static class Note {
 				private String text;
 			}
-			
+
 			@Data
 			@NoArgsConstructor
 			@AllArgsConstructor
 			@EqualsAndHashCode(callSuper = false)
-			public static class RelatedParty{
+			public static class RelatedParty {
 				private String id;
 				private String name;
 				private String role;
 				private List<LegalId> legalId = new ArrayList<>();
 				private List<ContactMedium> contactMedium = new ArrayList<>();
-				
+				private List<AdditionalData> additionalData = new ArrayList<>();
+
 				@Data
 				@NoArgsConstructor
 				@AllArgsConstructor
 				@EqualsAndHashCode(callSuper = false)
-				public static class LegalId{
+				public static class LegalId {
 					private String nationalIdType;
 					private String nationalId;
 				}
-				
+
 				@Data
 				@NoArgsConstructor
 				@AllArgsConstructor
 				@EqualsAndHashCode(callSuper = false)
-				public static class ContactMedium{
+				public static class ContactMedium {
 					private String type;
 					private String number;
-					
+
 				}
 			}
-			
+
 			@Data
 			@NoArgsConstructor
 			@AllArgsConstructor
 			@EqualsAndHashCode(callSuper = false)
-			public static class RelatedPlace{
-				private String 	id;
-				private String 	name;
-				private Coordinates coordinates;
+			public static class RelatedPlace {
+				private String id;
+				private String name;
+				private Address address;
 				
 				@Data
 				@NoArgsConstructor
 				@AllArgsConstructor
 				@EqualsAndHashCode(callSuper = false)
-				public static class Coordinates{
-					private String longitude;
-					private String latitude;
+				public static class Address {
+					private String city;
+					private String stateOrProvince;
+					private String region;
+					private String comments;
+					private Coordinates coordinates;
 					
+					@Data
+					@NoArgsConstructor
+					@AllArgsConstructor
+					@EqualsAndHashCode(callSuper = false)
+					public static class Coordinates {
+						private String longitude;
+						private String latitude;
+
+					}
 				}
-				
 			}
-			
+
 			@Data
 			@NoArgsConstructor
 			@AllArgsConstructor
 			@EqualsAndHashCode(callSuper = false)
-			public static class RelatedObject{
+			public static class RelatedObject {
 				private String involvement;
 				private List<AdditionalData> additionalData = new ArrayList<>();
-				
+
 				@Data
 				@NoArgsConstructor
 				@AllArgsConstructor
 				@EqualsAndHashCode(callSuper = false)
-				public static class AdditionalData{
+				public static class AdditionalData {
 					private String key;
 					private String value;
-					
+
 				}
 			}
-			
+
 			@Data
 			@NoArgsConstructor
 			@AllArgsConstructor
 			@EqualsAndHashCode(callSuper = false)
-			public static class AdditionalData{
+			public static class AdditionalData {
 				private String key;
 				private String value;
-				
+
 			}
 		}
-		
+
 	}
 
 }

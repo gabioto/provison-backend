@@ -5,27 +5,44 @@ import pe.telefonica.provision.model.Customer;
 public class ScheduleRequest extends LogDataFrontendRequest {
 
 	private String requestId;
+
 	private String requestType;
+
 	private String requestName;
+
 	private String selectedDate;
+
 	private String selectedRange;
+
 	private boolean isPilot;
+
 	private String orderCode;
+
 	private String stpsiCode;
+
 	private String xaOrderCode;
+
 	private Customer customer;
 
-	/*public ScheduleRequest(String requestId, String requestType, String requestName, String selectedDate, String selectedRange, String isPilot, String orderCode, String stpsiCode) {
-		super();
-		this.requestId = requestId;
-		this.requestType = requestType;
-		this.requestName = requestName;
-		this.selectedDate = selectedDate;
-		this.selectedRange = selectedRange;
-		this.isPilot = isPilot;
-		this.orderCode = orderCode;
-		this.stpsiCode = stpsiCode;
-	}*/
+	private String scheduler;
+
+	private String priority;
+
+	private String customerType;
+
+	private String customerSubType;
+
+	private String phoneNetworkTechnology;
+
+	private String phoneTechnology;
+
+	private String broadbandNetworkTechnology;
+
+	private String broadbandTechnology;
+
+	private String tvNetworkTechnology;
+
+	private String tvTechnology;
 
 	public String getRequestId() {
 		return requestId;
@@ -105,6 +122,86 @@ public class ScheduleRequest extends LogDataFrontendRequest {
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
+	}
+
+	public String getScheduler() {
+		return scheduler;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public String getCustomerSubType() {
+		return customerSubType;
+	}
+
+	public String getPhoneNetworkTechnology() {
+		return phoneNetworkTechnology;
+	}
+
+	public String getPhoneTechnology() {
+		return phoneTechnology;
+	}
+
+	public String getBroadbandNetworkTechnology() {
+		return broadbandNetworkTechnology;
+	}
+
+	public String getBroadbandTechnology() {
+		return broadbandTechnology;
+	}
+
+	public String getTvNetworkTechnology() {
+		return tvNetworkTechnology;
+	}
+
+	public String getTvTechnology() {
+		return tvTechnology;
+	}
+
+	public void setScheduler(String scheduler) {
+		this.scheduler = scheduler;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+
+	public void setCustomerSubType(String customerSubType) {
+		this.customerSubType = customerSubType;
+	}
+
+	public void setPhoneNetworkTechnology(String phoneNetworkTechnology) {
+		this.phoneNetworkTechnology = phoneNetworkTechnology;
+	}
+
+	public void setPhoneTechnology(String phoneTechnology) {
+		this.phoneTechnology = phoneTechnology;
+	}
+
+	public void setBroadbandNetworkTechnology(String broadbandNetworkTechnology) {
+		this.broadbandNetworkTechnology = broadbandNetworkTechnology;
+	}
+
+	public void setBroadbandTechnology(String broadbandTechnology) {
+		this.broadbandTechnology = broadbandTechnology;
+	}
+
+	public void setTvNetworkTechnology(String tvNetworkTechnology) {
+		this.tvNetworkTechnology = tvNetworkTechnology;
+	}
+
+	public void setTvTechnology(String tvTechnology) {
+		this.tvTechnology = tvTechnology;
 	}
 
 }

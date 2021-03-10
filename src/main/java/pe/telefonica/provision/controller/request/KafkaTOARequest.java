@@ -141,6 +141,7 @@ public class KafkaTOARequest {
 			@EqualsAndHashCode(callSuper = false)
 			public static class RelatedObject {
 				private String involvement;
+				private String reference;
 				private List<AdditionalData> additionalData = new ArrayList<>();
 
 				@Data

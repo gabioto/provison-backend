@@ -36,19 +36,25 @@ public abstract class ProvisionUpdateServiceImpl {
 	private ProvisionRepository provisionRepository;
 
 	public abstract boolean updateInToa(Provision provision, KafkaTOARequest kafkaToaRequest, Status status);
-	
-	public abstract boolean updateWoPrestart();
-	
-	public abstract boolean updateWoInit();
-	
-	public abstract boolean updateWoCompleted();
-	
-	public abstract boolean updateWoCancel();
-	
-	public abstract boolean updateWoReschdule();
-	
-	public abstract boolean updateWoNotDone();
-	
+
+	public abstract boolean updateWoPrestart(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status);
+
+	public abstract boolean updateWoInit(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status);
+
+	public abstract boolean updateWoCompleted(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status);
+
+	public abstract boolean updateWoCancel(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status);
+
+	public abstract boolean updateWoReschdule(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status);
+
+	public abstract boolean updateWoNotDone(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status);
+
 	public boolean getCarrier(String phoneNumber) {
 
 		boolean isMovistar = false;

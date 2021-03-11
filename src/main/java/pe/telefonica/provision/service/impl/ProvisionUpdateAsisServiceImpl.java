@@ -809,37 +809,43 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 	}
 
 	@Override
-	public boolean updateWoPrestart() {
+	public boolean updateWoPrestart(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean updateWoInit() {
+	public boolean updateWoInit(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean updateWoCompleted() {
+	public boolean updateWoCompleted(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean updateWoCancel() {
+	public boolean updateWoCancel(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean updateWoReschdule() {
+	public boolean updateWoReschdule(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean updateWoNotDone() {
+	public boolean updateWoNotDone(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status) {
 		// TODO Auto-generated method stub
 		return false;
 	}

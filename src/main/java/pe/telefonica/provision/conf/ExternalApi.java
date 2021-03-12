@@ -41,6 +41,7 @@ public class ExternalApi {
 	private String searchCustomer;
 	private String productOrders;
 	private String loginToken;
+	private String insertSchedule;
 
 	private String searchCustomerOnPremise;
 	private String nroDiasVidaProvision;
@@ -48,12 +49,13 @@ public class ExternalApi {
 	private String securityGetOAuthToken;
 	private String simpliGetUrl;
 	private String simpliBaseUrl;
-	
+
 	private String simpliGetUrlAzure;
 	private String simpliBaseUrlAzure;
 	private String apiClientKeyAzure;
-	
+
 	private String oauthTokenOnPremise;
 	private String customerSearchClientOnPremise;
 	private String securityGetOAuthTokenAzure;
+
 }

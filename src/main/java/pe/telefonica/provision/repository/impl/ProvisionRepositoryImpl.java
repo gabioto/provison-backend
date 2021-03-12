@@ -26,7 +26,6 @@ import com.mongodb.client.result.UpdateResult;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
-import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
@@ -78,7 +77,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime01 = dateStart.format(formatter);		
+		String formattedDateTime01 = dateStart.format(formatter);
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
@@ -92,31 +91,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public List<Provision> findAllTraza__tes(String documentType, String documentNumber) {
-
-		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
-						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_NOTDONE),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
-				Provision.class);
-
-		return provisions;
-	}
-
-	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime = dateStart.format(formatter);		
+		String formattedDateTime = dateStart.format(formatter);
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
@@ -231,21 +212,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
 	}
-	
+
 	@Override
-	public Optional<List<ProvisionCustomerDto>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
-		
-		Query query = new Query(Criteria.where("log_status.status").ne("SCHEDULED").and("active_status").is("active").
-				and("notifications.into_send_notify").is(true).
-				and("resend_intoa.intoa_count").exists(false).
-				andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
+	public Optional<List<ProvisionCustomerDto>> getAllResendNotification(LocalDateTime startDate,
+			LocalDateTime endDate) {
+
+		Query query = new Query(Criteria.where("log_status.status").ne("SCHEDULED").and("active_status").is("active")
+				.and("notifications.into_send_notify").is(true).and("resend_intoa.intoa_count").exists(false)
+				.andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
 						Criteria.where("notifications.into_send_date").lte(endDate)));
 
 		List<ProvisionCustomerDto> provisions = this.mongoOperations.find(query, ProvisionCustomerDto.class);
 
 		Optional<List<ProvisionCustomerDto>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
-		
+
 	}
 
 	@Override
@@ -418,7 +399,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public void updateFlagDateNotify(List<Provision> listProvision) {
 		Update update = new Update();
-		
+
 		for (int i = 0; i < listProvision.size(); i++) {
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.caida_send_notify", true);
@@ -487,26 +468,26 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update, Provision.class);
 		}
 	}
-	
+
 	@Override
 	public void updateResendNotification(List<ProvisionCustomerDto> listProvision) {
 		Update update = new Update();
-		ResendNotification resendNotification= new ResendNotification();
-		List<ResendNotification> listResendNotification=new ArrayList<ResendNotification>();
+		ResendNotification resendNotification = new ResendNotification();
+		List<ResendNotification> listResendNotification = new ArrayList<ResendNotification>();
 		for (int i = 0; i < listProvision.size(); i++) {
-			resendNotification= new ResendNotification();	
-			listResendNotification=new ArrayList<ResendNotification>();					
+			resendNotification = new ResendNotification();
+			listResendNotification = new ArrayList<ResendNotification>();
 			resendNotification.setIntoaCount(1);
 			resendNotification.setIntoaSendDate(LocalDateTime.now(ZoneOffset.of("-05:00")));
 			resendNotification.setIntoaSendNotify(true);
 			listResendNotification.add(resendNotification);
 			update.set("resend_intoa", listResendNotification);
-			
+
 			this.mongoOperations.updateFirst(
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
 					update, Provision.class);
 		}
-		
+
 	}
 
 	@Override
@@ -586,10 +567,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public ProvisionDetailTrazaDto getProvisionDetailById(String provisionId) {
+	public Provision getProvisionDetailById(String provisionId) {
 
-		ProvisionDetailTrazaDto provision = this.mongoOperations
-				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), ProvisionDetailTrazaDto.class);
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), Provision.class);
 
 		return provision;
 	}

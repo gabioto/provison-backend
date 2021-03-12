@@ -1827,7 +1827,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
 
-		return provisionRepository.getProvisionDetailById(request.getIdProvision());
+		Provision provision = provisionRepository.getProvisionDetailById(request.getIdProvision());
+
+		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}
 
 }

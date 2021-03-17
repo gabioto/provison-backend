@@ -9,10 +9,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import pe.telefonica.provision.model.Contacts;
-import pe.telefonica.provision.model.HomePhone;
-import pe.telefonica.provision.model.Internet;
 import pe.telefonica.provision.model.Provision;
-import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.rating.Rating;
 
@@ -80,11 +77,17 @@ public class ProvisionDetailTrazaDto implements Serializable {
 
 	private String customerSubType;
 
-	private Internet internetDetail;
+	private String telephoneTechnology;
 
-	private Television tvDetail;
+	private String telephoneNetworkTechnology;
 
-	private HomePhone homePhoneDetail;
+	private String broadbandTechnology;
+
+	private String broadbandNetworkTechnology;
+
+	private String tvTechnology;
+
+	private String tvNetworkTechnology;
 
 	public ProvisionDetailTrazaDto fromProvision(Provision provision) {
 		this.idProvision = provision.getIdProvision();
@@ -116,9 +119,20 @@ public class ProvisionDetailTrazaDto implements Serializable {
 		this.priority = provision.getPriority();
 		this.customerType = provision.getCustomerType();
 		this.customerSubType = provision.getCustomerSubType();
-		this.internetDetail = provision.getInternetDetail();
-		this.tvDetail = provision.getTvDetail();
-		this.homePhoneDetail = provision.getHomePhoneDetail();
+		this.broadbandTechnology = provision.getInternetDetail() != null ? provision.getInternetDetail().getTechnology()
+				: "";
+		this.broadbandNetworkTechnology = provision.getInternetDetail() != null
+				? provision.getInternetDetail().getNetworkTechnology()
+				: "";
+		this.tvTechnology = provision.getTvDetail() != null ? provision.getTvDetail().getTechnology() : "";
+		this.tvNetworkTechnology = provision.getTvDetail() != null ? provision.getTvDetail().getNetworkTechnology()
+				: "";
+		this.telephoneTechnology = provision.getHomePhoneDetail() != null
+				? provision.getHomePhoneDetail().getTechnology()
+				: "";
+		this.telephoneNetworkTechnology = provision.getHomePhoneDetail() != null
+				? provision.getHomePhoneDetail().getNetworkTechnology()
+				: "";
 		return this;
 	}
 

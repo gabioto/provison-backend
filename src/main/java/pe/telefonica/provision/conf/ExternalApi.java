@@ -32,7 +32,7 @@ public class ExternalApi {
 	String sendSMSById;
 	String bucketsByProduct;
 	String updateScheduleDate;
-	String inserSchedule;
+	String insertSchedule;
 	String cancelLocalSchedule;
 	String searchCustomer;
 	String productOrders;
@@ -364,12 +364,12 @@ public class ExternalApi {
 		this.securityGetOAuthTokenAzure = securityGetOAuthTokenAzure;
 	}
 
-	public String getInserSchedule() {
-		return inserSchedule;
+	public String getInsertSchedule() {
+		return insertSchedule;
 	}
 
-	public void setInserSchedule(String inserSchedule) {
-		this.inserSchedule = inserSchedule;
+	public void setInsertSchedule(String insertSchedule) {
+		this.insertSchedule = insertSchedule;
 	}
 
 }

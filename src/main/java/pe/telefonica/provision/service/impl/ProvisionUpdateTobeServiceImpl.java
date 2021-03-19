@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pe.telefonica.provision.controller.request.CustomerRequest;
 import pe.telefonica.provision.controller.request.KafkaTOARequest;
 import pe.telefonica.provision.controller.request.KafkaTOARequest.Event.Appointment;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
@@ -125,17 +126,16 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 			customer.setDistrict(appointment.getRelatedPlace().getAddress().getCity());
 			customer.setProvince(appointment.getRelatedPlace().getAddress().getStateOrProvince());
 			customer.setDepartment(appointment.getRelatedPlace().getAddress().getRegion());
-			customer.setAddress(appointment.getRelatedPlace().getAddress().getCity()); // TODO: Validar si es el campo
-																						// correspondiente a dirección
+			customer.setAddress(appointment.getRelatedPlace().getName());
 			customer.setLatitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLatitude());
 			customer.setLongitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLongitude());
-			customer.setCarrier(getCarrier(customer.getPhoneNumber()));
+			customer.setCarrier(!customer.getPhoneNumber().isEmpty() ? getCarrier(customer.getPhoneNumber()) : false);
 			provision.setCustomer(customer);
 
 			Contacts contact = new Contacts();
 			contact.setPhoneNumber(appointment.getContactMedium().get(5).getNumber());
 			contact.setMail(appointment.getContactMedium().get(7).getEmail());
-			contact.setCarrier(getCarrier(contact.getPhoneNumber()));
+			contact.setCarrier(!contact.getPhoneNumber().isEmpty() ? getCarrier(contact.getPhoneNumber()) : false);
 			provision.getContacts().add(contact);
 
 			HomePhone phone = new HomePhone();
@@ -292,15 +292,18 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		ScheduleRequest scheduleRequest = new ScheduleRequest();
 		scheduleRequest.setBucket(provision.getWorkZone());
-		scheduleRequest.setPilot(false); //
+		scheduleRequest.setWorkZone(provision.getWorkZone());
+		scheduleRequest.setPilot(false);
+		scheduleRequest.setChannel("TZ");
 		scheduleRequest.setOrderCode(provision.getXaRequest());
 		scheduleRequest.setXaOrderCode(provision.getXaRequest());
 		scheduleRequest.setRequestId(provision.getIdProvision());
 		scheduleRequest.setRequestType(provision.getActivityType());
+		scheduleRequest.setRequestName(provision.getProductName());
+		scheduleRequest.setRequestId(provision.getIdProvision());
 		scheduleRequest.setSelectedDate(appointmentDate);
 		scheduleRequest.setSelectedRange(range);
 		scheduleRequest.setStpsiCode(appointment.getId());
-		scheduleRequest.setCustomer(provision.getCustomer());
 		scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
 		scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
 		scheduleRequest.setScheduler(provision.getScheduler());
@@ -318,6 +321,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		scheduleRequest.setTvNetworkTechnology(
 				provision.getTvDetail() != null ? provision.getTvDetail().getNetworkTechnology() : "");
 		scheduleRequest.setTvTechnology(provision.getTvDetail() != null ? provision.getTvDetail().getTechnology() : "");
+		scheduleRequest.setCustomer(new CustomerRequest().fromCustomer(provision.getCustomer()));
 
 		return scheduleRequest;
 	}
@@ -339,6 +343,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.IN_TOA.getStatusName());
 		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
 
 		Update update = new Update();
 		update.set("notifications.into_send_notify", false);
@@ -354,12 +359,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("description_status",
 				inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
 		update.set("front_speech", inToaStatus != null ? inToaStatus.getFront() : Status.IN_TOA.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus().add(statusLog));
+		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
-
-		if (provision.getXaIdSt() != null) {
-			update.set("has_schedule", false);
-		}
 
 		provisionRepository.updateProvision(provision, update);
 
@@ -385,6 +386,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.WO_PRESTART.getStatusName());
 		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
 
 		Update update = new Update();
 		update.set("external_id", appointment.getRelatedParty().get(1).getId());
@@ -400,7 +402,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 				preStartStatus != null ? preStartStatus.getDescription() : Status.WO_PRESTART.getDescription());
 		update.set("front_speech",
 				preStartStatus != null ? preStartStatus.getFront() : Status.WO_PRESTART.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus().add(statusLog));
+		update.set("log_status", provision.getLogStatus());
 
 		// Job Woprestart
 		LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
@@ -490,6 +492,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.WO_INIT.getStatusName());
 		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
 
 		Update update = new Update();
 		update.set("wo_init", woInit);
@@ -501,7 +504,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("description_status",
 				initStatus != null ? initStatus.getDescription() : Status.WO_INIT.getDescription());
 		update.set("front_speech", initStatus != null ? initStatus.getFront() : Status.WO_INIT.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus().add(statusLog));
+		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
 		provisionRepository.updateProvision(provision, update);
@@ -526,6 +529,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.WO_COMPLETED.getStatusName());
 		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
 
 		Update update = new Update();
 		update.set("wo_completed", woCompleted);
@@ -539,7 +543,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 				completedStatus != null ? completedStatus.getDescription() : Status.WO_COMPLETED.getDescription());
 		update.set("front_speech",
 				completedStatus != null ? completedStatus.getFront() : Status.WO_COMPLETED.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus().add(statusLog));
+		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
 		provisionRepository.updateProvision(provision, update);
@@ -565,6 +569,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.WO_CANCEL.getStatusName());
 		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
 
 		Update update = new Update();
 		update.set("wo_cancel", woCancel);
@@ -579,7 +584,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 				cancelStatus != null ? cancelStatus.getDescription() : Status.WO_CANCEL.getDescription());
 		update.set("front_speech", cancelStatus != null ? cancelStatus.getFront() : Status.WO_CANCEL.getFrontSpeech());
 		update.set("show_location", false);
-		update.set("log_status", provision.getLogStatus().add(statusLog));
+		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
 		// Actualiza estado en provision
@@ -631,6 +636,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		statusLog.setScheduledRange(range);
 		statusLog.setScheduledDate(dateString.toString());
 		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
 
 		Update update = new Update();
 		update.set("wo_schedule", woReshedule);
@@ -645,7 +651,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 				rescheduleStatus != null ? rescheduleStatus.getDescription() : Status.SCHEDULED.getDescription());
 		update.set("front_speech",
 				rescheduleStatus != null ? rescheduleStatus.getFront() : Status.SCHEDULED.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus().add(statusLog));
+		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
@@ -674,6 +680,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.WO_NOTDONE.getStatusName());
 		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
 
 		String speech = notDoneStatus != null ? notDoneStatus.getGenericSpeech() : Status.WO_NOTDONE.getGenericSpeech();
 		speech = hasCustomerInfo(provision.getCustomer())
@@ -691,7 +698,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 				notDoneStatus != null ? notDoneStatus.getDescription() : Status.WO_NOTDONE.getDescription());
 		update.set("front_speech",
 				notDoneStatus != null ? notDoneStatus.getFront() : Status.WO_NOTDONE.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus().add(statusLog));
+		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("send_notify", false);
 

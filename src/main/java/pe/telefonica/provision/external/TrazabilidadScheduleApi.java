@@ -133,7 +133,7 @@ public class TrazabilidadScheduleApi {
 
 	public boolean insertSchedule(ScheduleRequest scheduleRequest) {
 
-		String urlSchedule = api.getScheduleUrl() + api.getInserSchedule();
+		String urlSchedule = api.getScheduleUrl() + api.getInsertSchedule();
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

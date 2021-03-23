@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pe.telefonica.provision.controller.request.CustomerRequest;
 import pe.telefonica.provision.controller.request.KafkaTOARequest;
 import pe.telefonica.provision.controller.request.KafkaTOARequest.Event.Appointment;
 import pe.telefonica.provision.controller.request.ScheduleNotDoneRequest;
@@ -683,7 +684,7 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 				scheduleRequest.setSelectedDate(dateString2);
 				scheduleRequest.setSelectedRange(range);
 				scheduleRequest.setStpsiCode(getXaIdSt);
-				scheduleRequest.setCustomer(customer);
+				scheduleRequest.setCustomer(new CustomerRequest().fromCustomer(customer));
 
 				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
 				scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());

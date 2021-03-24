@@ -5,34 +5,37 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class Television implements Serializable{
+public class Television implements Serializable {
 
 	private static final long serialVersionUID = -5505560087293506272L;
-	
+
 	@Field("type")
 	private String type;
-	
+
 	@Field("description")
 	private String description;
-	
+
 	@Field("equipment")
 	private String equipment;
-	
+
 	@Field("total_equipments_number")
 	private Integer equipmentsNumber;
-	
+
 	@Field("additional_hd")
 	private Integer additionalHd;
-	
+
 	@Field("additional_smart_hd")
 	private Integer additionalSmartHd;
-	
+
 	@Field("tv_signal")
 	private String tvSignal;
-	
+
 	@Field("technology")
 	private String technology;
-	
+
+	@Field("network_technology")
+	private String networkTechnology;
+
 	@Field("tv_block")
 	private List<TvBlock> tvBlocks;
 
@@ -106,5 +109,14 @@ public class Television implements Serializable{
 
 	public void setTvBlocks(List<TvBlock> tvBlocks) {
 		this.tvBlocks = tvBlocks;
-	} 
+	}
+
+	public String getNetworkTechnology() {
+		return networkTechnology;
+	}
+
+	public void setNetworkTechnology(String networkTechnology) {
+		this.networkTechnology = networkTechnology;
+	}
+
 }

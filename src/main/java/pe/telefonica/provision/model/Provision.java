@@ -189,7 +189,7 @@ public class Provision implements Serializable {
 
 	@Field("contacts")
 	private List<Contacts> contacts = new ArrayList<>();
-	
+
 	@Field("work_zone")
 	private String workZone;
 
@@ -261,9 +261,9 @@ public class Provision implements Serializable {
 
 	@Field("notifications")
 	private Notifications notifications;
-	
+
 	@Field("resend_intoa")
-	private List<ResendNotification> resendIntoa= new ArrayList<ResendNotification>();
+	private List<ResendNotification> resendIntoa = new ArrayList<ResendNotification>();
 
 	@Field("cod_cliente_atis")
 	private String codClienteAtis;
@@ -288,10 +288,19 @@ public class Provision implements Serializable {
 
 	@Field("configurada")
 	private Configurada configurada;
-	
+
+	private String scheduler;
+
+	private String priority;
+
+	@Field("customer_type")
+	private String customerType;
+
+	@Field("customer_subtype")
+	private String customerSubType;
+
 	@Field("status_change_date")
 	private LocalDateTime statusChangeDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-	
 
 	@Field("text_return")
 	private String textReturn;
@@ -959,7 +968,6 @@ public class Provision implements Serializable {
 	public Provision() {
 
 	}
-	
 
 //	@Override
 //	public String toString() {
@@ -990,7 +998,6 @@ public class Provision implements Serializable {
 //				+ cancellationCause + ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation
 //				+ ", sendNotify=" + sendNotify + ", components=" + components + ", rating=" + rating + "]";
 //	}
-	
 
 	@Override
 	public String toString() {
@@ -1029,7 +1036,6 @@ public class Provision implements Serializable {
 				+ pendienteDeValidacion + ", pendienteDeAproacion=" + pendienteDeAproacion + ", configurada="
 				+ configurada + ", statusChangeDate=" + statusChangeDate + "]";
 	}
-
 
 	public static class StatusLog {
 
@@ -1135,6 +1141,38 @@ public class Provision implements Serializable {
 
 	public void setTextReturn(String textReturn) {
 		this.textReturn = textReturn;
+	}
+
+	public String getScheduler() {
+		return scheduler;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public String getCustomerSubType() {
+		return customerSubType;
+	}
+
+	public void setScheduler(String scheduler) {
+		this.scheduler = scheduler;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+
+	public void setCustomerSubType(String customerSubType) {
+		this.customerSubType = customerSubType;
 	}
 
 }

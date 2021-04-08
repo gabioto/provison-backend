@@ -49,6 +49,7 @@ import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
@@ -148,7 +149,6 @@ public class ProvisionController {
 	}
 
 	/**
-	 * 
 	 * @param provisionRequest
 	 * @return ProvisionResponse<Provision>
 	 * @description get all provisions related to type and number of the document
@@ -346,7 +346,6 @@ public class ProvisionController {
 		String errorInternal = "";
 		String timestamp = "";
 
-		// Validate documentType
 		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
 
 			status = HttpStatus.BAD_REQUEST;
@@ -363,7 +362,6 @@ public class ProvisionController {
 			return ResponseEntity.status(status).body(apiResponse);
 		}
 
-		// Validate documentNumber
 		if (request.getBody().getDocumentNumber() == null || request.getBody().getDocumentNumber().equals("")) {
 
 			status = HttpStatus.BAD_REQUEST;
@@ -456,7 +454,6 @@ public class ProvisionController {
 	}
 
 	/**
-	 * 
 	 * @param provisionId
 	 * @return
 	 */
@@ -1524,6 +1521,37 @@ public class ProvisionController {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), ex.getMessage(), null);
+		}
+
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+
+	@RequestMapping(value = "/getAllResendNotification", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<ProvisionCustomerDto>>> getAllResendNotification(
+			@RequestBody ApiRequest<GetAllInTimeRangeRequest> request) {
+
+		ApiResponse<List<ProvisionCustomerDto>> apiResponse;
+		HttpStatus status;
+
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime startDate = LocalDateTime.parse(request.getBody().getStartDateStr(), formatter);
+			LocalDateTime endDate = LocalDateTime.parse(request.getBody().getEndDateStr(), formatter);
+
+			List<ProvisionCustomerDto> provisions = provisionService.getAllResendNotification(startDate, endDate);
+
+			status = HttpStatus.OK;
+
+			apiResponse = new ApiResponse<List<ProvisionCustomerDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_ALL_RESEND_NOTIFICATION, String.valueOf(status.value()),
+					status.getReasonPhrase(), provisions);
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+			apiResponse = new ApiResponse<List<ProvisionCustomerDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_ALL_RESEND_NOTIFICATION, String.valueOf(status.value()), ex.getMessage(), null);
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);

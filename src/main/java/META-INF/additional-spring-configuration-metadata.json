@@ -241,6 +241,7 @@
   },
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "name": "external.api.inserSchedule",
     "type": "java.lang.String",
     "description": "A description for 'external.api.inserSchedule'"
@@ -249,5 +250,15 @@
     "type": "java.lang.String",
     "description": "A description for 'external.api.loginToken'"
 >>>>>>> feature/SAQ-1305/nuevo_login
+=======
+    "name": "external.api.loginToken",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.loginToken'"
+=======
+    "name": "external.api.inserSchedule",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.inserSchedule'"
+>>>>>>> feature/SAQR-1473/lectura_topico_tobe
+>>>>>>> feature/SAQR-1505/datos_minimos_toa
   }
 ]}

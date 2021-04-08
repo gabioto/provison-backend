@@ -21,7 +21,7 @@ import okhttp3.OkHttpClient;
 
 public class SSLClientFactory {
 
-	private static boolean allowUntrusted = false;
+//	private static boolean allowUntrusted = false;
     private static final long LOGIN_TIMEOUT_SEC = 20;
     private static HttpClientBuilder closeableClientBuilder = null;
     private static OkHttpClient.Builder okHttpClientBuilder = null;

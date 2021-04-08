@@ -57,6 +57,7 @@ public final class Constants {
 	public static final String OPER_GET_TOKEN_EXTERNAL = "OPER_GET_TOKEN_EXTERNAL";
 	public static final String OPER_GET_OAUTH_TOKEN = "OPER_GET_OAUTH_TOKEN";
 	public static final String OPER_GET_ALL_IN_TIME_RANGE = "OPER_GET_ALL_IN_TIME_RANGE";
+	public static final String OPER_GET_ALL_RESEND_NOTIFICATION = "OPER_GET_ALL_RESEND_NOTIFICATION";
 	public static final String OPER_GET_ORDER_TO_NOTIFY = "OPER_GET_ORDER_TO_NOTIFY";
 
 	public static final String APP_NAME_FRONT_END = "APP_FRONT_END";
@@ -156,6 +157,10 @@ public final class Constants {
 	public static final String STATUS_PENDIENTE_PAGO = "PENDIENTE-PAGO";
 	public static final String STATUS_PAGADO = "PAGADO";
 
+	// Mensaje devolución de equipos
+	public static final String MESSAGE_RETURN = "MESSAGE_RETURN";
+	public static final String OP_COMMERCIAL_MIGRACION = "MIGRACION";
+
 	// Estados ATIS
 	public static final String STATUS_FINALIZADO = "FI";
 	public static final String STATUS_TERMINADA = "TE";
@@ -167,8 +172,8 @@ public final class Constants {
 
 	public static final String STATUS_FIJA_PARKOUR = "VENTASFIJA_PARKUR";
 	public static final String STATUS_ATIS = "ATIS";
-	
-	//Scheduler source
+
+	// Scheduler source
 	public static final String SCHEDULER_PSI = "PSI";
 	public static final String SCHEDULER_AMDOCS = "AMDOCS";
 

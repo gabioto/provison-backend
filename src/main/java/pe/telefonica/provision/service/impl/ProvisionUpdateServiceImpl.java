@@ -70,17 +70,14 @@ public abstract class ProvisionUpdateServiceImpl {
 	}
 
 	public void sendEmailToCustomer(Customer objCustomer, WoPreStart objWoPreStart) {
+
 		ArrayList<MailParameter> mailParameters = new ArrayList<MailParameter>();
+
 		String customerFullName = objCustomer.getName();
 
 		MailParameter mailParameter1 = new MailParameter();
 		mailParameter1.setParamKey("SHORTNAME");
-		if (customerFullName.trim().length() > 0) {
-			String[] customerFullNameArrStr = customerFullName.split(" ");
-			mailParameter1.setParamValue(customerFullNameArrStr[0]);
-		} else {
-			mailParameter1.setParamValue("");
-		}
+		mailParameter1.setParamValue(customerFullName.trim().length() > 0 ? customerFullName.split(" ")[0] : "");
 		mailParameters.add(mailParameter1);
 
 		MailParameter mailParameter2 = new MailParameter();
@@ -112,10 +109,12 @@ public abstract class ProvisionUpdateServiceImpl {
 	}
 
 	public void sendSMSWoPrestartContact(Provision provision) {
+
+		List<Contacts> conct = provision.getContacts();
+
 		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 			return;
 		}
-		List<Contacts> conct = provision.getContacts();
 
 		for (Contacts item : conct) {
 			String text = item.getFullName();
@@ -144,24 +143,23 @@ public abstract class ProvisionUpdateServiceImpl {
 			trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_SCHEDULE_TECHNICIAN_KEY,
 					msgParameters.toArray(new MsgParameter[0]), "", urlTraza);
 		}
-
 	}
 
 	public void sendSMSWoPrestartHolder(Provision provision) {
-		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
-			return;
-		}
+
 		String text = provision.getCustomer().getName();
 
 		String nameCapitalize = text.substring(0, 1).toUpperCase() + text.substring(1);
+
+		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+			return;
+		}
 
 		List<MsgParameter> msgParameters = new ArrayList<>();
 		MsgParameter paramName = new MsgParameter();
 		paramName.setKey(Constants.TEXT_NAME_REPLACE);
 		paramName.setValue(nameCapitalize);
-
 		msgParameters.add(paramName);
-		// msgParameters.add(paramProduct);
 
 		List<Contact> contacts = new ArrayList<>();
 
@@ -175,7 +173,6 @@ public abstract class ProvisionUpdateServiceImpl {
 		String urlTraza = provisionTexts.getWebUrl();
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_FAULT_WOPRESTART,
 				msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
-
 	}
 
 	public pe.telefonica.provision.model.Status getInfoStatus(String statusName,

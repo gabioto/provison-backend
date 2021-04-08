@@ -41,6 +41,7 @@ public class ExternalApi {
 	private String searchCustomer;
 	private String productOrders;
 	private String loginToken;
+	private String insertSchedule;
 
 	private String searchCustomerOnPremise;
 	private String nroDiasVidaProvision;
@@ -56,4 +57,5 @@ public class ExternalApi {
 	private String oauthTokenOnPremise;
 	private String customerSearchClientOnPremise;
 	private String securityGetOAuthTokenAzure;
+
 }

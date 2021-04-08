@@ -37,6 +37,7 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
@@ -598,26 +599,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public boolean insertProvision(InsertOrderRequest request) {
 
-		String speech = "";
-		String getData[];
-		Provision provisionx = null;
-		// InsertOrderRequest request = formatProvision(message);
+		String getData[] = request.getData().split("\\|");
 
-//		if (request == null) {
-//			return false;
-//		}
+		Provision provisionx = null;
+
+		if (request.getDataOrigin().equalsIgnoreCase("ATIS")) {
+			provisionx = provisionRepository.getProvisionByXaRequest(getData[1]);
+		} else {
+			provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
+		}
 
 		if (request.getDataOrigin().equalsIgnoreCase("ORDENES")) {
 			return false;
 		}
-		getData = request.getData().split("\\|");
-		provisionx = request.getDataOrigin().equalsIgnoreCase("ATIS")
-				? provisionRepository.getProvisionByXaRequest(getData[1])
-				: provisionRepository.getProvisionBySaleCode(getData[2]);
 
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
 		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
+		String speech = "";
 
 		if (provisionx != null) {
 
@@ -1273,6 +1272,21 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
 		Optional<List<Provision>> optional = provisionRepository.getAllInTimeRange(startDate, endDate);
+
+		if (optional.isPresent()) {
+			return optional.get();
+		}
+
+		return null;
+	}
+
+	@Override
+	public List<ProvisionCustomerDto> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate) {
+		Optional<List<ProvisionCustomerDto>> optional = provisionRepository.getAllResendNotification(startDate,
+				endDate);
+
+		// Agrego registro al objecto resend_intoa
+		provisionRepository.updateResendNotification(optional.get());
 
 		if (optional.isPresent()) {
 			return optional.get();

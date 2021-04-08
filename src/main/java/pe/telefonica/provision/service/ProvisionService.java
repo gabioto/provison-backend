@@ -12,6 +12,7 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
@@ -58,6 +59,8 @@ public interface ProvisionService {
 			String scheduledRange, Integer scheduledType);
 
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
+	
+	public List<ProvisionCustomerDto> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate);
 
 	Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,
 			LocalDate scheduledDate, String scheduledRange, Integer scheduleType, String description, String speech,

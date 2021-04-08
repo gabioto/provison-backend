@@ -263,6 +263,7 @@ public class TrazabilidadSecurityApi {
 	}
 
 	public String generateToken() {
+
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

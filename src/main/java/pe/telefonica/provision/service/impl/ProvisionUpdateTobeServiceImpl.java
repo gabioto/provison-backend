@@ -421,7 +421,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 				String switchAzure = System.getenv("TDP_SWITCH_AZURE");
 				String tokenExternal = switchAzure.equals("true") ? trazabilidadSecurityApi.gerateTokenAzure()
-						: trazabilidadSecurityApi.gerateToken();
+						: trazabilidadSecurityApi.generateToken();
 
 				// validate TechAvailable
 				GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();

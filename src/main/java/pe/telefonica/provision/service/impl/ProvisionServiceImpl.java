@@ -37,6 +37,7 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
@@ -905,7 +906,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision requestAddressUpdate(String provisionId) {
+	public ProvisionDetailTrazaDto requestAddressUpdate(String provisionId) {
 		Optional<Provision> optional = provisionRepository.getProvisionById(provisionId);
 
 		if (optional.isPresent()) {
@@ -920,7 +921,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			if (updated) {
 				boolean sent = bOApi.sendRequestToBO(provision, "3");
 				// boolean sent = sendAddressChangeRequest(provision);
-				return sent ? provision : null;
+				return sent ? new ProvisionDetailTrazaDto().fromProvision(provision) : null;
 			} else {
 				return null;
 			}
@@ -1088,7 +1089,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision orderCancellation(String provisionId, String cause, String detail) {
+	public ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail) {
 		boolean sentBOCancellation;
 		boolean provisionUpdated;
 		boolean scheduleUpdated;
@@ -1148,7 +1149,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
 			}
 
-			return provision;
+			return new ProvisionDetailTrazaDto().fromProvision(provision);
 		} else {
 			return null;
 		}
@@ -1323,14 +1324,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
+	public ProvisionDetailTrazaDto setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
 		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
 
 		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
 		int count = 0;
 		int maxTries = 2;
 
-		while (true) {
+		while (count < maxTries) {
 			try {
 				if (provision != null) {
 					List<ContactRequest> listContact = request.getContacts();
@@ -1410,7 +1411,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						throw new Exception();
 					}
 
-					return provision;
+					return new ProvisionDetailTrazaDto().fromProvision(provision);
 
 				} else {
 					return null;
@@ -1421,6 +1422,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 			}
 		}
+
+		throw new Exception("Maxima cantidad de intentos permitidos");
 	}
 
 	@Override
@@ -1805,6 +1808,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 		}
 
 		return provisions;
+	}
+
+	@Override
+	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
+
+		Provision provision = provisionRepository.getProvisionDetailById(request.getIdProvision());
+
+		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}
 
 }

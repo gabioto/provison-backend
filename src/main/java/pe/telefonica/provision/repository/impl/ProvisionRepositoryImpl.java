@@ -24,6 +24,7 @@ import com.mongodb.client.result.UpdateResult;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Provision;
@@ -162,6 +163,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					Provision.class);
 		} catch (Exception e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+		}
+
+		Optional<Provision> optionalSchedule = Optional.ofNullable(provision);
+
+		return optionalSchedule;
+	}
+
+	@Override
+	public Optional<Provision> getAllProvisionById(String provisionId) {
+		Provision provision = null;
+		try {
+			provision = this.mongoOperations
+					.findOne(new Query(Criteria.where("idProvision").is(new ObjectId(provisionId))), Provision.class);
+		} catch (Exception e) {
+			log.info(e.getMessage());
 		}
 
 		Optional<Provision> optionalSchedule = Optional.ofNullable(provision);
@@ -518,5 +534,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update, Provision.class);
 		}
 
+	}
+
+	@Override
+	public ProvisionDetailTrazaDto getProvisionDetailById(String provisionId) {
+
+		ProvisionDetailTrazaDto provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), ProvisionDetailTrazaDto.class);
+
+		return provision;
 	}
 }

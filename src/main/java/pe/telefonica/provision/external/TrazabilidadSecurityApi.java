@@ -21,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -37,7 +38,12 @@ import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgPara
 import pe.telefonica.provision.controller.response.SMSByIdResponse;
 import pe.telefonica.provision.external.request.LogDataRequest;
 import pe.telefonica.provision.external.request.security.GetTokenExternalRequest;
+import pe.telefonica.provision.external.request.security.TokenRequest;
+import pe.telefonica.provision.external.response.TokenResponse;
+import pe.telefonica.provision.model.Customer;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.exception.FunctionalErrorException;
+import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
 @Component
 public class TrazabilidadSecurityApi {
@@ -198,12 +204,65 @@ public class TrazabilidadSecurityApi {
 			return responseEntity.getBody();
 		} catch (Exception e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
-			
+
 			return null;
 		}
 	}
 
-	public String gerateToken() {
+	public TokenResponse sendLoginToken(Customer customer) {
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("X-IBM-Client-Id", ibmSecuritySeguridad.getClientId());
+		headersMap.add("X-IBM-Client-Secret", ibmSecuritySeguridad.getClientSecret());
+		headersMap.add("Authorization", ibmSecuritySeguridad.getAuth());
+		headersMap.add("Content-Type", "application/json");
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String url = api.getSecurityUrl() + api.getLoginToken();
+
+		TokenRequest tokenRequest = new TokenRequest();
+		tokenRequest.setCarrier(String.valueOf(customer.getCarrier()));
+		tokenRequest.setCustomerIDNumber(customer.getDocumentNumber());
+		tokenRequest.setCustomerIDType(customer.getDocumentType());
+		tokenRequest.setCustomerName(customer.getName());
+		tokenRequest.setPhoneNumber(customer.getPhoneNumber());
+		tokenRequest.setRequestType("provision");
+
+		ApiRequest<TokenRequest> apiRequest = new ApiRequest<>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION,
+				Constants.OPER_SEND_TOKEN, tokenRequest);
+
+		HttpEntity<ApiRequest<TokenRequest>> entity = new HttpEntity<>(apiRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, entity, String.class);
+
+			JsonObject object = new Gson().fromJson(responseEntity.getBody(), JsonObject.class);
+			JsonObject content = object.getAsJsonObject("body").getAsJsonObject("content");
+			TokenResponse response = new Gson().fromJson(content.toString(), TokenResponse.class);
+			response.setPhone(customer.getPhoneNumber());
+
+			return response;
+
+		} catch (HttpClientErrorException ex) {
+			if (ex.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
+				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+				JsonObject appDetail = jsonDecode.getAsJsonObject("header");
+
+				String message = appDetail.get("message").toString();
+				String codeError = appDetail.get("resultCode").toString();
+
+				throw new FunctionalErrorException(message, ex, codeError);
+			} else {
+				throw new ServerNotFoundException(ex.getMessage());
+			}
+
+		} catch (Exception ex) {
+			throw new ServerNotFoundException(ex.getMessage());
+		}
+	}
+
+	public String generateToken() {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -240,11 +299,11 @@ public class TrazabilidadSecurityApi {
 			}
 		} catch (HttpClientErrorException e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
-			
-			return null;		
+
+			return null;
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return null;
 		}
 	}
@@ -284,12 +343,12 @@ public class TrazabilidadSecurityApi {
 			}
 		} catch (HttpClientErrorException e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
-			
+
 			return null;
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return null;
 		}
 	}

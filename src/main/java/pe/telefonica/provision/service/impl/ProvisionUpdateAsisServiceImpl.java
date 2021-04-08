@@ -350,7 +350,7 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 						if (switchAzure.equals("true")) {
 							tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
 						} else {
-							tokenExternal = trazabilidadSecurityApi.gerateToken();
+							tokenExternal = trazabilidadSecurityApi.generateToken();
 						}
 						// validate TechAvailable
 						GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();

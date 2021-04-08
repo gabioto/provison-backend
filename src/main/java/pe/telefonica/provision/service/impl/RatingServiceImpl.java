@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import pe.telefonica.provision.controller.request.rating.GetRatingRequest;
 import pe.telefonica.provision.controller.request.rating.SetRatingRequest;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.rating.Rating;
 import pe.telefonica.provision.repository.ProvisionRepository;
@@ -29,7 +30,7 @@ public class RatingServiceImpl implements RatingService {
 	}
 
 	@Override
-	public Provision setRating(SetRatingRequest request) {
+	public ProvisionDetailTrazaDto setRating(SetRatingRequest request) {
 
 		Provision provision = provisionRepository.getProvisionByIdNotFilter(request.getProvisionId());
 		if (provision != null) {
@@ -47,12 +48,12 @@ public class RatingServiceImpl implements RatingService {
 			ratingList.add(rating);
 
 			update.set("rating", ratingList);
-			
+
 			provision.setRating(ratingList);
 
 			boolean updated = provisionRepository.updateProvision(provision, update);
 
-			return updated ? provision : null;
+			return updated ? new ProvisionDetailTrazaDto().fromProvision(provision) : null;
 
 		}
 		return null;

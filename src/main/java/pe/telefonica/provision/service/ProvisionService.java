@@ -12,6 +12,7 @@ import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Contacts;
@@ -28,6 +29,8 @@ public interface ProvisionService {
 
 	List<ProvisionTrazaDto> getAllTraza(ApiRequest<ProvisionRequest> provisionRequest);
 
+	ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request);
+
 	ProvisionResponse<String> getStatus(String provisionId);
 
 	ApiResponse<List<Contacts>> getContactList(String provisionId);
@@ -36,18 +39,18 @@ public interface ProvisionService {
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
-	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
+	public ProvisionDetailTrazaDto setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
 
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);
 
 	public Provision setProvisionIsValidated(String provisionId);
 
-	public Provision requestAddressUpdate(String provisionId);
+	public ProvisionDetailTrazaDto requestAddressUpdate(String provisionId);
 
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);
 
-	public Provision orderCancellation(String provisionId, String cause, String detail);
+	ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail);
 
 	ProvisionResponse<Boolean> validateQueue();
 

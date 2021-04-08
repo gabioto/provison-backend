@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import pe.telefonica.provision.model.provision.WoPreStart;
+
 public class WoPreStartDto implements Serializable {
 
 	private static final long serialVersionUID = 3119564011070588284L;
@@ -52,5 +54,12 @@ public class WoPreStartDto implements Serializable {
 		this.trackingUrl = trackingUrl;
 	}
 
+	public WoPreStartDto fromWoPrestart(WoPreStart woPrestart) {
+		this.availableTracking = woPrestart.getAvailableTracking();
+		this.documentNumber = woPrestart.getDocumentNumber();
+		this.fullName = woPrestart.getFullName();
+		this.trackingUrl = woPrestart.getTrackingUrl();
+		return this;
+	}
 }
 

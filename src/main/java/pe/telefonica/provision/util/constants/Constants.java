@@ -44,6 +44,7 @@ public final class Constants {
 	public static final String TIMESTAMP_FORMAT_CMS_ATIS = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 	public static final String TIMESTAMP_FORMAT_CMS_RESP = "yyyy-MM-dd";
+	public static final String TIMESTAMP_FORMAT_SCHEDULE = "yyyy-MM-dd";
 	public static final String TIME_ZONE_LOCALE = "-05:00";
 
 	public static final String ENVIROMENT_PROD = "prod";
@@ -164,6 +165,10 @@ public final class Constants {
 
 	public static final String STATUS_FIJA_PARKOUR = "VENTASFIJA_PARKUR";
 	public static final String STATUS_ATIS = "ATIS";
+	
+	//Scheduler source
+	public static final String SCHEDULER_PSI = "PSI";
+	public static final String SCHEDULER_AMDOCS = "AMDOCS";
 
 	public static final Map<String, String> ATIS_CMS_STATUS = Stream
 			.of(new String[][] { { "new", "EN PROCESO" }, { "rejeted", "EN PROCESO" }, { "pending", "EN PROCESO" },

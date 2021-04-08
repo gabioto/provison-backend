@@ -3,7 +3,6 @@ package pe.telefonica.provision.repository.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -51,17 +49,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<ProvisionDto>> findAll(String documentType, String documentNumber) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime01 = dateStart.format(formatter);
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 		List<ProvisionDto> provisions = this.mongoOperations.find(query, ProvisionDto.class);
 
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
@@ -70,18 +66,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<ProvisionTrazaDto>> findAllTraza(String documentType, String documentNumber) {
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime01 = dateStart.format(formatter);		
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 
 		List<ProvisionTrazaDto> provisions = this.mongoOperations.find(query, ProvisionTrazaDto.class);
 		Optional<List<ProvisionTrazaDto>> optionalProvisions = Optional.ofNullable(provisions);
@@ -108,18 +101,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime = dateStart.format(formatter);		
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 		Provision provision = this.mongoOperations.findOne(query, Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
@@ -286,7 +276,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode())
 				.andOperator(Criteria.where("status_toa").is("done")));
 
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
@@ -373,7 +363,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		Query query = new Query(criteria).limit(15);
 
-		query.with(new Sort(new Order(Direction.ASC, "_id")));
+		query.with(new Sort(Direction.ASC, "_id"));
 
 		List<Provision> provision = this.mongoOperations.find(query, Provision.class);
 
@@ -384,7 +374,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public void updateFlagDateNotify(List<Provision> listProvision) {
 		Update update = new Update();
-		
+
 		for (int i = 0; i < listProvision.size(); i++) {
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.caida_send_notify", true);

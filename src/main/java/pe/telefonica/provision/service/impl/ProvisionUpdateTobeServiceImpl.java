@@ -92,7 +92,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 			pe.telefonica.provision.model.Status inToaStatus = getInfoStatus(Status.IN_TOA.getStatusName(), statusList);
 
 			String productName = (appointment.getRelatedObject().get(2).getReference() != null
-					|| !appointment.getRelatedObject().get(2).getReference().isEmpty())
+					&& !appointment.getRelatedObject().get(2).getReference().isEmpty())
 							? appointment.getRelatedObject().get(2).getReference()
 							: "Movistar Hogar";
 

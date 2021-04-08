@@ -41,12 +41,15 @@ import pe.telefonica.provision.controller.request.GetCustomerByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
+import pe.telefonica.provision.controller.request.KafkaTOARequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.ReceiveAddressUpdateBORequest;
 import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.request.ValidateDataRequest;
 import pe.telefonica.provision.controller.response.GetAllInTimeRangeResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
+import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
@@ -56,6 +59,8 @@ import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.ProvisionScheduler;
 import pe.telefonica.provision.service.OrderService;
 import pe.telefonica.provision.service.ProvisionService;
+import pe.telefonica.provision.service.ProvisionUpdateService.ProvisionUpdateAsisService;
+import pe.telefonica.provision.service.ProvisionUpdateService.ProvisionUpdateTobeService;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ErrorCode;
@@ -72,6 +77,12 @@ public class ProvisionController {
 
 	@Autowired
 	private ProvisionService provisionService;
+
+	@Autowired
+	private ProvisionUpdateAsisService provisionUpdateAsisService;
+
+	@Autowired
+	private ProvisionUpdateTobeService provisionUpdateTobeService;
 
 	@Autowired
 	private OrderService orderService;
@@ -120,7 +131,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			timestamp = getTimestamp();
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Customer>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_USER,
@@ -138,7 +149,6 @@ public class ProvisionController {
 	}
 
 	/**
-	 * 
 	 * @param provisionRequest
 	 * @return ProvisionResponse<Provision>
 	 * @description get all provisions related to type and number of the document
@@ -242,7 +252,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<ProvisionTrazaDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -257,7 +267,74 @@ public class ProvisionController {
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 		}
-		return ResponseEntity.status(status).body(apiResponse);		
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+
+	@RequestMapping(value = "/getProvisionDetailById", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> getProvisionDetailById(
+			@RequestBody ApiRequest<ProvisionRequest> request) {
+
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
+		HttpStatus status;
+		String timestamp = "";
+
+		try {
+			ProvisionDetailTrazaDto provisions = provisionService.getProvisionDetailById(request.getBody());
+
+			if (provisions != null) {
+				status = HttpStatus.OK;
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), status.getReasonPhrase(),
+						null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "OK", new Gson().toJson(request), new Gson().toJson(apiResponse),
+						ConstantsLogData.ACCESS_APP_TYPE_ORDER, request.getHeader().getMessageId(),
+						request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+						request.getHeader().getAppName());
+
+			} else {
+				status = HttpStatus.NOT_FOUND;
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()),
+						"No se encontraron provisiones", null);
+				apiResponse.setBody(provisions);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.ACCESS_APP_TYPE_ORDER,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
+			}
+
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_PROVISION_DETAIL, String.valueOf(status.value()), ex.getMessage().toString(),
+					null);
+
+			timestamp = getTimestamp();
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.ACCESS_APP_TYPE_ORDER, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());
+		}
+		return ResponseEntity.status(status).body(apiResponse);
 	}
 
 	@RequestMapping(value = "/aftersales/services-contracted-by-customer", method = RequestMethod.POST)
@@ -269,7 +346,6 @@ public class ProvisionController {
 		String errorInternal = "";
 		String timestamp = "";
 
-		// Validate documentType
 		if (request.getBody().getDocumentType() == null || request.getBody().getDocumentType().equals("")) {
 
 			status = HttpStatus.BAD_REQUEST;
@@ -286,7 +362,6 @@ public class ProvisionController {
 			return ResponseEntity.status(status).body(apiResponse);
 		}
 
-		// Validate documentNumber
 		if (request.getBody().getDocumentNumber() == null || request.getBody().getDocumentNumber().equals("")) {
 
 			status = HttpStatus.BAD_REQUEST;
@@ -360,7 +435,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<ProvisionDto>>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_ALL, String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -375,11 +450,10 @@ public class ProvisionController {
 					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
 					request.getHeader().getAppName());
 		}
-		return ResponseEntity.status(status).body(apiResponse);		
+		return ResponseEntity.status(status).body(apiResponse);
 	}
 
 	/**
-	 * 
 	 * @param provisionId
 	 * @return
 	 */
@@ -414,7 +488,7 @@ public class ProvisionController {
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_BY_SALE_CODE, String.valueOf(status.value()),
@@ -446,7 +520,7 @@ public class ProvisionController {
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_INSERT_PROVISION,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -474,7 +548,11 @@ public class ProvisionController {
 
 		try {
 
-			provisions = provisionService.provisionUpdateFromTOA(request.getBody());
+			KafkaTOARequest kafkaTOARequest = new Gson().fromJson(request.getBody().getData(), KafkaTOARequest.class);
+
+			provisions = kafkaTOARequest.getEvent().getAppointment().getScheduler().equals(Constants.SCHEDULER_PSI)
+					? provisionUpdateAsisService.provisionUpdateFromTOA(kafkaTOARequest)
+					: provisionUpdateTobeService.provisionUpdateFromTOA(kafkaTOARequest);
 
 			if (provisions) {
 				status = HttpStatus.OK;
@@ -492,7 +570,7 @@ public class ProvisionController {
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_PROVISION_UPDATE_FROM_TOA, String.valueOf(status.value()), ex.getMessage(), null);
@@ -526,7 +604,7 @@ public class ProvisionController {
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_INSERT_PROVISION_CODE_FICT, String.valueOf(status.value()),
@@ -545,7 +623,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/setProvisionValidated", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<List<Provision>>> setProvisionValidated(
 			@RequestBody ApiRequest<ValidateDataRequest> request) {
-		
+
 		String timestamp;
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
@@ -587,7 +665,7 @@ public class ProvisionController {
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_VALIDATE_DATA,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
@@ -612,9 +690,11 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<Provision>> setContactInfoUpdate(
-			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {		
-		ApiResponse<Provision> apiResponse;
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> setContactInfoUpdate(
+			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
+		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 		String errorInternal = "";
 		String timestamp = "";
@@ -632,8 +712,8 @@ public class ProvisionController {
 						.toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode obligatorio", null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						errorInternal, "PSICode obligatorio", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
@@ -647,8 +727,8 @@ public class ProvisionController {
 					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
 							.toString();
 					timestamp = getTimestamp();
-					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode maximo 11 caracteres", null);
+					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+							errorInternal, "PSICode maximo 11 caracteres", null);
 					apiResponse.getHeader().setTimestamp(timestamp);
 					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
@@ -660,8 +740,8 @@ public class ProvisionController {
 					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
 							.toString();
 					timestamp = getTimestamp();
-					apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode debe ser una cadena", null);
+					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+							errorInternal, "PSICode debe ser una cadena", null);
 					apiResponse.getHeader().setTimestamp(timestamp);
 					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
@@ -685,7 +765,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "fullName obligatorio", null);
 
 						apiResponse.getHeader().setTimestamp(timestamp);
@@ -699,7 +779,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber obligatorio", null);
 						apiResponse.getHeader().setTimestamp(timestamp);
 						apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -714,7 +794,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber debe ser numerico",
 								null);
 						apiResponse.getHeader().setTimestamp(timestamp);
@@ -730,7 +810,7 @@ public class ProvisionController {
 								.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", "")).toString();
 
 						timestamp = getTimestamp();
-						apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
 								Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "phoneNumber maximo 9 caracteres",
 								null);
 						apiResponse.getHeader().setTimestamp(timestamp);
@@ -751,22 +831,20 @@ public class ProvisionController {
 						.toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal,
-						"Minimo 1 y maximo 4 datos datos de contacto", null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						errorInternal, "Minimo 1 y maximo 4 datos datos de contacto", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
 				return ResponseEntity.status(status).body(apiResponse);
 			}
 
-			Provision result = provisionService.setContactInfoUpdate(request.getBody());
+			ProvisionDetailTrazaDto result = provisionService.setContactInfoUpdate(request.getBody());
 
 			if (result != null) {
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), status.getReasonPhrase(),
-						result);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						String.valueOf(status.value()), status.getReasonPhrase(), result);
 
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -784,8 +862,8 @@ public class ProvisionController {
 						.toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "No existe registro", null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						errorInternal, "No existe registro", null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 				restSecuritySaveLogData.saveLogData(request.getHeader().getUser(), "", "", "", "ERROR",
@@ -798,11 +876,11 @@ public class ProvisionController {
 
 		} catch (BadRequest ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.BAD_REQUEST;
 
 			timestamp = getTimestamp();
-			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 			apiResponse.getHeader().setTimestamp(timestamp);
 			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
@@ -814,7 +892,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
@@ -833,9 +911,8 @@ public class ProvisionController {
 				errorCode = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorCode.replace("\"", "")).toString();
 
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, errorCode,
-						((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						errorCode, ((FunctionalErrorException) ex).getMessage().replace("\"", ""), null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
@@ -848,9 +925,8 @@ public class ProvisionController {
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
 				timestamp = getTimestamp();
-				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), ex.getMessage().toString(),
-						null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_CONTACT_INFO_UPDATE,
+						String.valueOf(status.value()), ex.getMessage().toString(), null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
 
@@ -1082,7 +1158,7 @@ public class ProvisionController {
 
 		} catch (BadRequest ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.BAD_REQUEST;
 
 			timestamp = getTimestamp();
@@ -1099,7 +1175,7 @@ public class ProvisionController {
 
 		catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
@@ -1155,25 +1231,22 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/requestAddressUpdate", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> requestAddressUpdate(
-			@RequestBody ApiRequest<AddressUpdateRequest> request) {		
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> requestAddressUpdate(
+			@RequestBody ApiRequest<AddressUpdateRequest> request) {
 
 		String timestamp;
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 		try {
 
-			Provision result = provisionService.requestAddressUpdate(request.getBody().getProvisionId());
+			ProvisionDetailTrazaDto result = provisionService.requestAddressUpdate(request.getBody().getProvisionId());
 
 			if (result != null) {
 
-				List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
-				apiResponse.setBody(provisions);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse.setBody(result);
 
 				timestamp = getTimestamp();
 
@@ -1187,8 +1260,8 @@ public class ProvisionController {
 			} else {
 				status = HttpStatus.OK;
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_UPDATE_ADDRESS, String.valueOf(status.value()), status.getReasonPhrase(), null);
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+						String.valueOf(status.value()), status.getReasonPhrase(), null);
 				apiResponse.setBody(null);
 
 				timestamp = getTimestamp();
@@ -1203,9 +1276,9 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
+			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESS,
 					String.valueOf(status.value()), ex.getMessage().toString(), null);
 
 			timestamp = getTimestamp();
@@ -1230,7 +1303,7 @@ public class ProvisionController {
 	@RequestMapping(value = "/receiveAddressUpdateBO", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<Object>> receiveAddressUpdateBO(
 			@RequestBody ApiRequest<ReceiveAddressUpdateBORequest> request) {
-		
+
 		String timestamp;
 		ApiResponse<Object> apiResponse;
 		HttpStatus status;
@@ -1273,7 +1346,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Object>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ADDRESSBO,
 					String.valueOf(status.value()), ex.getMessage(), null);
@@ -1297,27 +1370,23 @@ public class ProvisionController {
 	 */
 
 	@RequestMapping(value = "/orderCancellation", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<List<Provision>>> orderCancellation(
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> orderCancellation(
 			@RequestBody ApiRequest<CancelOrderRequest> request) {
-		
+
 		String timestamp;
-		ApiResponse<List<Provision>> apiResponse;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;
 
 		try {
-			Provision result = provisionService.orderCancellation(request.getBody().getProvisionId(),
+			ProvisionDetailTrazaDto result = provisionService.orderCancellation(request.getBody().getProvisionId(),
 					request.getBody().getCause(), request.getBody().getDetail());
 
 			if (result != null) {
-
-				List<Provision> provisions = new ArrayList<>();
-				provisions.add(result);
-
 				status = HttpStatus.OK;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
-				apiResponse.setBody(provisions);
+				apiResponse.setBody(result);
 
 				timestamp = getTimestamp();
 				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
@@ -1329,7 +1398,7 @@ public class ProvisionController {
 
 			} else {
 				status = HttpStatus.BAD_REQUEST;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), status.getReasonPhrase(),
 						null);
 
@@ -1345,11 +1414,11 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			if (ex instanceof FunctionalErrorException) {
 
 				status = HttpStatus.BAD_REQUEST;
-			
+
 				String errorCode[] = ((FunctionalErrorException) ex).getErrorCode().split("_");
 				Integer htttCode = Integer.parseInt(errorCode[0]);
 
@@ -1363,7 +1432,7 @@ public class ProvisionController {
 					status = HttpStatus.CONFLICT;
 				}
 
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_CONTACT_INFO_UPDATE, errorCode[1], ((FunctionalErrorException) ex).getMessage(),
 						null);
 
@@ -1377,7 +1446,7 @@ public class ProvisionController {
 
 			} else {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
-				apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION,
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_ORDER_CANCELLATION, String.valueOf(status.value()), ex.getMessage().toString(),
 						null);
 
@@ -1414,7 +1483,7 @@ public class ProvisionController {
 					request.getScheduleRange(), request.getScheduleType());
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ProvisionResponse<Boolean>().setData(null);
 		}
@@ -1449,10 +1518,41 @@ public class ProvisionController {
 					response);
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<GetAllInTimeRangeResponse>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_ALL_IN_TIME_RANGE, String.valueOf(status.value()), ex.getMessage(), null);
+		}
+
+		return ResponseEntity.status(status).body(apiResponse);
+	}
+
+	@RequestMapping(value = "/getAllResendNotification", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<List<ProvisionCustomerDto>>> getAllResendNotification(
+			@RequestBody ApiRequest<GetAllInTimeRangeRequest> request) {
+
+		ApiResponse<List<ProvisionCustomerDto>> apiResponse;
+		HttpStatus status;
+
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime startDate = LocalDateTime.parse(request.getBody().getStartDateStr(), formatter);
+			LocalDateTime endDate = LocalDateTime.parse(request.getBody().getEndDateStr(), formatter);
+
+			List<ProvisionCustomerDto> provisions = provisionService.getAllResendNotification(startDate, endDate);
+
+			status = HttpStatus.OK;
+
+			apiResponse = new ApiResponse<List<ProvisionCustomerDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_ALL_RESEND_NOTIFICATION, String.valueOf(status.value()),
+					status.getReasonPhrase(), provisions);
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+			apiResponse = new ApiResponse<List<ProvisionCustomerDto>>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_GET_ALL_RESEND_NOTIFICATION, String.valueOf(status.value()), ex.getMessage(), null);
 		}
 
 		return ResponseEntity.status(status).body(apiResponse);
@@ -1487,7 +1587,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION,
 					Constants.OPER_GET_PROVISION_BY_ORDER_CODE, String.valueOf(status.value()), ex.getMessage(), null);
@@ -1519,7 +1619,7 @@ public class ProvisionController {
 
 	@RequestMapping(value = "/getOrderToNotify", method = RequestMethod.GET)
 	public ResponseEntity<ApiResponse<List<Provision>>> getOrderToNotify() {
-		
+
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
 
@@ -1579,7 +1679,7 @@ public class ProvisionController {
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			apiResponse = new ApiResponse<String>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
 					String.valueOf(status.value()), ex.getMessage(), null);

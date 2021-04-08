@@ -34,7 +34,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
-	
+
 	@Autowired
 	private TrazabilidadSecurityApi restSecuritySaveLogData;
 
@@ -47,13 +47,12 @@ public class OrderServiceImpl implements OrderService {
 		HttpStatus status;
 		boolean success;
 
-		restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
-				request.getDocumentType(), "code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(),
-				"", "", new Gson().toJson(request),
-				"", "INSERT ORDER REQUEST",
-				"", "", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
+		restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+				"code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(), "", "",
+				new Gson().toJson(request), "", "INSERT ORDER REQUEST", "", "",
+				LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
 				order.getSource(), "ORDERS_BACK");
-		
+
 		try {
 			switch (order.getSource()) {
 			case Constants.SOURCE_ORDERS_ORDENES:
@@ -85,28 +84,26 @@ public class OrderServiceImpl implements OrderService {
 
 			success = true;
 			status = HttpStatus.OK;
-			
-			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
-					request.getDocumentType(), "code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(),
-					"", "OK", new Gson().toJson(request),
-					"", "INSERT ORDER RESPONSE",
-					"", "", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
+
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+					"code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(), "", "OK",
+					new Gson().toJson(request), "", "INSERT ORDER RESPONSE", "", "", LocalDateTime
+							.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
 					order.getSource(), "ORDERS_BACK");
 
 		} catch (Exception e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
-			
+
 			success = false;
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			
-			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(),
-					request.getDocumentType(), "code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(),
-					"", "ERROR", new Gson().toJson(request),
-					e.getLocalizedMessage(), "INSERT ORDER RESPONSE",
-					"", "", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
+
+			restSecuritySaveLogData.saveLogData(request.getDocumentNumber(), request.getDocumentType(),
+					"code: " + request.getCode() + ", atisCode: " + order.getAtisOrder(), "", "ERROR",
+					new Gson().toJson(request), e.getLocalizedMessage(), "INSERT ORDER RESPONSE", "", "", LocalDateTime
+							.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
 					order.getSource(), "ORDERS_BACK");
 		}
-		
+
 		return new ResponseEntity<Object>(new OrderCreateResponse(order.getSource(),
 				order.getSource().equals(Constants.SOURCE_ORDERS_ATIS) ? order.getAtisOrder() : order.getCode(),
 				success), status);
@@ -232,7 +229,7 @@ public class OrderServiceImpl implements OrderService {
 
 			SimpleDateFormat dateFormatString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			SimpleDateFormat dateFormatNew = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-			
+
 			try {
 				Date date = dateFormatString.parse(dateString);
 				dateString = dateFormatNew.format(date);
@@ -261,9 +258,9 @@ public class OrderServiceImpl implements OrderService {
 			// VALDIATION Y FORMAT RegisterDate
 			String registerDateString = parts[7].replaceAll("\\s+", " ").trim();
 			if (!registerDateString.isEmpty()) {
-				registerDateString = registerDateString.substring(0, 10) + " " + registerDateString.substring(11, 19);
-
 				try {
+					registerDateString = registerDateString.substring(0, 10) + " "
+							+ registerDateString.substring(11, 19);
 					Date dateSusp = dateFormatString.parse(registerDateString);
 					registerDateString = dateFormatNew.format(dateSusp);
 
@@ -275,9 +272,8 @@ public class OrderServiceImpl implements OrderService {
 			// VALDIATION Y FORMAT ExecSuspDate
 			String dateSuspString = parts[8].replaceAll("\\s+", " ").trim();
 			if (!dateSuspString.isEmpty()) {
-				dateSuspString = dateSuspString.substring(0, 10) + " " + dateSuspString.substring(11, 19);
-
 				try {
+					dateSuspString = dateSuspString.substring(0, 10) + " " + dateSuspString.substring(11, 19);
 					Date dateSusp = dateFormatString.parse(dateSuspString);
 					dateSuspString = dateFormatNew.format(dateSusp);
 
@@ -289,10 +285,9 @@ public class OrderServiceImpl implements OrderService {
 			// VALDIATION Y FORMAT ExecRecoxDate
 			String execRecoxDateString = parts[9].replaceAll("\\s+", " ").trim();
 			if (!execRecoxDateString.isEmpty()) {
-				execRecoxDateString = execRecoxDateString.substring(0, 10) + " "
-						+ execRecoxDateString.substring(11, 19);
-
 				try {
+					execRecoxDateString = execRecoxDateString.substring(0, 10) + " "
+							+ execRecoxDateString.substring(11, 19);
 					Date datRecox = dateFormatString.parse(execRecoxDateString);
 					execRecoxDateString = dateFormatNew.format(datRecox);
 
@@ -316,11 +311,9 @@ public class OrderServiceImpl implements OrderService {
 			// VALDIATION Y FORMAT ReceptionDate
 			String receptionDateString = parts[18].replaceAll("\\s+", " ").trim();
 			if (!receptionDateString.isEmpty()) {
-				receptionDateString = receptionDateString.substring(0, 10) + " "
-						+ receptionDateString.substring(11, 19);
-
 				try {
-
+					receptionDateString = receptionDateString.substring(0, 10) + " "
+							+ receptionDateString.substring(11, 19);
 					Date reception = dateFormatString.parse(receptionDateString);
 					receptionDateString = dateFormatNew.format(reception);
 
@@ -342,12 +335,10 @@ public class OrderServiceImpl implements OrderService {
 			// VALDIATION Y FORMAT RegisterOrderDate
 			String registerOrderDateString = parts[24].trim().replaceAll("\\s+", " ").trim();
 			if (!registerOrderDateString.isEmpty()) {
-				registerOrderDateString = registerOrderDateString.substring(0, 10) + " "
-						+ registerOrderDateString.substring(11, 19);
-
 				try {
+					registerOrderDateString = registerOrderDateString.substring(0, 10) + " "
+							+ registerOrderDateString.substring(11, 19);
 					Date dateOrder = dateFormatString.parse(registerOrderDateString);
-
 					registerOrderDateString = dateFormatNew.format(dateOrder);
 
 				} catch (Exception e) {
@@ -359,9 +350,8 @@ public class OrderServiceImpl implements OrderService {
 			// VALDIATION Y FORMAT ReceptionDate
 			String releaseOrderString = parts[25].replaceAll("\\s+", " ").trim();
 			if (!releaseOrderString.isEmpty()) {
-				execRecoxDateString = releaseOrderString.substring(0, 10) + " " + releaseOrderString.substring(11, 19);
 				try {
-
+					execRecoxDateString = releaseOrderString.substring(0, 10) + " " + releaseOrderString.substring(11, 19);
 					Date releaseOrder = dateFormatString.parse(releaseOrderString);
 					releaseOrderString = dateFormatNew.format(releaseOrder);
 

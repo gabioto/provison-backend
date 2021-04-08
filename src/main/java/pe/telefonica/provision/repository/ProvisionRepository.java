@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Provision;
@@ -18,10 +19,10 @@ import pe.telefonica.provision.model.Status;
 public interface ProvisionRepository {
 
 	Optional<List<ProvisionDto>> findAll(String documentType, String documentNumber);
-	
+
 	Optional<List<ProvisionTrazaDto>> findAllTraza(String documentType, String documentNumber);
 
-	List<Provision> findAllTraza__tes(String documentType, String documentNumber);
+	Provision getProvisionDetailById(String idProvision);
 
 	Optional<Provision> getOrder(String documentType, String documentNumber);
 
@@ -30,7 +31,7 @@ public interface ProvisionRepository {
 	Provision getProvisionByXaRequest(String xaRequest);
 
 	Provision getProvisionBySaleCode(String saleCode);
-	
+
 	Provision getProvisionByXaIdSt(String xaIdSt);
 
 	Provision getProvisionByDummyStPsiCode(String dummyStPsiCode);
@@ -50,6 +51,8 @@ public interface ProvisionRepository {
 
 	Optional<Provision> getProvisionById(String provisionId);
 
+	Optional<Provision> getAllProvisionById(String provisionId);
+
 	Provision getProvisionByIdNotFilter(String provisionId);
 
 	Optional<Provision> getProvisionByIdAndActiveStatus(String provisionId, String activeStatus);
@@ -66,6 +69,8 @@ public interface ProvisionRepository {
 
 	Optional<List<Provision>> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
 
+	Optional<List<ProvisionCustomerDto>> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate);
+
 	Provision getProvisionByOrderCode(ApiRequest<GetProvisionByOrderCodeRequest> request);
 
 	Provision getByOrderCodeForUpdate(String orderCode);
@@ -75,6 +80,8 @@ public interface ProvisionRepository {
 	Optional<List<Provision>> getOrderToNotify();
 
 	void updateFlagDateNotify(List<Provision> listProvision);
+
+	void updateResendNotification(List<ProvisionCustomerDto> listProvision);
 
 	boolean updateShowLocation(Provision provision);
 

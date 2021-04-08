@@ -262,6 +262,9 @@ public class Provision implements Serializable {
 	@Field("notifications")
 	private Notifications notifications;
 
+	@Field("resend_intoa")
+	private List<ResendNotification> resendIntoa = new ArrayList<ResendNotification>();
+
 	@Field("cod_cliente_atis")
 	private String codClienteAtis;
 
@@ -285,10 +288,31 @@ public class Provision implements Serializable {
 
 	@Field("configurada")
 	private Configurada configurada;
-	
+
+	private String scheduler;
+
+	private String priority;
+
+	@Field("customer_type")
+	private String customerType;
+
+	@Field("customer_subtype")
+	private String customerSubType;
+
 	@Field("status_change_date")
 	private LocalDateTime statusChangeDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-	
+
+	@Field("text_return")
+	private String textReturn;
+
+	public List<ResendNotification> getResendIntoa() {
+		return resendIntoa;
+	}
+
+	public void setResendIntoa(List<ResendNotification> resendIntoa) {
+		this.resendIntoa = resendIntoa;
+	}
+
 	public LocalDateTime getStatusChangeDate() {
 		return statusChangeDate;
 	}
@@ -945,6 +969,36 @@ public class Provision implements Serializable {
 
 	}
 
+//	@Override
+//	public String toString() {
+//		return "Provision [idProvision=" + idProvision + ", externalId=" + externalId + ", xaRequest=" + xaRequest
+//				+ ", dummyXaRequest=" + dummyXaRequest + ", xaRequirementNumber=" + xaRequirementNumber
+//				+ ", apptNumber=" + apptNumber + ", xaNumberServiceOrder=" + xaNumberServiceOrder
+//				+ ", xaNumberWorkOrder=" + xaNumberWorkOrder + ", activityType=" + activityType + ", xaIdSt=" + xaIdSt
+//				+ ", dummyStPsiCode=" + dummyStPsiCode + ", isUpdatedummyStPsiCode=" + isUpdatedummyStPsiCode
+//				+ ", back=" + back + ", saleSource=" + saleSource + ", saleCode=" + saleCode + ", originCode="
+//				+ originCode + ", saleRequestDate=" + saleRequestDate + ", saleRegisterDate=" + saleRegisterDate
+//				+ ", channelEntered=" + channelEntered + ", protectedData=" + protectedData + ", codePsCode="
+//				+ codePsCode + ", kafkaDateSend=" + kafkaDateSend + ", productName=" + productName
+//				+ ", productNameSource=" + productNameSource + ", productType=" + productType + ", productSub="
+//				+ productSub + ", productInternalEquipment=" + productInternalEquipment + ", productSignal="
+//				+ productSignal + ", productPsAdmin=" + productPsAdmin + ", svaCode=" + svaCode + ", legacies="
+//				+ legacies + ", commercialOp=" + commercialOp + ", productCode=" + productCode + ", paymentMethod="
+//				+ paymentMethod + ", campaign=" + campaign + ", regularPrice=" + regularPrice + ", promoPrice="
+//				+ promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency=" + currency + ", installPrice="
+//				+ installPrice + ", installPriceMonth=" + installPriceMonth + ", activeStatus=" + activeStatus
+//				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
+//				+ registerDate + ", registerDateUpdate=" + registerDateUpdate + ", hasSchedule=" + hasSchedule
+//				+ ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail + ", homePhoneDetail="
+//				+ homePhoneDetail + ", customer=" + customer + ", contacts=" + contacts + ", workZone=" + workZone
+//				+ ", updatedDate=" + updatedDate + ", inviteMessageDate=" + inviteMessageDate + ", lastTrackingStatus="
+//				+ lastTrackingStatus + ", descriptionStatus=" + descriptionStatus + ", genericSpeech=" + genericSpeech
+//				+ ", frontSpeech=" + frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart="
+//				+ woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause="
+//				+ cancellationCause + ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation
+//				+ ", sendNotify=" + sendNotify + ", components=" + components + ", rating=" + rating + "]";
+//	}
+
 	@Override
 	public String toString() {
 		return "Provision [idProvision=" + idProvision + ", externalId=" + externalId + ", xaRequest=" + xaRequest
@@ -959,20 +1013,28 @@ public class Provision implements Serializable {
 				+ ", productNameSource=" + productNameSource + ", productType=" + productType + ", productSub="
 				+ productSub + ", productInternalEquipment=" + productInternalEquipment + ", productSignal="
 				+ productSignal + ", productPsAdmin=" + productPsAdmin + ", svaCode=" + svaCode + ", legacies="
-				+ legacies + ", commercialOp=" + commercialOp + ", productCode=" + productCode + ", paymentMethod="
-				+ paymentMethod + ", campaign=" + campaign + ", regularPrice=" + regularPrice + ", promoPrice="
-				+ promoPrice + ", timePromoPrice=" + timePromoPrice + ", currency=" + currency + ", installPrice="
-				+ installPrice + ", installPriceMonth=" + installPriceMonth + ", activeStatus=" + activeStatus
-				+ ", statusToa=" + statusToa + ", validatedAddress=" + validatedAddress + ", registerDate="
-				+ registerDate + ", registerDateUpdate=" + registerDateUpdate + ", hasSchedule=" + hasSchedule
-				+ ", internetDetail=" + internetDetail + ", tvDetail=" + tvDetail + ", homePhoneDetail="
-				+ homePhoneDetail + ", customer=" + customer + ", contacts=" + contacts + ", workZone=" + workZone
-				+ ", updatedDate=" + updatedDate + ", inviteMessageDate=" + inviteMessageDate + ", lastTrackingStatus="
-				+ lastTrackingStatus + ", descriptionStatus=" + descriptionStatus + ", genericSpeech=" + genericSpeech
-				+ ", frontSpeech=" + frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart="
-				+ woPreStart + ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause="
-				+ cancellationCause + ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation
-				+ ", sendNotify=" + sendNotify + ", components=" + components + ", rating=" + rating + "]";
+				+ legacies + ", commercialOp=" + commercialOp + ", commercialOpAtis=" + commercialOpAtis
+				+ ", productCode=" + productCode + ", paymentMethod=" + paymentMethod + ", campaign=" + campaign
+				+ ", regularPrice=" + regularPrice + ", promoPrice=" + promoPrice + ", timePromoPrice=" + timePromoPrice
+				+ ", currency=" + currency + ", installPrice=" + installPrice + ", installPriceMonth="
+				+ installPriceMonth + ", activeStatus=" + activeStatus + ", statusToa=" + statusToa
+				+ ", validatedAddress=" + validatedAddress + ", registerDate=" + registerDate + ", registerDateUpdate="
+				+ registerDateUpdate + ", hasSchedule=" + hasSchedule + ", internetDetail=" + internetDetail
+				+ ", tvDetail=" + tvDetail + ", homePhoneDetail=" + homePhoneDetail + ", customer=" + customer
+				+ ", contacts=" + contacts + ", workZone=" + workZone + ", updatedDate=" + updatedDate
+				+ ", inviteMessageDate=" + inviteMessageDate + ", lastTrackingStatus=" + lastTrackingStatus
+				+ ", descriptionStatus=" + descriptionStatus + ", genericSpeech=" + genericSpeech + ", frontSpeech="
+				+ frontSpeech + ", logStatus=" + logStatus + ", inToa=" + inToa + ", woPreStart=" + woPreStart
+				+ ", woInit=" + woInit + ", woCompleted=" + woCompleted + ", cancellationCause=" + cancellationCause
+				+ ", cancellationDetail=" + cancellationDetail + ", showLocation=" + showLocation + ", sendNotify="
+				+ sendNotify + ", components=" + components + ", rating=" + rating + ", upFront=" + upFront
+				+ ", isUpFront=" + isUpFront + ", upFrontRead=" + upFrontRead + ", subReasonNotDone=" + subReasonNotDone
+				+ ", actionNotDone=" + actionNotDone + ", notifications=" + notifications + ", resendIntoa="
+				+ resendIntoa + ", codClienteAtis=" + codClienteAtis + ", codCuentaAtis=" + codCuentaAtis
+				+ ", technology=" + technology + ", canceladoMotivoAtis=" + canceladoMotivoAtis
+				+ ", canceladoSubmotivoAtis=" + canceladoSubmotivoAtis + ", pendienteDeValidacion="
+				+ pendienteDeValidacion + ", pendienteDeAproacion=" + pendienteDeAproacion + ", configurada="
+				+ configurada + ", statusChangeDate=" + statusChangeDate + "]";
 	}
 
 	public static class StatusLog {
@@ -1071,6 +1133,46 @@ public class Provision implements Serializable {
 
 	public void setNotifications(Notifications notifications) {
 		this.notifications = notifications;
+	}
+
+	public String getTextReturn() {
+		return textReturn;
+	}
+
+	public void setTextReturn(String textReturn) {
+		this.textReturn = textReturn;
+	}
+
+	public String getScheduler() {
+		return scheduler;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public String getCustomerSubType() {
+		return customerSubType;
+	}
+
+	public void setScheduler(String scheduler) {
+		this.scheduler = scheduler;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+
+	public void setCustomerSubType(String customerSubType) {
+		this.customerSubType = customerSubType;
 	}
 
 }

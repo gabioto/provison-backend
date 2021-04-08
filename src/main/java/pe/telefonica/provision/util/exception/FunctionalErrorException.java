@@ -1,6 +1,8 @@
 package pe.telefonica.provision.util.exception;
 
 public class FunctionalErrorException extends RuntimeException {
+	
+	private static final long serialVersionUID = 1L;
 	private String errorCode;
 	
 

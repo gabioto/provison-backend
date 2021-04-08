@@ -44,6 +44,7 @@ public final class Constants {
 	public static final String TIMESTAMP_FORMAT_CMS_ATIS = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String TIMESTAMP_FORMAT_CMS_ATIS_NO_ZONE = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 	public static final String TIMESTAMP_FORMAT_CMS_RESP = "yyyy-MM-dd";
+	public static final String TIMESTAMP_FORMAT_SCHEDULE = "yyyy-MM-dd";
 	public static final String TIME_ZONE_LOCALE = "-05:00";
 
 	public static final String ENVIROMENT_PROD = "prod";
@@ -56,6 +57,7 @@ public final class Constants {
 	public static final String OPER_GET_TOKEN_EXTERNAL = "OPER_GET_TOKEN_EXTERNAL";
 	public static final String OPER_GET_OAUTH_TOKEN = "OPER_GET_OAUTH_TOKEN";
 	public static final String OPER_GET_ALL_IN_TIME_RANGE = "OPER_GET_ALL_IN_TIME_RANGE";
+	public static final String OPER_GET_ALL_RESEND_NOTIFICATION = "OPER_GET_ALL_RESEND_NOTIFICATION";
 	public static final String OPER_GET_ORDER_TO_NOTIFY = "OPER_GET_ORDER_TO_NOTIFY";
 
 	public static final String APP_NAME_FRONT_END = "APP_FRONT_END";
@@ -94,6 +96,7 @@ public final class Constants {
 
 	public static final String OPER_SEND_SMS_BY_ID = "OPER_SEND_SMS_BY_ID";
 	public static final String OPER_SEND_MAIL_BY_ID = "OPER_SEND_MAIL_BY_ID";
+	public static final String OPER_SEND_TOKEN = "OPER_SEND_TOKEN";
 
 	public static final String OPER_CONTACT_INFO_UPDATE = "OPER_CONTACT_INFO_UPDATE";
 	public static final String OPER_UPDATE_ADDRESS = "OPER_UPDATE_ADDRESS";
@@ -103,6 +106,7 @@ public final class Constants {
 	public static final String OPER_MONITORING_PROVISION = "OPER_MONITORING_PROVISION";
 	public static final String OPER_GET_SALE_CODE = "OPER_GET_SALE_CODE";
 	public static final String OPER_GET_PROVISION_ALL = "OPER_GET_PROVISION_ALL";
+	public static final String OPER_GET_PROVISION_DETAIL = "OPER_GET_PROVISION_DETAIL";
 	public static final String OPER_GET_PROVISION_BY_REGISTER_DATE = "OPER_GET_PROVISION_BY_REGISTER_DATE";
 	public static final String OPER_INSERT_PROVISION = "OPER_INSERT_PROVISION";
 	public static final String OPER_PROVISION_UPDATE_FROM_TOA = "OPER_PROVISION_UPDATE_FROM_TOA";
@@ -153,6 +157,10 @@ public final class Constants {
 	public static final String STATUS_PENDIENTE_PAGO = "PENDIENTE-PAGO";
 	public static final String STATUS_PAGADO = "PAGADO";
 
+	// Mensaje devolución de equipos
+	public static final String MESSAGE_RETURN = "MESSAGE_RETURN";
+	public static final String OP_COMMERCIAL_MIGRACION = "MIGRACION";
+
 	// Estados ATIS
 	public static final String STATUS_FINALIZADO = "FI";
 	public static final String STATUS_TERMINADA = "TE";
@@ -164,6 +172,10 @@ public final class Constants {
 
 	public static final String STATUS_FIJA_PARKOUR = "VENTASFIJA_PARKUR";
 	public static final String STATUS_ATIS = "ATIS";
+
+	// Scheduler source
+	public static final String SCHEDULER_PSI = "PSI";
+	public static final String SCHEDULER_AMDOCS = "AMDOCS";
 
 	public static final Map<String, String> ATIS_CMS_STATUS = Stream
 			.of(new String[][] { { "new", "EN PROCESO" }, { "rejeted", "EN PROCESO" }, { "pending", "EN PROCESO" },

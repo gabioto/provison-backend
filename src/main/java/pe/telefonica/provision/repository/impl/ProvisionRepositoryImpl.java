@@ -3,7 +3,6 @@ package pe.telefonica.provision.repository.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,11 +24,13 @@ import com.mongodb.client.result.UpdateResult;
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest;
+import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
+import pe.telefonica.provision.model.ResendNotification;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.Status;
@@ -51,17 +51,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<ProvisionDto>> findAll(String documentType, String documentNumber) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime01 = dateStart.format(formatter);
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 		List<ProvisionDto> provisions = this.mongoOperations.find(query, ProvisionDto.class);
 
 		Optional<List<ProvisionDto>> optionalProvisions = Optional.ofNullable(provisions);
@@ -70,18 +68,15 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<ProvisionTrazaDto>> findAllTraza(String documentType, String documentNumber) {
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime01 = dateStart.format(formatter);		
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 
 		List<ProvisionTrazaDto> provisions = this.mongoOperations.find(query, ProvisionTrazaDto.class);
 		Optional<List<ProvisionTrazaDto>> optionalProvisions = Optional.ofNullable(provisions);
@@ -89,37 +84,16 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
-	public List<Provision> findAllTraza__tes(String documentType, String documentNumber) {
-
-		List<Provision> provisions = this.mongoOperations.find(
-				new Query(Criteria.where("customer.document_type").is(documentType).and("customer.document_number")
-						.is(documentNumber).and("xa_request").ne("").and("work_zone").ne("").and("xa_id_st").ne("")
-						.orOperator(Criteria.where("active_status").is(Constants.PROVISION_STATUS_CANCELLED),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ACTIVE),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_ADDRESS_CHANGED),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_SCHEDULE_IN_PROGRESS),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_WOINIT),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_NOTDONE),
-								Criteria.where("active_status").is(Constants.PROVISION_STATUS_COMPLETED))),
-				Provision.class);
-
-		return provisions;
-	}
-
-	@Override
 	public Optional<Provision> getOrder(String documentType, String documentNumber) {
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int diasVidaProvision = Integer.parseInt(api.getNroDiasVidaProvision()) + 1;
 		diasVidaProvision = diasVidaProvision * -1;
 		LocalDateTime dateStart = LocalDateTime.now().plusDays(diasVidaProvision);
-		String formattedDateTime = dateStart.format(formatter);		
 
 		Query query = new Query(Criteria.where("customer.document_type").is(documentType)
 				.and("customer.document_number").is(documentNumber).andOperator(Criteria.where("product_name").ne(null),
 						Criteria.where("product_name").ne(""), Criteria.where("register_date").gte(dateStart)))
 								.limit(3);
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 		Provision provision = this.mongoOperations.findOne(query, Provision.class);
 		Optional<Provision> optionalOrder = Optional.ofNullable(provision);
 		return optionalOrder;
@@ -180,6 +154,21 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	}
 
 	@Override
+	public Optional<Provision> getAllProvisionById(String provisionId) {
+		Provision provision = null;
+		try {
+			provision = this.mongoOperations
+					.findOne(new Query(Criteria.where("idProvision").is(new ObjectId(provisionId))), Provision.class);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+		}
+
+		Optional<Provision> optionalSchedule = Optional.ofNullable(provision);
+
+		return optionalSchedule;
+	}
+
+	@Override
 	public boolean updateProvision(Provision provision, Update update) {
 		UpdateResult result = this.mongoOperations.updateFirst(
 				new Query(Criteria.where("idProvision").is(new ObjectId(provision.getIdProvision()))), update,
@@ -212,6 +201,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		return optionalProvisions;
+	}
+
+	@Override
+	public Optional<List<ProvisionCustomerDto>> getAllResendNotification(LocalDateTime startDate,
+			LocalDateTime endDate) {
+
+		Query query = new Query(Criteria.where("log_status.status").ne("SCHEDULED").and("active_status").is("active")
+				.and("notifications.into_send_notify").is(true).and("resend_intoa.intoa_count").exists(false)
+				.andOperator(Criteria.where("notifications.into_send_date").gte(startDate),
+						Criteria.where("notifications.into_send_date").lte(endDate)));
+
+		List<ProvisionCustomerDto> provisions = this.mongoOperations.find(query, ProvisionCustomerDto.class);
+
+		Optional<List<ProvisionCustomerDto>> optionalProvisions = Optional.ofNullable(provisions);
+		return optionalProvisions;
+
 	}
 
 	@Override
@@ -286,7 +291,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		Query query = new Query(Criteria.where("xaRequest").is(request.getBody().getOrderCode())
 				.andOperator(Criteria.where("status_toa").is("done")));
 
-		query.with(new Sort(new Order(Direction.DESC, "register_date")));
+		query.with(new Sort(Direction.DESC, "register_date"));
 
 		List<Provision> provisions = this.mongoOperations.find(query, Provision.class);
 
@@ -373,7 +378,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		Query query = new Query(criteria).limit(15);
 
-		query.with(new Sort(new Order(Direction.ASC, "_id")));
+		query.with(new Sort(Direction.ASC, "_id"));
 
 		List<Provision> provision = this.mongoOperations.find(query, Provision.class);
 
@@ -384,7 +389,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public void updateFlagDateNotify(List<Provision> listProvision) {
 		Update update = new Update();
-		
+
 		for (int i = 0; i < listProvision.size(); i++) {
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.caida_send_notify", true);
@@ -452,6 +457,27 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
 					update, Provision.class);
 		}
+	}
+
+	@Override
+	public void updateResendNotification(List<ProvisionCustomerDto> listProvision) {
+		Update update = new Update();
+		ResendNotification resendNotification = new ResendNotification();
+		List<ResendNotification> listResendNotification = new ArrayList<ResendNotification>();
+		for (int i = 0; i < listProvision.size(); i++) {
+			resendNotification = new ResendNotification();
+			listResendNotification = new ArrayList<ResendNotification>();
+			resendNotification.setIntoaCount(1);
+			resendNotification.setIntoaSendDate(LocalDateTime.now(ZoneOffset.of("-05:00")));
+			resendNotification.setIntoaSendNotify(true);
+			listResendNotification.add(resendNotification);
+			update.set("resend_intoa", listResendNotification);
+
+			this.mongoOperations.updateFirst(
+					new Query(Criteria.where("idProvision").is(new ObjectId(listProvision.get(i).getIdProvision()))),
+					update, Provision.class);
+		}
+
 	}
 
 	@Override
@@ -528,5 +554,14 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 					update, Provision.class);
 		}
 
+	}
+
+	@Override
+	public Provision getProvisionDetailById(String provisionId) {
+
+		Provision provision = this.mongoOperations
+				.findOne(new Query(Criteria.where("_id").is(new ObjectId(provisionId))), Provision.class);
+
+		return provision;
 	}
 }

@@ -41,7 +41,7 @@ public class TrazabilidadScheduleApi {
 	@Autowired
 	private ExternalApi api;
 
-	public boolean cancelLocalSchedule(ScheduleNotDoneRequest scheduleNotDoneRequest) {		
+	public boolean cancelLocalSchedule(ScheduleNotDoneRequest scheduleNotDoneRequest) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getCancelLocalSchedule();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -51,38 +51,43 @@ public class TrazabilidadScheduleApi {
 		headersMap.add("Authorization", iBMSecurityAgendamiento.getAuth());
 		headersMap.add("X-IBM-Client-Id", iBMSecurityAgendamiento.getClientId());
 		headersMap.add("X-IBM-Client-Secret", iBMSecurityAgendamiento.getClientSecret());
-		
-		ApiRequest<ScheduleNotDoneRequest> apiRequest = new ApiRequest<ScheduleNotDoneRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_NOTDONE_SCHEDULE, scheduleNotDoneRequest);
 
-		HttpEntity<ApiRequest<ScheduleNotDoneRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleNotDoneRequest>>(apiRequest, headersMap);
+		ApiRequest<ScheduleNotDoneRequest> apiRequest = new ApiRequest<ScheduleNotDoneRequest>(
+				Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_NOTDONE_SCHEDULE,
+				scheduleNotDoneRequest);
+
+		HttpEntity<ApiRequest<ScheduleNotDoneRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleNotDoneRequest>>(
+				apiRequest, headersMap);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
-			
+
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-				throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode().value() +"_"+ "401" ));
+				throw new FunctionalErrorException(ex.getMessage(), ex,
+						String.valueOf(ex.getStatusCode().value() + "_" + "401"));
 			} else {
-				
+
 				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
-				
+
 				String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
-				String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
-				
-				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));
-			}			
+				String message = jsonDecode.getAsJsonObject("header").get("message").getAsString();
+
+				throw new FunctionalErrorException(message, ex,
+						String.valueOf(ex.getStatusCode().value() + "_" + errorCode));
+			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
-	
-	public boolean updateSchedule(ScheduleRequest scheduleRequest) {	
+
+	public boolean updateSchedule(ScheduleRequest scheduleRequest) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getUpdateScheduleDate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -92,36 +97,86 @@ public class TrazabilidadScheduleApi {
 		headersMap.add("Authorization", iBMSecurityAgendamiento.getAuth());
 		headersMap.add("X-IBM-Client-Id", iBMSecurityAgendamiento.getClientId());
 		headersMap.add("X-IBM-Client-Secret", iBMSecurityAgendamiento.getClientSecret());
-		
-		ApiRequest<ScheduleRequest> apiRequest = new ApiRequest<ScheduleRequest>(Constants.APP_NAME_PROVISION, Constants.USER_PROVISION, Constants.OPER_UPDATE_RESCHEDULE, scheduleRequest);
 
-		HttpEntity<ApiRequest<ScheduleRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleRequest>>(apiRequest, headersMap);
+		ApiRequest<ScheduleRequest> apiRequest = new ApiRequest<ScheduleRequest>(Constants.APP_NAME_PROVISION,
+				Constants.USER_PROVISION, Constants.OPER_UPDATE_RESCHEDULE, scheduleRequest);
+
+		HttpEntity<ApiRequest<ScheduleRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleRequest>>(
+				apiRequest, headersMap);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
 					String.class);
-			
+
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-				throw new FunctionalErrorException(ex.getMessage(), ex, String.valueOf(ex.getStatusCode().value() +"_"+ "401" ));
-			} else {			
+				throw new FunctionalErrorException(ex.getMessage(), ex,
+						String.valueOf(ex.getStatusCode().value() + "_" + "401"));
+			} else {
 				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
-				
+
 				String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
-				String message   = jsonDecode.getAsJsonObject("header").get("message").getAsString();
-				
-				throw new FunctionalErrorException(message, ex, String.valueOf(ex.getStatusCode().value() +"_"+ errorCode ));				
-			}			
+				String message = jsonDecode.getAsJsonObject("header").get("message").getAsString();
+
+				throw new FunctionalErrorException(message, ex,
+						String.valueOf(ex.getStatusCode().value() + "_" + errorCode));
+			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
-	
+
+	public boolean insertSchedule(ScheduleRequest scheduleRequest) {
+
+		String urlSchedule = api.getScheduleUrl() + api.getInsertSchedule();
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
+		headersMap.add("Content-Type", "application/json");
+		headersMap.add("Authorization", iBMSecurityAgendamiento.getAuth());
+		headersMap.add("X-IBM-Client-Id", iBMSecurityAgendamiento.getClientId());
+		headersMap.add("X-IBM-Client-Secret", iBMSecurityAgendamiento.getClientSecret());
+
+		ApiRequest<ScheduleRequest> apiRequest = new ApiRequest<ScheduleRequest>(Constants.APP_NAME_PROVISION,
+				Constants.USER_PROVISION, Constants.OPER_UPDATE_RESCHEDULE, scheduleRequest);
+
+		HttpEntity<ApiRequest<ScheduleRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleRequest>>(
+				apiRequest, headersMap);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,
+					String.class);
+
+			return responseEntity.getStatusCode().equals(HttpStatus.OK);
+		} catch (HttpClientErrorException ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+
+			if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+				throw new FunctionalErrorException(ex.getMessage(), ex,
+						String.valueOf(ex.getStatusCode().value() + "_" + "401"));
+			} else {
+				JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+
+				String errorCode = jsonDecode.getAsJsonObject("header").get("resultCode").getAsString();
+				String message = jsonDecode.getAsJsonObject("header").get("message").getAsString();
+
+				throw new FunctionalErrorException(message, ex,
+						String.valueOf(ex.getStatusCode().value() + "_" + errorCode));
+			}
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+
+			throw new ServerNotFoundException(ex.getMessage());
+		}
+	}
+
 	public boolean updateCancelSchedule(CancelRequest cancelRequest) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getUpdateSchedule();
@@ -146,7 +201,7 @@ public class TrazabilidadScheduleApi {
 			return responseEntity.getStatusCode().equals(HttpStatus.OK);
 		} catch (HttpClientErrorException ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
 				throw new FunctionalErrorException(ex.getMessage(), ex,
 						String.valueOf(ex.getStatusCode().value() + "_" + "401"));
@@ -161,12 +216,12 @@ public class TrazabilidadScheduleApi {
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
 
-	public boolean updateFicticious(ScheduleUpdateFicticiousRequest request) {		
+	public boolean updateFicticious(ScheduleUpdateFicticiousRequest request) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getScheduleUpdateFicticious();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -195,12 +250,13 @@ public class TrazabilidadScheduleApi {
 			return false;
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return false;
 		}
 	}
 
-	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode, String requestType, Customer customer) {
+	public boolean updatePSICodeReal(String idProvision, String orderCode, String stPsiCode, String requestType,
+			Customer customer) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getScheduleUpdatePSICodeReal();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -237,15 +293,15 @@ public class TrazabilidadScheduleApi {
 			return false;
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return false;
 		}
 	}
-	
+
 	public String getTechAvailable(GetTechnicianAvailableRequest request) {
 		RestTemplate restTemplate = new RestTemplate();
 		String urlSchedule = api.getScheduleUrl() + api.getScheduleGetTechAvailable();
-		
+
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<String, String>();
@@ -267,19 +323,19 @@ public class TrazabilidadScheduleApi {
 
 			if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
 				JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-				String driverUserName = jsonObject.get("body").getAsJsonObject().get("driverUsername").toString().replaceAll("\"",
-						"");
-				
+				String driverUserName = jsonObject.get("body").getAsJsonObject().get("driverUsername").toString()
+						.replaceAll("\"", "");
+
 				return driverUserName;
 			}
 			return null;
 		} catch (HttpClientErrorException ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return null;
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return null;
 		}
 	}

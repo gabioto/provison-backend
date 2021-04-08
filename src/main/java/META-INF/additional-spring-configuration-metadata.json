@@ -238,5 +238,16 @@
     "name": "external.api.productOrders",
     "type": "java.lang.String",
     "description": "A description for 'external.api.productOrders'"
+  },
+  {
+<<<<<<< HEAD
+    "name": "external.api.loginToken",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.loginToken'"
+=======
+    "name": "external.api.inserSchedule",
+    "type": "java.lang.String",
+    "description": "A description for 'external.api.inserSchedule'"
+>>>>>>> feature/SAQR-1473/lectura_topico_tobe
   }
 ]}

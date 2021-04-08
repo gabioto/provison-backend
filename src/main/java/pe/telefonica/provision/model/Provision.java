@@ -285,10 +285,20 @@ public class Provision implements Serializable {
 
 	@Field("configurada")
 	private Configurada configurada;
-	
+
+	private String scheduler;
+
+	private String priority;
+
+	@Field("customer_type")
+	private String customerType;
+
+	@Field("customer_subtype")
+	private String customerSubType;
+
 	@Field("status_change_date")
 	private LocalDateTime statusChangeDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-	
+
 	public LocalDateTime getStatusChangeDate() {
 		return statusChangeDate;
 	}
@@ -1071,6 +1081,38 @@ public class Provision implements Serializable {
 
 	public void setNotifications(Notifications notifications) {
 		this.notifications = notifications;
+	}
+
+	public String getScheduler() {
+		return scheduler;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public String getCustomerSubType() {
+		return customerSubType;
+	}
+
+	public void setScheduler(String scheduler) {
+		this.scheduler = scheduler;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+
+	public void setCustomerSubType(String customerSubType) {
+		this.customerSubType = customerSubType;
 	}
 
 }

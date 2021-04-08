@@ -11,7 +11,6 @@ import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
-import pe.telefonica.provision.controller.request.UpdateFromToaRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
@@ -36,8 +35,6 @@ public interface ProvisionService {
 	boolean insertProvision(InsertOrderRequest request);
 
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
-
-	boolean provisionUpdateFromTOA(UpdateFromToaRequest request) throws Exception;
 
 	public Provision setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
 

@@ -204,7 +204,7 @@ public class TrazabilidadSecurityApi {
 			return responseEntity.getBody();
 		} catch (Exception e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
-			
+
 			return null;
 		}
 	}
@@ -264,8 +264,6 @@ public class TrazabilidadSecurityApi {
 
 	public String generateToken() {
 
-		log.info(this.getClass().getName() + " - " + "generateToken");
-
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -302,11 +300,11 @@ public class TrazabilidadSecurityApi {
 			}
 		} catch (HttpClientErrorException e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
-			
-			return null;		
+
+			return null;
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return null;
 		}
 	}
@@ -346,12 +344,12 @@ public class TrazabilidadSecurityApi {
 			}
 		} catch (HttpClientErrorException e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
-			
+
 			return null;
 
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
-			
+
 			return null;
 		}
 	}

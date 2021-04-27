@@ -390,9 +390,10 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public void updateFlagDateNotify(List<Provision> listProvision) {
-		Update update = new Update();
-
+		
 		for (int i = 0; i < listProvision.size(); i++) {
+			Update update = new Update();
+			
 			if (Status.CAIDA.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.caida_send_notify", true);
 				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
@@ -426,9 +427,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			if (Status.WO_COMPLETED.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
 				update.set("notifications.completed_send_notify", true);
 				update.set("notifications.finalizado_send_notify", true);
-
 				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
-
 					update.set("notifications.completed_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				}
 			}
@@ -448,7 +447,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 			}
 
 			if (Status.CANCELADA_ATIS.getStatusName().equals(listProvision.get(i).getLastTrackingStatus())) {
-
 				update.set("notifications.cancelada_atis_send_notify", true);
 				if (Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
 					update.set("notifications.cancelada_atis_send_date", LocalDateTime.now(ZoneOffset.of("-05:00")));

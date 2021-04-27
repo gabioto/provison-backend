@@ -3,17 +3,17 @@ applications:
   - name: UK-PROVISION-TRAZABILIDAD
     routes:
     - route: uk-provision-trazabilidad.eu-gb.mybluemix.net
-    memory: 1GB
+    memory: 4GB
     path: target/tdp-provision-1.0.2-SNAPSHOT.jar
     buildpack: liberty-for-java
     health-check-type: process
     disk_quota: 2GB
-    instances: 2
+    instances: 4
     env:
-      TDP_FUNCTIONS_PROVISION_ENABLE: true
-      TDP_FUNCTIONS_FAULT_ENABLE: true
-      TDP_DATA_MONGODB_URI: mongodb://admin:JOQIORBFYKYVSJTH@portal-ssl1348-50.bmix-dal-yp-a589d8bf-2208-4290-880f-9a48911af4e3.3558158292.composedb.com:23906,portal-ssl1272-51.bmix-dal-yp-a589d8bf-2208-4290-880f-9a48911af4e3.3558158292.composedb.com:23906/compose?authSource=admin&ssl=true
+      TDP_MESSAGE_PROVISION_ENABLE: true
+      TDP_MESSAGE_FAULT_ENABLE: true
+      TDP_DATA_MONGODB_URI: mongodb://admin:JOQIORBFYKYVSJTH@portal-ssl1348-50.bmix-dal-yp-a589d8bf-2208-4290-880f-9a48911af4e3.3558158292.composedb.com:23906,portal-ssl1272-51.bmix-dal-yp-a589d8bf-2208-4290-880f-9a48911af4e3.3558158292.composedb.com:23906/compose?authSource=admin&ssl=true    
       TDP_DATA_MONGODB_DATABASE: compose
-      TDP_SIMPLI_ENABLE: true
+      TDP_SIMPLI_ENABLE: false
       TDP_SWITCH_AZURE: false
-      TDP_SWITCH_ON_PREMISE: false
+      TDP_SWITCH_ON_PREMISE: true

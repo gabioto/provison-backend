@@ -691,8 +691,7 @@ public class ProvisionController {
 //@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request
 	@RequestMapping(value = "/setContactInfoUpdate", method = RequestMethod.POST)
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> setContactInfoUpdate(
-			@RequestBody ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
-		log.info(this.getClass().getName() + " - " + "setContactInfoUpdate");
+			@RequestBody @Validated ApiRequest<ApiTrazaSetContactInfoUpdateRequest> request) {
 
 		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
 		HttpStatus status;

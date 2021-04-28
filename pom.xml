@@ -99,7 +99,7 @@
 				<configuration>
 					<schemaVersion>V2</schemaVersion>
 					<resourceGroup>RG-trazabilidad-dev</resourceGroup>
-					<appName>Wa-trazabilidad-msProvision-dev</appName>
+					<appName>Wa-trazabilidad-msProvision-cert</appName>
 					<region>eastus</region>
 					<runtime>
 						<os>linux</os>

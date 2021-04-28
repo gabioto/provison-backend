@@ -98,7 +98,7 @@
 				<version>1.12.0</version>
 				<configuration>
 					<schemaVersion>V2</schemaVersion>
-					<resourceGroup>RG-trazabilidad-dev</resourceGroup>
+					<resourceGroup>RG-trazabilidad-cert</resourceGroup>
 					<appName>Wa-trazabilidad-msProvision-cert</appName>
 					<region>eastus</region>
 					<runtime>

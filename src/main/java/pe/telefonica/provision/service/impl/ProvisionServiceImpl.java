@@ -742,7 +742,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 						&& provisionx.getDummyStPsiCode() != null) {
 
 					trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provisionx.getIdProvision(),
-							Constants.ACTIVITY_TYPE_PROVISION.toLowerCase(), provisionx.getDummyStPsiCode(), true));
+							Constants.ACTIVITY_TYPE_PROVISION.toLowerCase(), provisionx.getDummyStPsiCode(), true,
+							"PSI", "", "", "", ""));
 				}
 
 				update.set("active_status", status);
@@ -1088,7 +1089,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail) {
+	public ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail,
+			String scheduler) {
+
 		boolean sentBOCancellation;
 		boolean provisionUpdated;
 		boolean scheduleUpdated;
@@ -1121,15 +1124,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 			update.set("generic_speech", cancel != null ? cancel.getGenericSpeech() : Status.CANCEL.getGenericSpeech());
 			update.set("front_speech", cancel != null ? cancel.getFront() : Status.CANCEL.getFrontSpeech());
 
-			sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
+			if (scheduler.equalsIgnoreCase("PSI")) {
 
-			if (!sentBOCancellation) {
-				return null;
+				sentBOCancellation = bOApi.sendRequestToBO(provision, "4");
+
+				if (!sentBOCancellation) {
+					return null;
+				}
 			}
 
 			if (provision.getHasSchedule()) {
-				scheduleUpdated = trazabilidadScheduleApi.updateCancelSchedule(
-						new CancelRequest(provision.getIdProvision(), "provision", provision.getXaIdSt(), false));
+				scheduleUpdated = trazabilidadScheduleApi
+						.updateCancelSchedule(new CancelRequest(provision.getIdProvision(), "provision",
+								provision.getXaIdSt(), false, scheduler, "", "", "", ""));
 				if (!scheduleUpdated) {
 					return null;
 				}

@@ -1319,7 +1319,7 @@ public class ProvisionController {
 
 		try {
 			Provision result = provisionService.orderCancellation(request.getBody().getProvisionId(),
-					request.getBody().getCause(), request.getBody().getDetail());
+					request.getBody().getCause(), request.getBody().getDetail(), request.getBody().getScheduler());
 
 			if (result != null) {
 

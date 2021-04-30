@@ -46,6 +46,7 @@ public class PSIWorkRequest {
 		startDate = date;
 
 		List<ContactMedia> contactMedia = new ArrayList<>();
+		//public ContactMedia(String _type, String type, String email, String number) {
 		contactMedia.add(new ContactMedia("email", "", request.getBodyUpdateClient().getCorreo(), ""));
 		contactMedia.add(new ContactMedia("phone", "mobile", "", request.getBodyUpdateClient().getTelefono1()));
 
@@ -114,8 +115,8 @@ public class PSIWorkRequest {
 				Appointment appointment) {
 			super();
 			this.name = name;
-			this.notes = notes;
-			this.relatedInformation = relatedInformation;
+			//this.notes = notes;
+			//this.relatedInformation = relatedInformation;
 			this.appointment = appointment;
 		}
 
@@ -183,9 +184,9 @@ public class PSIWorkRequest {
 		public Appointment(String activityType, String startDate, List<String> timeSlots,
 				List<ContactMedia> contactMedia) {
 			super();
-			this.activityType = activityType;
-			this.startDate = startDate;
-			this.timeSlots = timeSlots;
+			//this.activityType = activityType;
+			//this.startDate = startDate;
+			//this.timeSlots = timeSlots;
 			this.contactMedia = contactMedia;
 		}
 

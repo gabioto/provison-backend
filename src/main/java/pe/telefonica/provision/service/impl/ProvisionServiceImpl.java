@@ -1531,12 +1531,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 					if (switchAgendamiento.equals("false")) {
 						updatedPsi = restPSI.updatePSIClient(psiRequest);
 					} else {
-						if(request.getSchedule().toUpperCase().equals("PSI")) {
-							updatedPsi = restPSI.updatePSIClient(psiRequest);
-						}else {
-							//Modificar request
-							updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);
-						}
+						//Modificar request
+						updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);
 					}
 					
 

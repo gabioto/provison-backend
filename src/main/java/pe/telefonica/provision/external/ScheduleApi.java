@@ -143,7 +143,8 @@ public class ScheduleApi {
 
 		//String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
 		
-		String url = "https://apisd.telefonica.com.pe/vp-tecnologia/bss/workOrderManagement/v1/modifyWorkOrderUpdate"; 
+		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/bss/workOrderManagement/v1/modifyWorkOrderUpdate";
+		String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 
@@ -156,15 +157,14 @@ public class ScheduleApi {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("UNICA-ServiceId", "");
-		headers.set("UNICA-Application", "");
-		headers.set("UNICA-PID", "");
+		headers.set("UNICA-ServiceId", "d4ce144c-6b26-4b5c-ad29-090a3a559123");
 		headers.set("UNICA-Application", "appmovistar");
-		headers.set("UNICA-User", "");
-		headers.set("Destination", "Agendador");
+		headers.set("UNICA-PID", "d4ce144c-6b26-4b5c-ad29-090a3a559123");
+		headers.set("UNICA-User", "UserTraceability");
+		headers.set("Destination", "AGENDADOR");
 		headers.set("auth_string", generateAuthString());
 		headers.set("Authorization", "Bearer " + oAuthToken);
-		headers.set("X-IBM-Client-Id", "88d1769b-521f-49d9-bfc9-35f15c336698");// api.getApiClient());
+		headers.set("X-IBM-Client-Id", "ca529df8-364a-4c73-9117-19113c552830");// api.getApiClient());
 
 		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
 
@@ -175,7 +175,7 @@ public class ScheduleApi {
 					PSIWorkResponse.class);
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
 					startHour, endHour, responseEntity.getStatusCodeValue());
 
 			return true;
@@ -183,7 +183,7 @@ public class ScheduleApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
 					startHour, endHour, ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -197,7 +197,7 @@ public class ScheduleApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("PSI", "modifyWork", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
 					endHour, Integer.parseInt(error));
 			throw new ServerNotFoundException(ex.getMessage());
 		}

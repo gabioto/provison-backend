@@ -1632,8 +1632,9 @@ public class ProvisionController {
 		HttpStatus status;
 
 		try {
+
 			ProvisionDetailTrazaDto result = provisionService.orderCancellation(request.getBody().getProvisionId(),
-					request.getBody().getCause(), request.getBody().getDetail());
+					request.getBody().getCause(), request.getBody().getDetail(), request.getBody().getScheduler());
 
 			if (result != null) {
 				status = HttpStatus.OK;

@@ -5,6 +5,7 @@ public class CancelOrderRequest extends LogDataFrontendRequest {
 	private String provisionId;
 	private String cause;
 	private String detail;
+	private String scheduler;
 
 	public String getProvisionId() {
 		return provisionId;
@@ -29,4 +30,13 @@ public class CancelOrderRequest extends LogDataFrontendRequest {
 	public void setDetail(String detail) {
 		this.detail = detail;
 	}
+
+	public String getScheduler() {
+		return scheduler;
+	}
+
+	public void setScheduler(String scheduler) {
+		this.scheduler = scheduler;
+	}
+
 }

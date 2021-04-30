@@ -51,7 +51,7 @@ public interface ProvisionService {
 	public Boolean receiveAddressUpdateBO(String action, String provisionId, String newDepartment, String newProvince,
 			String newDistrict, String newAddress, String newReference, boolean isSMSRequired);
 
-	ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail);
+	public ProvisionDetailTrazaDto orderCancellation(String provisionId, String cause, String detail, String scheduler);
 
 	ProvisionResponse<Boolean> validateQueue();
 
@@ -59,7 +59,7 @@ public interface ProvisionService {
 			String scheduledRange, Integer scheduledType);
 
 	public List<Provision> getAllInTimeRange(LocalDateTime startDate, LocalDateTime endDate);
-	
+
 	public List<ProvisionCustomerDto> getAllResendNotification(LocalDateTime startDate, LocalDateTime endDate);
 
 	Boolean updateTrackingStatus(String xaRequest, String xaIdSt, String status, boolean comesFromSchedule,

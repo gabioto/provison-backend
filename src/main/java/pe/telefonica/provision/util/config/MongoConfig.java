@@ -14,13 +14,13 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 	@Override
 	protected String getDatabaseName() {
 		return System.getenv("TDP_DATA_MONGODB_DATABASE");
-		// return "compose";
+		//return "compose";
 	}
 
 	@Override
 	public MongoClient mongoClient() {
-		ConnectionString connectionString = new ConnectionString(System.getenv("TDP_DATA_MONGODB_URI"));
 
+		ConnectionString connectionString = new ConnectionString(System.getenv("TDP_DATA_MONGODB_URI"));
 		MongoClientSettings mongoClientSettings = MongoClientSettings.builder().applyConnectionString(connectionString)
 				.build();
 

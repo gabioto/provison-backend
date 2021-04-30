@@ -110,7 +110,11 @@ public class ProvisionDetailTrazaDto implements Serializable {
 		this.showLocation = provision.getShowLocation();
 		this.subReasonNotDone = provision.getSubReasonNotDone();
 		this.upFront = provision.getUpFront();
-		this.woPreStart = new WoPreStartDto().fromWoPrestart(provision.getWoPreStart());
+		if (provision.getWoPreStart() == null) {
+			this.woPreStart = new WoPreStartDto();
+		} else {
+			this.woPreStart = new WoPreStartDto().fromWoPrestart(provision.getWoPreStart());
+		}
 		this.workZone = provision.getWorkZone();
 		this.xaIdSt = provision.getXaIdSt();
 		this.xaRequest = provision.getXaRequest();

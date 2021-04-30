@@ -43,6 +43,8 @@ import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.PSIApi;
+
+import pe.telefonica.provision.external.ScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.external.request.ScheduleUpdateFicticiousRequest;
@@ -83,6 +85,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private TrazabilidadScheduleApi trazabilidadScheduleApi;
+	
+	@Autowired
+	private ScheduleApi scheduleApi;
+	
 
 	@Autowired
 	private ProvisionRepository provisionRepository;
@@ -1376,7 +1382,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						boolean isMovistar = false;
 
 						if (!listContact.get(a).getPhoneNumber().toString().equals("")) {
-							String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
+							String switchOnPremise = "true"; //System.getenv("TDP_SWITCH_ON_PREMISE");
 							if (switchOnPremise.equals("true")) {
 								isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
 							} else {
@@ -1444,6 +1450,118 @@ public class ProvisionServiceImpl implements ProvisionService {
 			}
 		}
 
+		throw new Exception("Maxima cantidad de intentos permitidos");
+	}
+	
+	@Override
+	public ProvisionDetailTrazaDto setContactInfoUpdateWeb(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
+		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
+
+		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
+		int count = 0;
+		int maxTries = 2;
+
+		while (count < maxTries) {
+			try {
+				if (provision != null) {
+					List<ContactRequest> listContact = request.getContacts();
+					List<Contacts> contactsList = new ArrayList<>();
+
+					if (request.isHolderWillReceive()) {
+						ContactRequest contactRequest = new ContactRequest();
+						contactRequest.setFullName(provision.getCustomer().getName());
+						contactRequest.setPhoneNumber((provision.getCustomer().getPhoneNumber() != null
+								&& !provision.getCustomer().getPhoneNumber().isEmpty())
+										? Integer.valueOf(provision.getCustomer().getPhoneNumber())
+										: 0);
+						request.getContacts().clear();
+						request.getContacts().add(contactRequest);
+					}
+
+					for (int a = 0; a < request.getContacts().size(); a++) {
+						Contacts contacts = new Contacts();
+						contacts.setFullName(listContact.get(a).getFullName());
+						contacts.setPhoneNumber(listContact.get(a).getPhoneNumber().toString());
+						boolean isMovistar = false;
+
+						if (!listContact.get(a).getPhoneNumber().toString().equals("")) {
+							String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
+							if (switchOnPremise.equals("true")) {
+								isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
+							} else {
+								isMovistar = restPSI.getCarrierOld(listContact.get(a).getPhoneNumber().toString());
+							}
+						}
+						contacts.setCarrier(isMovistar);
+						contactsList.add(contacts);
+
+						if (a == 0) {
+							psiRequest.getBodyUpdateClient().setNombre_completo(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono1(listContact.get(a).getPhoneNumber().toString());
+						}
+
+						if (a == 1) {
+							psiRequest.getBodyUpdateClient().setNombre_completo2(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono2(listContact.get(a).getPhoneNumber().toString());
+						}
+
+						if (a == 2) {
+							psiRequest.getBodyUpdateClient().setNombre_completo3(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono3(listContact.get(a).getPhoneNumber().toString());
+						}
+
+						if (a == 3) {
+							psiRequest.getBodyUpdateClient().setNombre_completo4(listContact.get(a).getFullName());
+							psiRequest.getBodyUpdateClient()
+									.setTelefono4(listContact.get(a).getPhoneNumber().toString());
+						}
+
+					}
+
+					psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
+					psiRequest.getBodyUpdateClient().setCorreo(
+							provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
+					
+					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
+					boolean updatedPsi = false;
+
+					if (switchAgendamiento.equals("false")) {
+						updatedPsi = restPSI.updatePSIClient(psiRequest);
+					} else {
+						//Modificar request
+						updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);
+					}
+					
+
+					if (updatedPsi) {
+						Update update = new Update();
+						update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
+						provisionRepository.updateProvision(provision, update);
+
+						if (provision.getContacts() != null) {
+							provision.getContacts().clear();
+						}
+
+						provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
+					} else {
+						throw new Exception();
+					}
+
+					return new ProvisionDetailTrazaDto().fromProvision(provision);
+
+				} else {
+					return null;
+				}
+			} catch (Exception e) {
+				if (++count == maxTries) {
+					throw e;
+				}
+			}
+		}
+		
 		throw new Exception("Maxima cantidad de intentos permitidos");
 	}
 

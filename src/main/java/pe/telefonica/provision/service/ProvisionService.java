@@ -41,6 +41,8 @@ public interface ProvisionService {
 	boolean provisionInsertCodeFictitious(InsertCodeFictionalRequest request);
 
 	public ProvisionDetailTrazaDto setContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
+	
+	public ProvisionDetailTrazaDto setContactInfoUpdateWeb(ApiTrazaSetContactInfoUpdateRequest request) throws Exception;
 
 	public Boolean apiContactInfoUpdate(ApiTrazaSetContactInfoUpdateRequest request);
 

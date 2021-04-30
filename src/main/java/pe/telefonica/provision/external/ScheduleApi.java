@@ -236,7 +236,7 @@ public class ScheduleApi {
 		headers.set("UNICA-PID", "d4ce144c-6b26-4b5c-ad29-090a3a559123");
 		headers.set("UNICA-User", "UserTraceability");
 		headers.set("X-IBM-Client-Id", "ca529df8-364a-4c73-9117-19113c552830");
-		headers.set("auth_string", "1fe2a7f10ef781a0046e6fa6afa112b5"); //generateAuthString());
+		headers.set("auth_string", generateAuthString()); //generateAuthString());//1fe2a7f10ef781a0046e6fa6afa112b5
 		headers.set("Destination", "AGENDADOR");		
 		headers.set("Authorization", "Bearer "+oAuthToken);
 		//oAuthToken
@@ -252,11 +252,11 @@ public class ScheduleApi {
 		System.out.println(new Gson().toJson(entity.getBody()));
 
 		try {
-//			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
-//					String.class);
+			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
+					String.class);
 			
-			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
-					PSIWorkResponse.class);
+//			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
+//					PSIWorkResponse.class);
 			
 			System.out.println(new Gson().toJson(responseEntity.getBody()));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));

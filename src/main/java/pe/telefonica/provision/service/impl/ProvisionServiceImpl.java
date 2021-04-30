@@ -1525,18 +1525,27 @@ public class ProvisionServiceImpl implements ProvisionService {
 					psiRequest.getBodyUpdateClient().setCorreo(
 							provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
 					
-					String switchAgendamiento = "true";//System.getenv("TDP_SWITCH_AGENDAMIENTO");
+					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
 
-					if (switchAgendamiento.equals("false")) {
-						updatedPsi = restPSI.updatePSIClient(psiRequest);
-					} else {						
-						if(request.getSchedule().toUpperCase().equals("PSI")) {
+//					if (switchAgendamiento.equals("false")) { updatedPsi = restPSI.updatePSIClient(psiRequest);
+//					} else {	 if(request.getSchedule().toUpperCase().equals("PSI")) {
+//							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
+//						} else { updatedPsi = scheduleApi.modifyWorkOrder(psiRequest); }						
+//					}
+
+					if (request.getSchedule().toUpperCase().equals("PSI")) {
+						
+						if (switchAgendamiento.equals("false")) {
+							updatedPsi = restPSI.updatePSIClient(psiRequest);
+						}else {
 							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-						} else {
-							updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);
-						}						
+						}
+						
+					} else {						
+							updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
 					}
+					
 
 					if (updatedPsi) {
 						Update update = new Update();

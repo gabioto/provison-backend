@@ -7,14 +7,15 @@ public class ApiTrazaSetContactInfoUpdateRequest extends LogDataFrontendRequest 
 	private String email;
 	private boolean holderWillReceive;
 	private List<ContactRequest> contacts;
-	private String schedule;
-
-	public String getSchedule() {
-		return schedule;
+	private String scheduler;
+	
+	
+	public String getScheduler() {
+		return scheduler;
 	}
 
-	public void setSchedule(String schedule) {
-		this.schedule = schedule;
+	public void setScheduler(String scheduler) {
+		this.scheduler = scheduler;
 	}
 
 	public String getPsiCode() {

@@ -141,16 +141,14 @@ public class ScheduleApi {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		//String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
-		
-		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/bss/workOrderManagement/v1/modifyWorkOrderUpdate";
-		String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
+		String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
+
+		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 		System.out.println(requestx.getBodyUpdateClient().getNombre_completo());
 		
-		String oAuthToken =// oAuthService.getPSIOAuth2Token().getAccessToken():
-				getAuthToken(requestx.getBodyUpdateClient().getNombre_completo());
+		String oAuthToken = getAuthToken(requestx.getBodyUpdateClient().getNombre_completo());
 
 		Calendar calendar = Calendar.getInstance();
 		Date now = calendar.getTime();
@@ -159,26 +157,25 @@ public class ScheduleApi {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("UNICA-ServiceId", "d4ce144c-6b26-4b5c-ad29-090a3a559123");
-		headers.set("UNICA-Application", "appmovistar");
-		headers.set("UNICA-PID", "d4ce144c-6b26-4b5c-ad29-090a3a559123");
-		headers.set("UNICA-User", "UserTraceability");
-		headers.set("Destination", "WEB PSI");
+		headers.set("UNICA-ServiceId", api.getUnicaServiceId());
+		headers.set("UNICA-Application", api.getUnicaApplication());
+		headers.set("UNICA-PID", api.getUnicaPID());
+		headers.set("UNICA-User", api.getUnicaUser());
+		headers.set("X-IBM-Client-Id", security.getClientId());
 		headers.set("auth_string", generateAuthString());
-		headers.set("Authorization", "Bearer " + oAuthToken);
-		headers.set("X-IBM-Client-Id", "ca529df8-364a-4c73-9117-19113c552830");// api.getApiClient());
-		System.out.println(url);
+		headers.set("Destination", "WEB PSI");
+		headers.set("Authorization", "Bearer "+oAuthToken );
+		
 		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
-		System.out.println(new Gson().toJson(request));
 		
-		HttpEntity<PSIWorkRequest> entity = new HttpEntity<>(request, headers);
-		
-		System.out.println(new Gson().toJson(entity.getBody()));
+//		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
+		HttpEntity<String> entity = new HttpEntity<>(new Gson().toJson(request), headers);
 
 		try {
-			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
-					PSIWorkResponse.class);
-			System.out.println(new Gson().toJson(responseEntity.getBody()));
+			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
+					String.class);
+			
+			//System.out.println(new Gson().toJson(responseEntity.getBody()));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("WEB PSI", "modifyWork DATOS", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
 					startHour, endHour, responseEntity.getStatusCodeValue());
@@ -214,10 +211,9 @@ public class ScheduleApi {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		//String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
+		String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
 		
-		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/bss/workOrderManagement/v1/modifyWorkOrderUpdate";
-		String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
+		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 		System.out.println(requestx.getBodyUpdateClient().getNombre_completo());
@@ -231,23 +227,19 @@ public class ScheduleApi {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("UNICA-ServiceId", "d4ce144c-6b26-4b5c-ad29-090a3a559123");
-		headers.set("UNICA-Application", "appmovistar");
-		headers.set("UNICA-PID", "d4ce144c-6b26-4b5c-ad29-090a3a559123");
-		headers.set("UNICA-User", "UserTraceability");
-		headers.set("X-IBM-Client-Id", "ca529df8-364a-4c73-9117-19113c552830");
-		headers.set("auth_string", generateAuthString()); //generateAuthString());//1fe2a7f10ef781a0046e6fa6afa112b5
-		headers.set("Destination", "AGENDADOR");		
-		headers.set("Authorization", "Bearer "+oAuthToken);
-		//oAuthToken
-		// api.getApiClient());
+		headers.set("UNICA-ServiceId", api.getUnicaServiceId());
+		headers.set("UNICA-Application", api.getUnicaApplication());
+		headers.set("UNICA-PID", api.getUnicaPID());
+		headers.set("UNICA-User", api.getUnicaUser());
+		headers.set("X-IBM-Client-Id", security.getClientId());
+		headers.set("auth_string", generateAuthString());
+		headers.set("Destination", "AGENDADOR");
+		headers.set("Authorization", "Bearer "+oAuthToken );
 
-		
-		System.out.println(url);
 		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
 		System.out.println(new Gson().toJson(request));
 		
-		HttpEntity<PSIWorkRequest> entity = new HttpEntity<>(request, headers);
+		HttpEntity<String> entity = new HttpEntity<>(new Gson().toJson(request), headers);
 		
 		System.out.println(new Gson().toJson(entity.getBody()));
 

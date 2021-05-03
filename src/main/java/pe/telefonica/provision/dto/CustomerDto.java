@@ -39,6 +39,12 @@ public class CustomerDto implements Serializable {
 
 	@Field("reference")
 	private String reference;
+	
+	@Field("latitude")
+	private String latitude;
+
+	@Field("longitude")
+	private String longitude;
 
 	@Field("product_name")
 	private String productName;

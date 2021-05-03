@@ -49,6 +49,12 @@ public class CustomerDto implements Serializable {
 	@Field("longitude")
 	private String longitude;
 
+	@Field("latitude")
+	private String latitude;
+
+	@Field("longitude")
+	private String longitude;
+
 	public String getDocumentType() {
 		return documentType;
 	}
@@ -137,6 +143,22 @@ public class CustomerDto implements Serializable {
 		this.reference = reference;
 	}
 
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
 	public CustomerDto fromCustomer(Customer customer) {
 		this.documentType = customer.getDocumentType();
 		this.documentNumber = customer.getDocumentNumber();
@@ -149,6 +171,8 @@ public class CustomerDto implements Serializable {
 		this.department = customer.getDepartment();
 		this.address = customer.getAddress();
 		this.reference = customer.getReference();
+		this.latitude = customer.getLatitude();
+		this.longitude = customer.getLongitude();
 		return this;
 	}
 }

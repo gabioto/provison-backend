@@ -49,12 +49,6 @@ public class CustomerDto implements Serializable {
 	@Field("longitude")
 	private String longitude;
 
-	@Field("latitude")
-	private String latitude;
-
-	@Field("longitude")
-	private String longitude;
-
 	public String getDocumentType() {
 		return documentType;
 	}

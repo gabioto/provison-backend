@@ -46,6 +46,7 @@ public class PSIWorkRequest {
 		startDate = date;
 
 		List<ContactMedia> contactMedia = new ArrayList<>();
+		//public ContactMedia(String _type, String type, String email, String number) {
 		contactMedia.add(new ContactMedia("email", "", request.getBodyUpdateClient().getCorreo(), ""));
 		contactMedia.add(new ContactMedia("phone", "mobile", "", request.getBodyUpdateClient().getTelefono1()));
 
@@ -74,20 +75,12 @@ public class PSIWorkRequest {
 
 	public class Work {
 		private String name;
-		private List<Note> notes = new ArrayList<>();
-		private List<RelatedInformation> relatedInformation = new ArrayList<>();
+		//private List<Note> notes = new ArrayList<>();
+		//private List<RelatedInformation> relatedInformation = new ArrayList<>();
 		private Appointment appointment;
-
-		public List<Note> getNotes() {
-			return notes;
-		}
-
+		
 		public Appointment getAppointment() {
 			return appointment;
-		}
-
-		public void setNotes(List<Note> notes) {
-			this.notes = notes;
 		}
 
 		public void setAppointment(Appointment appointment) {
@@ -98,24 +91,17 @@ public class PSIWorkRequest {
 			return name;
 		}
 
-		public List<RelatedInformation> getRelatedInformation() {
-			return relatedInformation;
-		}
-
 		public void setName(String name) {
 			this.name = name;
 		}
 
-		public void setRelatedInformation(List<RelatedInformation> relatedInformation) {
-			this.relatedInformation = relatedInformation;
-		}
-
+		
 		public Work(String name, List<Note> notes, List<RelatedInformation> relatedInformation,
 				Appointment appointment) {
 			super();
 			this.name = name;
-			this.notes = notes;
-			this.relatedInformation = relatedInformation;
+			//this.notes = notes;
+			//this.relatedInformation = relatedInformation;
 			this.appointment = appointment;
 		}
 
@@ -145,7 +131,7 @@ public class PSIWorkRequest {
 	public class Appointment {
 		private String activityType;
 		private String startDate;
-		private List<String> timeSlots = new ArrayList<>();
+		//private List<String> timeSlots = new ArrayList<>();
 		private List<ContactMedia> contactMedia = new ArrayList<>();
 
 		public String getActivityType() {
@@ -156,9 +142,7 @@ public class PSIWorkRequest {
 			return startDate;
 		}
 
-		public List<String> getTimeSlots() {
-			return timeSlots;
-		}
+		
 
 		public void setActivityType(String activityType) {
 			this.activityType = activityType;
@@ -168,10 +152,7 @@ public class PSIWorkRequest {
 			this.startDate = startDate;
 		}
 
-		public void setTimeSlots(List<String> timeSlots) {
-			this.timeSlots = timeSlots;
-		}
-
+		
 		public List<ContactMedia> getContactMedia() {
 			return contactMedia;
 		}
@@ -183,9 +164,9 @@ public class PSIWorkRequest {
 		public Appointment(String activityType, String startDate, List<String> timeSlots,
 				List<ContactMedia> contactMedia) {
 			super();
-			this.activityType = activityType;
-			this.startDate = startDate;
-			this.timeSlots = timeSlots;
+			//this.activityType = activityType;
+			//this.startDate = startDate;
+			//this.timeSlots = timeSlots;
 			this.contactMedia = contactMedia;
 		}
 
@@ -196,6 +177,7 @@ public class PSIWorkRequest {
 	}
 
 	public class ContactMedia {
+		
 		@JsonProperty("@type")
 		private String _type;
 
@@ -204,6 +186,20 @@ public class PSIWorkRequest {
 		private String email;
 
 		private String number;
+		
+		
+		@Override
+		public String toString() {
+			return "ContactMedia [@type=" + _type + ", type=" + type + ", email=" + email + ", number=" + number + "]";
+		}
+
+		public String getNumber() {
+			return number;
+		}
+
+		public void setNumber(String number) {
+			this.number = number;
+		}
 
 		public String getType() {
 			return type;

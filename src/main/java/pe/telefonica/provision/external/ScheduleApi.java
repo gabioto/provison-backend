@@ -135,6 +135,150 @@ public class ScheduleApi {
 			throw new ServerNotFoundException(ex.getMessage());
 		}
 	}
+	
+	public Boolean modifyWorkOrderPSI(PSIUpdateClientRequest requestx) throws Exception {
+
+		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
+
+		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
+		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		LocalDateTime endHour;
+		System.out.println(requestx.getBodyUpdateClient().getNombre_completo());
+		
+		String oAuthToken = getAuthToken(requestx.getBodyUpdateClient().getNombre_completo());
+
+		Calendar calendar = Calendar.getInstance();
+		Date now = calendar.getTime();
+		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIMESTAMP_FORMAT_PSI_WORK);
+		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("UNICA-ServiceId", api.getUnicaServiceId());
+		headers.set("UNICA-Application", api.getUnicaApplication());
+		headers.set("UNICA-PID", api.getUnicaPID());
+		headers.set("UNICA-User", api.getUnicaUser());
+		headers.set("X-IBM-Client-Id", security.getClientId());
+		headers.set("auth_string", generateAuthString());
+		headers.set("Destination", "WEB PSI");
+		headers.set("Authorization", "Bearer "+oAuthToken );
+		
+		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
+		
+//		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
+		HttpEntity<String> entity = new HttpEntity<>(new Gson().toJson(request), headers);
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
+					String.class);
+			
+			//System.out.println(new Gson().toJson(responseEntity.getBody()));
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("WEB PSI", "modifyWork DATOS", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
+					startHour, endHour, responseEntity.getStatusCodeValue());
+
+			return true;
+		} catch (HttpClientErrorException ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("WEB PSI", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
+					startHour, endHour, ex.getStatusCode().value());
+
+			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+			JsonObject appDetail = jsonDecode.getAsJsonObject("BodyOut").getAsJsonObject("ClientException")
+					.getAsJsonObject("appDetail");
+			String message = appDetail.get("exceptionAppMessage").toString();
+			String codeError = appDetail.get("exceptionAppCode").toString();
+
+			throw new FunctionalErrorException(message, ex, codeError);
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("WEB PSI", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
+					endHour, Integer.parseInt(error));
+			throw new ServerNotFoundException(ex.getMessage());
+		}
+	}
+
+	
+	public Boolean modifyWorkOrder(PSIUpdateClientRequest requestx) throws Exception {
+
+		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
+		
+		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
+		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		LocalDateTime endHour;
+		System.out.println(requestx.getBodyUpdateClient().getNombre_completo());
+		
+		String oAuthToken =getAuthToken(requestx.getBodyUpdateClient().getNombre_completo());
+
+		Calendar calendar = Calendar.getInstance();
+		Date now = calendar.getTime();
+		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIMESTAMP_FORMAT_PSI_WORK);
+		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("UNICA-ServiceId", api.getUnicaServiceId());
+		headers.set("UNICA-Application", api.getUnicaApplication());
+		headers.set("UNICA-PID", api.getUnicaPID());
+		headers.set("UNICA-User", api.getUnicaUser());
+		headers.set("X-IBM-Client-Id", security.getClientId());
+		headers.set("auth_string", generateAuthString());
+		headers.set("Destination", "AGENDADOR");
+		headers.set("Authorization", "Bearer "+oAuthToken );
+
+		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
+		System.out.println(new Gson().toJson(request));
+		
+		HttpEntity<String> entity = new HttpEntity<>(new Gson().toJson(request), headers);
+		
+		System.out.println(new Gson().toJson(entity.getBody()));
+
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
+					String.class);
+			
+//			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
+//					PSIWorkResponse.class);
+			
+			System.out.println(new Gson().toJson(responseEntity.getBody()));
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
+					startHour, endHour, responseEntity.getStatusCodeValue());
+
+			return true;
+		} catch (HttpClientErrorException ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
+					startHour, endHour, ex.getStatusCode().value());
+
+			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
+			JsonObject appDetail = jsonDecode.getAsJsonObject("BodyOut").getAsJsonObject("ClientException")
+					.getAsJsonObject("appDetail");
+			String message = appDetail.get("exceptionAppMessage").toString();
+			String codeError = appDetail.get("exceptionAppCode").toString();
+
+			throw new FunctionalErrorException(message, ex, codeError);
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
+			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
+					endHour, Integer.parseInt(error));
+			throw new ServerNotFoundException(ex.getMessage());
+		}
+	}
 
 	/**
 	 * 

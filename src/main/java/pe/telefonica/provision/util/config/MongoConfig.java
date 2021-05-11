@@ -20,7 +20,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 	@Override
 	public MongoClient mongoClient() {
 		ConnectionString connectionString = new ConnectionString(System.getenv("TDP_DATA_MONGODB_URI"));
-
 		MongoClientSettings mongoClientSettings = MongoClientSettings.builder().applyConnectionString(connectionString)
 				.build();
 

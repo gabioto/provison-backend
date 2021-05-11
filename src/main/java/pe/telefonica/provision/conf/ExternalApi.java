@@ -57,5 +57,12 @@ public class ExternalApi {
 	private String oauthTokenOnPremise;
 	private String customerSearchClientOnPremise;
 	private String securityGetOAuthTokenAzure;
+	//--//
+	private String workOrderManagementUrl;
+	private String workOrders;	
+	private String unicaServiceId;
+	private String unicaApplication;
+	private String unicaPID;
+	private String unicaUser;
 
 }

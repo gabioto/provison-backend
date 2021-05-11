@@ -133,6 +133,9 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 			provision.setCustomer(customer);
 
 			Contacts contact = new Contacts();
+			contact.setFullName(appointment.getRelatedObject().get(1).getAdditionalData().size() > 0
+					? appointment.getRelatedObject().get(1).getAdditionalData().get(0).getValue()
+					: "");
 			contact.setPhoneNumber(appointment.getContactMedium().get(5).getNumber());
 			contact.setMail(appointment.getContactMedium().get(7).getEmail());
 			contact.setCarrier(!contact.getPhoneNumber().isEmpty() ? getCarrier(contact.getPhoneNumber()) : false);

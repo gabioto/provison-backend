@@ -39,6 +39,7 @@ public final class Constants {
 	public static final String DATE_FORMAT_PSI_AUTH = "yyyy-MM-dd";
 	public static final String DATE_FORMAT_EMAILING = "dd' de 'MMMMM' de 'yyyy";
 	public static final String TIMESTAMP_FORMAT_PSI = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	public static final String TIMESTAMP_FORMAT_PSI_WORK = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String TIMESTAMP_FORMAT_USER = "yyyy-MM-dd HH:mm:ss";
 	public static final String TIMESTAMP_FORMAT_ORDERS = "dd/MM/yyyy HH:mm:ss";
 	public static final String TIMESTAMP_FORMAT_CMS_ATIS = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";

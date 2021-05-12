@@ -1525,7 +1525,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					psiRequest.getBodyUpdateClient().setCorreo(
 							provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
 					
-					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
+					String switchAgendamiento = "true";//System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
 
 //					if (switchAgendamiento.equals("false")) { updatedPsi = restPSI.updatePSIClient(psiRequest);

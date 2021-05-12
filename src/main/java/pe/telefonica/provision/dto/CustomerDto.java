@@ -42,28 +42,12 @@ public class CustomerDto implements Serializable {
 
 	@Field("reference")
 	private String reference;
-	
+
 	@Field("latitude")
 	private String latitude;
 
 	@Field("longitude")
 	private String longitude;
-	
-	public String getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(String latitude) {
-		this.latitude = latitude;
-	}
-
-	public String getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
-	}
 
 	public String getDocumentType() {
 		return documentType;
@@ -151,6 +135,22 @@ public class CustomerDto implements Serializable {
 
 	public void setReference(String reference) {
 		this.reference = reference;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
 	}
 
 	public CustomerDto fromCustomer(Customer customer) {

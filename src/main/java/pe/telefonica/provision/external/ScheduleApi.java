@@ -231,7 +231,7 @@ public class ScheduleApi {
 		headers.set("UNICA-Application", api.getUnicaApplication());
 		headers.set("UNICA-PID", api.getUnicaPID());
 		headers.set("UNICA-User", api.getUnicaUser());
-		headers.set("X-IBM-Client-Id", security.getClientId());
+		headers.set("X-IBM-Client-Id", api.getApiClient());
 		headers.set("auth_string", generateAuthString());
 		headers.set("Destination", "AGENDADOR");
 		headers.set("Authorization", "Bearer "+oAuthToken );

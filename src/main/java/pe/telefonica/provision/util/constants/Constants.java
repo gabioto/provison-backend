@@ -133,7 +133,7 @@ public final class Constants {
 	public static final String STATUS_WO_PRESTART = "WO_PRESTART";
 	public static final String STATUS_WO_INIT = "WO_INIT";
 	public static final String STATUS_WO_COMPLETED = "WO_COMPLETED";
-	public static final String STATUS_WO_PRE_NOTDONE = "WO_PRE_NOTDONE";
+	public static final String STATUS_WO_PRE_NOTDONE = "WO_PRENOTDONE";
 	public static final String STATUS_WO_NOTDONE = "WO_NOTDONE";
 	public static final String STATUS_WO_CANCEL = "WO_CANCEL";
 	public static final String STATUS_WO_RESCHEDULE = "WO_RESCHEDULE";

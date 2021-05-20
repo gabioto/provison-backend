@@ -55,7 +55,8 @@ public enum Status {
 	CONFIGURADA("CONFIGURADA", 21, "CONFIGURADA", "", "", "Configurada"),
 	PENDIENTE_DE_APROBACION("PENDIENTE_DE_APROBACION", 22, "PENDIENTE DE APROBACION", "", "", "Pendiente de aprovacion"),
 	PETICION_PENDIENTE("PETICION_PENDIENTE", 23, "PETICION PENDIENTE", "", "", "Peticion Pendiente"),	
-	WO_PRENOTDONE("WO_PRENOTDONE", 24, "PEDIDO NO INSTALADO", "", "", "Tu pedido no fue instalado, lamentamos los inconvenientes");
+	WO_PRENOTDONE("WO_PRENOTDONE", 24, "REGISTRADO TÉCNICO ESPERANDO AL CLIENTE", 
+			"[$name], el técnico está esperando en tu domicilio para la instalación de tu pedido. Confirma o reagenda aquí", "", "El técnico se encuentra en el domicilio");
 	
 	private String statusName;
 	private int statusId;

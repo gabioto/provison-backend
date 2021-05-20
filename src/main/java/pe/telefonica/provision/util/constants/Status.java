@@ -54,7 +54,8 @@ public enum Status {
 	PENDIENTE_DE_VALIDACION("PENDIENTE_DE_VALIDACION", 20, "PENDIENTE DE VALIDACION", "", "", "Pendiente de validacion"),
 	CONFIGURADA("CONFIGURADA", 21, "CONFIGURADA", "", "", "Configurada"),
 	PENDIENTE_DE_APROBACION("PENDIENTE_DE_APROBACION", 22, "PENDIENTE DE APROBACION", "", "", "Pendiente de aprovacion"),
-	PETICION_PENDIENTE("PETICION_PENDIENTE", 23, "PETICION PENDIENTE", "", "", "Peticion Pendiente");
+	PETICION_PENDIENTE("PETICION_PENDIENTE", 23, "PETICION PENDIENTE", "", "", "Peticion Pendiente"),	
+	WO_PRENOTDONE("WO_PRENOTDONE", 24, "PEDIDO NO INSTALADO", "", "", "Tu pedido no fue instalado, lamentamos los inconvenientes");
 	
 	private String statusName;
 	private int statusId;

@@ -204,7 +204,7 @@ public abstract class ProvisionUpdateServiceImpl {
 		contacts.add(contactCustomer);
 
 		String urlTraza = provisionTexts.getWebUrl();
-		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_FAULT_WOPRESTART,
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_WOPRENOTDONE,
 				msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
 	}
 	

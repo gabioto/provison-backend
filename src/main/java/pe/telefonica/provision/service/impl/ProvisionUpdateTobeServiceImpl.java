@@ -777,15 +777,15 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		Update update = new Update();
 		update.set("wo_notdone", woPreNotdone);
-		update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
+		update.set("active_status", Constants.PROVISION_STATUS_PRENOTDONE);
 		update.set("a_observation", appointment.getNote().get(0).getText());
 		update.set("user_prenotdone", appointment.getRelatedParty().get(4).getId());
-		update.set("last_tracking_status", Status.WO_NOTDONE.getStatusName());
+		update.set("last_tracking_status", Status.WO_PRENOTDONE.getStatusName());
 		update.set("generic_speech", speech);
 		update.set("description_status",
-				preNotDoneStatus != null ? preNotDoneStatus.getDescription() : Status.WO_NOTDONE.getDescription());
+				preNotDoneStatus != null ? preNotDoneStatus.getDescription() : Status.WO_PRENOTDONE.getDescription());
 		update.set("front_speech",
-				preNotDoneStatus != null ? preNotDoneStatus.getFront() : Status.WO_NOTDONE.getFrontSpeech());
+				preNotDoneStatus != null ? preNotDoneStatus.getFront() : Status.WO_PRENOTDONE.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("send_notify", false);

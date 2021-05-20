@@ -22,6 +22,7 @@ public final class Constants {
 	public static final String PROVISION_STATUS_DONE = "done";
 	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
 	public static final String PROVISION_STATUS_NOTDONE = "notDone";
+	public static final String PROVISION_STATUS_PRENOTDONE = "preNotDone";
 	public static final String PROVISION_STATUS_WOINIT = "init";
 
 	public static final String COMPONENTS_NAME_TV = "TV";
@@ -86,6 +87,7 @@ public final class Constants {
 	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
 	public static final String MSG_FAULT_WOPRESTART = "MSG_FAULT_WOPRESTART";
 	public static final String MSG_PRO_SCHEDULE_TECHNICIAN_KEY = "MSG_PRO_SCHEDULE_TECHNICIAN_KEY";
+	public static final String MSG_PRO_WOPRENOTDONE = "MSG_FAULT_WOPRENOTDONE";
 
 	// Codigos de los endpoints de PSI
 	public static final String PSI_CODE_CAPACITY = "201";

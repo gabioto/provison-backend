@@ -816,8 +816,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
-		update.set("notifications.prestart_send_notify", true);
-		update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		update.set("notifications.notdone_send_notify", true);
+		update.set("notifications.notdone_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 		
 		// SMS
 		sendSMSWoPreNotDoneHolder(provision);

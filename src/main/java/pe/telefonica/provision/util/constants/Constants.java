@@ -87,7 +87,7 @@ public final class Constants {
 	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
 	public static final String MSG_FAULT_WOPRESTART = "MSG_FAULT_WOPRESTART";
 	public static final String MSG_PRO_SCHEDULE_TECHNICIAN_KEY = "MSG_PRO_SCHEDULE_TECHNICIAN_KEY";
-	public static final String MSG_PRO_WOPRENOTDONE = "MSG_FAULT_WOPRENOTDONE";
+	public static final String MSG_PRO_WOPRENOTDONE = "MSG_PRO_WOPRENOTDONE";
 
 	// Codigos de los endpoints de PSI
 	public static final String PSI_CODE_CAPACITY = "201";

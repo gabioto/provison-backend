@@ -125,7 +125,8 @@ public final class Constants {
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
 	public static final String OPER_GET_PROVISION_BY_SALE_CODE = "OPER_GET_PROVISION_BY_SALE_CODE";
-
+	public static final String OPER_UPDATE_ACTIVITY = "OPER_UPDATE_ACTIVITY";
+	
 	public static final String OPER_GET_ALL_PROVISION = "OPER_GET_ALL_PROVISION";
 
 	public static final String TIPO_RUC = "ruc";

@@ -34,6 +34,7 @@ import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
+import pe.telefonica.provision.controller.request.simpli.SetNmoRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
@@ -42,6 +43,7 @@ import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
+import pe.telefonica.provision.external.NmoApi;
 import pe.telefonica.provision.external.PSIApi;
 
 import pe.telefonica.provision.external.ScheduleApi;
@@ -79,6 +81,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private PSIApi restPSI;
+	
+	@Autowired
+	private NmoApi nmoPSI;
 
 	@Autowired
 	private TrazabilidadSecurityApi trazabilidadSecurityApi;
@@ -1968,4 +1973,30 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}
 
+	@Override
+	public boolean updateActivity(String idActivity) {
+		SetNmoRequest requestNmo = new SetNmoRequest();
+		requestNmo.setA_form_nmo("3");
+		
+		boolean resultado = false;
+		try {
+			String switchAzure = System.getenv("TDP_SWITCH_AZURE");
+			String tokenExternal = "";
+			if (switchAzure.equals("true")) {
+				tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
+			} else {
+				tokenExternal = trazabilidadSecurityApi.generateToken();
+			}			
+			resultado = nmoPSI.updateActivity(idActivity, requestNmo, tokenExternal);
+			if (resultado) {
+				// Llamar al segundo servicio
+			} else {
+				
+			}
+			return resultado;
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+		}
+		return resultado;
+	}	
 }

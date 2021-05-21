@@ -11,6 +11,7 @@ import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest
 import pe.telefonica.provision.controller.request.InsertCodeFictionalRequest;
 import pe.telefonica.provision.controller.request.InsertOrderRequest;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
+import pe.telefonica.provision.controller.request.simpli.SetNmoRequest;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
@@ -78,4 +79,5 @@ public interface ProvisionService {
 
 	List<Provision> getUpFrontProvisions();
 
+	public boolean updateActivity(String idActivity);
 }

@@ -1966,4 +1966,40 @@ public class ProvisionController {
 		return ResponseEntity.status(status).body(apiResponse);
 	}
 
+	@RequestMapping(value = "/updateActivity", method = RequestMethod.POST)
+	public ResponseEntity<ApiResponse<String>> updateActivity(
+			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
+		ApiResponse<String> apiResponse;
+		HttpStatus status;
+		
+		try {
+			ProvisionDetailTrazaDto provisions = provisionService.getProvisionDetailById(request.getBody());
+			if (provisions == null) {
+				status = HttpStatus.NOT_FOUND;
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+						String.valueOf(status.value()), "No se encontró provisión", null);				
+				apiResponse.setBody("NOT FOUND");
+			} else {
+				boolean resultado = provisionService.updateActivity(provisions.getActivityType());
+				if (resultado) {
+					status = HttpStatus.OK;
+					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+							String.valueOf(status.value()), "Actualización actividad", null);
+					apiResponse.setBody("OK");
+				} else {
+					status = HttpStatus.BAD_REQUEST;
+					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+							String.valueOf(status.value()), "Error Actualización actividad", null);
+					apiResponse.setBody("BAD REQUEST");
+				}
+			}
+		} catch (Exception ex) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+					String.valueOf(status.value()), ex.getMessage(), null);
+			apiResponse.setBody("INTERNAL SERVER ERROR");
+		}
+		return ResponseEntity.status(status).body(apiResponse);		
+	}
+		
 }

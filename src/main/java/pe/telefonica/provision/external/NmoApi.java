@@ -73,6 +73,8 @@ public class NmoApi {
 		try {
 			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.PATCH, entity,
 					PSIWorkResponse.class);
+			
+			log.info(responseEntity.toString());
 
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 			loggerApi.thirdLogEvent("NMO", "updateActivity", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,

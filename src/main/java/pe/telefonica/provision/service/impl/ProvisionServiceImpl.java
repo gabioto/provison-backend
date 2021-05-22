@@ -34,7 +34,6 @@ import pe.telefonica.provision.controller.request.MailRequest.MailParameter;
 import pe.telefonica.provision.controller.request.ProvisionRequest;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Contact;
 import pe.telefonica.provision.controller.request.SMSByIdRequest.Message.MsgParameter;
-import pe.telefonica.provision.controller.request.simpli.SetNmoRequest;
 import pe.telefonica.provision.controller.response.ProvisionHeaderResponse;
 import pe.telefonica.provision.controller.response.ProvisionResponse;
 import pe.telefonica.provision.dto.ComponentsDto;
@@ -1975,9 +1974,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public boolean updateActivity(String idActivity) {
-		SetNmoRequest requestNmo = new SetNmoRequest();
-		requestNmo.setA_form_nmo("3");
-		
 		boolean resultado = false;
 		try {
 			String switchAzure = System.getenv("TDP_SWITCH_AZURE");
@@ -1986,12 +1982,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
 			} else {
 				tokenExternal = trazabilidadSecurityApi.generateToken();
-			}			
-			resultado = nmoPSI.updateActivity(idActivity, requestNmo, tokenExternal);
+			}
+			resultado = nmoPSI.updateActivity(idActivity, tokenExternal);
 			if (resultado) {
 				// Llamar al segundo servicio
-			} else {
-				
+				resultado = nmoPSI.serviceRequest(idActivity, tokenExternal);				
 			}
 			return resultado;
 		} catch (Exception ex) {

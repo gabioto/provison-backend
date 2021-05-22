@@ -1980,7 +1980,8 @@ public class ProvisionController {
 						String.valueOf(status.value()), "No se encontró provisión", null);				
 				apiResponse.setBody("NOT FOUND");
 			} else {
-				boolean resultado = provisionService.updateActivity(provisions.getActivityType());
+				String idActivity = "45840";
+				boolean resultado = provisionService.updateActivity(idActivity);
 				if (resultado) {
 					status = HttpStatus.OK;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,

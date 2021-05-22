@@ -64,5 +64,6 @@ public class ExternalApi {
 	private String unicaApplication;
 	private String unicaPID;
 	private String unicaUser;
+	private String ocpApimSubscriptionKey;
 
 }

@@ -60,11 +60,11 @@ public class NmoApi {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("UNICA-ServiceId", "");
-		headers.set("UNICA-Application", "trazabilidad");
-		headers.set("UNICA-PID", "");
-		headers.set("UNICA-User", "user_trazabilidad");
-		headers.set("Ocp-Apim-Subscription-Key", externalApi.getApiClientKeyAzure());
+		headers.set("UNICA-ServiceId", externalApi.getUnicaServiceId());
+		headers.set("UNICA-Application", externalApi.getUnicaApplication());
+		headers.set("UNICA-PID", externalApi.getUnicaPID());
+		headers.set("UNICA-User", externalApi.getUnicaUser());
+		headers.set("Ocp-Apim-Subscription-Key", externalApi.getOcpApimSubscriptionKey());
 		headers.set("Authorization", "Bearer " + tokenExternal);		
 
 		HttpEntity<SetNmoRequest> entity = new HttpEntity<>(request, headers);

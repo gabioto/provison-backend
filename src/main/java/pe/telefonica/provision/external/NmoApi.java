@@ -50,7 +50,8 @@ public class NmoApi {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		String url = "https://apimngr-genesis-dev.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/activities/" + idActivity;
+		idActivity = "45840";
+		String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/activities/" + idActivity;
 		
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;

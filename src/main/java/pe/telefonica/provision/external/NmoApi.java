@@ -111,7 +111,7 @@ public class NmoApi {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		SetServiceRequest request = new SetServiceRequest();
-		request.setActivityId(idActivity);
+		request.setActivityId(Integer.parseInt(idActivity));
 		request.setRequestType("REJECTION");
 		
 		String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/serviceRequests";
@@ -136,8 +136,8 @@ public class NmoApi {
 		log.info(new Gson().toJson(entity));
 		
 		try {
-			ResponseEntity<PSIWorkResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
-					PSIWorkResponse.class);
+			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
+					String.class);
 			
 			log.info(new Gson().toJson(responseEntity));
 

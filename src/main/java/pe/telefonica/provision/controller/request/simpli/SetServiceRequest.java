@@ -1,13 +1,13 @@
 package pe.telefonica.provision.controller.request.simpli;
 
 public class SetServiceRequest {
-	private String activityId;
+	private int activityId;
 	private String requestType;
 	
-	public String getActivityId() {
+	public int getActivityId() {
 		return activityId;
 	}
-	public void setActivityId(String activityId) {
+	public void setActivityId(int activityId) {
 		this.activityId = activityId;
 	}
 	public String getRequestType() {

@@ -1976,13 +1976,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public boolean updateActivity(String idActivity) {
 		boolean resultado = false;
 		try {
-			String switchAzure = System.getenv("TDP_SWITCH_AZURE");
-			String tokenExternal = "";
-			if (switchAzure.equals("true")) {
-				tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
-			} else {
-				tokenExternal = trazabilidadSecurityApi.generateToken();
-			}
+			String tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
 			resultado = nmoPSI.updateActivity(idActivity, tokenExternal);
 			if (resultado) {
 				// Llamar al segundo servicio

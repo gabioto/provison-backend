@@ -1967,44 +1967,85 @@ public class ProvisionController {
 	}
 
 	@RequestMapping(value = "/updateActivity", method = RequestMethod.POST)
-	public ResponseEntity<ApiResponse<String>> updateActivity(
+	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> updateActivity(
 			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
-		ApiResponse<String> apiResponse;
-		HttpStatus status;
+		
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse = new ApiResponse<ProvisionDetailTrazaDto>();
+		HttpStatus status = null;
+		String timestamp = "";
+		ProvisionDetailTrazaDto provision = new ProvisionDetailTrazaDto();
 		
 		try {
-			ProvisionDetailTrazaDto provision = provisionService.getProvisionDetailById(request.getBody());
+			provision = provisionService.getProvisionDetailById(request.getBody());
 			if (provision == null) {
 				status = HttpStatus.NOT_FOUND;
-				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
-						String.valueOf(status.value()), "No se encontró provisión", null);				
-				apiResponse.setBody("NOT FOUND");
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_UPDATE_ACTIVITY, String.valueOf(status.value()),
+						"No se encontró provisón", null);
+				apiResponse.setBody(provision);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				// Log
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.ACCESS_APP_TYPE_ORDER,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());				
 			} else if (provision.getActivityId() != null) {
-				boolean resultado = provisionService.updateActivity(provision.getActivityId());
-				if (resultado) {
-					status = HttpStatus.OK;
-					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
-							String.valueOf(status.value()), "Actualización actividad", null);
-					apiResponse.setBody("OK");
-				} else {
+				provision = provisionService.updateActivity(provision.getIdProvision(), provision.getActivityId(), request.getBody().getIndicador());
+				if (provision == null) {
 					status = HttpStatus.BAD_REQUEST;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
 							String.valueOf(status.value()), "Error Actualización actividad", null);
-					apiResponse.setBody("BAD REQUEST");
-				}
+					apiResponse.setBody(provision);
+					
+				} else {
+					status = HttpStatus.OK;
+					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+							String.valueOf(status.value()), "Actualización actividad", null);
+					apiResponse.setBody(provision);
+				}					
 			} else {
 				status = HttpStatus.NOT_FOUND;
-				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
-						String.valueOf(status.value()), "No se encuentra activity_id", null);
-				apiResponse.setBody("NOT FOUND");
+				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_UPDATE_ACTIVITY, String.valueOf(status.value()),
+						"No existe activity_id", null);
+				apiResponse.setBody(provision);
+
+				timestamp = getTimestamp();
+				apiResponse.getHeader().setTimestamp(timestamp);
+				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+
+				// Log
+				restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+						request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+						request.getBody().getBucket(), "ERROR", new Gson().toJson(request),
+						new Gson().toJson(apiResponse), ConstantsLogData.ACCESS_APP_TYPE_ORDER,
+						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
+						request.getBody().getActivityType(), request.getHeader().getAppName());
 			}
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
-			apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
-					String.valueOf(status.value()), ex.getMessage(), null);
-			apiResponse.setBody("INTERNAL SERVER ERROR");
+			apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
+					Constants.OPER_UPDATE_ACTIVITY, String.valueOf(status.value()), ex.getMessage().toString(),
+					null);
+
+			// Log
+			timestamp = getTimestamp();
+			apiResponse.getHeader().setTimestamp(timestamp);
+			apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+			restSecuritySaveLogData.saveLogData(request.getBody().getDocumentNumber(),
+					request.getBody().getDocumentType(), request.getBody().getOrderCode(),
+					request.getBody().getBucket(), "ERROR", new Gson().toJson(request), new Gson().toJson(apiResponse),
+					ConstantsLogData.ACCESS_APP_TYPE_ORDER, request.getHeader().getMessageId(),
+					request.getHeader().getTimestamp(), timestamp, request.getBody().getActivityType(),
+					request.getHeader().getAppName());						
 		}
-		return ResponseEntity.status(status).body(apiResponse);		
+		return ResponseEntity.status(status).body(apiResponse);
 	}
 		
 }

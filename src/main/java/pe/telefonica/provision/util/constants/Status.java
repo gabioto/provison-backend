@@ -56,7 +56,11 @@ public enum Status {
 	PENDIENTE_DE_APROBACION("PENDIENTE_DE_APROBACION", 22, "PENDIENTE DE APROBACION", "", "", "Pendiente de aprovacion"),
 	PETICION_PENDIENTE("PETICION_PENDIENTE", 23, "PETICION PENDIENTE", "", "", "Peticion Pendiente"),	
 	WO_PRENOTDONE("WO_PRENOTDONE", 24, "REGISTRADO TÉCNICO ESPERANDO AL CLIENTE", 
-			"[$name], el técnico está esperando en tu domicilio para la instalación de tu pedido. Confirma o reagenda aquí", "", "El técnico se encuentra en el domicilio");
+			"[$name], el técnico está esperando en tu domicilio para la instalación de tu pedido. Confirma o reagenda aquí", "", "El técnico se encuentra en el domicilio"),
+	WO_PRENOTDONE_TRAZA("WO_PRENOTDONE_TRAZA", 25, "REGISTRADO TÉCNICO ESPERANDO AL CLIENTE", 
+			"[$name], el técnico está esperando en tu casa", "", "El técnico está esperando en tu casa"),
+	WO_NOTDONE_TRAZA2("WO_NOTDONE_TRAZA", 26, "PEDIDO NO INSTALADO", 
+			"[$name], te enviaremos un SMS en las próximas horas para reagendar la vísita del técnico", "", "Pendiente por reagendar");	
 	
 	private String statusName;
 	private int statusId;

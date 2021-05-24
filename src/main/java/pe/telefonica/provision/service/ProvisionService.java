@@ -79,5 +79,5 @@ public interface ProvisionService {
 
 	List<Provision> getUpFrontProvisions();
 
-	public boolean updateActivity(String idActivity);
+	public ProvisionDetailTrazaDto updateActivity(String idProvision, String activityId, String indicador);
 }

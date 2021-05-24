@@ -23,6 +23,8 @@ public final class Constants {
 	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
 	public static final String PROVISION_STATUS_NOTDONE = "notDone";
 	public static final String PROVISION_STATUS_PRENOTDONE = "preNotDone";
+	public static final String PROVISION_STATUS_NOTDONE_TRAZA = "notDoneTraza";
+	public static final String PROVISION_STATUS_PRENOTDONE_TRAZA = "preNotDoneTraza";	
 	public static final String PROVISION_STATUS_WOINIT = "init";
 
 	public static final String COMPONENTS_NAME_TV = "TV";

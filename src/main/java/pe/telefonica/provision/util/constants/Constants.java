@@ -22,6 +22,7 @@ public final class Constants {
 	public static final String PROVISION_STATUS_DONE = "done";
 	public static final String PROVISION_STATUS_RESCHEDULE = "schedule";
 	public static final String PROVISION_STATUS_NOTDONE = "notDone";
+	public static final String PROVISION_STATUS_PRENOTDONE = "preNotDone";
 	public static final String PROVISION_STATUS_WOINIT = "init";
 
 	public static final String COMPONENTS_NAME_TV = "TV";
@@ -86,6 +87,7 @@ public final class Constants {
 	public static final String MSG_PRO_CANCELLED_BY_CUSTOMER_KEY = "MSG_PRO_CANCELLED_BY_CUSTOMER_KEY";
 	public static final String MSG_FAULT_WOPRESTART = "MSG_FAULT_WOPRESTART";
 	public static final String MSG_PRO_SCHEDULE_TECHNICIAN_KEY = "MSG_PRO_SCHEDULE_TECHNICIAN_KEY";
+	public static final String MSG_PRO_WOPRENOTDONE = "MSG_PRO_WOPRENOTDONE";
 
 	// Codigos de los endpoints de PSI
 	public static final String PSI_CODE_CAPACITY = "201";
@@ -123,7 +125,8 @@ public final class Constants {
 	public static final String OPER_UPDATE_STATUS = "OPER_UPDATE_STATUS";
 	public static final String OPER_GET_PROVISION_BY_ORDER_CODE = "OPER_GET_PROVISION_BY_ORDER_CODE";
 	public static final String OPER_GET_PROVISION_BY_SALE_CODE = "OPER_GET_PROVISION_BY_SALE_CODE";
-
+	public static final String OPER_UPDATE_ACTIVITY = "OPER_UPDATE_ACTIVITY";
+	
 	public static final String OPER_GET_ALL_PROVISION = "OPER_GET_ALL_PROVISION";
 
 	public static final String TIPO_RUC = "ruc";
@@ -133,7 +136,7 @@ public final class Constants {
 	public static final String STATUS_WO_PRESTART = "WO_PRESTART";
 	public static final String STATUS_WO_INIT = "WO_INIT";
 	public static final String STATUS_WO_COMPLETED = "WO_COMPLETED";
-	public static final String STATUS_WO_PRE_NOTDONE = "WO_PRE_NOTDONE";
+	public static final String STATUS_WO_PRE_NOTDONE = "WO_PRENOTDONE";
 	public static final String STATUS_WO_NOTDONE = "WO_NOTDONE";
 	public static final String STATUS_WO_CANCEL = "WO_CANCEL";
 	public static final String STATUS_WO_RESCHEDULE = "WO_RESCHEDULE";

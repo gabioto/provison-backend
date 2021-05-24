@@ -1984,11 +1984,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 					resultado = nmoPSI.serviceRequest(activityId, tokenExternal);
 					if (resultado) {
 						// Actualizar la provision con el nuevo estado
-						provision = updateProvisionActivity(idProvision, Status.WO_PRENOTDONE_TRAZA); 
+						provision = updateProvisionActivity(idProvision, Status.WO_PRENOTDONE_TRAZA, Constants.PROVISION_STATUS_PRENOTDONE_TRAZA); 
 					}
 				}
 			} else if (indicador.equals("1")) {
-				provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA2);
+				provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA, Constants.PROVISION_STATUS_NOTDONE_TRAZA);
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
@@ -1996,7 +1996,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return provision;
 	}	
 	
-	private ProvisionDetailTrazaDto updateProvisionActivity(String idProvision, Status status) {
+	private ProvisionDetailTrazaDto updateProvisionActivity(String idProvision, Status status, String statusProvision) {
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
 
@@ -2009,7 +2009,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		List<StatusLog> listLog = provision.getLogStatus();
 
 		Update update = new Update();
-		update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
+		update.set("active_status", statusProvision);
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(status.getStatusName());
 		statusLog.setXaidst(provision.getXaIdSt());

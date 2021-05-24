@@ -1970,10 +1970,10 @@ public class ProvisionController {
 	public ResponseEntity<ApiResponse<ProvisionDetailTrazaDto>> updateActivity(
 			@RequestBody @Valid ApiRequest<ProvisionRequest> request) {
 		
-		ApiResponse<ProvisionDetailTrazaDto> apiResponse = new ApiResponse<ProvisionDetailTrazaDto>();
-		HttpStatus status = null;
+		ApiResponse<ProvisionDetailTrazaDto> apiResponse;
+		HttpStatus status;
 		String timestamp = "";
-		ProvisionDetailTrazaDto provision = new ProvisionDetailTrazaDto();
+		ProvisionDetailTrazaDto provision;
 		
 		try {
 			provision = provisionService.getProvisionDetailById(request.getBody());
@@ -1997,24 +1997,23 @@ public class ProvisionController {
 						request.getBody().getActivityType(), request.getHeader().getAppName());				
 			} else if (provision.getActivityId() != null) {
 				provision = provisionService.updateActivity(provision.getIdProvision(), provision.getActivityId(), request.getBody().getIndicador());
-				if (provision == null) {
+				if (provision.getIdProvision() == null) {
 					status = HttpStatus.BAD_REQUEST;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
 							String.valueOf(status.value()), "Error Actualización actividad", null);
-					apiResponse.setBody(provision);
-					
+					apiResponse.setBody(provision);					
 				} else {
 					status = HttpStatus.OK;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
 							String.valueOf(status.value()), "Actualización actividad", null);
-					apiResponse.setBody(provision);
+					apiResponse.setBody(null);
 				}					
 			} else {
 				status = HttpStatus.NOT_FOUND;
 				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,
 						Constants.OPER_UPDATE_ACTIVITY, String.valueOf(status.value()),
 						"No existe activity_id", null);
-				apiResponse.setBody(provision);
+				apiResponse.setBody(null);
 
 				timestamp = getTimestamp();
 				apiResponse.getHeader().setTimestamp(timestamp);

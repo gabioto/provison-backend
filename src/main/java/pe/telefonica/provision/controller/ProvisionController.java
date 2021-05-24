@@ -1973,15 +1973,14 @@ public class ProvisionController {
 		HttpStatus status;
 		
 		try {
-			ProvisionDetailTrazaDto provisions = provisionService.getProvisionDetailById(request.getBody());
-			if (provisions == null) {
+			ProvisionDetailTrazaDto provision = provisionService.getProvisionDetailById(request.getBody());
+			if (provision == null) {
 				status = HttpStatus.NOT_FOUND;
 				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
 						String.valueOf(status.value()), "No se encontró provisión", null);				
 				apiResponse.setBody("NOT FOUND");
-			} else {
-				String idActivity = "45840";
-				boolean resultado = provisionService.updateActivity(idActivity);
+			} else if (provision.getActivityId() != null) {
+				boolean resultado = provisionService.updateActivity(provision.getActivityId());
 				if (resultado) {
 					status = HttpStatus.OK;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
@@ -1993,6 +1992,11 @@ public class ProvisionController {
 							String.valueOf(status.value()), "Error Actualización actividad", null);
 					apiResponse.setBody("BAD REQUEST");
 				}
+			} else {
+				status = HttpStatus.NOT_FOUND;
+				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+						String.valueOf(status.value()), "No se encuentra activity_id", null);
+				apiResponse.setBody("NOT FOUND");
 			}
 		} catch (Exception ex) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;

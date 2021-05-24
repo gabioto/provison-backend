@@ -515,7 +515,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("front_speech", initStatus != null ? initStatus.getFront() : Status.WO_INIT.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
-
+		update.set("activity_id", appointment.getAdditionalData().get(0).getValue());
+		
 		provisionRepository.updateProvision(provision, update);
 
 		return true;
@@ -710,7 +711,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("send_notify", false);
-
+		update.set("activity_id", appointment.getAdditionalData().get(0).getValue());
+		
 		String subReason;
 		String nameReplace = (provision.getCustomer().getName() != null && !provision.getCustomer().getName().isEmpty())
 				? provision.getCustomer().getName().split(" ")[0]
@@ -789,7 +791,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("send_notify", false);
-
+		update.set("activity_id", appointment.getAdditionalData().get(0).getValue());
+		
 		String subReason;
 		String nameReplace = (provision.getCustomer().getName() != null && !provision.getCustomer().getName().isEmpty())
 				? provision.getCustomer().getName().split(" ")[0]

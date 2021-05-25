@@ -40,6 +40,7 @@ import pe.telefonica.provision.model.provision.WoCancel;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
 import pe.telefonica.provision.model.provision.WoNotdone;
+import pe.telefonica.provision.model.provision.WoPreNotdone;
 import pe.telefonica.provision.model.provision.WoPreStart;
 import pe.telefonica.provision.model.provision.WoReshedule;
 import pe.telefonica.provision.repository.ProvisionRepository;
@@ -268,6 +269,11 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 					statusList);
 			updatedProvision = updateWoNotDone(provision, kafkaTOARequest, notDoneStatus);
 			break;
+		case Constants.STATUS_WO_PRE_NOTDONE:
+			pe.telefonica.provision.model.Status prenotDoneStatus = getInfoStatus(Status.WO_PRENOTDONE.getStatusName(),
+					statusList);
+			updatedProvision = updateWoPreNotDone(provision, kafkaTOARequest, prenotDoneStatus);
+			break;
 		default:
 			break;
 		}
@@ -410,7 +416,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		// Job Woprestart
 		LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
 
-		if (nowDate.getHour() >= 07 && nowDate.getHour() <= 19) {
+		if (nowDate.getHour() >= 07 && nowDate.getHour() <= 20) {
 //			if (nowDate.getHour() >= 0 && nowDate.getHour() <= 23) {
 
 			// SMS
@@ -509,7 +515,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("front_speech", initStatus != null ? initStatus.getFront() : Status.WO_INIT.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
-
+		update.set("activity_id", appointment.getAdditionalData().get(0).getValue());
+		
 		provisionRepository.updateProvision(provision, update);
 
 		return true;
@@ -704,7 +711,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("send_notify", false);
-
+		update.set("activity_id", appointment.getAdditionalData().get(0).getValue());
+		
 		String subReason;
 		String nameReplace = (provision.getCustomer().getName() != null && !provision.getCustomer().getName().isEmpty())
 				? provision.getCustomer().getName().split(" ")[0]
@@ -746,4 +754,80 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		return true;
 	}
 
+	@Override
+	public boolean updateWoPreNotDone(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status preNotDoneStatus) {
+
+		Appointment appointment = kafkaToaRequest.getEvent().getAppointment();
+
+		WoPreNotdone woPreNotdone = new WoPreNotdone();
+		woPreNotdone.setaNotDoneTypeInstall(appointment.getAdditionalData().get(2).getValue());
+		woPreNotdone.setaNotDoneReasonInstall(appointment.getStatusReason());
+		woPreNotdone.setaNotDoneSubReasonInstall(appointment.getStatusReason());
+		woPreNotdone.setaObservation(appointment.getNote().get(0).getText());
+		woPreNotdone.setUserNotdone(appointment.getRelatedParty().get(4).getId());
+
+		StatusLog statusLog = new StatusLog();
+		statusLog.setStatus(Status.WO_PRENOTDONE.getStatusName());
+		statusLog.setXaidst(appointment.getId());
+		provision.getLogStatus().add(statusLog);
+
+		String speech = preNotDoneStatus != null ? preNotDoneStatus.getGenericSpeech() : Status.WO_PRENOTDONE.getGenericSpeech();
+		speech = hasCustomerInfo(provision.getCustomer())
+				? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
+				: speech;
+
+		Update update = new Update();
+		update.set("wo_notdone", woPreNotdone);
+		update.set("active_status", Constants.PROVISION_STATUS_PRENOTDONE);
+		update.set("a_observation", appointment.getNote().get(0).getText());
+		update.set("user_prenotdone", appointment.getRelatedParty().get(4).getId());
+		update.set("last_tracking_status", Status.WO_PRENOTDONE.getStatusName());
+		update.set("generic_speech", speech);
+		update.set("description_status",
+				preNotDoneStatus != null ? preNotDoneStatus.getDescription() : Status.WO_PRENOTDONE.getDescription());
+		update.set("front_speech",
+				preNotDoneStatus != null ? preNotDoneStatus.getFront() : Status.WO_PRENOTDONE.getFrontSpeech());
+		update.set("log_status", provision.getLogStatus());
+		update.set("show_location", false);
+		update.set("send_notify", false);
+		update.set("activity_id", appointment.getAdditionalData().get(0).getValue());
+		
+		String subReason;
+		String nameReplace = (provision.getCustomer().getName() != null && !provision.getCustomer().getName().isEmpty())
+				? provision.getCustomer().getName().split(" ")[0]
+				: "Hola";
+
+		if (preNotDoneStatus.getReturnedList() != null && preNotDoneStatus.getReturnedList().size() > 0) {
+			Optional<ReturnedProvision> notDoneList = preNotDoneStatus.getReturnedList().stream()
+					.filter(x -> woPreNotdone.getaNotDoneReasonInstall().equals(x.getCodReason())).findFirst();
+
+			if (notDoneList.isPresent()) {
+				subReason = notDoneList.get().getSubReason().replace(Constants.TEXT_NAME_REPLACE, nameReplace);
+				update.set("sub_reason_not_done", subReason);
+				update.set("action_not_done", notDoneList.get().getAction());
+			} else {
+				subReason = Constants.DEFAULT_NOTDONE_SUBREASON.replace(Constants.TEXT_NAME_REPLACE, nameReplace);
+				update.set("sub_reason_not_done", subReason);
+				update.set("action_not_done", Constants.DEFAULT_NOTDONE_ACTION);
+			}
+		} else {
+			subReason = Constants.DEFAULT_NOTDONE_SUBREASON.replace(Constants.TEXT_NAME_REPLACE, nameReplace);
+			update.set("sub_reason_not_done", subReason);
+			update.set("action_not_done", Constants.DEFAULT_NOTDONE_ACTION);
+		}
+
+		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+
+		update.set("notifications.notdone_send_notify", true);
+		update.set("notifications.notdone_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		
+		// SMS
+		sendSMSWoPreNotDoneHolder(provision);
+		
+		// Actualiza provision
+		provisionRepository.updateProvision(provision, update);
+			
+		return true;
+	}
 }

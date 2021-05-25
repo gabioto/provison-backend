@@ -972,18 +972,18 @@ public class ProvisionController {
 
 			if (requestBody.getPsiCode() != null) {
 				status = HttpStatus.BAD_REQUEST;
-				if (requestBody.getPsiCode().length() > 11) {
-					errorInternal = InternalError.TRZ02.toString();
-					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
-							.toString();
-					timestamp = getTimestamp();
-					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
-							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode maximo 11 caracteres", null);
-					apiResponse.getHeader().setTimestamp(timestamp);
-					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
-
-					return ResponseEntity.status(status).body(apiResponse);
-				}
+//				if (requestBody.getPsiCode().length() > 11) {
+//					errorInternal = InternalError.TRZ02.toString();
+//					errorInternal = ErrorCode.get(Constants.PSI_CODE_UPDATE_CONTACT + errorInternal.replace("\"", ""))
+//							.toString();
+//					timestamp = getTimestamp();
+//					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
+//							Constants.OPER_CONTACT_INFO_UPDATE, errorInternal, "PSICode maximo 11 caracteres", null);
+//					apiResponse.getHeader().setTimestamp(timestamp);
+//					apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());
+//
+//					return ResponseEntity.status(status).body(apiResponse);
+//				}
 				Boolean typedata = requestBody.getPsiCode() instanceof String;
 				if (!typedata) {
 					errorInternal = InternalError.TRZ03.toString();
@@ -1004,6 +1004,7 @@ public class ProvisionController {
 			List<ContactRequest> contact = requestBody.getContacts();
 
 			if (requestBody.getContacts().size() > 0) {
+
 				status = HttpStatus.BAD_REQUEST;
 
 				for (ContactRequest list : contact) {

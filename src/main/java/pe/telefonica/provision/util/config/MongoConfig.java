@@ -19,7 +19,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
 	@Override
 	public MongoClient mongoClient() {
-		ConnectionString connectionString = new ConnectionString("mongodb://admin:SNOKIDFOQWHKSMXO@portal-ssl1346-52.bmix-dal-yp-b97ae098-6774-4b4d-8fee-2d41318ea29e.3558158292.composedb.com:23712,portal-ssl1226-53.bmix-dal-yp-b97ae098-6774-4b4d-8fee-2d41318ea29e.3558158292.composedb.com:23712/compose?authSource=admin&ssl=true");
+		ConnectionString connectionString = new ConnectionString("mongodb://admin:JOQIORBFYKYVSJTH@portal-ssl1348-50.bmix-dal-yp-a589d8bf-2208-4290-880f-9a48911af4e3.3558158292.composedb.com:23906,portal-ssl1272-51.bmix-dal-yp-a589d8bf-2208-4290-880f-9a48911af4e3.3558158292.composedb.com:23906/compose?authSource=admin&ssl=true");
 		//ConnectionString connectionString = new ConnectionString(System.getenv("TDP_DATA_MONGODB_URI"));
 		MongoClientSettings mongoClientSettings = MongoClientSettings.builder().applyConnectionString(connectionString)
 				.build();

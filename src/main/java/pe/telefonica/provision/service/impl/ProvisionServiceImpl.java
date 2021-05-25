@@ -1485,7 +1485,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						boolean isMovistar = false;
 
 						if (!listContact.get(a).getPhoneNumber().toString().equals("")) {
-							String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
+							String switchOnPremise = "true";//System.getenv("TDP_SWITCH_ON_PREMISE");
 							if (switchOnPremise.equals("true")) {
 								isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
 							} else {

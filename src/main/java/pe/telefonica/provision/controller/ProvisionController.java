@@ -2001,13 +2001,13 @@ public class ProvisionController {
 					status = HttpStatus.BAD_REQUEST;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
 							String.valueOf(status.value()), "Error Actualización actividad", null);
-					apiResponse.setBody(provision);					
+					apiResponse.setBody(null);					
 				} else {
 					status = HttpStatus.OK;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
 							String.valueOf(status.value()), "Actualización actividad", null);
-					apiResponse.setBody(null);
-				}					
+					apiResponse.setBody(provision);
+				}
 			} else {
 				status = HttpStatus.NOT_FOUND;
 				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,

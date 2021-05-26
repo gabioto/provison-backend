@@ -1004,6 +1004,7 @@ public class ProvisionController {
 			List<ContactRequest> contact = requestBody.getContacts();
 
 			if (requestBody.getContacts().size() > 0) {
+
 				status = HttpStatus.BAD_REQUEST;
 
 				for (ContactRequest list : contact) {

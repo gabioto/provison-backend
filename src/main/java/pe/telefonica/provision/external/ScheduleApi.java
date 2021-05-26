@@ -169,7 +169,8 @@ public class ScheduleApi {
 		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
 		
 //		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
-		HttpEntity<String> entity = new HttpEntity<>(new Gson().toJson(request), headers);
+		System.out.println(new Gson().toJson(request));
+		HttpEntity<PSIWorkRequest> entity = new HttpEntity<>(request, headers);
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity,
@@ -235,7 +236,9 @@ public class ScheduleApi {
 		headers.set("auth_string", generateAuthString());
 		headers.set("Destination", "AGENDADOR");
 		headers.set("Authorization", "Bearer "+oAuthToken );
-
+		
+		
+			
 		PSIWorkRequest request = new PSIWorkRequest(requestx, dateFormat.format(now));
 		System.out.println(new Gson().toJson(request));
 		

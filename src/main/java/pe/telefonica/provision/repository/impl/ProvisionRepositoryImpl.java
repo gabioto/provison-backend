@@ -2,7 +2,9 @@ package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -530,16 +532,22 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
-		LocalDate today = LocalDate.now(ZoneOffset.of("-05:00")).minusDays(1);
-		LocalDate yesterday = today.minusDays(1);
+		LocalDateTime today = LocalDateTime.now(ZoneOffset.of("-05:00")).minusDays(1);
+		//LocalDateTime yesterday = today.minusDays(1);
+
+		LocalDateTime startDate = today.with(LocalTime.MIN);
+		LocalDateTime endDate = today.withHour(23).withMinute(59).withSecond(59);
+		System.out.println(startDate);
+		System.out.println(endDate);
 
 		List<Provision> provisions = this.mongoOperations
 				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
-						Criteria.where("register_date").gt(yesterday), Criteria.where("register_date").lt(today),
+						Criteria.where("register_date").gt(startDate), Criteria.where("register_date").lt(endDate),
 						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne("")))
 								.limit(10),
 						Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		System.out.println("trajo:: "+optionalProvisions.get().size());
 		return optionalProvisions;
 	}
 

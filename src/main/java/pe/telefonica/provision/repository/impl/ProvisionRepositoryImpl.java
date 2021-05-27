@@ -537,14 +537,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		LocalDateTime startDate = today.with(LocalTime.MIN);
 		LocalDateTime endDate = today.withHour(23).withMinute(59).withSecond(59);
-		System.out.println(startDate);
-		System.out.println(endDate);
 
 		List<Provision> provisions = this.mongoOperations
 				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
 						Criteria.where("register_date").gt(startDate), Criteria.where("register_date").lt(endDate),
-						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne("")))
-								.limit(10),
+						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne(""))),
 						Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		System.out.println("trajo:: "+optionalProvisions.get().size());

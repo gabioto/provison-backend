@@ -58,7 +58,7 @@ public abstract class ProvisionUpdateServiceImpl {
 	public boolean getCarrier(String phoneNumber) {
 
 		boolean isMovistar = false;
-		if (!phoneNumber.trim().equals("")) {
+		if (phoneNumber.matches("[0-9]+") && phoneNumber.length() == 9 && phoneNumber.substring(0, 1).equals("9")) {
 			String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
 			if (switchOnPremise.equals("true")) {
 				isMovistar = restPSI.getCarrier(phoneNumber);

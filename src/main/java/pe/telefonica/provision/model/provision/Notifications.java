@@ -63,6 +63,12 @@ public class Notifications implements Serializable {
 	@Field("finalizado_send_date")
 	private LocalDateTime finalizadoSendDate;
 
+	@Field("prenotdone_send_notify")
+	private Boolean prenotdoneSendNotify = false;
+	
+	@Field("prenotdone_send_date")
+	private LocalDateTime prenotdoneSendDate;
+	
 	public Boolean getCaidaSendNotify() {
 		return caidaSendNotify;
 	}
@@ -207,4 +213,20 @@ public class Notifications implements Serializable {
 		this.finalizadoSendDate = finalizadoSendDate;
 	}
 
+	public Boolean getPrenotdoneSendNotify() {
+		return prenotdoneSendNotify;
+	}
+
+	public void setPrenotdoneSendNotify(Boolean prenotdoneSendNotify) {
+		this.prenotdoneSendNotify = prenotdoneSendNotify;
+	}
+
+	public LocalDateTime getPrenotdoneSendDate() {
+		return prenotdoneSendDate;
+	}
+
+	public void setPrenotdoneSendDate(LocalDateTime prenotdoneSendDate) {
+		this.prenotdoneSendDate = prenotdoneSendDate;
+	}
+	
 }

@@ -801,7 +801,6 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		if (preNotDoneStatus.getReturnedList() != null && preNotDoneStatus.getReturnedList().size() > 0) {
 			Optional<ReturnedProvision> notDoneList = preNotDoneStatus.getReturnedList().stream()
 					.filter(x -> woPreNotdone.getaNotDoneReasonInstall().equals(x.getCodReason())).findFirst();
-
 			if (notDoneList.isPresent()) {
 				subReason = notDoneList.get().getSubReason().replace(Constants.TEXT_NAME_REPLACE, nameReplace);
 				update.set("sub_reason_not_done", subReason);
@@ -819,8 +818,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
-		update.set("notifications.notdone_send_notify", true);
-		update.set("notifications.notdone_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		update.set("notifications.notpredone_send_notify", true);
+		update.set("notifications.notpredone_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 		
 		// SMS
 		sendSMSWoPreNotDoneHolder(provision);

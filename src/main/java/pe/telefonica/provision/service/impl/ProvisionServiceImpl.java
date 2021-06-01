@@ -2023,7 +2023,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 		update.set("description_status", notDoneStatus != null ? notDoneStatus.getDescription() : status.getDescription());
 		update.set("front_speech", notDoneStatus != null ? notDoneStatus.getFront() : status.getFrontSpeech());
 		update.set("log_status", listLog);
-		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));		
+		update.set("sub_reason_not_done", speech);		
+		
 		provisionRepository.updateProvision(provision, update);
 		
 		provision = provisionRepository.getProvisionDetailById(idProvision);

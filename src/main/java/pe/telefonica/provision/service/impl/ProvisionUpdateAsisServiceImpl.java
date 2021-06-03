@@ -30,11 +30,15 @@ import pe.telefonica.provision.external.request.schedule.GetTechnicianAvailableR
 import pe.telefonica.provision.external.request.simpli.SimpliRequest;
 import pe.telefonica.provision.model.Contacts;
 import pe.telefonica.provision.model.Customer;
+import pe.telefonica.provision.model.HomePhone;
+import pe.telefonica.provision.model.Internet;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.ReturnedProvision;
+import pe.telefonica.provision.model.Television;
 import pe.telefonica.provision.model.params.Parameter;
 import pe.telefonica.provision.model.provision.InToa;
+import pe.telefonica.provision.model.provision.Notifications;
 import pe.telefonica.provision.model.provision.WoCancel;
 import pe.telefonica.provision.model.provision.WoCompleted;
 import pe.telefonica.provision.model.provision.WoInit;
@@ -725,108 +729,95 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 				return true;
 			}
 		} else {
-			Provision provisionInToa = new Provision();
-			
-			// IN_TOA minimo
-			List<StatusLog> listLog = provision.getLogStatus();
-
-			// valida Bucket x Producto
-			boolean boolBucket = validateBucketProduct(appointment, provision, provisionStatus);
-			if (boolBucket) {
-				return false;
-			}
-
-			pe.telefonica.provision.model.Status dummyInToa = getInfoStatus(Status.DUMMY_IN_TOA.getStatusName(), statusList);
-
-			speech = dummyInToa != null ? dummyInToa.getGenericSpeech() : Status.DUMMY_IN_TOA.getGenericSpeech();
-			speech = hasCustomerInfo(provision.getCustomer())
-					? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
-					: speech;
-
-			if (provisionStatus.equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-				Update update = new Update();
-				if (provision.getCommercialOp().equals(Constants.OP_COMMERCIAL_MIGRACION)) {
-					Parameter objParams = paramsRepository.getMessage(Constants.MESSAGE_RETURN);
-					if (objParams != null) {
-						provisionInToa.setTextReturn(objParams.getValue());
-					}
-				}
-
+			if (kafkaTOARequest.getEventType().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 				pe.telefonica.provision.model.Status inToaStatus = getInfoStatus(Status.IN_TOA.getStatusName(), statusList);
 
-				provisionInToa.setXaIdSt(getXaIdSt);
-				provisionInToa.setXaRequirementNumber(getXaRequirementNumber);
+				String productName = (appointment.getRelatedObject().get(2).getReference() != null
+						&& !appointment.getRelatedObject().get(2).getReference().isEmpty())
+								? appointment.getRelatedObject().get(2).getReference()
+								: "Movistar Hogar";
+
+				Provision provisionInToa = new Provision();
+				provisionInToa.setProductName(productName);
+				provisionInToa.setCustomerType(appointment.getRelatedParty().get(0).getAdditionalData().get(0).getValue());
+				provisionInToa.setCustomerSubType(appointment.getRelatedParty().get(0).getAdditionalData().get(1).getValue());
+				provisionInToa.setPriority(appointment.getRelatedParty().get(0).getAdditionalData().get(2).getValue());
 				provisionInToa.setApptNumber(appointment.getId());
+				provisionInToa.setXaIdSt(appointment.getId());
+				provisionInToa.setScheduler(appointment.getScheduler().toUpperCase());
 				provisionInToa.setActivityType(appointment.getDescription().toLowerCase());
 				provisionInToa.setWorkZone(appointment.getAdditionalData().get(1).getValue());
-				provisionInToa.setDummyStPsiCode(appointment.getRelatedObject().get(0).getAdditionalData().get(1).getValue());
-				
-				update.set("notifications.into_send_notify", false);
-				provisionInToa.setShowLocation("false");
-				if (provision.getXaIdSt() != null) {
-					update.set("has_schedule", false);
-				}
-				update.set("wo_prestart.tracking_url", null);
-				update.set("wo_prestart.available_tracking", false);
+				provisionInToa.setActiveStatus(Constants.PROVISION_STATUS_ACTIVE);
+				provisionInToa.setStatusToa(Constants.PROVISION_STATUS_DONE);
+				provisionInToa.setLastTrackingStatus(Status.IN_TOA.getStatusName());
+				provisionInToa.setGenericSpeech(inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule() : Status.IN_TOA.getSpeechWithoutSchedule());
+				provisionInToa.setDescriptionStatus(inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
+				provisionInToa.setFrontSpeech(inToaStatus != null ? inToaStatus.getFront() : Status.IN_TOA.getFrontSpeech());
+
+				Customer customer = new Customer();
+				customer.setName(appointment.getRelatedParty().get(0).getName());
+				customer.setDocumentType(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalIdType());
+				customer.setDocumentNumber(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalId());
+				customer.setPhoneNumber(appointment.getContactMedium().get(4).getNumber());
+				customer.setMail(appointment.getContactMedium().get(6).getEmail());
+				customer.setDistrict(appointment.getRelatedPlace().getAddress().getCity());
+				customer.setProvince(appointment.getRelatedPlace().getAddress().getStateOrProvince());
+				customer.setDepartment(appointment.getRelatedPlace().getAddress().getRegion());
+				customer.setAddress(appointment.getRelatedPlace().getName());
+				customer.setLatitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLatitude());
+				customer.setLongitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLongitude());
+				customer.setCarrier(!customer.getPhoneNumber().isEmpty() ? getCarrier(customer.getPhoneNumber()) : false);
+				provisionInToa.setCustomer(customer);
+
+				Contacts contact = new Contacts();
+				contact.setFullName(appointment.getRelatedObject().get(1).getAdditionalData().size() > 0
+						? appointment.getRelatedObject().get(1).getAdditionalData().get(0).getValue()
+						: "");
+				contact.setPhoneNumber(appointment.getContactMedium().get(5).getNumber());
+				contact.setMail(appointment.getContactMedium().get(7).getEmail());
+				contact.setCarrier(!contact.getPhoneNumber().isEmpty() ? getCarrier(contact.getPhoneNumber()) : false);
+				provisionInToa.getContacts().add(contact);
+
+				HomePhone phone = new HomePhone();
+				phone.setNetworkTechnology(appointment.getRelatedObject().get(2).getAdditionalData().get(0).getValue());
+				phone.setTechnology(appointment.getRelatedObject().get(2).getAdditionalData().get(1).getValue());
+				provisionInToa.setHomePhoneDetail(phone);
+
+				Internet internet = new Internet();
+				internet.setNetworkTechnology(appointment.getRelatedObject().get(2).getAdditionalData().get(2).getValue());
+				internet.setTechnology(appointment.getRelatedObject().get(2).getAdditionalData().get(3).getValue());
+				provisionInToa.setInternetDetail(internet);
+
+				Television tv = new Television();
+				tv.setNetworkTechnology(appointment.getRelatedObject().get(2).getAdditionalData().get(4).getValue());
+				tv.setTechnology(appointment.getRelatedObject().get(2).getAdditionalData().get(5).getValue());
+				provisionInToa.setTvDetail(tv);
+
+				Notifications notifications = new Notifications();
+				notifications.setIntoaSendNotify(false);
+				provisionInToa.setNotifications(notifications);
 
 				InToa inToa = new InToa();
 				inToa.setXaNote(appointment.getNote().get(0).getText());
 				inToa.setXaCreationDate(appointment.getCreationDate());
 				inToa.setDate(kafkaTOARequest.getEventTime());
-				inToa.setXaScheduler(appointment.getScheduler());
+				inToa.setXaScheduler(appointment.getScheduler().toUpperCase());
 				inToa.setLongitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLongitude());
 				inToa.setLatitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLatitude());
-
 				provisionInToa.setInToa(inToa);
-				provisionInToa.setActiveStatus(Constants.PROVISION_STATUS_ACTIVE);
-				provisionInToa.setStatusToa(Constants.PROVISION_STATUS_DONE);
 
-				String phoneNumber = "";
-				boolean carrierTitular = false;
-				int numPhone = appointment.getContactMedium().size();
-				for (int index = 0; index < numPhone; index++) {
-					phoneNumber = appointment.getContactMedium().get(index).getNumber().trim();
-					if (phoneNumber.matches("[0-9]+") && phoneNumber.length() == 9 && phoneNumber.substring(0, 1).equals("9")) {
-						carrierTitular = getCarrier(phoneNumber);
-						break;
-					}
-				}
-				
-				Customer customer = new Customer();
-				customer.setName(appointment.getRelatedParty().get(0).getName().trim());
-				customer.setDocumentType(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalIdType());
-				customer.setDocumentNumber(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalIdType());
-				customer.setPhoneNumber(phoneNumber);
-				customer.setMail("");
-				customer.setAddress(appointment.getRelatedPlace().getName());
-				customer.setDistrict(appointment.getRelatedPlace().getAddress().getCity());
-				customer.setProvince(appointment.getRelatedPlace().getAddress().getStateOrProvince());
-				customer.setDepartment(appointment.getRelatedPlace().getAddress().getRegion());
-				customer.setLongitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLongitude());
-				customer.setLatitude(appointment.getRelatedPlace().getAddress().getCoordinates().getLatitude());
-				customer.setOriginData("");
-				customer.setCarrier(carrierTitular);
-				provision.setCustomer(customer);				
-				
+				WoPreStart prestart = new WoPreStart();
+				prestart.setTrackingUrl(null);
+				prestart.setAvailableTracking(false);
+				provisionInToa.setWoPreStart(prestart);
+
 				StatusLog statusLog = new StatusLog();
-				statusLog.setStatus(Status.IN_TOA.getStatusName());
-				statusLog.setXaidst(getXaIdSt);
-				listLog.add(statusLog);
+				statusLog.setStatus(kafkaTOARequest.getEventType());
+				statusLog.setXaidst(appointment.getId());
+				provisionInToa.getLogStatus().add(statusLog);
 				
-				provision.setLastTrackingStatus(Status.IN_TOA.getStatusName());
-				provision.setGenericSpeech(inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule() : Status.IN_TOA.getSpeechWithoutSchedule());
-				provision.setDescriptionStatus(inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
-				provision.setFrontSpeech(inToaStatus != null ? inToaStatus.getFront() : Status.IN_TOA.getFrontSpeech());
-				provision.setLogStatus(listLog);
+				provisionRepository.insertProvision(provisionInToa);
 				
-				// Add carrier phone contact
-				List<Contacts> contacts = new ArrayList<Contacts>();
-				provision.setContacts(contacts);
-				
-				provision.setStatusChangeDate(LocalDateTime.now(ZoneOffset.of("-05:00")));
-				
-				provisionRepository.insertProvision(provision);
-
 				return true;
 			}
 		}

@@ -743,7 +743,7 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 				provisionInToa.setCustomerSubType(appointment.getRelatedParty().get(0).getAdditionalData().get(1).getValue());
 				provisionInToa.setPriority(appointment.getRelatedParty().get(0).getAdditionalData().get(2).getValue());
 				provisionInToa.setApptNumber(appointment.getId());
-				provisionInToa.setXaIdSt(appointment.getId());
+				provisionInToa.setXaIdSt(getXaIdSt);
 				provisionInToa.setScheduler(appointment.getScheduler().toUpperCase());
 				provisionInToa.setActivityType(appointment.getDescription().toLowerCase());
 				provisionInToa.setWorkZone(appointment.getAdditionalData().get(1).getValue());

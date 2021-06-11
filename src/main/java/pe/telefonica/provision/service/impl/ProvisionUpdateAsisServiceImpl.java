@@ -742,8 +742,9 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 				provisionInToa.setCustomerType(appointment.getRelatedParty().get(0).getAdditionalData().get(0).getValue());
 				provisionInToa.setCustomerSubType(appointment.getRelatedParty().get(0).getAdditionalData().get(1).getValue());
 				provisionInToa.setPriority(appointment.getRelatedParty().get(0).getAdditionalData().get(2).getValue());
-				provisionInToa.setApptNumber(appointment.getId());
+				provisionInToa.setApptNumber(getXaRequirementNumber);
 				provisionInToa.setXaIdSt(getXaIdSt);
+				provisionInToa.setXaRequest(getXaRequest);
 				provisionInToa.setScheduler(appointment.getScheduler().toUpperCase());
 				provisionInToa.setActivityType(appointment.getDescription().toLowerCase());
 				provisionInToa.setWorkZone(appointment.getAdditionalData().get(1).getValue());
@@ -813,7 +814,7 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(kafkaTOARequest.getEventType());
-				statusLog.setXaidst(appointment.getId());
+				statusLog.setXaidst(getXaIdSt);
 				provisionInToa.getLogStatus().add(statusLog);
 				
 				provisionRepository.insertProvision(provisionInToa);

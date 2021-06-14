@@ -614,7 +614,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			provisionx = provisionRepository.getProvisionByXaRequest(getData[1]);
 		} else {
 			provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
-			if (provisionx == null) {
+			if (provisionx == null && !getData[11].equals("")) {
 				provisionx = provisionRepository.getByOrderCodeForUpdate(getData[11]);
 				indicador = Boolean.TRUE;
 			}

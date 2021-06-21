@@ -10,9 +10,9 @@ applications:
     env:
       TDP_FUNCTIONS_PROVISION_ENABLE: true
       TDP_FUNCTIONS_FAULT_ENABLE: true
-      TDP_DATA_MONGODB_URI: mongodb://admin:WSSEKLEAQPOSGUEA@portal-ssl1165-48.bmix-dal-yp-475fda4f-3013-4c51-939c-310ac34e7992.3558158292.composedb.com:23243,portal-ssl639-56.bmix-dal-yp-475fda4f-3013-4c51-939c-310ac34e7992.3558158292.composedb.com:23243/compose?authSource=admin&ssl=true
-      TDP_DATA_MONGODB_DATABASE: compose
-      TDP_SIMPLI_ENABLE: true
-      TDP_SWITCH_AZURE: false
-      TDP_SWITCH_ON_PREMISE: false
+      TDP_DATA_MONGODB_URI: mongodb://account-trazabilidad-dev:MPng4K2GN5BrlIq1PnMguTRhAPeBxN7dIDHdl8i2UwmDjxgz4InYyx6SyB8GhVbsVc4dCVcun6kLFDOxZ0BNWQ==@account-trazabilidad-dev.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@account-trazabilidad-dev@
+      TDP_DATA_MONGODB_DATABASE: dbProvision
+      TDP_SIMPLI_ENABLE: false
+      TDP_SWITCH_AZURE: true
+      TDP_SWITCH_ON_PREMISE: true
       TDP_SWITCH_AGENDAMIENTO: false

@@ -34,8 +34,6 @@ import pe.telefonica.provision.model.ResendNotification;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.Status;
-import com.mongodb.MongoClient;
-
 
 @Repository
 public class ProvisionRepositoryImpl implements ProvisionRepository {
@@ -367,12 +365,11 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status")
 						.is(Status.WO_NOTDONE.getStatusName()),
 				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status")
-						.is(Status.WO_CANCEL.getStatusName()),
+						.is(Status.WO_CANCEL.getStatusName()).and("xa_cancel_reason").ne("4"),
 				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status")
 						.is(Status.WO_COMPLETED.getStatusName()),
 				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status")
 						.is(Status.FINALIZADO.getStatusName()),
-
 				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status")
 						.is(Status.CANCELADA_ATIS.getStatusName())
 

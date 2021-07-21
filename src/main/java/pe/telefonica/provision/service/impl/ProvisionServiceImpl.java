@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pe.telefonica.provision.model.Toolbox;
+import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.common.ResponseHeader;
@@ -89,10 +91,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Autowired
 	private ScheduleApi scheduleApi;
 	
-
 	@Autowired
 	private ProvisionRepository provisionRepository;
 
+	@Autowired
+	private ToolboxRepository toolboxRepository;
+	
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
 
@@ -1962,9 +1966,22 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
-
 		Provision provision = provisionRepository.getProvisionDetailById(request.getIdProvision());
-
+		if (provision.getLastTrackingStatus().equals(Constants.STATUS_WO_PRESTART)) {
+			if (provision.getWoPreStart() != null) {
+				Toolbox objToolbox = new Toolbox();
+				objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
+				objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+				objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+				objToolbox.setCarrier(provision.getCustomer().getCarrier());
+				if (!provision.getWoPreStart().getTrackingUrl().equals("") && provision.getWoPreStart().getTrackingUrl() != null) {
+					objToolbox.setChart(Boolean.FALSE);
+				} else {
+					objToolbox.setChart(Boolean.TRUE);
+				}				
+				toolboxRepository.insertLog(objToolbox);				
+			}
+		}
 		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}
 

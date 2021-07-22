@@ -1,6 +1,8 @@
 package pe.telefonica.provision.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import javax.persistence.Id;
 
@@ -19,6 +21,9 @@ public class Toolbox implements Serializable {
 	@Field("_id")
 	private String idToolbox;
 		
+	@Field("xa_request")
+	private String xaRequest;
+	
 	@Field("document_type")
 	private String documentType;
 	
@@ -33,6 +38,20 @@ public class Toolbox implements Serializable {
 	
 	@Field("chart")
 	private boolean chart;
+
+	@Field("url")
+	private String url;
+	
+	@Field("register_date")
+	private LocalDateTime registerDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+	
+	public String getXaRequest() {
+		return xaRequest;
+	}
+
+	public void setXaRequest(String xaRequest) {
+		this.xaRequest = xaRequest;
+	}
 
 	public String getIdToolbox() {
 		return idToolbox;
@@ -81,4 +100,13 @@ public class Toolbox implements Serializable {
 	public void setChart(boolean chart) {
 		this.chart = chart;
 	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 }

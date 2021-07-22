@@ -1967,19 +1967,54 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
 		Provision provision = provisionRepository.getProvisionDetailById(request.getIdProvision());
-		if (provision.getLastTrackingStatus().equals(Constants.STATUS_WO_PRESTART)) {
+		if (provision.getLastTrackingStatus().equals(Constants.STATUS_WO_PRESTART)) {			
 			if (provision.getWoPreStart() != null) {
-				Toolbox objToolbox = new Toolbox();
-				objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
-				objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
-				objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
-				objToolbox.setCarrier(provision.getCustomer().getCarrier());
-				if (!provision.getWoPreStart().getTrackingUrl().equals("") && provision.getWoPreStart().getTrackingUrl() != null) {
-					objToolbox.setChart(Boolean.FALSE);
+				String xaRequest = "";
+				if (provision.getXaRequest() != null) {
+					xaRequest = provision.getXaRequest();				
 				} else {
-					objToolbox.setChart(Boolean.TRUE);
+					xaRequest = provision.getXaIdSt();
 				}				
-				toolboxRepository.insertLog(objToolbox);				
+				Optional<Toolbox> optional = toolboxRepository.getLog(
+						provision.getCustomer().getDocumentType(),
+						provision.getCustomer().getDocumentNumber(),
+						xaRequest,
+						provision.getWoPreStart().getTrackingUrl());
+				if (optional.isEmpty()) {
+					Toolbox objToolbox = new Toolbox();
+					objToolbox.setXaRequest(xaRequest);
+					objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
+					objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+					objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+					objToolbox.setCarrier(provision.getCustomer().getCarrier());
+					objToolbox.setUrl("");
+					objToolbox.setChart(Boolean.FALSE);
+					if (provision.getWoPreStart().getTrackingUrl() != null) {
+						if (!provision.getWoPreStart().getTrackingUrl().equals("")) {
+							objToolbox.setChart(Boolean.TRUE);
+							objToolbox.setUrl(provision.getWoPreStart().getTrackingUrl());
+						}
+					}
+					toolboxRepository.insertLog(objToolbox);
+				} else if (provision.getWoPreStart().getTrackingUrl() != null) {
+					if (!provision.getWoPreStart().getTrackingUrl().equals(optional.get().getUrl())) {				
+						Toolbox objToolbox = new Toolbox();
+						objToolbox.setXaRequest(xaRequest);
+						objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
+						objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+						objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+						objToolbox.setCarrier(provision.getCustomer().getCarrier());
+						objToolbox.setUrl("");
+						objToolbox.setChart(Boolean.FALSE);
+						if (provision.getWoPreStart().getTrackingUrl() != null) {
+							if (!provision.getWoPreStart().getTrackingUrl().equals("")) {
+								objToolbox.setChart(Boolean.TRUE);
+								objToolbox.setUrl(provision.getWoPreStart().getTrackingUrl());
+							}
+						}
+						toolboxRepository.insertLog(objToolbox);
+					}
+				}
 			}
 		}
 		return new ProvisionDetailTrazaDto().fromProvision(provision);

@@ -88,6 +88,8 @@ public class ProvisionDetailTrazaDto implements Serializable {
 	private String tvTechnology;
 
 	private String tvNetworkTechnology;
+	
+	private String activityId;
 
 	public ProvisionDetailTrazaDto fromProvision(Provision provision) {
 		this.idProvision = provision.getIdProvision();
@@ -137,6 +139,9 @@ public class ProvisionDetailTrazaDto implements Serializable {
 		this.telephoneNetworkTechnology = provision.getHomePhoneDetail() != null
 				? provision.getHomePhoneDetail().getNetworkTechnology()
 				: "";
+		
+		this.activityId = provision.getActivityId() != null ? provision.getActivityId() : "";
+		
 		return this;
 	}
 

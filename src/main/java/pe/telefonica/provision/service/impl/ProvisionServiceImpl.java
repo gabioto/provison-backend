@@ -44,6 +44,7 @@ import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
+import pe.telefonica.provision.external.NmoApi;
 import pe.telefonica.provision.external.PSIApi;
 
 import pe.telefonica.provision.external.ScheduleApi;
@@ -81,6 +82,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private PSIApi restPSI;
+	
+	@Autowired
+	private NmoApi nmoPSI;
 
 	@Autowired
 	private TrazabilidadSecurityApi trazabilidadSecurityApi;
@@ -2020,4 +2024,63 @@ public class ProvisionServiceImpl implements ProvisionService {
 		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}
 
+	@Override
+	public ProvisionDetailTrazaDto updateActivity(String idProvision,  String activityId, String indicador) {
+		ProvisionDetailTrazaDto provision = new ProvisionDetailTrazaDto();
+		try {
+			if (indicador.equals("0")) {
+				String tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
+				boolean resultado = nmoPSI.updateActivity(activityId, tokenExternal);
+				if (resultado) {
+					// Llamar al segundo servicio
+					resultado = nmoPSI.serviceRequest(activityId, tokenExternal);
+					if (resultado) {
+						// Actualizar la provision con el nuevo estado
+						provision = updateProvisionActivity(idProvision, Status.WO_PRENOTDONE_TRAZA, Constants.PROVISION_STATUS_PRENOTDONE_TRAZA); 
+					}
+				}
+			} else if (indicador.equals("1")) {
+				provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA, Constants.PROVISION_STATUS_NOTDONE_TRAZA);
+			}
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+		}
+		return provision;
+	}	
+	
+	private ProvisionDetailTrazaDto updateProvisionActivity(String idProvision, Status status, String statusProvision) {
+		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
+				.getAllInfoStatus();
+
+		Provision provision = provisionRepository.getProvisionDetailById(idProvision);
+		
+		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
+		pe.telefonica.provision.model.Status notDoneStatus = getInfoStatus(status.getStatusName(),
+				statusList);
+
+		List<StatusLog> listLog = provision.getLogStatus();
+
+		Update update = new Update();
+		update.set("active_status", statusProvision);
+		StatusLog statusLog = new StatusLog();
+		statusLog.setStatus(status.getStatusName());
+		statusLog.setXaidst(provision.getXaIdSt());
+		listLog.add(statusLog);
+		
+		String speech = notDoneStatus != null ? notDoneStatus.getGenericSpeech() : status.getGenericSpeech();
+		
+		speech = hasCustomerInfo(provision.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0]) : speech;
+		update.set("last_tracking_status", status.getStatusName());
+		update.set("generic_speech", speech);
+		update.set("description_status", notDoneStatus != null ? notDoneStatus.getDescription() : status.getDescription());
+		update.set("front_speech", notDoneStatus != null ? notDoneStatus.getFront() : status.getFrontSpeech());
+		update.set("log_status", listLog);
+		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));		
+		update.set("sub_reason_not_done", speech);		
+		
+		provisionRepository.updateProvision(provision, update);
+		
+		provision = provisionRepository.getProvisionDetailById(idProvision);
+		return new ProvisionDetailTrazaDto().fromProvision(provision);
+	}
 }

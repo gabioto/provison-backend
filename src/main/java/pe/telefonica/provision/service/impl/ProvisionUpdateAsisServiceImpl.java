@@ -875,4 +875,10 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 		return false;
 	}
 
+	@Override
+	public boolean updateWoPreNotDone(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

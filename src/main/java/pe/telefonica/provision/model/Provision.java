@@ -305,6 +305,17 @@ public class Provision implements Serializable {
 	@Field("text_return")
 	private String textReturn;
 
+	@Field("activity_id")
+	private String activityId;
+	
+	public String getActivityId() {
+		return activityId;
+	}
+
+	public void setActivityId(String activityId) {
+		this.activityId = activityId;
+	}
+
 	public List<ResendNotification> getResendIntoa() {
 		return resendIntoa;
 	}

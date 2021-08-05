@@ -375,7 +375,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		).and("customer").ne(null).and("notifications").ne(null);
 
-		Query query = new Query(criteria).limit(35);
+		Query query = new Query(criteria).limit(25);
 
 		query.with(new Sort(Direction.ASC, "_id"));
 

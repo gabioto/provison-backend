@@ -617,10 +617,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Provision provisionx = null;
 
+		Boolean indicador = Boolean.FALSE;
 		if (request.getDataOrigin().equalsIgnoreCase("ATIS")) {
 			provisionx = provisionRepository.getProvisionByXaRequest(getData[1]);
 		} else {
 			provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
+			if (provisionx == null && !getData[11].equals("")) {
+				provisionx = provisionRepository.getByOrderCodeForUpdate(getData[11]);
+				indicador = Boolean.TRUE;
+			}
 		}
 
 		if (request.getDataOrigin().equalsIgnoreCase("ORDENES")) {
@@ -665,72 +670,77 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				String status = "";
 
-				if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
-					pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
-							statusList);
-					if (pendiente != null) {
-						speech = hasFictitious ? pendiente.getGenericSpeech() : pendiente.getSpeechWithoutSchedule();
-					} else {
-						speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
-								: Status.PENDIENTE.getSpeechWithoutSchedule();
+				if (!indicador) {
+					if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
+						pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
+								statusList);
+						if (pendiente != null) {
+							speech = hasFictitious ? pendiente.getGenericSpeech() : pendiente.getSpeechWithoutSchedule();
+						} else {
+							speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
+									: Status.PENDIENTE.getSpeechWithoutSchedule();
+						}
+	
+						speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
+								provisionx.getCustomer().getName().split(" ")[0]) : speech;
+						provisionx.setGenericSpeech(speech);
+						provisionx.setDescriptionStatus(
+								pendiente != null ? pendiente.getDescription() : Status.PENDIENTE.getDescription());
+						provisionx.setFrontSpeech(
+								pendiente != null ? pendiente.getFront() : Status.PENDIENTE.getFrontSpeech());
+						status = Status.PENDIENTE.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
+						pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
+								statusList);
+						if (ingresado != null) {
+							speech = hasFictitious ? ingresado.getGenericSpeech() : ingresado.getSpeechWithoutSchedule();
+						} else {
+							speech = hasFictitious ? Status.INGRESADO.getGenericSpeech()
+									: Status.INGRESADO.getSpeechWithoutSchedule();
+						}
+						speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
+								provisionx.getCustomer().getName().split(" ")[0]) : speech;
+						provisionx.setGenericSpeech(speech);
+						provisionx.setDescriptionStatus(
+								ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
+						provisionx.setFrontSpeech(
+								ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
+						status = Status.INGRESADO.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
+						pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(),
+								statusList);
+						provisionx.setDescriptionStatus(
+								caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
+						provisionx.setGenericSpeech(
+								caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
+						provisionx.setFrontSpeech(caida != null ? caida.getFront() : Status.CAIDA.getFrontSpeech());
+						status = Constants.PROVISION_STATUS_CAIDA;
+					} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_PAGO.getStatusName())) {
+						pe.telefonica.provision.model.Status pendingPayment = getInfoStatus(
+								Status.PENDIENTE_PAGO.getStatusName(), statusList);
+						provisionx.setDescriptionStatus(pendingPayment != null ? pendingPayment.getDescription()
+								: Status.PENDIENTE_PAGO.getDescription());
+						provisionx.setGenericSpeech(pendingPayment != null ? pendingPayment.getGenericSpeech()
+								: Status.PENDIENTE_PAGO.getGenericSpeech());
+						provisionx.setFrontSpeech(pendingPayment != null ? pendingPayment.getFront()
+								: Status.PENDIENTE_PAGO.getFrontSpeech());
+						status = Status.PENDIENTE_PAGO.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
+						pe.telefonica.provision.model.Status paid = getInfoStatus(Status.PAGADO.getStatusName(),
+								statusList);
+						provisionx.setDescriptionStatus(
+								paid != null ? paid.getDescription() : Status.PAGADO.getDescription());
+						provisionx.setGenericSpeech(
+								paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
+						provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
+						status = Status.PAGADO.getStatusName().toLowerCase();
+						update.set("send_notify", false);
 					}
-
-					speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
-							provisionx.getCustomer().getName().split(" ")[0]) : speech;
-					provisionx.setGenericSpeech(speech);
-					provisionx.setDescriptionStatus(
-							pendiente != null ? pendiente.getDescription() : Status.PENDIENTE.getDescription());
-					provisionx.setFrontSpeech(
-							pendiente != null ? pendiente.getFront() : Status.PENDIENTE.getFrontSpeech());
-					status = Status.PENDIENTE.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
-					pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
-							statusList);
-					if (ingresado != null) {
-						speech = hasFictitious ? ingresado.getGenericSpeech() : ingresado.getSpeechWithoutSchedule();
-					} else {
-						speech = hasFictitious ? Status.INGRESADO.getGenericSpeech()
-								: Status.INGRESADO.getSpeechWithoutSchedule();
-					}
-					speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
-							provisionx.getCustomer().getName().split(" ")[0]) : speech;
-					provisionx.setGenericSpeech(speech);
-					provisionx.setDescriptionStatus(
-							ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
-					provisionx.setFrontSpeech(
-							ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
-					status = Status.INGRESADO.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
-					pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(),
-							statusList);
-					provisionx.setDescriptionStatus(
-							caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
-					provisionx.setGenericSpeech(
-							caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
-					provisionx.setFrontSpeech(caida != null ? caida.getFront() : Status.CAIDA.getFrontSpeech());
-					status = Constants.PROVISION_STATUS_CAIDA;
-				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_PAGO.getStatusName())) {
-					pe.telefonica.provision.model.Status pendingPayment = getInfoStatus(
-							Status.PENDIENTE_PAGO.getStatusName(), statusList);
-					provisionx.setDescriptionStatus(pendingPayment != null ? pendingPayment.getDescription()
-							: Status.PENDIENTE_PAGO.getDescription());
-					provisionx.setGenericSpeech(pendingPayment != null ? pendingPayment.getGenericSpeech()
-							: Status.PENDIENTE_PAGO.getGenericSpeech());
-					provisionx.setFrontSpeech(pendingPayment != null ? pendingPayment.getFront()
-							: Status.PENDIENTE_PAGO.getFrontSpeech());
-					status = Status.PENDIENTE_PAGO.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
-					pe.telefonica.provision.model.Status paid = getInfoStatus(Status.PAGADO.getStatusName(),
-							statusList);
-					provisionx.setDescriptionStatus(
-							paid != null ? paid.getDescription() : Status.PAGADO.getDescription());
-					provisionx.setGenericSpeech(
-							paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
-					provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
-					status = Status.PAGADO.getStatusName().toLowerCase();
-					update.set("send_notify", false);
+				} else {
+					status = provisionx.getActiveStatus();
+					request.setStatus(provisionx.getLastTrackingStatus());
 				}
-
+				
 				if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
 
 					if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
@@ -769,7 +779,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("last_tracking_status", request.getStatus());
 				update.set("description_status", provisionx.getDescriptionStatus());
 				update.set("generic_speech", provisionx.getGenericSpeech());
-				update.set("front_speech", provisionx.getFrontSpeech());
 				update.set("front_speech", provisionx.getFrontSpeech());
 
 				listLog.add(statusLog);

@@ -225,7 +225,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Provision.class);
 		return provision;
 	}
-
+	
 	@Override
 	public Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt) {
 		Provision provision = this.mongoOperations.findOne(

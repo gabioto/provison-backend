@@ -141,7 +141,7 @@ public class ScheduleApi {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-		String url =api.getWorkOrderManagementUrl()+api.getWorkOrders();
+		String url = api.getWorkOrderManagementUrl()+api.getWorkOrders();
 
 		//String url = "https://apisd.telefonica.com.pe/vp-tecnologia/oss/workOrderManagement/v3/workOrders";
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
@@ -177,7 +177,7 @@ public class ScheduleApi {
 			
 			//System.out.println(new Gson().toJson(responseEntity.getBody()));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("WEB PSI", "modifyWork DATOS", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
+			loggerApi.thirdLogEvent("WEB PSI", "modifyWorkDatos", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
 					startHour, endHour, responseEntity.getStatusCodeValue());
 
 			return true;
@@ -185,7 +185,7 @@ public class ScheduleApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("WEB PSI", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
+			loggerApi.thirdLogEvent("WEB PSI", "modifyWorkDatos", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
 					startHour, endHour, ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -199,7 +199,7 @@ public class ScheduleApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("WEB PSI", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
+			loggerApi.thirdLogEvent("WEB PSI", "modifyWorkDatos", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
 					endHour, Integer.parseInt(error));
 			throw new ServerNotFoundException(ex.getMessage());
 		}
@@ -252,7 +252,7 @@ public class ScheduleApi {
 			
 			System.out.println(new Gson().toJson(responseEntity.getBody()));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWorkDatos", new Gson().toJson(entity.getBody()), new Gson().toJson(responseEntity.getBody()), url,
 					startHour, endHour, responseEntity.getStatusCodeValue());
 
 			return true;
@@ -260,7 +260,7 @@ public class ScheduleApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWorkDatos", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url,
 					startHour, endHour, ex.getStatusCode().value());
 
 			JsonObject jsonDecode = new Gson().fromJson(ex.getResponseBodyAsString(), JsonObject.class);
@@ -274,7 +274,7 @@ public class ScheduleApi {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 			String error = ex.getLocalizedMessage().substring(0, ex.getLocalizedMessage().indexOf(" "));
 			endHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
-			loggerApi.thirdLogEvent("AGENDADOR", "modifyWork DATOS", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
+			loggerApi.thirdLogEvent("AGENDADOR", "modifyWorkDatos", new Gson().toJson(entity.getBody()), ex.getLocalizedMessage(), url, startHour,
 					endHour, Integer.parseInt(error));
 			throw new ServerNotFoundException(ex.getMessage());
 		}
@@ -376,7 +376,7 @@ public class ScheduleApi {
 		Calendar calendar = Calendar.getInstance();
 		Date now = calendar.getTime();
 
-		String passMD5 = stringToMD5("pS1D3v3L0p3R");
+		String passMD5 = stringToMD5("aPpM0v1S7@R");
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_PSI_AUTH);
 		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));

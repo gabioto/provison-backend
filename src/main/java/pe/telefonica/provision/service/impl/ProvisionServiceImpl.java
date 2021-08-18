@@ -1544,26 +1544,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 					
 					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
-
-//					if (switchAgendamiento.equals("false")) { updatedPsi = restPSI.updatePSIClient(psiRequest);
-//					} else {	 if(request.getSchedule().toUpperCase().equals("PSI")) {
-//							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-//						} else { updatedPsi = scheduleApi.modifyWorkOrder(psiRequest); }						
-//					}
-
-					if (request.getScheduler().toUpperCase().equals("PSI")) {
-						
+					if (request.getScheduler().toUpperCase().equals("PSI")) {						
 						if (switchAgendamiento.equals("false")) {
 							updatedPsi = restPSI.updatePSIClient(psiRequest);
-						}else {
+						} else {
 							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-						}
-						
+						}					
 					} else {						
-							updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
+						updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
 					}
-					
-
 					if (updatedPsi) {
 						Update update = new Update();
 						update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
@@ -1993,7 +1982,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						provision.getCustomer().getDocumentNumber(),
 						xaRequest,
 						provision.getWoPreStart().getTrackingUrl());
-				if (optional.isEmpty()) {
+				if (!optional.isPresent()) {
 					Toolbox objToolbox = new Toolbox();
 					objToolbox.setXaRequest(xaRequest);
 					objToolbox.setDocumentType(provision.getCustomer().getDocumentType());

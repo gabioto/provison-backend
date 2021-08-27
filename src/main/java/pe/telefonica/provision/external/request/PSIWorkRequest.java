@@ -41,15 +41,19 @@ public class PSIWorkRequest {
 		super();
 	}
 
-	public PSIWorkRequest(PSIUpdateClientRequest request, String date) {
+	public PSIWorkRequest(PSIUpdateClientRequest request, String date, String indicador) {
 		correlationId = request.getBodyUpdateClient().getSolicitud();
 		startDate = date;
 
 		List<ContactMedia> contactMedia = new ArrayList<>();
 		//public ContactMedia(String _type, String type, String email, String number) {
 		contactMedia.add(new ContactMedia("email", "", request.getBodyUpdateClient().getCorreo(), ""));
-		contactMedia.add(new ContactMedia("phone", "mobile", "", request.getBodyUpdateClient().getTelefono1()));
-
+		if (indicador.equals("1")) {
+			contactMedia.add(new ContactMedia("phone", "mobile", "", request.getBodyUpdateClient().getTelefono1()));
+		} else {
+			contactMedia.add(new ContactMedia("phone", "mobile", "", ""));
+			contactMedia.add(new ContactMedia("phone", "mobile", "", request.getBodyUpdateClient().getTelefono1()));
+		}
 		Appointment appointment = new Appointment("", date, null, contactMedia);
 
 		details.add(new Detail(new Work(request.getBodyUpdateClient().getNombre_completo(), null, null, appointment)));

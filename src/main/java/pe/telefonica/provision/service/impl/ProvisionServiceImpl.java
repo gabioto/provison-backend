@@ -1544,7 +1544,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					
 					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
-					if (request.getScheduler().toUpperCase().equals("PSI")) {						
+					if (request.getScheduler().toUpperCase().equals("PSI")) {
 						if (switchAgendamiento.equals("false")) {
 							updatedPsi = restPSI.updatePSIClient(psiRequest);
 						} else {
@@ -1555,14 +1555,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 					if (updatedPsi) {
 						Update update = new Update();
-						update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
+						update.set("contacts", request.isHolderWillReceive() ? new ArrayList<>() : contactsList);
 						provisionRepository.updateProvision(provision, update);
 
-						if (provision.getContacts() != null) {
+						if (provision.getContacts().size() == 0) {
 							provision.getContacts().clear();
 						}
 
-						provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
+						provision.setContacts(request.isHolderWillReceive() ? new ArrayList<>() : contactsList);
 					} else {
 						throw new Exception();
 					}

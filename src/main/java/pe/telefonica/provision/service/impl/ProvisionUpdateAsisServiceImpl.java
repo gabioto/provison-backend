@@ -759,7 +759,7 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 				customer.setName(appointment.getRelatedParty().get(0).getName());
 				customer.setDocumentType(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalIdType());
 				customer.setDocumentNumber(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalId());
-				customer.setPhoneNumber(appointment.getContactMedium().get(4).getNumber());
+				customer.setPhoneNumber(appointment.getContactMedium().get(1).getNumber());
 				customer.setMail(appointment.getContactMedium().get(6).getEmail());
 				customer.setDistrict(appointment.getRelatedPlace().getAddress().getCity());
 				customer.setProvince(appointment.getRelatedPlace().getAddress().getStateOrProvince());

@@ -55,10 +55,13 @@ public abstract class ProvisionUpdateServiceImpl {
 	public abstract boolean updateWoNotDone(Provision provision, KafkaTOARequest kafkaToaRequest,
 			pe.telefonica.provision.model.Status status);
 
+	public abstract boolean updateWoPreNotDone(Provision provision, KafkaTOARequest kafkaToaRequest,
+			pe.telefonica.provision.model.Status status);
+	
 	public boolean getCarrier(String phoneNumber) {
 
 		boolean isMovistar = false;
-		if (!phoneNumber.trim().equals("")) {
+		if (phoneNumber.matches("[0-9]+") && phoneNumber.length() == 9 && phoneNumber.substring(0, 1).equals("9")) {
 			String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
 			if (switchOnPremise.equals("true")) {
 				isMovistar = restPSI.getCarrier(phoneNumber);
@@ -175,6 +178,36 @@ public abstract class ProvisionUpdateServiceImpl {
 				msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
 	}
 
+	public void sendSMSWoPreNotDoneHolder(Provision provision) {
+
+		String text = provision.getCustomer().getName();
+
+		String nameCapitalize = text.substring(0, 1).toUpperCase() + text.substring(1);
+
+		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+			return;
+		}
+
+		List<MsgParameter> msgParameters = new ArrayList<>();
+		MsgParameter paramName = new MsgParameter();
+		paramName.setKey(Constants.TEXT_NAME_REPLACE);
+		paramName.setValue(nameCapitalize);
+		msgParameters.add(paramName);
+
+		List<Contact> contacts = new ArrayList<>();
+
+		Contact contactCustomer = new Contact();
+		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+		contactCustomer.setFullName(provision.getCustomer().getName());
+		contactCustomer.setHolder(true);
+		contacts.add(contactCustomer);
+
+		String urlTraza = provisionTexts.getWebUrl();
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_WOPRENOTDONE,
+				msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
+	}
+	
 	public pe.telefonica.provision.model.Status getInfoStatus(String statusName,
 			List<pe.telefonica.provision.model.Status> statusList) {
 		pe.telefonica.provision.model.Status localStatus = null;

@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pe.telefonica.provision.model.Toolbox;
+import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.common.ResponseHeader;
@@ -42,6 +44,7 @@ import pe.telefonica.provision.dto.ProvisionDetailTrazaDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
+import pe.telefonica.provision.external.NmoApi;
 import pe.telefonica.provision.external.PSIApi;
 
 import pe.telefonica.provision.external.ScheduleApi;
@@ -79,6 +82,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private PSIApi restPSI;
+	
+	@Autowired
+	private NmoApi nmoPSI;
 
 	@Autowired
 	private TrazabilidadSecurityApi trazabilidadSecurityApi;
@@ -89,10 +95,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Autowired
 	private ScheduleApi scheduleApi;
 	
-
 	@Autowired
 	private ProvisionRepository provisionRepository;
 
+	@Autowired
+	private ToolboxRepository toolboxRepository;
+	
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
 
@@ -609,10 +617,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Provision provisionx = null;
 
+		Boolean indicador = Boolean.FALSE;
 		if (request.getDataOrigin().equalsIgnoreCase("ATIS")) {
 			provisionx = provisionRepository.getProvisionByXaRequest(getData[1]);
 		} else {
 			provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
+			if (provisionx == null && !getData[11].equals("")) {
+				provisionx = provisionRepository.getByOrderCodeForUpdate(getData[11]);
+				indicador = Boolean.TRUE;
+			}
 		}
 
 		if (request.getDataOrigin().equalsIgnoreCase("ORDENES")) {
@@ -657,72 +670,77 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				String status = "";
 
-				if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
-					pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
-							statusList);
-					if (pendiente != null) {
-						speech = hasFictitious ? pendiente.getGenericSpeech() : pendiente.getSpeechWithoutSchedule();
-					} else {
-						speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
-								: Status.PENDIENTE.getSpeechWithoutSchedule();
+				if (!indicador) {
+					if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
+						pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
+								statusList);
+						if (pendiente != null) {
+							speech = hasFictitious ? pendiente.getGenericSpeech() : pendiente.getSpeechWithoutSchedule();
+						} else {
+							speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
+									: Status.PENDIENTE.getSpeechWithoutSchedule();
+						}
+	
+						speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
+								provisionx.getCustomer().getName().split(" ")[0]) : speech;
+						provisionx.setGenericSpeech(speech);
+						provisionx.setDescriptionStatus(
+								pendiente != null ? pendiente.getDescription() : Status.PENDIENTE.getDescription());
+						provisionx.setFrontSpeech(
+								pendiente != null ? pendiente.getFront() : Status.PENDIENTE.getFrontSpeech());
+						status = Status.PENDIENTE.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
+						pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
+								statusList);
+						if (ingresado != null) {
+							speech = hasFictitious ? ingresado.getGenericSpeech() : ingresado.getSpeechWithoutSchedule();
+						} else {
+							speech = hasFictitious ? Status.INGRESADO.getGenericSpeech()
+									: Status.INGRESADO.getSpeechWithoutSchedule();
+						}
+						speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
+								provisionx.getCustomer().getName().split(" ")[0]) : speech;
+						provisionx.setGenericSpeech(speech);
+						provisionx.setDescriptionStatus(
+								ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
+						provisionx.setFrontSpeech(
+								ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
+						status = Status.INGRESADO.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
+						pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(),
+								statusList);
+						provisionx.setDescriptionStatus(
+								caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
+						provisionx.setGenericSpeech(
+								caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
+						provisionx.setFrontSpeech(caida != null ? caida.getFront() : Status.CAIDA.getFrontSpeech());
+						status = Constants.PROVISION_STATUS_CAIDA;
+					} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_PAGO.getStatusName())) {
+						pe.telefonica.provision.model.Status pendingPayment = getInfoStatus(
+								Status.PENDIENTE_PAGO.getStatusName(), statusList);
+						provisionx.setDescriptionStatus(pendingPayment != null ? pendingPayment.getDescription()
+								: Status.PENDIENTE_PAGO.getDescription());
+						provisionx.setGenericSpeech(pendingPayment != null ? pendingPayment.getGenericSpeech()
+								: Status.PENDIENTE_PAGO.getGenericSpeech());
+						provisionx.setFrontSpeech(pendingPayment != null ? pendingPayment.getFront()
+								: Status.PENDIENTE_PAGO.getFrontSpeech());
+						status = Status.PENDIENTE_PAGO.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
+						pe.telefonica.provision.model.Status paid = getInfoStatus(Status.PAGADO.getStatusName(),
+								statusList);
+						provisionx.setDescriptionStatus(
+								paid != null ? paid.getDescription() : Status.PAGADO.getDescription());
+						provisionx.setGenericSpeech(
+								paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
+						provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
+						status = Status.PAGADO.getStatusName().toLowerCase();
+						update.set("send_notify", false);
 					}
-
-					speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
-							provisionx.getCustomer().getName().split(" ")[0]) : speech;
-					provisionx.setGenericSpeech(speech);
-					provisionx.setDescriptionStatus(
-							pendiente != null ? pendiente.getDescription() : Status.PENDIENTE.getDescription());
-					provisionx.setFrontSpeech(
-							pendiente != null ? pendiente.getFront() : Status.PENDIENTE.getFrontSpeech());
-					status = Status.PENDIENTE.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
-					pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
-							statusList);
-					if (ingresado != null) {
-						speech = hasFictitious ? ingresado.getGenericSpeech() : ingresado.getSpeechWithoutSchedule();
-					} else {
-						speech = hasFictitious ? Status.INGRESADO.getGenericSpeech()
-								: Status.INGRESADO.getSpeechWithoutSchedule();
-					}
-					speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
-							provisionx.getCustomer().getName().split(" ")[0]) : speech;
-					provisionx.setGenericSpeech(speech);
-					provisionx.setDescriptionStatus(
-							ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
-					provisionx.setFrontSpeech(
-							ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
-					status = Status.INGRESADO.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
-					pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(),
-							statusList);
-					provisionx.setDescriptionStatus(
-							caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
-					provisionx.setGenericSpeech(
-							caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
-					provisionx.setFrontSpeech(caida != null ? caida.getFront() : Status.CAIDA.getFrontSpeech());
-					status = Constants.PROVISION_STATUS_CAIDA;
-				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_PAGO.getStatusName())) {
-					pe.telefonica.provision.model.Status pendingPayment = getInfoStatus(
-							Status.PENDIENTE_PAGO.getStatusName(), statusList);
-					provisionx.setDescriptionStatus(pendingPayment != null ? pendingPayment.getDescription()
-							: Status.PENDIENTE_PAGO.getDescription());
-					provisionx.setGenericSpeech(pendingPayment != null ? pendingPayment.getGenericSpeech()
-							: Status.PENDIENTE_PAGO.getGenericSpeech());
-					provisionx.setFrontSpeech(pendingPayment != null ? pendingPayment.getFront()
-							: Status.PENDIENTE_PAGO.getFrontSpeech());
-					status = Status.PENDIENTE_PAGO.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
-					pe.telefonica.provision.model.Status paid = getInfoStatus(Status.PAGADO.getStatusName(),
-							statusList);
-					provisionx.setDescriptionStatus(
-							paid != null ? paid.getDescription() : Status.PAGADO.getDescription());
-					provisionx.setGenericSpeech(
-							paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
-					provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
-					status = Status.PAGADO.getStatusName().toLowerCase();
-					update.set("send_notify", false);
+				} else {
+					status = provisionx.getActiveStatus();
+					request.setStatus(provisionx.getLastTrackingStatus());
 				}
-
+				
 				if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
 
 					if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
@@ -761,7 +779,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("last_tracking_status", request.getStatus());
 				update.set("description_status", provisionx.getDescriptionStatus());
 				update.set("generic_speech", provisionx.getGenericSpeech());
-				update.set("front_speech", provisionx.getFrontSpeech());
 				update.set("front_speech", provisionx.getFrontSpeech());
 
 				listLog.add(statusLog);
@@ -1527,36 +1544,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 					
 					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
-
-//					if (switchAgendamiento.equals("false")) { updatedPsi = restPSI.updatePSIClient(psiRequest);
-//					} else {	 if(request.getSchedule().toUpperCase().equals("PSI")) {
-//							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-//						} else { updatedPsi = scheduleApi.modifyWorkOrder(psiRequest); }						
-//					}
-
 					if (request.getScheduler().toUpperCase().equals("PSI")) {
-						
 						if (switchAgendamiento.equals("false")) {
 							updatedPsi = restPSI.updatePSIClient(psiRequest);
-						}else {
+						} else {
 							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-						}
-						
+						}					
 					} else {						
-							updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
+						updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
 					}
-					
-
 					if (updatedPsi) {
 						Update update = new Update();
-						update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
+						update.set("contacts", request.isHolderWillReceive() ? new ArrayList<>() : contactsList);
 						provisionRepository.updateProvision(provision, update);
 
-						if (provision.getContacts() != null) {
+						if (provision.getContacts().size() == 0) {
 							provision.getContacts().clear();
 						}
 
-						provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
+						provision.setContacts(request.isHolderWillReceive() ? new ArrayList<>() : contactsList);
 					} else {
 						throw new Exception();
 					}
@@ -1962,10 +1968,117 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
-
 		Provision provision = provisionRepository.getProvisionDetailById(request.getIdProvision());
-
+		if (provision.getLastTrackingStatus().equals(Constants.STATUS_WO_PRESTART)) {			
+			if (provision.getWoPreStart() != null) {
+				String xaRequest = "";
+				if (provision.getXaRequest() != null) {
+					xaRequest = provision.getXaRequest();				
+				} else {
+					xaRequest = provision.getXaIdSt();
+				}				
+				Optional<Toolbox> optional = toolboxRepository.getLog(
+						provision.getCustomer().getDocumentType(),
+						provision.getCustomer().getDocumentNumber(),
+						xaRequest,
+						provision.getWoPreStart().getTrackingUrl());
+				if (!optional.isPresent()) {
+					Toolbox objToolbox = new Toolbox();
+					objToolbox.setXaRequest(xaRequest);
+					objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
+					objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+					objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+					objToolbox.setCarrier(provision.getCustomer().getCarrier());
+					objToolbox.setUrl("");
+					objToolbox.setChart(Boolean.FALSE);
+					if (provision.getWoPreStart().getTrackingUrl() != null) {
+						if (!provision.getWoPreStart().getTrackingUrl().equals("")) {
+							objToolbox.setChart(Boolean.TRUE);
+							objToolbox.setUrl(provision.getWoPreStart().getTrackingUrl());
+						}
+					}
+					toolboxRepository.insertLog(objToolbox);
+				} else if (provision.getWoPreStart().getTrackingUrl() != null) {
+					if (!provision.getWoPreStart().getTrackingUrl().equals(optional.get().getUrl())) {				
+						Toolbox objToolbox = new Toolbox();
+						objToolbox.setXaRequest(xaRequest);
+						objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
+						objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+						objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+						objToolbox.setCarrier(provision.getCustomer().getCarrier());
+						objToolbox.setUrl("");
+						objToolbox.setChart(Boolean.FALSE);
+						if (provision.getWoPreStart().getTrackingUrl() != null) {
+							if (!provision.getWoPreStart().getTrackingUrl().equals("")) {
+								objToolbox.setChart(Boolean.TRUE);
+								objToolbox.setUrl(provision.getWoPreStart().getTrackingUrl());
+							}
+						}
+						toolboxRepository.insertLog(objToolbox);
+					}
+				}
+			}
+		}
 		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}
 
+	@Override
+	public ProvisionDetailTrazaDto updateActivity(String idProvision,  String activityId, String indicador) {
+		ProvisionDetailTrazaDto provision = new ProvisionDetailTrazaDto();
+		try {
+			if (indicador.equals("0")) {
+				String tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
+				boolean resultado = nmoPSI.updateActivity(activityId, tokenExternal);
+				if (resultado) {
+					// Llamar al segundo servicio
+					resultado = nmoPSI.serviceRequest(activityId, tokenExternal);
+					if (resultado) {
+						// Actualizar la provision con el nuevo estado
+						provision = updateProvisionActivity(idProvision, Status.WO_PRENOTDONE_TRAZA, Constants.PROVISION_STATUS_PRENOTDONE_TRAZA); 
+					}
+				}
+			} else if (indicador.equals("1")) {
+				provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA, Constants.PROVISION_STATUS_NOTDONE_TRAZA);
+			}
+		} catch (Exception ex) {
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
+		}
+		return provision;
+	}	
+	
+	private ProvisionDetailTrazaDto updateProvisionActivity(String idProvision, Status status, String statusProvision) {
+		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
+				.getAllInfoStatus();
+
+		Provision provision = provisionRepository.getProvisionDetailById(idProvision);
+		
+		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
+		pe.telefonica.provision.model.Status notDoneStatus = getInfoStatus(status.getStatusName(),
+				statusList);
+
+		List<StatusLog> listLog = provision.getLogStatus();
+
+		Update update = new Update();
+		update.set("active_status", statusProvision);
+		StatusLog statusLog = new StatusLog();
+		statusLog.setStatus(status.getStatusName());
+		statusLog.setXaidst(provision.getXaIdSt());
+		listLog.add(statusLog);
+		
+		String speech = notDoneStatus != null ? notDoneStatus.getGenericSpeech() : status.getGenericSpeech();
+		
+		speech = hasCustomerInfo(provision.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0]) : speech;
+		update.set("last_tracking_status", status.getStatusName());
+		update.set("generic_speech", speech);
+		update.set("description_status", notDoneStatus != null ? notDoneStatus.getDescription() : status.getDescription());
+		update.set("front_speech", notDoneStatus != null ? notDoneStatus.getFront() : status.getFrontSpeech());
+		update.set("log_status", listLog);
+		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));		
+		update.set("sub_reason_not_done", speech);		
+		
+		provisionRepository.updateProvision(provision, update);
+		
+		provision = provisionRepository.getProvisionDetailById(idProvision);
+		return new ProvisionDetailTrazaDto().fromProvision(provision);
+	}
 }

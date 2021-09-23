@@ -52,7 +52,6 @@ public class OrderServiceImpl implements OrderService {
 				new Gson().toJson(request), "", "INSERT ORDER REQUEST", "", "",
 				LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
 				order.getSource(), "ORDERS_BACK");
-
 		try {
 			switch (order.getSource()) {
 			case Constants.SOURCE_ORDERS_ORDENES:
@@ -65,7 +64,6 @@ public class OrderServiceImpl implements OrderService {
 			default:
 				break;
 			}
-
 			if (orderSaved != null) {
 				if (order.getSource().equals(Constants.SOURCE_ORDERS_VENTAS_FIJA)
 						&& orderSaved.getStatus().equals(order.getStatus())) {
@@ -74,10 +72,8 @@ public class OrderServiceImpl implements OrderService {
 									"Status field has the same value as the stored one", "Duplicate status field"),
 							HttpStatus.BAD_REQUEST);
 				}
-
 				Update update = updateOrderFields(order, orderSaved);
 				orderRepository.updateOrder(orderSaved.getIdOrder(), update);
-
 			} else {
 				orderRepository.saveOrder(order);
 			}
@@ -103,14 +99,12 @@ public class OrderServiceImpl implements OrderService {
 							.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)).format(DateTimeFormatter.ISO_DATE_TIME),
 					order.getSource(), "ORDERS_BACK");
 		}
-
 		return new ResponseEntity<Object>(new OrderCreateResponse(order.getSource(),
 				order.getSource().equals(Constants.SOURCE_ORDERS_ATIS) ? order.getAtisOrder() : order.getCode(),
 				success), status);
 	}
 
 	private Update updateOrderFields(Order order, Order orderSaved) {
-
 		Update update = new Update();
 		update.set("source", order.getSource());
 		update.set("code", StringUtil.getValue(order.getCode(), orderSaved.getCode()));
@@ -156,7 +150,6 @@ public class OrderServiceImpl implements OrderService {
 			update.set("commercialOpAtis",
 					StringUtil.getValue(order.getCommercialOpAtis(), orderSaved.getCommercialOpAtis()));
 		}
-
 		return update;
 	}
 
@@ -192,14 +185,12 @@ public class OrderServiceImpl implements OrderService {
 				orderRequest.setAtisOrder("");
 				orderRequest.setCmsRequest(parts[11]);
 			}
-
 			orderRequest.setStatusOrderCode("");
 			orderRequest.setStatusOrderDescription("");
 			orderRequest.setRegisterOrderDate(parts[19]);
 			orderRequest.setReleaseOrderDate("");
 			orderRequest.setNote2("");
 			orderRequest.setOldResult("");
-
 		} else if (parts[0].equalsIgnoreCase("ATIS")) {
 			orderRequest.setSource(parts[0].replaceAll("\\s+", " ").trim());
 			orderRequest.setCode("");
@@ -224,26 +215,23 @@ public class OrderServiceImpl implements OrderService {
 			orderRequest.setCmsRequest("");
 			orderRequest.setStatusOrderCode(parts[3].replaceAll("\\s+", " ").trim());
 			orderRequest.setStatusOrderDescription(parts[4].replaceAll("\\s+", " ").trim());
+			
 			// Formater date
 			String dateString = parts[6].replaceAll("\\s+", " ").trim() + " 00:00:00";
-
 			SimpleDateFormat dateFormatString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			SimpleDateFormat dateFormatNew = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
 			try {
 				Date date = dateFormatString.parse(dateString);
 				dateString = dateFormatNew.format(date);
-
 			} catch (Exception e) {
+				log.error(e.getMessage());
 				dateString = "";
 			}
-
 			orderRequest.setRegisterOrderDate(dateString);
 			orderRequest.setReleaseOrderDate("");
 			orderRequest.setNote2("");
 			orderRequest.setOldResult("");
-			orderRequest.setFlagMT(parts[30]);
-
+			orderRequest.setFlagMT(parts[21]);
 		} else if (parts[0].equalsIgnoreCase("ORDENES")) {
 			SimpleDateFormat dateFormatString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			SimpleDateFormat dateFormatNew = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -263,7 +251,6 @@ public class OrderServiceImpl implements OrderService {
 							+ registerDateString.substring(11, 19);
 					Date dateSusp = dateFormatString.parse(registerDateString);
 					registerDateString = dateFormatNew.format(dateSusp);
-
 				} catch (Exception e) {
 					registerDateString = "";
 				}
@@ -290,12 +277,10 @@ public class OrderServiceImpl implements OrderService {
 							+ execRecoxDateString.substring(11, 19);
 					Date datRecox = dateFormatString.parse(execRecoxDateString);
 					execRecoxDateString = dateFormatNew.format(datRecox);
-
 				} catch (Exception e) {
 					execRecoxDateString = "";
 				}
 			}
-
 			orderRequest.setRegisterDate(registerDateString);
 			orderRequest.setExecSuspDate(dateSuspString);
 			orderRequest.setExecRecoxDate(execRecoxDateString);
@@ -316,15 +301,11 @@ public class OrderServiceImpl implements OrderService {
 							+ receptionDateString.substring(11, 19);
 					Date reception = dateFormatString.parse(receptionDateString);
 					receptionDateString = dateFormatNew.format(reception);
-
 				} catch (Exception e) {
 					receptionDateString = "";
-
 				}
-
 				System.out.println(receptionDateString);
 			}
-
 			orderRequest.setReceptionDate(receptionDateString);
 			orderRequest.setStatus(parts[19]);
 			orderRequest.setAtisOrder(parts[20]);
@@ -340,11 +321,9 @@ public class OrderServiceImpl implements OrderService {
 							+ registerOrderDateString.substring(11, 19);
 					Date dateOrder = dateFormatString.parse(registerOrderDateString);
 					registerOrderDateString = dateFormatNew.format(dateOrder);
-
 				} catch (Exception e) {
 					registerOrderDateString = "";
 				}
-
 			}
 
 			// VALDIATION Y FORMAT ReceptionDate
@@ -354,22 +333,16 @@ public class OrderServiceImpl implements OrderService {
 					execRecoxDateString = releaseOrderString.substring(0, 10) + " " + releaseOrderString.substring(11, 19);
 					Date releaseOrder = dateFormatString.parse(releaseOrderString);
 					releaseOrderString = dateFormatNew.format(releaseOrder);
-
 				} catch (Exception e) {
 					releaseOrderString = "";
-
 				}
-
 				System.out.println(releaseOrderString);
 			}
-
 			orderRequest.setRegisterOrderDate(registerOrderDateString);
 			orderRequest.setReleaseOrderDate(releaseOrderString);
-
 			orderRequest.setNote2(parts[26]);
 			orderRequest.setOldResult(parts[27]);
 		}
-
 		return orderRequest;
 	}
 }

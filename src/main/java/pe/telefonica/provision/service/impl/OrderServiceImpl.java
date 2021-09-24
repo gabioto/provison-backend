@@ -195,7 +195,7 @@ public class OrderServiceImpl implements OrderService {
 			orderRequest.setSource(parts[0].replaceAll("\\s+", " ").trim());
 			orderRequest.setCode("");
 			orderRequest.setServiceCode("");
-			orderRequest.setPhone(parts[12].replaceAll("\\s+", " ").trim());
+			orderRequest.setPhone(parts[11].replaceAll("\\s+", " ").trim());
 			orderRequest.setDocumentType("");
 			orderRequest.setDocumentNumber("");
 			orderRequest.setRegisterDate("");
@@ -203,7 +203,7 @@ public class OrderServiceImpl implements OrderService {
 			orderRequest.setExecRecoxDate("");
 			orderRequest.setNote1("");
 			orderRequest.setApplication("");
-			orderRequest.setCommercialOp(parts[11].replaceAll("\\s+", " ").trim());
+			orderRequest.setCommercialOp(parts[10].replaceAll("\\s+", " ").trim());
 			orderRequest.setContactPhone("");
 			orderRequest.setContactCellphone("");
 			orderRequest.setContactMail("");

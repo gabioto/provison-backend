@@ -779,12 +779,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return false;
 				}
 				Update update = new Update();
-				update.set("commercial_op_atis", getData[11]);
-				update.set("cod_cliente_atis", getData[31]);
-				update.set("cod_cuenta_atis", getData[32]);
-				update.set("technology", getData[29]);
-				update.set("cancelado_motivo_atis", getData[26]);
-				update.set("cancelado_submotivo_atis", getData[27]);
+				update.set("commercial_op_atis", getData[10]);
+				update.set("cod_cliente_atis", getData[22]);
+				update.set("cod_cuenta_atis", getData[23]);
+				update.set("technology", getData[20]);
+				update.set("cancelado_motivo_atis", getData[17]);
+				update.set("cancelado_submotivo_atis", getData[18]);
 
 				StatusLog statusLog = new StatusLog();
 				if (request.getStatus().equalsIgnoreCase(Status.FINALIZADO.getStatusName())) {

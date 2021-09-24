@@ -389,7 +389,7 @@ public class PSIApi extends ConfigRestTemplate {
 
 		bucketRequest.setBucket(bucket);
 		bucketRequest.setChannel(channel);
-		bucketRequest.setProduct(product);
+		bucketRequest.setProduct(null);
 
 		String bucketUrl = api.getSecurityUrl() + api.getBucketsByProduct();
 

@@ -387,8 +387,6 @@ public class PSIApi extends ConfigRestTemplate {
 		RestTemplate restTemplate = new RestTemplate();
 		BucketRequest bucketRequest = new BucketRequest();
 
-		bucketRequest.setBucket(null);
-		bucketRequest.setChannel(null);
 		bucketRequest.setProduct(product);
 
 		String bucketUrl = api.getSecurityUrl() + api.getBucketsByProduct();

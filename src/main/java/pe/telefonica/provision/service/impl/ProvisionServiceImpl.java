@@ -864,10 +864,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 				return isUpdate ? true : false;
 			}
 		} else {
-			Provision provision = fillProvisionInsert(request);
-			provision = evaluateProvisionComponents(provision);
-			provisionRepository.insertProvision(provision);
-			return true;
+			if (!request.getDataOrigin().equalsIgnoreCase("ATIS")) {
+				Provision provision = fillProvisionInsert(request);
+				provision = evaluateProvisionComponents(provision);
+				provisionRepository.insertProvision(provision);
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 

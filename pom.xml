@@ -99,14 +99,9 @@
 				<configuration>
 					<schemaVersion>V2</schemaVersion>
 					<authType>azure_cli</authType>
-					<resourceGroup>RG-trazabilidad-cert</resourceGroup>
-					<appName>Wa-trazabilidad-msProvision-cert</appName>
-					<region>eastus</region>
-					<runtime>
-						<os>linux</os>
-						<javaVersion>java8</javaVersion>
-						<webContainer>java8</webContainer>
-					</runtime>
+					<resourceGroup>rg-trazabilidad-prod</resourceGroup>
+					<appName>Wa-trazabilidad-msProvision-prod</appName>
+					<region>eastus2</region>					
 					<deployment>
 						<resources>
 							<resource>
@@ -121,5 +116,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

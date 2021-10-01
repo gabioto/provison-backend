@@ -60,7 +60,7 @@ public enum Status {
 	WO_PRENOTDONE_TRAZA("WO_PRENOTDONE_TRAZA", 25, "REGISTRADO TÉCNICO ESPERANDO AL CLIENTE", 
 			"[$name], el técnico está esperando en tu casa", "", "El técnico está esperando en tu casa"),
 	WO_NOTDONE_TRAZA("WO_NOTDONE_TRAZA", 26, "PEDIDO NO INSTALADO", 
-			"[$name], te enviaremos un SMS en las próximas horas para reagendar la vísita del técnico", "", "Pendiente por reagendar");	
+			"[$name], te enviaremos un SMS en las próximas horas para reagendar la visita del técnico", "", "Pendiente por reagendar");	
 	
 	private String statusName;
 	private int statusId;

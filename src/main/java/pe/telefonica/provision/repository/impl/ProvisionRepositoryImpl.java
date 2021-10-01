@@ -36,8 +36,6 @@ import pe.telefonica.provision.model.ResendNotification;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.Status;
-import com.mongodb.MongoClient;
-
 
 @Repository
 public class ProvisionRepositoryImpl implements ProvisionRepository {
@@ -229,7 +227,7 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Provision.class);
 		return provision;
 	}
-
+	
 	@Override
 	public Optional<Provision> getProvisionByXaRequestAndSt(String xaRequest, String xaIdSt) {
 		Provision provision = this.mongoOperations.findOne(
@@ -369,18 +367,17 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 				Criteria.where("notifications.notdone_send_notify").is(false).and("last_tracking_status")
 						.is(Status.WO_NOTDONE.getStatusName()),
 				Criteria.where("notifications.cancel_send_notify").is(false).and("last_tracking_status")
-						.is(Status.WO_CANCEL.getStatusName()),
+						.is(Status.WO_CANCEL.getStatusName()).and("xa_cancel_reason").ne("4"),
 				Criteria.where("notifications.completed_send_notify").is(false).and("last_tracking_status")
 						.is(Status.WO_COMPLETED.getStatusName()),
 				Criteria.where("notifications.finalizado_send_notify").is(false).and("last_tracking_status")
 						.is(Status.FINALIZADO.getStatusName()),
-
 				Criteria.where("notifications.cancelada_atis_send_notify").is(false).and("last_tracking_status")
 						.is(Status.CANCELADA_ATIS.getStatusName())
 
 		).and("customer").ne(null).and("notifications").ne(null);
 
-		Query query = new Query(criteria).limit(15);
+		Query query = new Query(criteria).limit(25);
 
 		query.with(new Sort(Direction.ASC, "_id"));
 
@@ -533,14 +530,13 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
 		LocalDateTime today = LocalDateTime.now(ZoneOffset.of("-05:00")).minusDays(1);
-		//LocalDateTime yesterday = today.minusDays(1);
 
-		LocalDateTime startDate = today.with(LocalTime.MIN);
+		LocalDateTime startDate = today.withHour(00).withMinute(00).withSecond(00);
 		LocalDateTime endDate = today.withHour(23).withMinute(59).withSecond(59);
-
+		
 		List<Provision> provisions = this.mongoOperations
 				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
-						Criteria.where("register_date").gt(startDate), Criteria.where("register_date").lt(endDate),
+						Criteria.where("register_date").gte(startDate), Criteria.where("register_date").lte(endDate),
 						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne(""))),
 						Provision.class);
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);

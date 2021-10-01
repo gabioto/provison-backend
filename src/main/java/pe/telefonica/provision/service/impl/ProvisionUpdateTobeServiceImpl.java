@@ -97,8 +97,6 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 							? appointment.getRelatedObject().get(2).getReference()
 							: "Movistar Hogar";
 
-			log.info("productName" + productName);
-
 			Provision provision = new Provision();
 			provision.setProductName(productName);
 			provision.setCustomerType(appointment.getRelatedParty().get(0).getAdditionalData().get(0).getValue());
@@ -112,10 +110,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 			provision.setActiveStatus(Constants.PROVISION_STATUS_ACTIVE);
 			provision.setStatusToa(Constants.PROVISION_STATUS_DONE);
 			provision.setLastTrackingStatus(Status.IN_TOA.getStatusName());
-			provision.setGenericSpeech(inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule()
-					: Status.IN_TOA.getSpeechWithoutSchedule());
-			provision.setDescriptionStatus(
-					inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
+			provision.setGenericSpeech(inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule() : Status.IN_TOA.getSpeechWithoutSchedule());
+			provision.setDescriptionStatus(inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
 			provision.setFrontSpeech(inToaStatus != null ? inToaStatus.getFront() : Status.IN_TOA.getFrontSpeech());
 
 			Customer customer = new Customer();
@@ -200,27 +196,19 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 					provision.setHasSchedule(true);
 					provision.setLastTrackingStatus(Status.SCHEDULED.getStatusName());
-					provision.setGenericSpeech(
-							scheduled != null ? scheduled.getGenericSpeech() : Status.SCHEDULED.getGenericSpeech());
-					provision.setDescriptionStatus(
-							scheduled != null ? scheduled.getDescription() : Status.SCHEDULED.getDescription());
-					provision.setFrontSpeech(
-							scheduled != null ? scheduled.getFront() : Status.SCHEDULED.getFrontSpeech());
+					provision.setGenericSpeech(scheduled != null ? scheduled.getGenericSpeech() : Status.SCHEDULED.getGenericSpeech());
+					provision.setDescriptionStatus(scheduled != null ? scheduled.getDescription() : Status.SCHEDULED.getDescription());
+					provision.setFrontSpeech(scheduled != null ? scheduled.getFront() : Status.SCHEDULED.getFrontSpeech());
 
 					// Llamar a servicio de agendamiento para regularizar la agenda
-					trazabilidadScheduleApi
-							.insertSchedule(generateScheduleRequest(provision, appointment, range, dateString2));
+					trazabilidadScheduleApi.insertSchedule(generateScheduleRequest(provision, appointment, range, dateString2));
 				}
-
 			} catch (Exception e) {
 				return false;
 			}
-
 			Optional<Provision> opt = provisionRepository.insertProvision(provision);
-
 			return opt.isPresent();
 		}
-
 		return false;
 	}
 
@@ -282,7 +270,6 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 	}
 
 	private String getFormatedDate(Appointment appointment) throws ParseException {
-
 		SimpleDateFormat parseador2 = new SimpleDateFormat("yyyy-MM-dd"); // el que parsea
 		SimpleDateFormat formateador2 = new SimpleDateFormat("dd/MM/yyyy"); // el que formatea
 
@@ -292,13 +279,10 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 	}
 
 	private String getRange(Appointment appointment) {
-		return (appointment.getTimeSlot().trim().equals("09-13")
-				|| appointment.getTimeSlot().toString().trim().equals("9-13")) ? "AM" : "PM";
+		return (appointment.getTimeSlot().trim().equals("09-13") || appointment.getTimeSlot().toString().trim().equals("9-13")) ? "AM" : "PM";
 	}
 
-	private ScheduleRequest generateScheduleRequest(Provision provision, Appointment appointment, String range,
-			String appointmentDate) {
-
+	private ScheduleRequest generateScheduleRequest(Provision provision, Appointment appointment, String range, String appointmentDate) {
 		ScheduleRequest scheduleRequest = new ScheduleRequest();
 		scheduleRequest.setBucket(provision.getWorkZone());
 		scheduleRequest.setWorkZone(provision.getWorkZone());
@@ -319,16 +303,11 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		scheduleRequest.setPriority(provision.getPriority());
 		scheduleRequest.setCustomerType(provision.getCustomerType());
 		scheduleRequest.setCustomerSubType(provision.getCustomerSubType());
-		scheduleRequest.setPhoneNetworkTechnology(
-				provision.getHomePhoneDetail() != null ? provision.getHomePhoneDetail().getNetworkTechnology() : "");
-		scheduleRequest.setPhoneTechnology(
-				provision.getHomePhoneDetail() != null ? provision.getHomePhoneDetail().getTechnology() : "");
-		scheduleRequest.setBroadbandNetworkTechnology(
-				provision.getInternetDetail() != null ? provision.getInternetDetail().getNetworkTechnology() : "");
-		scheduleRequest.setBroadbandTechnology(
-				provision.getInternetDetail() != null ? provision.getInternetDetail().getTechnology() : "");
-		scheduleRequest.setTvNetworkTechnology(
-				provision.getTvDetail() != null ? provision.getTvDetail().getNetworkTechnology() : "");
+		scheduleRequest.setPhoneNetworkTechnology(provision.getHomePhoneDetail() != null ? provision.getHomePhoneDetail().getNetworkTechnology() : "");
+		scheduleRequest.setPhoneTechnology(provision.getHomePhoneDetail() != null ? provision.getHomePhoneDetail().getTechnology() : "");
+		scheduleRequest.setBroadbandNetworkTechnology(provision.getInternetDetail() != null ? provision.getInternetDetail().getNetworkTechnology() : "");
+		scheduleRequest.setBroadbandTechnology(provision.getInternetDetail() != null ? provision.getInternetDetail().getTechnology() : "");
+		scheduleRequest.setTvNetworkTechnology(provision.getTvDetail() != null ? provision.getTvDetail().getNetworkTechnology() : "");
 		scheduleRequest.setTvTechnology(provision.getTvDetail() != null ? provision.getTvDetail().getTechnology() : "");
 		scheduleRequest.setCustomer(new CustomerRequest().fromCustomer(provision.getCustomer()));
 
@@ -336,8 +315,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 	}
 
 	@Override
-	public boolean updateInToa(Provision provision, KafkaTOARequest kafkaToaRequest,
-			pe.telefonica.provision.model.Status inToaStatus) {
+	public boolean updateInToa(Provision provision, KafkaTOARequest kafkaToaRequest, pe.telefonica.provision.model.Status inToaStatus) {
 
 		Appointment appointment = kafkaToaRequest.getEvent().getAppointment();
 
@@ -363,10 +341,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
 		update.set("status_toa", Constants.PROVISION_STATUS_DONE);
 		update.set("last_tracking_status", Status.IN_TOA.getStatusName());
-		update.set("generic_speech", inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule()
-				: Status.IN_TOA.getSpeechWithoutSchedule());
-		update.set("description_status",
-				inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
+		update.set("generic_speech", inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule() : Status.IN_TOA.getSpeechWithoutSchedule());
+		update.set("description_status", inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
 		update.set("front_speech", inToaStatus != null ? inToaStatus.getFront() : Status.IN_TOA.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
@@ -377,8 +353,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 	}
 
 	@Override
-	public boolean updateWoPrestart(Provision provision, KafkaTOARequest kafkaToaRequest,
-			pe.telefonica.provision.model.Status preStartStatus) {
+	public boolean updateWoPrestart(Provision provision, KafkaTOARequest kafkaToaRequest, pe.telefonica.provision.model.Status preStartStatus) {
 
 		Appointment appointment = kafkaToaRequest.getEvent().getAppointment();
 
@@ -405,39 +380,30 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("show_location", false);
 		update.set("notifications.prestart_send_notify", false);
 		update.set("last_tracking_status", Status.WO_PRESTART.getStatusName());
-		update.set("generic_speech",
-				preStartStatus != null ? preStartStatus.getGenericSpeech() : Status.WO_PRESTART.getGenericSpeech());
-		update.set("description_status",
-				preStartStatus != null ? preStartStatus.getDescription() : Status.WO_PRESTART.getDescription());
-		update.set("front_speech",
-				preStartStatus != null ? preStartStatus.getFront() : Status.WO_PRESTART.getFrontSpeech());
+		update.set("generic_speech", preStartStatus != null ? preStartStatus.getGenericSpeech() : Status.WO_PRESTART.getGenericSpeech());
+		update.set("description_status", preStartStatus != null ? preStartStatus.getDescription() : Status.WO_PRESTART.getDescription());
+		update.set("front_speech", preStartStatus != null ? preStartStatus.getFront() : Status.WO_PRESTART.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 
 		// Job Woprestart
 		LocalDateTime nowDate = LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE));
 
 		if (nowDate.getHour() >= 07 && nowDate.getHour() <= 20) {
-//			if (nowDate.getHour() >= 0 && nowDate.getHour() <= 23) {
-
 			// SMS
 			sendSMSWoPrestartHolder(provision);
 
 			update.set("notifications.prestart_send_notify", true);
-			update.set("notifications.prestart_send_date",
-					LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+			update.set("notifications.prestart_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
 			if (Boolean.valueOf(System.getenv("TDP_SIMPLI_ENABLE"))) {
-
 				String switchAzure = System.getenv("TDP_SWITCH_AZURE");
-				String tokenExternal = switchAzure.equals("true") ? trazabilidadSecurityApi.gerateTokenAzure()
-						: trazabilidadSecurityApi.generateToken();
+				String tokenExternal = switchAzure.equals("true") ? trazabilidadSecurityApi.gerateTokenAzure() : trazabilidadSecurityApi.generateToken();
 
 				// validate TechAvailable
 				GetTechnicianAvailableRequest getTechnicianAvailableRequest = new GetTechnicianAvailableRequest();
 				getTechnicianAvailableRequest.setDni(woPreStart.getDocumentNumber());
 
 				String isAvailableTech = trazabilidadScheduleApi.getTechAvailable(getTechnicianAvailableRequest);
-
 				if (isAvailableTech != null) {
 					sendEmailToCustomer(provision.getCustomer(), woPreStart);
 
@@ -453,10 +419,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 					int maxTries = 2;
 
 					while (count < maxTries) {
-						String urlSimpli = switchAzure.equals("true")
-								? urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest)
-								: simpliConnectApi.getUrlTrakingOld(simpliRequest);
-
+						String urlSimpli = switchAzure.equals("true") ? urlSimpli = simpliConnectApi.getUrlTraking(simpliRequest) : simpliConnectApi.getUrlTrakingOld(simpliRequest);
 						if (urlSimpli != null) {
 							// SEND SMS BY CONTACTS
 							woPreStart.setTrackingUrl(urlSimpli);
@@ -464,18 +427,15 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 							sendSMSWoPrestartContact(provision);
 
 							woPreStart.setAvailableTracking(true);
-
 						} else {
 							if (++count == maxTries) {
 								break;
 							}
 						}
 					}
-
 				}
 			}
 		}
-
 		update.set("wo_prestart", woPreStart);
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
@@ -508,10 +468,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("show_location", false);
 		update.set("active_status", Constants.PROVISION_STATUS_WOINIT);
 		update.set("last_tracking_status", Status.WO_INIT.getStatusName());
-		update.set("generic_speech",
-				initStatus != null ? initStatus.getGenericSpeech() : Status.WO_INIT.getGenericSpeech());
-		update.set("description_status",
-				initStatus != null ? initStatus.getDescription() : Status.WO_INIT.getDescription());
+		update.set("generic_speech", initStatus != null ? initStatus.getGenericSpeech() : Status.WO_INIT.getGenericSpeech());
+		update.set("description_status", initStatus != null ? initStatus.getDescription() : Status.WO_INIT.getDescription());
 		update.set("front_speech", initStatus != null ? initStatus.getFront() : Status.WO_INIT.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
@@ -523,8 +481,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 	}
 
 	@Override
-	public boolean updateWoCompleted(Provision provision, KafkaTOARequest kafkaToaRequest,
-			pe.telefonica.provision.model.Status completedStatus) {
+	public boolean updateWoCompleted(Provision provision, KafkaTOARequest kafkaToaRequest, pe.telefonica.provision.model.Status completedStatus) {
 
 		Appointment appointment = kafkaToaRequest.getEvent().getAppointment();
 
@@ -547,12 +504,9 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("show_location", false);
 		update.set("notifications.completed_send_notify", false);
 		update.set("last_tracking_status", Status.WO_COMPLETED.getStatusName());
-		update.set("generic_speech",
-				completedStatus != null ? completedStatus.getGenericSpeech() : Status.WO_COMPLETED.getGenericSpeech());
-		update.set("description_status",
-				completedStatus != null ? completedStatus.getDescription() : Status.WO_COMPLETED.getDescription());
-		update.set("front_speech",
-				completedStatus != null ? completedStatus.getFront() : Status.WO_COMPLETED.getFrontSpeech());
+		update.set("generic_speech", completedStatus != null ? completedStatus.getGenericSpeech() : Status.WO_COMPLETED.getGenericSpeech());
+		update.set("description_status", completedStatus != null ? completedStatus.getDescription() : Status.WO_COMPLETED.getDescription());
+		update.set("front_speech", completedStatus != null ? completedStatus.getFront() : Status.WO_COMPLETED.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
@@ -562,8 +516,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 	}
 
 	@Override
-	public boolean updateWoCancel(Provision provision, KafkaTOARequest kafkaToaRequest,
-			pe.telefonica.provision.model.Status cancelStatus) {
+	public boolean updateWoCancel(Provision provision, KafkaTOARequest kafkaToaRequest, pe.telefonica.provision.model.Status cancelStatus) {
 
 		Appointment appointment = kafkaToaRequest.getEvent().getAppointment();
 
@@ -588,10 +541,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("xa_cancel_reason", appointment.getStatusReason());
 		update.set("user_cancel", appointment.getRelatedParty().get(2).getId());
 		update.set("last_tracking_status", Status.WO_CANCEL.getStatusName());
-		update.set("generic_speech",
-				cancelStatus != null ? cancelStatus.getGenericSpeech() : Status.WO_CANCEL.getGenericSpeech());
-		update.set("description_status",
-				cancelStatus != null ? cancelStatus.getDescription() : Status.WO_CANCEL.getDescription());
+		update.set("generic_speech", cancelStatus != null ? cancelStatus.getGenericSpeech() : Status.WO_CANCEL.getGenericSpeech());
+		update.set("description_status", cancelStatus != null ? cancelStatus.getDescription() : Status.WO_CANCEL.getDescription());
 		update.set("front_speech", cancelStatus != null ? cancelStatus.getFront() : Status.WO_CANCEL.getFrontSpeech());
 		update.set("show_location", false);
 		update.set("log_status", provision.getLogStatus());
@@ -655,12 +606,9 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("send_notify", false);
 		update.set("time_slot", range);
 		update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
-		update.set("generic_speech",
-				rescheduleStatus != null ? rescheduleStatus.getGenericSpeech() : Status.SCHEDULED.getGenericSpeech());
-		update.set("description_status",
-				rescheduleStatus != null ? rescheduleStatus.getDescription() : Status.SCHEDULED.getDescription());
-		update.set("front_speech",
-				rescheduleStatus != null ? rescheduleStatus.getFront() : Status.SCHEDULED.getFrontSpeech());
+		update.set("generic_speech", rescheduleStatus != null ? rescheduleStatus.getGenericSpeech() : Status.SCHEDULED.getGenericSpeech());
+		update.set("description_status", rescheduleStatus != null ? rescheduleStatus.getDescription() : Status.SCHEDULED.getDescription());
+		update.set("front_speech", rescheduleStatus != null ? rescheduleStatus.getFront() : Status.SCHEDULED.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
@@ -704,10 +652,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("user_notdone", appointment.getRelatedParty().get(4).getId());
 		update.set("last_tracking_status", Status.WO_NOTDONE.getStatusName());
 		update.set("generic_speech", speech);
-		update.set("description_status",
-				notDoneStatus != null ? notDoneStatus.getDescription() : Status.WO_NOTDONE.getDescription());
-		update.set("front_speech",
-				notDoneStatus != null ? notDoneStatus.getFront() : Status.WO_NOTDONE.getFrontSpeech());
+		update.set("description_status", notDoneStatus != null ? notDoneStatus.getDescription() : Status.WO_NOTDONE.getDescription());
+		update.set("front_speech", notDoneStatus != null ? notDoneStatus.getFront() : Status.WO_NOTDONE.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("send_notify", false);
@@ -801,7 +747,6 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		if (preNotDoneStatus.getReturnedList() != null && preNotDoneStatus.getReturnedList().size() > 0) {
 			Optional<ReturnedProvision> notDoneList = preNotDoneStatus.getReturnedList().stream()
 					.filter(x -> woPreNotdone.getaNotDoneReasonInstall().equals(x.getCodReason())).findFirst();
-
 			if (notDoneList.isPresent()) {
 				subReason = notDoneList.get().getSubReason().replace(Constants.TEXT_NAME_REPLACE, nameReplace);
 				update.set("sub_reason_not_done", subReason);
@@ -819,8 +764,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
-		update.set("notifications.notdone_send_notify", true);
-		update.set("notifications.notdone_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		update.set("notifications.notpredone_send_notify", true);
+		update.set("notifications.notpredone_send_date", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 		
 		// SMS
 		sendSMSWoPreNotDoneHolder(provision);

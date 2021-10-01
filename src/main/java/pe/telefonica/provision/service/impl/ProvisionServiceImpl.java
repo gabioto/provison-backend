@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pe.telefonica.provision.model.Toolbox;
+import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.common.ResponseHeader;
@@ -93,10 +95,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Autowired
 	private ScheduleApi scheduleApi;
 	
-
 	@Autowired
 	private ProvisionRepository provisionRepository;
 
+	@Autowired
+	private ToolboxRepository toolboxRepository;
+	
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
 
@@ -613,10 +617,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Provision provisionx = null;
 
+		Boolean indicador = Boolean.FALSE;
 		if (request.getDataOrigin().equalsIgnoreCase("ATIS")) {
 			provisionx = provisionRepository.getProvisionByXaRequest(getData[1]);
 		} else {
 			provisionx = provisionRepository.getProvisionBySaleCode(getData[2]);
+			if (provisionx == null && !getData[11].equals("")) {
+				provisionx = provisionRepository.getByOrderCodeForUpdate(getData[11]);
+				indicador = Boolean.TRUE;
+			}
 		}
 
 		if (request.getDataOrigin().equalsIgnoreCase("ORDENES")) {
@@ -661,77 +670,80 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				String status = "";
 
-				if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
-					pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
-							statusList);
-					if (pendiente != null) {
-						speech = hasFictitious ? pendiente.getGenericSpeech() : pendiente.getSpeechWithoutSchedule();
-					} else {
-						speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
-								: Status.PENDIENTE.getSpeechWithoutSchedule();
+				if (!indicador) {
+					if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
+						pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
+								statusList);
+						if (pendiente != null) {
+							speech = hasFictitious ? pendiente.getGenericSpeech() : pendiente.getSpeechWithoutSchedule();
+						} else {
+							speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
+									: Status.PENDIENTE.getSpeechWithoutSchedule();
+						}
+	
+						speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
+								provisionx.getCustomer().getName().split(" ")[0]) : speech;
+						provisionx.setGenericSpeech(speech);
+						provisionx.setDescriptionStatus(
+								pendiente != null ? pendiente.getDescription() : Status.PENDIENTE.getDescription());
+						provisionx.setFrontSpeech(
+								pendiente != null ? pendiente.getFront() : Status.PENDIENTE.getFrontSpeech());
+						status = Status.PENDIENTE.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
+						pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
+								statusList);
+						if (ingresado != null) {
+							speech = hasFictitious ? ingresado.getGenericSpeech() : ingresado.getSpeechWithoutSchedule();
+						} else {
+							speech = hasFictitious ? Status.INGRESADO.getGenericSpeech()
+									: Status.INGRESADO.getSpeechWithoutSchedule();
+						}
+						speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
+								provisionx.getCustomer().getName().split(" ")[0]) : speech;
+						provisionx.setGenericSpeech(speech);
+						provisionx.setDescriptionStatus(
+								ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
+						provisionx.setFrontSpeech(
+								ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
+						status = Status.INGRESADO.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
+						pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(),
+								statusList);
+						provisionx.setDescriptionStatus(
+								caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
+						provisionx.setGenericSpeech(
+								caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
+						provisionx.setFrontSpeech(caida != null ? caida.getFront() : Status.CAIDA.getFrontSpeech());
+						status = Constants.PROVISION_STATUS_CAIDA;
+					} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_PAGO.getStatusName())) {
+						pe.telefonica.provision.model.Status pendingPayment = getInfoStatus(
+								Status.PENDIENTE_PAGO.getStatusName(), statusList);
+						provisionx.setDescriptionStatus(pendingPayment != null ? pendingPayment.getDescription()
+								: Status.PENDIENTE_PAGO.getDescription());
+						provisionx.setGenericSpeech(pendingPayment != null ? pendingPayment.getGenericSpeech()
+								: Status.PENDIENTE_PAGO.getGenericSpeech());
+						provisionx.setFrontSpeech(pendingPayment != null ? pendingPayment.getFront()
+								: Status.PENDIENTE_PAGO.getFrontSpeech());
+						status = Status.PENDIENTE_PAGO.getStatusName().toLowerCase();
+					} else if (request.getStatus().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
+						pe.telefonica.provision.model.Status paid = getInfoStatus(Status.PAGADO.getStatusName(),
+								statusList);
+						provisionx.setDescriptionStatus(
+								paid != null ? paid.getDescription() : Status.PAGADO.getDescription());
+						provisionx.setGenericSpeech(
+								paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
+						provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
+						status = Status.PAGADO.getStatusName().toLowerCase();
+						update.set("send_notify", false);
 					}
-
-					speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
-							provisionx.getCustomer().getName().split(" ")[0]) : speech;
-					provisionx.setGenericSpeech(speech);
-					provisionx.setDescriptionStatus(
-							pendiente != null ? pendiente.getDescription() : Status.PENDIENTE.getDescription());
-					provisionx.setFrontSpeech(
-							pendiente != null ? pendiente.getFront() : Status.PENDIENTE.getFrontSpeech());
-					status = Status.PENDIENTE.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())) {
-					pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
-							statusList);
-					if (ingresado != null) {
-						speech = hasFictitious ? ingresado.getGenericSpeech() : ingresado.getSpeechWithoutSchedule();
-					} else {
-						speech = hasFictitious ? Status.INGRESADO.getGenericSpeech()
-								: Status.INGRESADO.getSpeechWithoutSchedule();
-					}
-					speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
-							provisionx.getCustomer().getName().split(" ")[0]) : speech;
-					provisionx.setGenericSpeech(speech);
-					provisionx.setDescriptionStatus(
-							ingresado != null ? ingresado.getDescription() : Status.INGRESADO.getDescription());
-					provisionx.setFrontSpeech(
-							ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
-					status = Status.INGRESADO.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
-					pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(),
-							statusList);
-					provisionx.setDescriptionStatus(
-							caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
-					provisionx.setGenericSpeech(
-							caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
-					provisionx.setFrontSpeech(caida != null ? caida.getFront() : Status.CAIDA.getFrontSpeech());
-					status = Constants.PROVISION_STATUS_CAIDA;
-				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_PAGO.getStatusName())) {
-					pe.telefonica.provision.model.Status pendingPayment = getInfoStatus(
-							Status.PENDIENTE_PAGO.getStatusName(), statusList);
-					provisionx.setDescriptionStatus(pendingPayment != null ? pendingPayment.getDescription()
-							: Status.PENDIENTE_PAGO.getDescription());
-					provisionx.setGenericSpeech(pendingPayment != null ? pendingPayment.getGenericSpeech()
-							: Status.PENDIENTE_PAGO.getGenericSpeech());
-					provisionx.setFrontSpeech(pendingPayment != null ? pendingPayment.getFront()
-							: Status.PENDIENTE_PAGO.getFrontSpeech());
-					status = Status.PENDIENTE_PAGO.getStatusName().toLowerCase();
-				} else if (request.getStatus().equalsIgnoreCase(Status.PAGADO.getStatusName())) {
-					pe.telefonica.provision.model.Status paid = getInfoStatus(Status.PAGADO.getStatusName(),
-							statusList);
-					provisionx.setDescriptionStatus(
-							paid != null ? paid.getDescription() : Status.PAGADO.getDescription());
-					provisionx.setGenericSpeech(
-							paid != null ? paid.getGenericSpeech() : Status.PAGADO.getGenericSpeech());
-					provisionx.setFrontSpeech(paid != null ? paid.getFront() : Status.PAGADO.getFrontSpeech());
-					status = Status.PAGADO.getStatusName().toLowerCase();
-					update.set("send_notify", false);
+				} else {
+					status = provisionx.getActiveStatus();
+					request.setStatus(provisionx.getLastTrackingStatus());
 				}
-
+				
 				if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
-
 					if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 							&& !provisionx.getDummyStPsiCode().isEmpty()) {
-
 						ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
 						updateFicRequest.setOrderCode(getData[11]);
 						updateFicRequest.setOriginCode(provisionx.getOriginCode());
@@ -742,15 +754,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 						// Actualiza agenda
 						if (!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
-							boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
-							update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+							if (!provisionx.getUpFrontRead()) {
+								boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+								update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+							}
 						}
 					}
 				}
 
 				if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA)
 						&& provisionx.getDummyStPsiCode() != null) {
-
 					trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provisionx.getIdProvision(),
 							Constants.ACTIVITY_TYPE_PROVISION.toLowerCase(), provisionx.getDummyStPsiCode(), true,
 							"PSI", "", "", "", ""));
@@ -766,7 +779,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("description_status", provisionx.getDescriptionStatus());
 				update.set("generic_speech", provisionx.getGenericSpeech());
 				update.set("front_speech", provisionx.getFrontSpeech());
-				update.set("front_speech", provisionx.getFrontSpeech());
 
 				listLog.add(statusLog);
 				update.set("log_status", listLog);
@@ -775,14 +787,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
 				return isUpdate ? true : false;
-
 			} else {
-
 				if (request.getStatus().equalsIgnoreCase(Status.PETICION_PENDIENTE.getStatusName())) {
 					return false;
 				}
 				Update update = new Update();
-
 				update.set("commercial_op_atis", getData[11]);
 				update.set("cod_cliente_atis", getData[31]);
 				update.set("cod_cuenta_atis", getData[32]);
@@ -795,7 +804,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				if (request.getStatus().equalsIgnoreCase(Status.FINALIZADO.getStatusName())) {
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(Status.FINALIZADO.getStatusName(),
 							statusList);
-
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.FINALIZADO.getDescription());
 					update.set("generic_speech",
@@ -810,12 +818,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.FINALIZADO.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.TERMINADA.getStatusName())) {
-
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(Status.TERMINADA.getStatusName(),
 							statusList);
-
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.TERMINADA.getDescription());
 					update.set("generic_speech",
@@ -830,22 +835,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.TERMINADA.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.CANCELADA_ATIS.getStatusName())) {
-
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(
 							Status.CANCELADA_ATIS.getStatusName(), statusList);
-
 					LocalDateTime paymentReturn = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 					paymentReturn = paymentReturn.plusDays(15);
 					UpFront upFront = provisionx.getUpFront();
 					if (upFront != null) {
 						upFront.setPaymentReturn(paymentReturn);
-
 						update.set("up_front", upFront);
 					}
-
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.CANCELADA_ATIS.getDescription());
 					update.set("generic_speech", finalizado != null ? finalizado.getGenericSpeech()
@@ -860,14 +860,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.CANCELADA_ATIS.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_DE_VALIDACION.getStatusName())) {
 					PendienteDeValidacion pendienteDeValidacion = new PendienteDeValidacion();
 					pendienteDeValidacion.setCodeStatusRequest(getData[3]);
 					pendienteDeValidacion.setChangeDate(getData[5]);
 					pendienteDeValidacion.setRequestDate(getData[2]);
 					update.set("pendiente_de_validacion", pendienteDeValidacion);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.CONFIGURADA.getStatusName())) {
 					Configurada configurada = new Configurada();
 					configurada.setCodeStatusRequest(getData[3]);
@@ -885,11 +883,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
 				return isUpdate ? true : false;
-
 			}
-
 		} else {
-
 			Provision provision = fillProvisionInsert(request);
 			provision = evaluateProvisionComponents(provision);
 			provisionRepository.insertProvision(provision);
@@ -1531,36 +1526,25 @@ public class ProvisionServiceImpl implements ProvisionService {
 					
 					String switchAgendamiento = "true";//System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
-
-//					if (switchAgendamiento.equals("false")) { updatedPsi = restPSI.updatePSIClient(psiRequest);
-//					} else {	 if(request.getSchedule().toUpperCase().equals("PSI")) {
-//							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-//						} else { updatedPsi = scheduleApi.modifyWorkOrder(psiRequest); }						
-//					}
-
 					if (request.getScheduler().toUpperCase().equals("PSI")) {
-						
 						if (switchAgendamiento.equals("false")) {
 							updatedPsi = restPSI.updatePSIClient(psiRequest);
-						}else {
+						} else {
 							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-						}
-						
+						}					
 					} else {						
-							updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
+						updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
 					}
-					
-
 					if (updatedPsi) {
 						Update update = new Update();
-						update.set("contacts", request.isHolderWillReceive() ? null : contactsList);
+						update.set("contacts", request.isHolderWillReceive() ? new ArrayList<>() : contactsList);
 						provisionRepository.updateProvision(provision, update);
 
-						if (provision.getContacts() != null) {
+						if (provision.getContacts().size() == 0) {
 							provision.getContacts().clear();
 						}
 
-						provision.setContacts(request.isHolderWillReceive() ? null : contactsList);
+						provision.setContacts(request.isHolderWillReceive() ? new ArrayList<>() : contactsList);
 					} else {
 						throw new Exception();
 					}
@@ -1966,9 +1950,57 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
-
 		Provision provision = provisionRepository.getProvisionDetailById(request.getIdProvision());
-
+		if (provision.getLastTrackingStatus().equals(Constants.STATUS_WO_PRESTART)) {			
+			if (provision.getWoPreStart() != null) {
+				String xaRequest = "";
+				if (provision.getXaRequest() != null) {
+					xaRequest = provision.getXaRequest();				
+				} else {
+					xaRequest = provision.getXaIdSt();
+				}				
+				Optional<Toolbox> optional = toolboxRepository.getLog(
+						provision.getCustomer().getDocumentType(),
+						provision.getCustomer().getDocumentNumber(),
+						xaRequest,
+						provision.getWoPreStart().getTrackingUrl());
+				if (!optional.isPresent()) {
+					Toolbox objToolbox = new Toolbox();
+					objToolbox.setXaRequest(xaRequest);
+					objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
+					objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+					objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+					objToolbox.setCarrier(provision.getCustomer().getCarrier());
+					objToolbox.setUrl("");
+					objToolbox.setChart(Boolean.FALSE);
+					if (provision.getWoPreStart().getTrackingUrl() != null) {
+						if (!provision.getWoPreStart().getTrackingUrl().equals("")) {
+							objToolbox.setChart(Boolean.TRUE);
+							objToolbox.setUrl(provision.getWoPreStart().getTrackingUrl());
+						}
+					}
+					toolboxRepository.insertLog(objToolbox);
+				} else if (provision.getWoPreStart().getTrackingUrl() != null) {
+					if (!provision.getWoPreStart().getTrackingUrl().equals(optional.get().getUrl())) {				
+						Toolbox objToolbox = new Toolbox();
+						objToolbox.setXaRequest(xaRequest);
+						objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
+						objToolbox.setDocumentNumber(provision.getCustomer().getDocumentNumber());
+						objToolbox.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+						objToolbox.setCarrier(provision.getCustomer().getCarrier());
+						objToolbox.setUrl("");
+						objToolbox.setChart(Boolean.FALSE);
+						if (provision.getWoPreStart().getTrackingUrl() != null) {
+							if (!provision.getWoPreStart().getTrackingUrl().equals("")) {
+								objToolbox.setChart(Boolean.TRUE);
+								objToolbox.setUrl(provision.getWoPreStart().getTrackingUrl());
+							}
+						}
+						toolboxRepository.insertLog(objToolbox);
+					}
+				}
+			}
+		}
 		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}
 
@@ -2023,7 +2055,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 		update.set("description_status", notDoneStatus != null ? notDoneStatus.getDescription() : status.getDescription());
 		update.set("front_speech", notDoneStatus != null ? notDoneStatus.getFront() : status.getFrontSpeech());
 		update.set("log_status", listLog);
-		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));		
+		update.set("sub_reason_not_done", speech);		
+		
 		provisionRepository.updateProvision(provision, update);
 		
 		provision = provisionRepository.getProvisionDetailById(idProvision);

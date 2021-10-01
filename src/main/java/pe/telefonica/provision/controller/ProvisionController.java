@@ -1180,7 +1180,7 @@ public class ProvisionController {
 				status = HttpStatus.INTERNAL_SERVER_ERROR;
 				timestamp = getTimestamp();
 				apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION,
-						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), ex.getMessage().toString(),
+						Constants.OPER_CONTACT_INFO_UPDATE, String.valueOf(status.value()), ex.getMessage(),
 						null);
 				apiResponse.getHeader().setTimestamp(timestamp);
 				apiResponse.getHeader().setMessageId(request.getHeader().getMessageId());

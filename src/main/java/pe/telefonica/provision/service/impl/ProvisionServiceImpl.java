@@ -1944,7 +1944,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		
 		trazabilidadSecurityApi.saveLogData("",
 				"", "",
-				"", "Info", new Gson().toJson(optProvisions.get()), "",
+				"", "Info01", new Gson().toJson(optProvisions.get()), "",
 				ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
 				"", timestamp, "",
 				"");
@@ -1959,7 +1959,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						.filter(x -> Status.PAGADO.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
 				trazabilidadSecurityApi.saveLogData("",
 						"", "",
-						listPaid.size()+"", "Info", new Gson().toJson(provisions.get(i)), "",
+						listPaid.size()+"", "Info02", new Gson().toJson(provisions.get(i)), "",
 						ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
 						"", timestamp, "",
 						"");

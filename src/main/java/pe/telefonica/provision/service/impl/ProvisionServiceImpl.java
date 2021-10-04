@@ -742,10 +742,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 				
 				if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
-
 					if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 							&& !provisionx.getDummyStPsiCode().isEmpty()) {
-
 						ScheduleUpdateFicticiousRequest updateFicRequest = new ScheduleUpdateFicticiousRequest();
 						updateFicRequest.setOrderCode(getData[11]);
 						updateFicRequest.setOriginCode(provisionx.getOriginCode());
@@ -756,15 +754,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 						// Actualiza agenda
 						if (!provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
-							boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
-							update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+							if (!provisionx.getUpFrontRead()) {
+								boolean updateFicticious = trazabilidadScheduleApi.updateFicticious(updateFicRequest);
+								update.set("is_update_dummy_st_psi_code", updateFicticious ? true : false);
+							}
 						}
 					}
 				}
 
 				if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA)
 						&& provisionx.getDummyStPsiCode() != null) {
-
 					trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provisionx.getIdProvision(),
 							Constants.ACTIVITY_TYPE_PROVISION.toLowerCase(), provisionx.getDummyStPsiCode(), true,
 							"PSI", "", "", "", ""));
@@ -788,14 +787,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
 				return isUpdate ? true : false;
-
 			} else {
-
 				if (request.getStatus().equalsIgnoreCase(Status.PETICION_PENDIENTE.getStatusName())) {
 					return false;
 				}
 				Update update = new Update();
-
 				update.set("commercial_op_atis", getData[11]);
 				update.set("cod_cliente_atis", getData[31]);
 				update.set("cod_cuenta_atis", getData[32]);
@@ -808,7 +804,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				if (request.getStatus().equalsIgnoreCase(Status.FINALIZADO.getStatusName())) {
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(Status.FINALIZADO.getStatusName(),
 							statusList);
-
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.FINALIZADO.getDescription());
 					update.set("generic_speech",
@@ -823,12 +818,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.FINALIZADO.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.TERMINADA.getStatusName())) {
-
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(Status.TERMINADA.getStatusName(),
 							statusList);
-
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.TERMINADA.getDescription());
 					update.set("generic_speech",
@@ -843,22 +835,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.TERMINADA.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.CANCELADA_ATIS.getStatusName())) {
-
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(
 							Status.CANCELADA_ATIS.getStatusName(), statusList);
-
 					LocalDateTime paymentReturn = LocalDateTime.now(ZoneOffset.of("-05:00"));
 
 					paymentReturn = paymentReturn.plusDays(15);
 					UpFront upFront = provisionx.getUpFront();
 					if (upFront != null) {
 						upFront.setPaymentReturn(paymentReturn);
-
 						update.set("up_front", upFront);
 					}
-
 					update.set("description_status",
 							finalizado != null ? finalizado.getDescription() : Status.CANCELADA_ATIS.getDescription());
 					update.set("generic_speech", finalizado != null ? finalizado.getGenericSpeech()
@@ -873,14 +860,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 					statusLog.setStatus(Status.CANCELADA_ATIS.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE_DE_VALIDACION.getStatusName())) {
 					PendienteDeValidacion pendienteDeValidacion = new PendienteDeValidacion();
 					pendienteDeValidacion.setCodeStatusRequest(getData[3]);
 					pendienteDeValidacion.setChangeDate(getData[5]);
 					pendienteDeValidacion.setRequestDate(getData[2]);
 					update.set("pendiente_de_validacion", pendienteDeValidacion);
-
 				} else if (request.getStatus().equalsIgnoreCase(Status.CONFIGURADA.getStatusName())) {
 					Configurada configurada = new Configurada();
 					configurada.setCodeStatusRequest(getData[3]);
@@ -898,11 +883,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
 				return isUpdate ? true : false;
-
 			}
-
 		} else {
-
 			Provision provision = fillProvisionInsert(request);
 			provision = evaluateProvisionComponents(provision);
 			provisionRepository.insertProvision(provision);

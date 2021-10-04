@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.gson.Gson;
+
 import pe.telefonica.provision.model.Toolbox;
 import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.controller.common.ApiRequest;
@@ -68,6 +70,7 @@ import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 
@@ -1929,7 +1932,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public List<Provision> getUpFrontProvisions() {
 		List<Provision> provisions = new ArrayList<>();
 		Optional<List<Provision>> optProvisions = provisionRepository.getUpFrontProvisionsOnDay();
-
+		
 		if (optProvisions.isPresent()) {
 			provisions = optProvisions.get();
 

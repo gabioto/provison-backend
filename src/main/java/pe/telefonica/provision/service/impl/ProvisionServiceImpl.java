@@ -103,6 +103,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private ToolboxRepository toolboxRepository;
+
 	
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
@@ -1927,11 +1928,26 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return localStatus;
 	}
+	
+	public String getTimestamp() {
+		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
+		String timeStamp = dateNow.format(formatter);
+		return timeStamp;
+	}
 
 	@Override
 	public List<Provision> getUpFrontProvisions() {
 		List<Provision> provisions = new ArrayList<>();
 		Optional<List<Provision>> optProvisions = provisionRepository.getUpFrontProvisionsOnDay();
+		String timestamp = getTimestamp();
+		
+		trazabilidadSecurityApi.saveLogData("",
+				"", "",
+				"", "Info", new Gson().toJson(optProvisions.get()), "",
+				ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
+				"", timestamp, "",
+				"");
 		
 		if (optProvisions.isPresent()) {
 			provisions = optProvisions.get();
@@ -1941,7 +1957,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < provisions.size(); i++) {
 				List<StatusLog> listPaid = provisions.get(i).getLogStatus().stream()
 						.filter(x -> Status.PAGADO.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
-
+				trazabilidadSecurityApi.saveLogData("",
+						"", "",
+						listPaid.size()+"", "Info", new Gson().toJson(provisions.get(i)), "",
+						ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
+						"", timestamp, "",
+						"");
 				if (listPaid.size() > 0) {
 					provisions.remove(i);
 				}

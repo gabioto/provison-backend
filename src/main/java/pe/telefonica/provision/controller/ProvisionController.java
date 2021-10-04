@@ -1957,12 +1957,31 @@ public class ProvisionController {
 
 		ApiResponse<List<Provision>> apiResponse;
 		HttpStatus status;
+		String timestamp;
+		List<Provision> provisions=null;
+		try {
+			provisions = provisionService.getUpFrontProvisions();
 
-		List<Provision> provisions = provisionService.getUpFrontProvisions();
+			status = HttpStatus.OK;
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ORDER_TO_NOTIFY,
+					String.valueOf(status.value()), status.getReasonPhrase(), provisions);
+			
+		}catch(Exception ex){
+			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 
-		status = HttpStatus.OK;
-		apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ORDER_TO_NOTIFY,
-				String.valueOf(status.value()), status.getReasonPhrase(), provisions);
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_SHOW_LOCATION,
+					String.valueOf(status.value()), ex.getMessage(), null);
+
+			timestamp = getTimestamp();
+			restSecuritySaveLogData.saveLogData("",
+					"", "",
+					"", "ERROR", new Gson().toJson(provisions), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
+					"", timestamp, "",
+					"");
+		}
+		
 
 		return ResponseEntity.status(status).body(apiResponse);
 	}

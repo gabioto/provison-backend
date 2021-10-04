@@ -13,4 +13,5 @@ public class ConstantsLogData {
 	public static final String UPDATE_SHOW_LOCATION = "UPDATE_SHOW_LOCATION";
 	public static final String PROVISION_UPDATE_ST = "PROVISION_UPDATE_ST";
 	public static final String PROVISION_GET_BY_ORDER_CODE = "PROVISION_GET_BY_ORDER_CODE";
+	public static final String PROVISION_GET_UP_FRONT_PROVISIONS = "PROVISION_GET_UP_FRONT_PROVISIONS";
 }

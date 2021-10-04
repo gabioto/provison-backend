@@ -1933,7 +1933,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 		if (optProvisions.isPresent()) {
 			provisions = optProvisions.get();
 
-			provisionRepository.updateUpFrontProvisionRead(provisions);
+			//provisionRepository.updateUpFrontProvisionRead(provisions);
 
 			for (int i = 0; i < provisions.size(); i++) {
 				List<StatusLog> listPaid = provisions.get(i).getLogStatus().stream()

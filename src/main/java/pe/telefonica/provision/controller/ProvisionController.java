@@ -70,7 +70,7 @@ import pe.telefonica.provision.util.exception.FunctionalErrorException;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("provision")
-//@EnableAsync
+@EnableAsync
 public class ProvisionController {
 
 	private static final Log log = LogFactory.getLog(ProvisionController.class);

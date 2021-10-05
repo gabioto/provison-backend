@@ -55,7 +55,7 @@ public class TrazabilidadSecurityApi {
 	@Autowired
 	private ExternalApi api;
 
-	@Async
+	//@Async
 	public void saveLogData(String documentNumber, String documentType, String orderCode, String bucket, String typeLog,
 			String request, String response, String action, String messageId, String firstDate, String lastDate,
 			String activityType, String channel) {

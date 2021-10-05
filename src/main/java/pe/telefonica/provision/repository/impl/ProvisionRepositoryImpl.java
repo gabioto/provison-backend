@@ -549,11 +549,20 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 		String timestamp;
 		timestamp = getTimestamp();
 		
+//		Query query=new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
+//				Criteria.where("register_date").gte(startDate), Criteria.where("register_date").lte(endDate),
+//				Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne(""))).limit(10);
+		
+		Query query=new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
+				Criteria.where("register_date").gte(startDate),
+				Criteria.where("register_date").lte(endDate),
+				Criteria.where("dummy_st_psi_code").exists(true),
+				Criteria.where("dummy_st_psi_code").ne(""),Criteria.where("dummy_st_psi_code").ne(null)
+				)).limit(10);
+		
 		List<Provision> provisions = this.mongoOperations
-				.find(new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
-						Criteria.where("register_date").gte(startDate), Criteria.where("register_date").lte(endDate),
-						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne(""))).limit(10),
-						Provision.class);
+				.find(query,Provision.class);
+
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		
 		trazabilidadSecurityApi.saveLogData("",

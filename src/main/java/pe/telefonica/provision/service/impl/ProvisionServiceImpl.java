@@ -1957,12 +1957,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < provisions.size(); i++) {
 				List<StatusLog> listPaid = provisions.get(i).getLogStatus().stream()
 						.filter(x -> Status.PAGADO.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
-				trazabilidadSecurityApi.saveLogData("",
-						"", "",
-						listPaid.size()+"", "Info02", new Gson().toJson(provisions.get(i)), "",
-						ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
-						"", timestamp, "",
-						"");
+				
 				if (listPaid.size() > 0) {
 					provisions.remove(i);
 				}

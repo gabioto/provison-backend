@@ -565,13 +565,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
 		
-		trazabilidadSecurityApi.saveLogData("",
-				"", startDate.toString(),
-				endDate.toString(), "Info-repo", new Gson().toJson(provisions), "",
-				ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
-				"", timestamp, "",
-				"");
-		
 		return optionalProvisions;
 	}
 

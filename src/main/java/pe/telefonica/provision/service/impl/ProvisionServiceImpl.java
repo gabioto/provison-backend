@@ -1940,14 +1940,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public List<Provision> getUpFrontProvisions() {
 		List<Provision> provisions = new ArrayList<>();
 		Optional<List<Provision>> optProvisions = provisionRepository.getUpFrontProvisionsOnDay();
-		String timestamp = getTimestamp();
-		
-		trazabilidadSecurityApi.saveLogData("",
-				"", "",
-				"", "Info01", new Gson().toJson(optProvisions.get()), "",
-				ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
-				"", timestamp, "",
-				"");
 		
 		if (optProvisions.isPresent()) {
 			provisions = optProvisions.get();

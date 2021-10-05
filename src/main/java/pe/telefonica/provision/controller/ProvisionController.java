@@ -1969,7 +1969,7 @@ public class ProvisionController {
 			timestamp = getTimestamp();
 			restSecuritySaveLogData.saveLogData("",
 					"", "",
-					"", "ERROR", new Gson().toJson(provisions), new Gson().toJson(apiResponse),
+					"", "INFO", new Gson().toJson(provisions), new Gson().toJson(apiResponse),
 					ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
 					"", timestamp, "",
 					"");

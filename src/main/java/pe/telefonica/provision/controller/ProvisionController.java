@@ -1966,6 +1966,14 @@ public class ProvisionController {
 			apiResponse = new ApiResponse<List<Provision>>(Constants.APP_NAME_PROVISION, Constants.OPER_GET_ORDER_TO_NOTIFY,
 					String.valueOf(status.value()), status.getReasonPhrase(), provisions);
 			
+			timestamp = getTimestamp();
+			restSecuritySaveLogData.saveLogData("",
+					"", "",
+					"", "INFO", new Gson().toJson(provisions), new Gson().toJson(apiResponse),
+					ConstantsLogData.PROVISION_GET_UP_FRONT_PROVISIONS, "",
+					"", timestamp, "",
+					"");
+			
 		}catch(Exception ex){
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 

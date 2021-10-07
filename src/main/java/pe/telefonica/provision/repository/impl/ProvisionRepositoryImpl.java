@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.google.gson.Gson;
 import com.mongodb.client.result.UpdateResult;
 
 import pe.telefonica.provision.conf.ExternalApi;
@@ -29,12 +30,14 @@ import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest
 import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
+import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.ResendNotification;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.Status;
 
 @Repository
@@ -45,6 +48,9 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private ExternalApi api;
+	
+	@Autowired
+	private TrazabilidadSecurityApi trazabilidadSecurityApi;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {
@@ -526,20 +532,33 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 		return provision;
 	}
+	
+	public String getTimestamp() {
+		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
+		String timeStamp = dateNow.format(formatter);
+		return timeStamp;
+	}
+
 
 	@Override
 	public Optional<List<Provision>> getUpFrontProvisionsOnDay() {
 		LocalDateTime today = LocalDateTime.now(ZoneOffset.of("-05:00")).minusDays(1);
-
 		LocalDateTime startDate = today.withHour(00).withMinute(00).withSecond(00);
 		LocalDateTime endDate = today.withHour(23).withMinute(59).withSecond(59);
 		
+		Query query=new Query(Criteria.where("is_up_front").is(true).and("up_front_read").is(false).andOperator(
+				Criteria.where("register_date").gte(startDate),
+				Criteria.where("register_date").lte(endDate),
+				Criteria.where("dummy_st_psi_code").exists(true),
+				Criteria.where("dummy_st_psi_code").ne(""),Criteria.where("dummy_st_psi_code").ne(null)
+				)).limit(10);
+		
 		List<Provision> provisions = this.mongoOperations
-				.find(new Query(Criteria.where("is_up_front").is(true).andOperator(
-						Criteria.where("register_date").gte(startDate), Criteria.where("register_date").lte(endDate),
-						Criteria.where("dummy_st_psi_code").ne(null), Criteria.where("dummy_st_psi_code").ne(""))),
-						Provision.class);
+				.find(query,Provision.class);
+
 		Optional<List<Provision>> optionalProvisions = Optional.ofNullable(provisions);
+		
 		return optionalProvisions;
 	}
 

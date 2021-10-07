@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.gson.Gson;
+
 import pe.telefonica.provision.model.Toolbox;
 import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.controller.common.ApiRequest;
@@ -68,6 +70,7 @@ import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
+import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 
@@ -100,6 +103,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private ToolboxRepository toolboxRepository;
+
 	
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
@@ -1484,7 +1488,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						boolean isMovistar = false;
 
 						if (!listContact.get(a).getPhoneNumber().toString().equals("")) {
-							String switchOnPremise = "true";//System.getenv("TDP_SWITCH_ON_PREMISE");
+							String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
 							if (switchOnPremise.equals("true")) {
 								isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
 							} else {
@@ -1524,7 +1528,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					psiRequest.getBodyUpdateClient().setCorreo(
 							provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
 					
-					String switchAgendamiento = "true";//System.getenv("TDP_SWITCH_AGENDAMIENTO");
+					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
 					if (request.getScheduler().toUpperCase().equals("PSI")) {
 						if (switchAgendamiento.equals("false")) {
@@ -1924,12 +1928,19 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return localStatus;
 	}
+	
+	public String getTimestamp() {
+		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
+		String timeStamp = dateNow.format(formatter);
+		return timeStamp;
+	}
 
 	@Override
 	public List<Provision> getUpFrontProvisions() {
 		List<Provision> provisions = new ArrayList<>();
 		Optional<List<Provision>> optProvisions = provisionRepository.getUpFrontProvisionsOnDay();
-
+		
 		if (optProvisions.isPresent()) {
 			provisions = optProvisions.get();
 
@@ -1938,7 +1949,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < provisions.size(); i++) {
 				List<StatusLog> listPaid = provisions.get(i).getLogStatus().stream()
 						.filter(x -> Status.PAGADO.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
-
+				
 				if (listPaid.size() > 0) {
 					provisions.remove(i);
 				}

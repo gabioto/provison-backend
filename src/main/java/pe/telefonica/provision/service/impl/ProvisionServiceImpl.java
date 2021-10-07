@@ -1488,7 +1488,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 						boolean isMovistar = false;
 
 						if (!listContact.get(a).getPhoneNumber().toString().equals("")) {
-							String switchOnPremise = "true";//System.getenv("TDP_SWITCH_ON_PREMISE");
+							String switchOnPremise = System.getenv("TDP_SWITCH_ON_PREMISE");
 							if (switchOnPremise.equals("true")) {
 								isMovistar = restPSI.getCarrier(listContact.get(a).getPhoneNumber().toString());
 							} else {
@@ -1528,7 +1528,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					psiRequest.getBodyUpdateClient().setCorreo(
 							provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
 					
-					String switchAgendamiento = "true";//System.getenv("TDP_SWITCH_AGENDAMIENTO");
+					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
 					if (request.getScheduler().toUpperCase().equals("PSI")) {
 						if (switchAgendamiento.equals("false")) {

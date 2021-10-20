@@ -116,7 +116,6 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 
 			// valida Bucket x Producto
 			boolean boolBucket = validateBucketProduct(appointment, provision, provisionStatus);
-
 			if (boolBucket) {
 				return false;
 			}
@@ -832,7 +831,6 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 		if (Constants.TIPO_RUC.equals(provision.getCustomer().getDocumentType().toLowerCase())
 				&& !provision.getCustomer().getDocumentNumber().startsWith(Constants.RUC_NATURAL)) {
 			errorBucket = true;
-
 			return errorBucket;
 		}
 		if (Constants.STATUS_IN_TOA.equalsIgnoreCase(status == null ? "" : status)) {

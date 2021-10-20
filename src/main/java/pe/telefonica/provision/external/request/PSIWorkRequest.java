@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 
@@ -182,7 +183,7 @@ public class PSIWorkRequest {
 
 	public class ContactMedia {
 		
-		@JsonProperty("@type")
+		@SerializedName("@type")
 		private String _type;
 
 		private String type;

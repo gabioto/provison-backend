@@ -17,4 +17,4 @@ applications:
       TDP_SIMPLI_ENABLE: false
       TDP_SWITCH_AZURE: true
       TDP_SWITCH_ON_PREMISE: true
-      TDP_SWITCH_AGENDAMIENTO: false
+      TDP_SWITCH_AGENDAMIENTO: false      

@@ -152,7 +152,8 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 					update.set("front_speech",
 							dummyInToa != null ? dummyInToa.getFront() : Status.DUMMY_IN_TOA.getFrontSpeech());
 					update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-
+					update.set("scheduler", appointment.getScheduler().toUpperCase());
+					
 					provisionRepository.updateProvision(provision, update);
 					return true;
 
@@ -189,6 +190,8 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 
 					update.set("show_location", false);
 					update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+					update.set("scheduler", appointment.getScheduler().toUpperCase());
+					
 					provisionRepository.updateProvision(provision, update);
 					return true;
 				} else {
@@ -292,6 +295,8 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 					// send sms invitation
 					provision.setContacts(contacts);
 					update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+					update.set("scheduler", appointment.getScheduler().toUpperCase());
+					
 					provisionRepository.updateProvision(provision, update);
 
 					return true;

@@ -589,13 +589,13 @@ public class ProvisionServiceImpl implements ProvisionService {
 			upFront.setCip(upFrontArray[4]);
 			upFront.setCurrency(upFrontArray[5]);
 			upFront.setAmount(Double.valueOf(upFrontArray[6]));
-			upFront.setCipUrl("");
-			upFront.setStatus(upFrontArray[8]);
+			upFront.setCipUrl(upFrontArray[8]);
+			upFront.setStatus(upFrontArray[9]);
 
 			try {
 				LocalDateTime paymentDate;
 				LocalDateTime expDate;
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 				expDate = LocalDateTime.parse(upFrontArray[7], formatter);
 				upFront.setExpDate(expDate);
 

@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -664,14 +665,17 @@ public class ProvisionServiceImpl implements ProvisionService {
 				if (listCaida.size() > 0) {
 					return false;
 				}
-
+				
 				Update update = fillProvisionUpdate(request);
 
 				boolean hasFictitious = validateFictitiousSchedule(listLog);
-
+				
+				//SOLO VIENEN LOS ESTADOS DE VF  (INGRESADO)
+				List<StatusLog> listLogNew = new ArrayList<StatusLog>();
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(request.getStatus());
-
+				
+				
 				String status = "";
 
 				if (!indicador) {
@@ -783,9 +787,29 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("description_status", provisionx.getDescriptionStatus());
 				update.set("generic_speech", provisionx.getGenericSpeech());
 				update.set("front_speech", provisionx.getFrontSpeech());
-
-				listLog.add(statusLog);
-				update.set("log_status", listLog);
+				
+				if(provisionx.getLastTrackingStatus().equals(Status.IN_TOA.getStatusName())) {
+					List<StatusLog> newList = Stream.concat(listLogNew.stream(), listLog.stream())
+							.collect(Collectors.toList());
+					statusLog.setInsertedDate(provisionx.getInToa().getRegisterDate());
+					listLogNew.add(statusLog);
+					update.set("log_status", newList);			
+				} else if(provisionx.getLastTrackingStatus().equals(Status.WO_PRESTART.getStatusName())
+						|| provisionx.getLastTrackingStatus().equals(Status.WO_INIT.getStatusName())
+						|| provisionx.getLastTrackingStatus().equals(Status.WO_COMPLETED.getStatusName())
+						|| provisionx.getLastTrackingStatus().equals(Status.WO_NOTDONE.getStatusName())
+						|| provisionx.getLastTrackingStatus().equals(Status.WO_CANCEL.getStatusName())) {
+					statusLog.setInsertedDate(provisionx.getInToa().getRegisterDate());
+					listLogNew.add(statusLog);
+					List<StatusLog> newList = Stream.concat(listLogNew.stream(), listLog.stream())
+							.collect(Collectors.toList());
+					update.set("log_status", newList);
+				}else {
+					listLog.add(statusLog);
+					update.set("log_status", listLog);
+				}
+				
+				
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionx = evaluateProvisionComponents(provisionx);
 

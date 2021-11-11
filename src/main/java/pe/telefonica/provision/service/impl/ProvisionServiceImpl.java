@@ -789,10 +789,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("front_speech", provisionx.getFrontSpeech());
 				
 				if(provisionx.getLastTrackingStatus().equals(Status.IN_TOA.getStatusName())) {
-					List<StatusLog> newList = Stream.concat(listLogNew.stream(), listLog.stream())
-							.collect(Collectors.toList());
+					
 					statusLog.setInsertedDate(provisionx.getInToa().getRegisterDate());
 					listLogNew.add(statusLog);
+					List<StatusLog> newList = Stream.concat(listLogNew.stream(), listLog.stream())
+							.collect(Collectors.toList());
 					update.set("log_status", newList);			
 				} else if(provisionx.getLastTrackingStatus().equals(Status.WO_PRESTART.getStatusName())
 						|| provisionx.getLastTrackingStatus().equals(Status.WO_INIT.getStatusName())

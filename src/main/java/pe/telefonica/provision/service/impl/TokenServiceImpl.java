@@ -44,21 +44,10 @@ public class TokenServiceImpl implements TokenService {
 						Constants.OPER_SEND_TOKEN, String.valueOf(HttpStatus.OK.value()), "OK", response),
 						HttpStatus.OK);
 				} else {
-					List<Contacts> contacts = optProvision.get().getContacts();
-					Contacts contact = contacts.stream()
-							.filter(itemContact -> validatePhoneNumber(itemContact.getPhoneNumber())).findAny().orElse(null);
-					if(contact != null) {
-						Customer customer = optProvision.get().getCustomer();
-						customer.setPhoneNumber(contact.getPhoneNumber());
-						TokenResponse response = trazabilidadSecurityApi.sendLoginToken(customer);
-						return new ResponseEntity<Object>(new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION,
-								Constants.OPER_SEND_TOKEN, String.valueOf(HttpStatus.OK.value()), "OK", response),
-								HttpStatus.OK);
-					}else {
-						return new ResponseEntity<Object>(new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION,
-								Constants.OPER_SEND_TOKEN, String.valueOf(HttpStatus.NOT_ACCEPTABLE.value()),
-								"El número de telefono no es válido", null), HttpStatus.NOT_ACCEPTABLE);
-					}					
+					
+				return new ResponseEntity<Object>(new ApiResponse<TokenResponse>(Constants.APP_NAME_PROVISION,
+						Constants.OPER_SEND_TOKEN, String.valueOf(HttpStatus.NOT_ACCEPTABLE.value()),
+						"El número de telefono no es válido", null), HttpStatus.NOT_ACCEPTABLE);				
 				}
 			} else {
 				return new ResponseEntity<Object>(

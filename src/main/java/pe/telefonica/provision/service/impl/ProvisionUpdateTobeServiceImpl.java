@@ -177,7 +177,7 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 			provision.getLogStatus().add(statusLog);
 
 			try {
-				if (!appointment.getScheduledDate().equals("3000-01-01")) {
+				if (!appointment.getScheduledDate().substring(0, 10).equals("3000-01-01")) {
 
 					pe.telefonica.provision.model.Status scheduled = getInfoStatus(Status.SCHEDULED.getStatusName(),
 							statusList);

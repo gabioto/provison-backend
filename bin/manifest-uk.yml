@@ -1,0 +1,15 @@
+---
+applications:
+  - name: PruebaUK
+    random-route: true
+    memory: 2GB
+    path: target/tdp-provision-1.0.2-SNAPSHOT.jar
+    buildpack: liberty-for-java
+    disk_quota: 2GB
+    instances: 1
+    env:
+      TDP_FUNCTIONS_PROVISION_ENABLE: true
+      TDP_FUNCTIONS_FAULT_ENABLE: true
+      TDP_SWITCH_AZURE: false
+      TDP_SWITCH_ON_PREMISE: false
+      TDP_SWITCH_AGENDAMIENTO: false

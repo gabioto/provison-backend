@@ -627,19 +627,30 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 				customer.setDocumentType(provision.getCustomer().getDocumentType());
 				ScheduleRequest scheduleRequest = new ScheduleRequest();
 				scheduleRequest.setBucket(provision.getWorkZone());
-				scheduleRequest.setPilot(false);				
+				scheduleRequest.setWorkZone(provision.getWorkZone());
+				scheduleRequest.setPilot(false);	
+				scheduleRequest.setChannel("TZ");
+				scheduleRequest.setScheduler(appointment.getScheduler());
+				scheduleRequest.setOrderCode(provision.getXaRequest());
 				scheduleRequest.setXaOrderCode(provision.getXaRequest());
 				scheduleRequest.setRequestId(provision.getIdProvision());
 				scheduleRequest.setRequestType(provision.getActivityType());
+				scheduleRequest.setRequestName(provision.getProductName());
 				scheduleRequest.setSelectedDate(dateString2);
 				scheduleRequest.setSelectedRange(range);
 				scheduleRequest.setStpsiCode(getXaIdSt);
-				scheduleRequest.setCustomer(new CustomerRequest().fromCustomer(customer));
+				scheduleRequest.setCustomer(new CustomerRequest().fromCustomer(provision.getCustomer()));
 				scheduleRequest.setDocumentNumber(provision.getCustomer().getDocumentNumber());
 				scheduleRequest.setDocumentType(provision.getCustomer().getDocumentType());
-				scheduleRequest.setOrderCode(provision.getXaRequest());
-				scheduleRequest.setBucket(provision.getWorkZone());
-
+				scheduleRequest.setCustomerType(provision.getCustomerType());
+				scheduleRequest.setCustomerSubType(provision.getCustomerSubType());
+				scheduleRequest.setPhoneNetworkTechnology(provision.getHomePhoneDetail() != null ? provision.getHomePhoneDetail().getNetworkTechnology() : "");
+				scheduleRequest.setPhoneTechnology(provision.getHomePhoneDetail() != null ? provision.getHomePhoneDetail().getTechnology() : "");
+				scheduleRequest.setBroadbandNetworkTechnology(provision.getInternetDetail() != null ? provision.getInternetDetail().getNetworkTechnology() : "");
+				scheduleRequest.setBroadbandTechnology(provision.getInternetDetail() != null ? provision.getInternetDetail().getTechnology() : "");
+				scheduleRequest.setTvNetworkTechnology(provision.getTvDetail() != null ? provision.getTvDetail().getNetworkTechnology() : "");
+				scheduleRequest.setTvTechnology(provision.getTvDetail() != null ? provision.getTvDetail().getTechnology() : "");
+								
 				// Actualiza el agendamiento
 				trazabilidadScheduleApi.updateSchedule(scheduleRequest);
 

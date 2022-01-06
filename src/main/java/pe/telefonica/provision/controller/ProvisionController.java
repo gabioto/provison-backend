@@ -505,7 +505,6 @@ public class ProvisionController {
 
 		try {
 			boolean provisions = processMessage(request.getBody());
-
 			if (provisions) {
 				status = HttpStatus.OK;
 				apiResponse = new ApiResponse<Provision>(Constants.APP_NAME_PROVISION, Constants.OPER_INSERT_PROVISION,
@@ -530,7 +529,6 @@ public class ProvisionController {
 	}
 
 	private boolean processMessage(InsertOrderRequest request) {
-
 		// Insertar en colección de Ordenes
 		orderService.createOrder(request.getData());
 

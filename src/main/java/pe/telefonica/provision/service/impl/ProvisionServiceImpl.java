@@ -469,7 +469,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provision.setFrontSpeech(ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
 				provision.setActiveStatus(Status.INGRESADO.getStatusName().toLowerCase());
 				provision.setStatusToa(Status.INGRESADO.getStatusName().toLowerCase());
-			} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
+			} else if  (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
 				pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(), statusList);
 				provision.setDescriptionStatus(caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
 				provision.setGenericSpeech(caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());

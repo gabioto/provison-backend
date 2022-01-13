@@ -13,15 +13,15 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
 	@Override
 	protected String getDatabaseName() {
-		return System.getenv("TDP_DATA_MONGODB_DATABASE");
-		//return "compose";
+		//return System.getenv("TDP_DATA_MONGODB_DATABASE");
+		return "compose";
 	}
 
 	@Override
 	public MongoClient mongoClient() {
 			
-		ConnectionString connectionString = new ConnectionString(System.getenv("TDP_DATA_MONGODB_URI"));
-		//ConnectionString connectionString = new ConnectionString("mongodb://account-trazabilidad-provision-cert:KiJ8oByP0ZMaIglR7Kzno3z2ZzIQllKNe47eJ7Lj0NZLPvlFxUgYbOCJZxRcbPn4pBN2es5awd3Ak6XxpqVvuw==@account-trazabilidad-provision-cert.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@account-trazabilidad-provision-cert@");
+		//ConnectionString connectionString = new ConnectionString(System.getenv("TDP_DATA_MONGODB_URI"));
+		ConnectionString connectionString = new ConnectionString("mongodb://account-trazabilidad-provision-prod:HbmNkc0Dk0jhg1K9prFQw3zBFIpQHbqV85ytJaQo8Y3y0qrLwsd81sKJsu2EQVhaoFNbY5ZFIvWaUWdHl8LQXA==@account-trazabilidad-provision-prod.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@account-trazabilidad-provision-prod@");
 		
 		MongoClientSettings mongoClientSettings = MongoClientSettings.builder().applyConnectionString(connectionString)
 				.build();

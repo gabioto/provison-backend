@@ -632,7 +632,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				indicador = Boolean.TRUE;
 			}
 		}
-
 		if (request.getDataOrigin().equalsIgnoreCase("ORDENES")) {
 			return false;
 		}
@@ -641,11 +640,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 				.getAllInfoStatus();
 		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
 		String speech = "";
-
 		if (provisionx != null) {
-
 			List<StatusLog> listLog = provisionx.getLogStatus();
-
 			if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())
 					|| request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 					|| request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())
@@ -657,11 +653,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 				List<StatusLog> listCaida = listLog.stream()
 						.filter(items -> Status.CAIDA.getStatusName().equals(items.getStatus()))
 						.collect(Collectors.toList());
-
 				if (listIngresado.size() > 0) {
 					return false;
 				}
-
 				if (listCaida.size() > 0) {
 					return false;
 				}
@@ -677,7 +671,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 				
 				
 				String status = "";
-
 				if (!indicador) {
 					if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
 						pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
@@ -688,7 +681,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 							speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
 									: Status.PENDIENTE.getSpeechWithoutSchedule();
 						}
-	
 						speech = hasCustomerInfo(provisionx.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE,
 								provisionx.getCustomer().getName().split(" ")[0]) : speech;
 						provisionx.setGenericSpeech(speech);
@@ -748,7 +740,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					status = provisionx.getActiveStatus();
 					request.setStatus(provisionx.getLastTrackingStatus());
 				}
-				
 				if (provisionx.getDummyStPsiCode() != null && provisionx.getIsUpdatedummyStPsiCode() != true) {
 					if (request.getStatus().equalsIgnoreCase(Status.INGRESADO.getStatusName())
 							&& !provisionx.getDummyStPsiCode().isEmpty()) {
@@ -769,14 +760,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 						}
 					}
 				}
-
 				if (status.equalsIgnoreCase(Constants.PROVISION_STATUS_CAIDA)
 						&& provisionx.getDummyStPsiCode() != null) {
 					trazabilidadScheduleApi.updateCancelSchedule(new CancelRequest(provisionx.getIdProvision(),
 							Constants.ACTIVITY_TYPE_PROVISION.toLowerCase(), provisionx.getDummyStPsiCode(), true,
 							"PSI", "", "", "", ""));
 				}
-
 				update.set("active_status", status);
 				update.set("status_toa", status);
 				update.set("send_notify",
@@ -821,15 +810,14 @@ public class ProvisionServiceImpl implements ProvisionService {
 					return false;
 				}
 				Update update = new Update();
-				update.set("commercial_op_atis", getData[11]);
-				update.set("cod_cliente_atis", getData[31]);
-				update.set("cod_cuenta_atis", getData[32]);
-				update.set("technology", getData[29]);
-				update.set("cancelado_motivo_atis", getData[26]);
-				update.set("cancelado_submotivo_atis", getData[27]);
+				update.set("commercial_op_atis", getData[10]);
+				update.set("cod_cliente_atis", getData[22]);
+				update.set("cod_cuenta_atis", getData[23]);
+				update.set("technology", getData[20]);
+				update.set("cancelado_motivo_atis", getData[17]);
+				update.set("cancelado_submotivo_atis", getData[18]);
 
 				StatusLog statusLog = new StatusLog();
-
 				if (request.getStatus().equalsIgnoreCase(Status.FINALIZADO.getStatusName())) {
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(Status.FINALIZADO.getStatusName(),
 							statusList);
@@ -839,7 +827,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 							finalizado != null ? finalizado.getGenericSpeech() : Status.FINALIZADO.getGenericSpeech());
 					update.set("front_speech",
 							finalizado != null ? finalizado.getFront() : Status.FINALIZADO.getFrontSpeech());
-
 					update.set("last_tracking_status", Status.FINALIZADO.getStatusName());
 					update.set("active_status", Status.FINALIZADO.getStatusName().toLowerCase());
 					update.set("status_toa", Status.FINALIZADO.getStatusName().toLowerCase());
@@ -856,11 +843,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 							finalizado != null ? finalizado.getGenericSpeech() : Status.TERMINADA.getGenericSpeech());
 					update.set("front_speech",
 							finalizado != null ? finalizado.getFront() : Status.TERMINADA.getFrontSpeech());
-
 					update.set("last_tracking_status", Status.TERMINADA.getStatusName());
 					update.set("active_status", Status.TERMINADA.getStatusName().toLowerCase());
 					update.set("status_toa", Status.TERMINADA.getStatusName().toLowerCase());
-
 					statusLog.setStatus(Status.TERMINADA.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
@@ -868,7 +853,6 @@ public class ProvisionServiceImpl implements ProvisionService {
 					pe.telefonica.provision.model.Status finalizado = getInfoStatus(
 							Status.CANCELADA_ATIS.getStatusName(), statusList);
 					LocalDateTime paymentReturn = LocalDateTime.now(ZoneOffset.of("-05:00"));
-
 					paymentReturn = paymentReturn.plusDays(15);
 					UpFront upFront = provisionx.getUpFront();
 					if (upFront != null) {
@@ -881,11 +865,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 							: Status.CANCELADA_ATIS.getGenericSpeech());
 					update.set("front_speech",
 							finalizado != null ? finalizado.getFront() : Status.CANCELADA_ATIS.getFrontSpeech());
-
 					update.set("last_tracking_status", Status.CANCELADA_ATIS.getStatusName());
 					update.set("active_status", Status.CANCELADA_ATIS.getStatusName().toLowerCase());
 					update.set("status_toa", Status.CANCELADA_ATIS.getStatusName().toLowerCase());
-
 					statusLog.setStatus(Status.CANCELADA_ATIS.getStatusName());
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
@@ -909,15 +891,18 @@ public class ProvisionServiceImpl implements ProvisionService {
 					update.set("pendiente_de_aprovacion", pendienteDeAprobacion);
 				}
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
-
 				Boolean isUpdate = provisionRepository.updateProvision(provisionx, update);
 				return isUpdate ? true : false;
 			}
 		} else {
-			Provision provision = fillProvisionInsert(request);
-			provision = evaluateProvisionComponents(provision);
-			provisionRepository.insertProvision(provision);
-			return true;
+			if (!request.getDataOrigin().equalsIgnoreCase("ATIS")) {
+				Provision provision = fillProvisionInsert(request);
+				provision = evaluateProvisionComponents(provision);
+				provisionRepository.insertProvision(provision);
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 

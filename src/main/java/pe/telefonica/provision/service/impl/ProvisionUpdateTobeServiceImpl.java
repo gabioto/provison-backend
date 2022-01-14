@@ -91,6 +91,12 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		if (kafkaTOARequest.getEventType().equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
 
 			pe.telefonica.provision.model.Status inToaStatus = getInfoStatus(Status.IN_TOA.getStatusName(), statusList);
+			
+			String documentType = appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalIdType();
+			String DocumentNumber = appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalId();
+			if(documentType.toUpperCase().equals("RUC") && DocumentNumber.substring(0, 2).equals("20")) {
+				return false;
+			}
 
 			String productName = (appointment.getRelatedObject().get(2).getReference() != null
 					&& !appointment.getRelatedObject().get(2).getReference().isEmpty())
@@ -116,8 +122,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 			Customer customer = new Customer();
 			customer.setName(appointment.getRelatedParty().get(0).getName());
-			customer.setDocumentType(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalIdType());
-			customer.setDocumentNumber(appointment.getRelatedParty().get(0).getLegalId().get(0).getNationalId());
+			customer.setDocumentType(documentType);
+			customer.setDocumentNumber(DocumentNumber);
 			customer.setPhoneNumber(appointment.getContactMedium().get(4).getNumber());
 			customer.setMail(appointment.getContactMedium().get(6).getEmail());
 			customer.setDistrict(appointment.getRelatedPlace().getAddress().getCity());

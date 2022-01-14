@@ -115,10 +115,10 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 			List<StatusLog> listLog = provision.getLogStatus();
 
 			// valida Bucket x Producto
-			boolean boolBucket = validateBucketProduct(appointment, provision, provisionStatus);
-			if (boolBucket) {
-				return false;
-			}
+//			boolean boolBucket = validateBucketProduct(appointment, provision, provisionStatus);
+//			if (boolBucket) {
+//				return false;
+//			}
 
 			pe.telefonica.provision.model.Status dummyInToa = getInfoStatus(Status.DUMMY_IN_TOA.getStatusName(),
 					statusList);

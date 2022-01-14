@@ -103,6 +103,8 @@ public class TrazabilidadScheduleApi {
 
 		HttpEntity<ApiRequest<ScheduleRequest>> entityProvision = new HttpEntity<ApiRequest<ScheduleRequest>>(
 				apiRequest, headersMap);
+		
+		System.out.println(new Gson().toJson(entityProvision));
 
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(urlSchedule, entityProvision,

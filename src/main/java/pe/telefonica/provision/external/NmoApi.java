@@ -54,8 +54,8 @@ public class NmoApi {
 		SetNmoRequest request = new SetNmoRequest();
 		request.setA_FORM_NMO("3");
 				
-		String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/activities/" + idActivity;
-		
+		//String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/activities/" + idActivity;
+		String url = externalApi.getSimpliBaseUrlAzure() + externalApi.getUpdateActivityNmoUrl() + idActivity;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
 
@@ -114,7 +114,8 @@ public class NmoApi {
 		request.setActivityId(Integer.parseInt(idActivity));
 		request.setRequestType("REJECTION");
 		
-		String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/serviceRequests";
+		//String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/serviceRequests";
+		String url = externalApi.getSimpliBaseUrlAzure() + externalApi.getServiceRequestNmoUrl();
 		
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;

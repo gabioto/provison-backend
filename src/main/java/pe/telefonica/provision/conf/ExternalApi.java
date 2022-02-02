@@ -49,7 +49,10 @@ public class ExternalApi {
 	private String securityGetOAuthToken;
 	private String simpliGetUrl;
 	private String simpliBaseUrl;
-
+	
+	private String updateActivityNmoUrl;
+	private String serviceRequestNmoUrl;
+	
 	private String simpliGetUrlAzure;
 	private String simpliBaseUrlAzure;
 	private String apiClientKeyAzure;

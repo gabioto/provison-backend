@@ -2029,8 +2029,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public ProvisionDetailTrazaDto updateActivity(String idProvision,  String activityId, String indicador) {
 		ProvisionDetailTrazaDto provision = new ProvisionDetailTrazaDto();
 		try {
+			String tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
 			if (indicador.equals("0")) {
-				String tokenExternal = trazabilidadSecurityApi.gerateTokenAzure();
 				boolean resultado = nmoPSI.updateActivity(activityId, tokenExternal);
 				if (resultado) {
 					// Llamar al segundo servicio
@@ -2041,7 +2041,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 				}
 			} else if (indicador.equals("1")) {
-				provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA, Constants.PROVISION_STATUS_NOTDONE_TRAZA);
+				boolean resultado = nmoPSI.notDoneActivity(activityId, tokenExternal);
+				if (resultado) {
+					provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA, Constants.PROVISION_STATUS_NOTDONE_TRAZA);
+				}
+				
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());

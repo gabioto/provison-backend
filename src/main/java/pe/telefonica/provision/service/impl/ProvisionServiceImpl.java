@@ -22,10 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.gson.Gson;
-
-import pe.telefonica.provision.model.Toolbox;
-import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.common.ResponseHeader;
@@ -49,7 +45,6 @@ import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.NmoApi;
 import pe.telefonica.provision.external.PSIApi;
-
 import pe.telefonica.provision.external.ScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
@@ -62,16 +57,17 @@ import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Television;
+import pe.telefonica.provision.model.Toolbox;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.provision.Configurada;
 import pe.telefonica.provision.model.provision.Notifications;
 import pe.telefonica.provision.model.provision.PendienteDeAprobacion;
 import pe.telefonica.provision.model.provision.PendienteDeValidacion;
 import pe.telefonica.provision.repository.ProvisionRepository;
+import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
-import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 

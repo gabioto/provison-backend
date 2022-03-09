@@ -1,7 +1,6 @@
 package pe.telefonica.provision.repository.impl;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import com.google.gson.Gson;
 import com.mongodb.client.result.UpdateResult;
 
 import pe.telefonica.provision.conf.ExternalApi;
@@ -29,14 +27,12 @@ import pe.telefonica.provision.controller.request.GetProvisionByOrderCodeRequest
 import pe.telefonica.provision.dto.ProvisionCustomerDto;
 import pe.telefonica.provision.dto.ProvisionDto;
 import pe.telefonica.provision.dto.ProvisionTrazaDto;
-import pe.telefonica.provision.external.TrazabilidadSecurityApi;
 import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.ResendNotification;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.util.constants.Constants;
-import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.Status;
 
 @Repository
@@ -47,9 +43,6 @@ public class ProvisionRepositoryImpl implements ProvisionRepository {
 
 	@Autowired
 	private ExternalApi api;
-	
-	@Autowired
-	private TrazabilidadSecurityApi trazabilidadSecurityApi;
 
 	@Autowired
 	public ProvisionRepositoryImpl(MongoOperations mongoOperations) {

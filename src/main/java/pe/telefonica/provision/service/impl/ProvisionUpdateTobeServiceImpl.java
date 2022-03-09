@@ -693,15 +693,13 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		Update update = new Update();
 		update.set("wo_notdone", woNotdone);
-		
+
 		update.set("a_observation", appointment.getNote().get(0).getText());
 		update.set("user_notdone", appointment.getRelatedParty().get(4).getId());
 		update.set("last_tracking_status", Status.WO_NOTDONE.getStatusName());
 		update.set("generic_speech", speech);
 		update.set("description_status",
 				notDoneStatus != null ? notDoneStatus.getDescription() : Status.WO_NOTDONE.getDescription());
-		update.set("front_speech",
-				notDoneStatus != null ? notDoneStatus.getFront() : Status.WO_NOTDONE.getFrontSpeech());
 		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("send_notify", false);
@@ -733,12 +731,13 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
-		
 		if (!validarStatusReason(appointment.getStatusReason())) {
 			update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
-		}
-		else {
+			update.set("front_speech",
+					notDoneStatus != null ? notDoneStatus.getFront() : Status.WO_NOTDONE.getFrontSpeech());
+		} else {
 			update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
+			update.set("front_speech", Status.IN_TOA.getFrontSpeech());
 			// SMS
 			sendSMSToInviteReschedule(provision);
 

@@ -229,4 +229,35 @@ public abstract class ProvisionUpdateServiceImpl {
 	public boolean hasCustomerInfo(Customer customer) {
 		return customer != null && customer.getName() != null && !customer.getName().isEmpty();
 	}
+	
+	public void sendSMSToInviteReschedule(Provision provision) {
+
+		String text = provision.getCustomer().getName();
+
+		String nameCapitalize = text.substring(0, 1).toUpperCase() + text.substring(1);
+
+//		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+		if (!Boolean.valueOf(true)) {
+			return;
+		}
+
+		List<MsgParameter> msgParameters = new ArrayList<>();
+		MsgParameter paramName = new MsgParameter();
+		paramName.setKey(Constants.TEXT_NAME_REPLACE);
+		paramName.setValue(nameCapitalize);
+		msgParameters.add(paramName);
+
+		List<Contact> contacts = new ArrayList<>();
+
+		Contact contactCustomer = new Contact();
+		contactCustomer.setPhoneNumber(provision.getCustomer().getPhoneNumber());
+		contactCustomer.setIsMovistar(provision.getCustomer().getCarrier());
+		contactCustomer.setFullName(provision.getCustomer().getName());
+		contactCustomer.setHolder(true);
+		contacts.add(contactCustomer);
+
+		String urlTraza = provisionTexts.getWebUrl();
+		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_OUTBOUND_INTOA_WITHOUT_SCHEDULE,
+				msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
+	}
 }

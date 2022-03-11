@@ -57,7 +57,7 @@ public abstract class ProvisionUpdateServiceImpl {
 
 	public abstract boolean updateWoPreNotDone(Provision provision, KafkaTOARequest kafkaToaRequest,
 			pe.telefonica.provision.model.Status status);
-	
+
 	public boolean getCarrier(String phoneNumber) {
 
 		boolean isMovistar = false;
@@ -207,7 +207,7 @@ public abstract class ProvisionUpdateServiceImpl {
 		trazabilidadSecurityApi.sendSMS(contacts, Constants.MSG_PRO_WOPRENOTDONE,
 				msgParameters.toArray(new MsgParameter[0]), urlTraza, "");
 	}
-	
+
 	public pe.telefonica.provision.model.Status getInfoStatus(String statusName,
 			List<pe.telefonica.provision.model.Status> statusList) {
 		pe.telefonica.provision.model.Status localStatus = null;
@@ -229,14 +229,15 @@ public abstract class ProvisionUpdateServiceImpl {
 	public boolean hasCustomerInfo(Customer customer) {
 		return customer != null && customer.getName() != null && !customer.getName().isEmpty();
 	}
-	
+
 	public void sendSMSToInviteReschedule(Provision provision) {
 
 		String text = provision.getCustomer().getName();
 
 		String nameCapitalize = text.substring(0, 1).toUpperCase() + text.substring(1);
 
-		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+//		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+		if (!Boolean.valueOf(true)) {
 			return;
 		}
 

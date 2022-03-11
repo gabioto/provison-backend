@@ -170,7 +170,7 @@ public class NmoApi {
 		RestTemplate restTemplate = new RestTemplate(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			
-		String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v1/rest/ofscCore/v1/activities/"+idActivity+"/customactions/notDone";
+		String url = "https://apimngr-genesis-cert.azure-api.net/api-ne-traceability-trazabilidadtoa-oc/v2/rest/ofscCore/v1/activities/"+idActivity+"/customactions/notDone";
 		//String url = externalApi.getSimpliBaseUrlAzure() + externalApi.getUpdateActivityNmoUrl() + idActivity;
 		LocalDateTime startHour = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		LocalDateTime endHour;
@@ -188,7 +188,7 @@ public class NmoApi {
 		headers.set("Authorization", "Bearer " + tokenExternal);		
 
 		HttpEntity<SetNmoRequest> entity = new HttpEntity<>(null, headers);
-		
+		log.info(new Gson().toJson(entity));
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
 					String.class);

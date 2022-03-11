@@ -371,30 +371,12 @@ public class ProvisionServiceImpl implements ProvisionService {
 		Customer customer = new Customer();
 		customer.setName(getData[3]);
 
-		if(getData[13].isEmpty()) {
-			customer.setDocumentType(getData[13]);
+		if (getData[13].equals("CE")) {
+			customer.setDocumentType("CEX");
+		} else if (getData[13].equals("PAS") || getData[13].equals("Pasaporte")) {
+			customer.setDocumentType("P");
 		} else {
-			String documentNumber = getData[4];
-			if (!documentNumber.isEmpty()) {
-				String documentType;
-
-				switch (documentNumber.length()) {
-				case 8:
-					documentType = "DNI";
-					break;
-				case 9:
-					documentType = "CEX";
-					break;
-				case 11:
-					documentType = "RUC";
-					break;
-				default:
-					documentType = "P";
-					break;
-				}
-
-				customer.setDocumentType(documentType);
-			}
+			customer.setDocumentType(getData[13]);
 		}
 
 		customer.setDocumentNumber(getData[4]);

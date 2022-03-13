@@ -681,11 +681,6 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		woNotdone.setaObservation(appointment.getNote().get(0).getText());
 		woNotdone.setUserNotdone(appointment.getRelatedParty().get(4).getId());
 
-		StatusLog statusLog = new StatusLog();
-		statusLog.setStatus(Status.WO_NOTDONE.getStatusName());
-		statusLog.setXaidst(appointment.getId());
-		provision.getLogStatus().add(statusLog);
-
 		String speech = notDoneStatus != null ? notDoneStatus.getGenericSpeech() : Status.WO_NOTDONE.getGenericSpeech();
 		speech = hasCustomerInfo(provision.getCustomer())
 				? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
@@ -696,7 +691,6 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		update.set("a_observation", appointment.getNote().get(0).getText());
 		update.set("user_notdone", appointment.getRelatedParty().get(4).getId());
-		update.set("last_tracking_status", Status.WO_NOTDONE.getStatusName());
 		update.set("generic_speech", speech);
 		update.set("description_status",
 				notDoneStatus != null ? notDoneStatus.getDescription() : Status.WO_NOTDONE.getDescription());
@@ -731,29 +725,47 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
+		StatusLog statusLog = new StatusLog();
+		statusLog.setXaidst(appointment.getId());
+		
 		if (!validarStatusReason(appointment.getStatusReason())) {
+			
+			statusLog.setStatus(Status.WO_NOTDONE.getStatusName());
+
+			update.set("last_tracking_status", Status.WO_NOTDONE.getStatusName());
 			update.set("active_status", Constants.PROVISION_STATUS_NOTDONE);
 			update.set("front_speech",
 					notDoneStatus != null ? notDoneStatus.getFront() : Status.WO_NOTDONE.getFrontSpeech());
+
+			ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+			scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
+			scheduleNotDoneRequest.setRequestType(provision.getActivityType());
+			scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
+			scheduleNotDoneRequest.setFlgFicticious(false);
+
+			// Cancela agenda sin ir a PSI
+			trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+
 		} else {
+	
+			pe.telefonica.provision.model.Status repoStatus = provisionRepository
+					.getInfoStatus(Status.WO_NOTDONE_MOTIVE.getStatusName()).orElse(null);
+
+			statusLog.setStatus(Status.WO_NOTDONE_MOTIVE.getStatusName());
+			
+			update.set("last_tracking_status", Status.WO_NOTDONE_MOTIVE.getStatusName());
 			update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
-			update.set("front_speech", Status.IN_TOA.getFrontSpeech());
+			update.set("front_speech",
+					repoStatus != null ? repoStatus.getFront() : Status.WO_NOTDONE_MOTIVE.getFrontSpeech());
 			// SMS
 			sendSMSToInviteReschedule(provision);
 
 		}
+		
+		provision.getLogStatus().add(statusLog);
 
 		// Actualiza provision
 		provisionRepository.updateProvision(provision, update);
-
-		ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
-		scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
-		scheduleNotDoneRequest.setRequestType(provision.getActivityType());
-		scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
-		scheduleNotDoneRequest.setFlgFicticious(false);
-
-		// Cancela agenda sin ir a PSI
-		trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
 
 		return true;
 	}

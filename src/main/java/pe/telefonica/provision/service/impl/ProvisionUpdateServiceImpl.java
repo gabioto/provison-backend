@@ -236,8 +236,8 @@ public abstract class ProvisionUpdateServiceImpl {
 
 		String nameCapitalize = text.substring(0, 1).toUpperCase() + text.substring(1);
 
-//		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
-		if (!Boolean.valueOf(true)) {
+		if (!Boolean.valueOf(System.getenv("TDP_MESSAGE_PROVISION_ENABLE"))) {
+		//if (!Boolean.valueOf(true)) {
 			return;
 		}
 

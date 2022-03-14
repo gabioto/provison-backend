@@ -13,8 +13,8 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
 	@Override
 	protected String getDatabaseName() {
-		return System.getenv("TDP_DATA_MONGODB_DATABASE");
-		//return "compose";
+		//return System.getenv("TDP_DATA_MONGODB_DATABASE");
+		return "compose";
 	}
 
 	@Override

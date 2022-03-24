@@ -22,10 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.gson.Gson;
-
-import pe.telefonica.provision.model.Toolbox;
-import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.controller.common.ApiRequest;
 import pe.telefonica.provision.controller.common.ApiResponse;
 import pe.telefonica.provision.controller.common.ResponseHeader;
@@ -49,7 +45,6 @@ import pe.telefonica.provision.dto.ProvisionTrazaDto;
 import pe.telefonica.provision.external.BOApi;
 import pe.telefonica.provision.external.NmoApi;
 import pe.telefonica.provision.external.PSIApi;
-
 import pe.telefonica.provision.external.ScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadScheduleApi;
 import pe.telefonica.provision.external.TrazabilidadSecurityApi;
@@ -62,16 +57,17 @@ import pe.telefonica.provision.model.Provision;
 import pe.telefonica.provision.model.Provision.StatusLog;
 import pe.telefonica.provision.model.Queue;
 import pe.telefonica.provision.model.Television;
+import pe.telefonica.provision.model.Toolbox;
 import pe.telefonica.provision.model.UpFront;
 import pe.telefonica.provision.model.provision.Configurada;
 import pe.telefonica.provision.model.provision.Notifications;
 import pe.telefonica.provision.model.provision.PendienteDeAprobacion;
 import pe.telefonica.provision.model.provision.PendienteDeValidacion;
 import pe.telefonica.provision.repository.ProvisionRepository;
+import pe.telefonica.provision.repository.ToolboxRepository;
 import pe.telefonica.provision.service.ProvisionService;
 import pe.telefonica.provision.service.request.PSIUpdateClientRequest;
 import pe.telefonica.provision.util.constants.Constants;
-import pe.telefonica.provision.util.constants.ConstantsLogData;
 import pe.telefonica.provision.util.constants.ProductType;
 import pe.telefonica.provision.util.constants.Status;
 
@@ -86,7 +82,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private PSIApi restPSI;
-	
+
 	@Autowired
 	private NmoApi nmoPSI;
 
@@ -95,17 +91,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 	@Autowired
 	private TrazabilidadScheduleApi trazabilidadScheduleApi;
-	
+
 	@Autowired
 	private ScheduleApi scheduleApi;
-	
+
 	@Autowired
 	private ProvisionRepository provisionRepository;
 
 	@Autowired
 	private ToolboxRepository toolboxRepository;
 
-	
 	@Override
 	public Customer validateUser(ApiRequest<ProvisionRequest> provisionRequest) {
 
@@ -375,7 +370,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		Customer customer = new Customer();
 		customer.setName(getData[3]);
-		customer.setDocumentType(getData[13].toUpperCase());
+
+		if (getData[13].equals("CE")) {
+			customer.setDocumentType("CEX");
+		} else if (getData[13].equals("PAS") || getData[13].equals("Pasaporte")) {
+			customer.setDocumentType("P");
+		} else {
+			customer.setDocumentType(getData[13]);
+		}
+
 		customer.setDocumentNumber(getData[4]);
 		customer.setPhoneNumber(getData[5]);
 		customer.setMail(getData[20]);
@@ -469,7 +472,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				provision.setFrontSpeech(ingresado != null ? ingresado.getFront() : Status.INGRESADO.getFrontSpeech());
 				provision.setActiveStatus(Status.INGRESADO.getStatusName().toLowerCase());
 				provision.setStatusToa(Status.INGRESADO.getStatusName().toLowerCase());
-			} else if  (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
+			} else if (request.getStatus().equalsIgnoreCase(Status.CAIDA.getStatusName())) {
 				pe.telefonica.provision.model.Status caida = getInfoStatus(Status.CAIDA.getStatusName(), statusList);
 				provision.setDescriptionStatus(caida != null ? caida.getDescription() : Status.CAIDA.getDescription());
 				provision.setGenericSpeech(caida != null ? caida.getGenericSpeech() : Status.CAIDA.getGenericSpeech());
@@ -659,24 +662,24 @@ public class ProvisionServiceImpl implements ProvisionService {
 				if (listCaida.size() > 0) {
 					return false;
 				}
-				
+
 				Update update = fillProvisionUpdate(request);
 
 				boolean hasFictitious = validateFictitiousSchedule(listLog);
-				
-				//SOLO VIENEN LOS ESTADOS DE VF  (INGRESADO)
+
+				// SOLO VIENEN LOS ESTADOS DE VF (INGRESADO)
 				List<StatusLog> listLogNew = new ArrayList<StatusLog>();
 				StatusLog statusLog = new StatusLog();
 				statusLog.setStatus(request.getStatus());
-				
-				
+
 				String status = "";
 				if (!indicador) {
 					if (request.getStatus().equalsIgnoreCase(Status.PENDIENTE.getStatusName())) {
 						pe.telefonica.provision.model.Status pendiente = getInfoStatus(Status.PENDIENTE.getStatusName(),
 								statusList);
 						if (pendiente != null) {
-							speech = hasFictitious ? pendiente.getGenericSpeech() : pendiente.getSpeechWithoutSchedule();
+							speech = hasFictitious ? pendiente.getGenericSpeech()
+									: pendiente.getSpeechWithoutSchedule();
 						} else {
 							speech = hasFictitious ? Status.PENDIENTE.getGenericSpeech()
 									: Status.PENDIENTE.getSpeechWithoutSchedule();
@@ -693,7 +696,8 @@ public class ProvisionServiceImpl implements ProvisionService {
 						pe.telefonica.provision.model.Status ingresado = getInfoStatus(Status.INGRESADO.getStatusName(),
 								statusList);
 						if (ingresado != null) {
-							speech = hasFictitious ? ingresado.getGenericSpeech() : ingresado.getSpeechWithoutSchedule();
+							speech = hasFictitious ? ingresado.getGenericSpeech()
+									: ingresado.getSpeechWithoutSchedule();
 						} else {
 							speech = hasFictitious ? Status.INGRESADO.getGenericSpeech()
 									: Status.INGRESADO.getSpeechWithoutSchedule();
@@ -776,15 +780,15 @@ public class ProvisionServiceImpl implements ProvisionService {
 				update.set("description_status", provisionx.getDescriptionStatus());
 				update.set("generic_speech", provisionx.getGenericSpeech());
 				update.set("front_speech", provisionx.getFrontSpeech());
-				
-				if(provisionx.getLastTrackingStatus().equals(Status.IN_TOA.getStatusName())) {
-					
+
+				if (provisionx.getLastTrackingStatus().equals(Status.IN_TOA.getStatusName())) {
+
 					statusLog.setInsertedDate(provisionx.getInToa().getRegisterDate());
 					listLogNew.add(statusLog);
 					List<StatusLog> newList = Stream.concat(listLogNew.stream(), listLog.stream())
 							.collect(Collectors.toList());
-					update.set("log_status", newList);			
-				} else if(provisionx.getLastTrackingStatus().equals(Status.WO_PRESTART.getStatusName())
+					update.set("log_status", newList);
+				} else if (provisionx.getLastTrackingStatus().equals(Status.WO_PRESTART.getStatusName())
 						|| provisionx.getLastTrackingStatus().equals(Status.WO_INIT.getStatusName())
 						|| provisionx.getLastTrackingStatus().equals(Status.WO_COMPLETED.getStatusName())
 						|| provisionx.getLastTrackingStatus().equals(Status.WO_NOTDONE.getStatusName())
@@ -794,12 +798,11 @@ public class ProvisionServiceImpl implements ProvisionService {
 					List<StatusLog> newList = Stream.concat(listLogNew.stream(), listLog.stream())
 							.collect(Collectors.toList());
 					update.set("log_status", newList);
-				}else {
+				} else {
 					listLog.add(statusLog);
 					update.set("log_status", listLog);
 				}
-				
-				
+
 				update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
 				provisionx = evaluateProvisionComponents(provisionx);
 
@@ -1465,9 +1468,10 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		throw new Exception("Maxima cantidad de intentos permitidos");
 	}
-	
+
 	@Override
-	public ProvisionDetailTrazaDto setContactInfoUpdateWeb(ApiTrazaSetContactInfoUpdateRequest request) throws Exception {
+	public ProvisionDetailTrazaDto setContactInfoUpdateWeb(ApiTrazaSetContactInfoUpdateRequest request)
+			throws Exception {
 		Provision provision = provisionRepository.getProvisionByXaIdSt(request.getPsiCode());
 
 		PSIUpdateClientRequest psiRequest = new PSIUpdateClientRequest();
@@ -1537,7 +1541,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					psiRequest.getBodyUpdateClient().setSolicitud(provision.getXaIdSt());
 					psiRequest.getBodyUpdateClient().setCorreo(
 							provision.getCustomer().getMail() != null ? provision.getCustomer().getMail() : "");
-					
+
 					String switchAgendamiento = System.getenv("TDP_SWITCH_AGENDAMIENTO");
 					boolean updatedPsi = false;
 					if (request.getScheduler().toUpperCase().equals("PSI")) {
@@ -1545,9 +1549,9 @@ public class ProvisionServiceImpl implements ProvisionService {
 							updatedPsi = restPSI.updatePSIClient(psiRequest);
 						} else {
 							updatedPsi = scheduleApi.modifyWorkOrderPSI(psiRequest);
-						}					
-					} else {						
-						updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);					
+						}
+					} else {
+						updatedPsi = scheduleApi.modifyWorkOrder(psiRequest);
 					}
 					if (updatedPsi) {
 						Update update = new Update();
@@ -1574,7 +1578,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 				}
 			}
 		}
-		
+
 		throw new Exception("Maxima cantidad de intentos permitidos");
 	}
 
@@ -1938,7 +1942,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 
 		return localStatus;
 	}
-	
+
 	public String getTimestamp() {
 		LocalDateTime dateNow = LocalDateTime.now(ZoneOffset.of("-05:00"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss.S");
@@ -1950,7 +1954,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	public List<Provision> getUpFrontProvisions() {
 		List<Provision> provisions = new ArrayList<>();
 		Optional<List<Provision>> optProvisions = provisionRepository.getUpFrontProvisionsOnDay();
-		
+
 		if (optProvisions.isPresent()) {
 			provisions = optProvisions.get();
 
@@ -1959,7 +1963,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 			for (int i = 0; i < provisions.size(); i++) {
 				List<StatusLog> listPaid = provisions.get(i).getLogStatus().stream()
 						.filter(x -> Status.PAGADO.getStatusName().equals(x.getStatus())).collect(Collectors.toList());
-				
+
 				if (listPaid.size() > 0) {
 					provisions.remove(i);
 				}
@@ -1972,18 +1976,16 @@ public class ProvisionServiceImpl implements ProvisionService {
 	@Override
 	public ProvisionDetailTrazaDto getProvisionDetailById(ProvisionRequest request) {
 		Provision provision = provisionRepository.getProvisionDetailById(request.getIdProvision());
-		if (provision.getLastTrackingStatus().equals(Constants.STATUS_WO_PRESTART)) {			
+		if (provision.getLastTrackingStatus().equals(Constants.STATUS_WO_PRESTART)) {
 			if (provision.getWoPreStart() != null) {
 				String xaRequest = "";
 				if (provision.getXaRequest() != null) {
-					xaRequest = provision.getXaRequest();				
+					xaRequest = provision.getXaRequest();
 				} else {
 					xaRequest = provision.getXaIdSt();
-				}				
-				Optional<Toolbox> optional = toolboxRepository.getLog(
-						provision.getCustomer().getDocumentType(),
-						provision.getCustomer().getDocumentNumber(),
-						xaRequest,
+				}
+				Optional<Toolbox> optional = toolboxRepository.getLog(provision.getCustomer().getDocumentType(),
+						provision.getCustomer().getDocumentNumber(), xaRequest,
 						provision.getWoPreStart().getTrackingUrl());
 				if (!optional.isPresent()) {
 					Toolbox objToolbox = new Toolbox();
@@ -2002,7 +2004,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 					}
 					toolboxRepository.insertLog(objToolbox);
 				} else if (provision.getWoPreStart().getTrackingUrl() != null) {
-					if (!provision.getWoPreStart().getTrackingUrl().equals(optional.get().getUrl())) {				
+					if (!provision.getWoPreStart().getTrackingUrl().equals(optional.get().getUrl())) {
 						Toolbox objToolbox = new Toolbox();
 						objToolbox.setXaRequest(xaRequest);
 						objToolbox.setDocumentType(provision.getCustomer().getDocumentType());
@@ -2026,7 +2028,7 @@ public class ProvisionServiceImpl implements ProvisionService {
 	}
 
 	@Override
-	public ProvisionDetailTrazaDto updateActivity(String idProvision,  String activityId, String indicador) {
+	public ProvisionDetailTrazaDto updateActivity(String idProvision, String activityId, String indicador) {
 		ProvisionDetailTrazaDto provision = new ProvisionDetailTrazaDto();
 		try {
 			if (indicador.equals("0")) {
@@ -2037,27 +2039,28 @@ public class ProvisionServiceImpl implements ProvisionService {
 					resultado = nmoPSI.serviceRequest(activityId, tokenExternal);
 					if (resultado) {
 						// Actualizar la provision con el nuevo estado
-						provision = updateProvisionActivity(idProvision, Status.WO_PRENOTDONE_TRAZA, Constants.PROVISION_STATUS_PRENOTDONE_TRAZA); 
+						provision = updateProvisionActivity(idProvision, Status.WO_PRENOTDONE_TRAZA,
+								Constants.PROVISION_STATUS_PRENOTDONE_TRAZA);
 					}
 				}
 			} else if (indicador.equals("1")) {
-				provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA, Constants.PROVISION_STATUS_NOTDONE_TRAZA);
+				provision = updateProvisionActivity(idProvision, Status.WO_NOTDONE_TRAZA,
+						Constants.PROVISION_STATUS_NOTDONE_TRAZA);
 			}
 		} catch (Exception ex) {
 			log.error(this.getClass().getName() + " - Exception: " + ex.getMessage());
 		}
 		return provision;
-	}	
-	
+	}
+
 	private ProvisionDetailTrazaDto updateProvisionActivity(String idProvision, Status status, String statusProvision) {
 		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
 				.getAllInfoStatus();
 
 		Provision provision = provisionRepository.getProvisionDetailById(idProvision);
-		
+
 		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
-		pe.telefonica.provision.model.Status notDoneStatus = getInfoStatus(status.getStatusName(),
-				statusList);
+		pe.telefonica.provision.model.Status notDoneStatus = getInfoStatus(status.getStatusName(), statusList);
 
 		List<StatusLog> listLog = provision.getLogStatus();
 
@@ -2067,20 +2070,23 @@ public class ProvisionServiceImpl implements ProvisionService {
 		statusLog.setStatus(status.getStatusName());
 		statusLog.setXaidst(provision.getXaIdSt());
 		listLog.add(statusLog);
-		
+
 		String speech = notDoneStatus != null ? notDoneStatus.getGenericSpeech() : status.getGenericSpeech();
-		
-		speech = hasCustomerInfo(provision.getCustomer()) ? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0]) : speech;
+
+		speech = hasCustomerInfo(provision.getCustomer())
+				? speech.replace(Constants.TEXT_NAME_REPLACE, provision.getCustomer().getName().split(" ")[0])
+				: speech;
 		update.set("last_tracking_status", status.getStatusName());
 		update.set("generic_speech", speech);
-		update.set("description_status", notDoneStatus != null ? notDoneStatus.getDescription() : status.getDescription());
+		update.set("description_status",
+				notDoneStatus != null ? notDoneStatus.getDescription() : status.getDescription());
 		update.set("front_speech", notDoneStatus != null ? notDoneStatus.getFront() : status.getFrontSpeech());
 		update.set("log_status", listLog);
-		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));		
-		update.set("sub_reason_not_done", speech);		
-		
+		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of("-05:00")));
+		update.set("sub_reason_not_done", speech);
+
 		provisionRepository.updateProvision(provision, update);
-		
+
 		provision = provisionRepository.getProvisionDetailById(idProvision);
 		return new ProvisionDetailTrazaDto().fromProvision(provision);
 	}

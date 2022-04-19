@@ -2022,7 +2022,7 @@ public class ProvisionController {
 						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
 						request.getBody().getActivityType(), request.getHeader().getAppName());				
 			} else if (provision.getActivityId() != null) {
-				if(provision.getActiveStatus().equals(Constants.STATUS_WO_PRE_NOTDONE)) {
+				if(provision.getActiveStatus().equals(Constants.PROVISION_STATUS_PRENOTDONE)) {
 					provision = provisionService.updateActivity(provision.getIdProvision(), provision.getActivityId(), request.getBody().getIndicador());
 					if (provision.getIdProvision() == null) {
 						status = HttpStatus.BAD_REQUEST;

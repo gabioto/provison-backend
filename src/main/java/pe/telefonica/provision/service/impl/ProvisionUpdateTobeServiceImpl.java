@@ -45,6 +45,7 @@ import pe.telefonica.provision.model.provision.WoPreStart;
 import pe.telefonica.provision.model.provision.WoReshedule;
 import pe.telefonica.provision.repository.ProvisionRepository;
 import pe.telefonica.provision.service.ProvisionUpdateService.ProvisionUpdateTobeService;
+import pe.telefonica.provision.util.DateUtil;
 import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.constants.Status;
 
@@ -183,14 +184,16 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 			provision.getLogStatus().add(statusLog);
 
 			try {
-				if (!appointment.getScheduledDate().substring(0, 10).equals("3000-01-01")) {
+				 String dateString = appointment.getScheduledDate().substring(0, 10);
+
+				 LocalDateTime scheduleDateKafka = DateUtil.stringToLocalDate(dateString, Constants.DATE_FORMAT_BO);
+
+				 if (scheduleDateKafka.compareTo(LocalDateTime.now().plusDays(40))  < 0) {
 
 					pe.telefonica.provision.model.Status scheduled = getInfoStatus(Status.SCHEDULED.getStatusName(),
 							statusList);
 
 					String range = getRange(appointment);
-
-					String dateString = appointment.getScheduledDate().substring(0, 10);
 					String dateString2 = getFormatedDate(appointment);
 
 					statusLog = new StatusLog();
@@ -322,7 +325,12 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 	@Override
 	public boolean updateInToa(Provision provision, KafkaTOARequest kafkaToaRequest, pe.telefonica.provision.model.Status inToaStatus) {
+		Optional<List<pe.telefonica.provision.model.Status>> statusListOptional = provisionRepository
+				.getAllInfoStatus();
 
+		List<pe.telefonica.provision.model.Status> statusList = statusListOptional.get();
+		List<StatusLog> listLog = provision.getLogStatus();
+		
 		Appointment appointment = kafkaToaRequest.getEvent().getAppointment();
 
 		InToa inToa = new InToa();
@@ -336,10 +344,9 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.IN_TOA.getStatusName());
 		statusLog.setXaidst(appointment.getId());
-		provision.getLogStatus().add(statusLog);
+		//provision.getLogStatus().add(statusLog);
 
 		Update update = new Update();
-		update.set("notifications.into_send_notify", false);
 		update.set("show_location", false);
 		update.set("wo_prestart.tracking_url", null);
 		update.set("wo_prestart.available_tracking", false);
@@ -350,9 +357,55 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 		update.set("generic_speech", inToaStatus != null ? inToaStatus.getSpeechWithoutSchedule() : Status.IN_TOA.getSpeechWithoutSchedule());
 		update.set("description_status", inToaStatus != null ? inToaStatus.getDescription() : Status.IN_TOA.getDescription());
 		update.set("front_speech", inToaStatus != null ? inToaStatus.getFront() : Status.IN_TOA.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus());
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
+		update.set("has_schedule", false);
+		
+		try {
+			 String dateString = appointment.getScheduledDate().substring(0, 10);
+			 LocalDateTime scheduleDateKafka = DateUtil.stringToLocalDate(dateString, Constants.DATE_FORMAT_BO);
 
+			 if (scheduleDateKafka.compareTo(LocalDateTime.now().plusDays(40))  < 0) {
+
+				pe.telefonica.provision.model.Status scheduled = getInfoStatus(Status.SCHEDULED.getStatusName(),
+						statusList);
+
+				String range = getRange(appointment);
+				String dateString2 = getFormatedDate(appointment);
+
+				statusLog = new StatusLog();
+				statusLog.setStatus(Status.SCHEDULED.getStatusName());
+				statusLog.setScheduledDate(dateString);
+				statusLog.setScheduledRange(range);
+				
+				update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+				update.set("generic_speech", scheduled != null ? scheduled.getGenericSpeech() : Status.IN_TOA.getGenericSpeech());
+				update.set("description_status", scheduled != null ? scheduled.getDescription() : Status.IN_TOA.getDescription());
+				update.set("front_speech", scheduled != null ? scheduled.getFront() : Status.IN_TOA.getFrontSpeech());
+				update.set("has_schedule", true);
+
+				// Llamar a servicio de agendamiento para regularizar la agenda
+				trazabilidadScheduleApi.insertSchedule(generateScheduleRequest(provision, appointment, range, dateString2));
+			 }else {
+				//hara que se envie SMS desde job
+				update.set("notifications.into_send_notify", false);
+				//CANCELA AGENDA
+				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				// Cancelar agenda Localmente
+			
+				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
+				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
+				scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
+				scheduleNotDoneRequest.setFlgFicticious(false);
+
+				// Cancela agenda sin ir a PSI
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+				
+			 }
+		}catch (Exception e) {
+			return false;
+		}
+		listLog.add(statusLog);
+		update.set("log_status", listLog);
 		provisionRepository.updateProvision(provision, update);
 
 		return true;
@@ -584,8 +637,8 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 			log.error(e.getLocalizedMessage());
 			return false;
 		}
-
-		List<StatusLog> listLogx = provision.getLogStatus().stream().filter(x -> "SCHEDULED".equals(x.getStatus()))
+		List<StatusLog> listLog = provision.getLogStatus();
+		List<StatusLog> listLogx = listLog.stream().filter(x -> "SCHEDULED".equals(x.getStatus()))
 				.collect(Collectors.toList());
 
 		if (listLogx.size() > 0
@@ -600,31 +653,64 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 
 		StatusLog statusLog = new StatusLog();
 		statusLog.setStatus(Status.SCHEDULED.getStatusName());
-		statusLog.setScheduledRange(range);
-		statusLog.setScheduledDate(dateString.toString());
 		statusLog.setXaidst(appointment.getId());
-		provision.getLogStatus().add(statusLog);
-
+		
 		Update update = new Update();
 		update.set("wo_schedule", woReshedule);
 		update.set("active_status", Constants.PROVISION_STATUS_ACTIVE);
-		update.set("date", appointment.getScheduledDate());
 		update.set("send_notify", false);
-		update.set("time_slot", range);
 		update.set("last_tracking_status", Status.SCHEDULED.getStatusName());
 		update.set("generic_speech", rescheduleStatus != null ? rescheduleStatus.getGenericSpeech() : Status.SCHEDULED.getGenericSpeech());
 		update.set("description_status", rescheduleStatus != null ? rescheduleStatus.getDescription() : Status.SCHEDULED.getDescription());
 		update.set("front_speech", rescheduleStatus != null ? rescheduleStatus.getFront() : Status.SCHEDULED.getFrontSpeech());
-		update.set("log_status", provision.getLogStatus());
 		update.set("show_location", false);
 		update.set("statusChangeDate", LocalDateTime.now(ZoneOffset.of(Constants.TIME_ZONE_LOCALE)));
 
+		try {
+			
+			 LocalDateTime scheduleDateKafka = DateUtil.stringToLocalDate(dateString, Constants.DATE_FORMAT_BO);
+
+			 if (scheduleDateKafka.compareTo(LocalDateTime.now().plusDays(40))  < 0) {
+				//provision
+				statusLog.setScheduledRange(range);
+				statusLog.setScheduledDate(dateString.toString());
+				update.set("date", appointment.getScheduledDate());
+				update.set("time_slot", range);	
+				update.set("has_schedule", true);
+				// Actualiza el agendamiento
+
+				trazabilidadScheduleApi.updateSchedule(generateScheduleRequest(provision, appointment, range, dateString2));
+			}else { //viene 300
+				statusLog.setStatus(Status.IN_TOA.getStatusName());
+			
+				update.set("last_tracking_status", Status.IN_TOA.getStatusName());
+				update.set("generic_speech", rescheduleStatus != null ? rescheduleStatus.getGenericSpeech() : Status.IN_TOA.getGenericSpeech());
+				update.set("description_status", rescheduleStatus != null ? rescheduleStatus.getDescription() : Status.IN_TOA.getDescription());
+				update.set("front_speech", rescheduleStatus != null ? rescheduleStatus.getFront() : Status.IN_TOA.getFrontSpeech());
+				update.set("has_schedule", false);
+				//hara que se envie SMS desde job
+				update.set("notifications.into_send_notify", false);
+				//CANCELA AGENDA
+				
+				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				// Solo cancelar agenda sin ir a PSI
+				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
+				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
+				scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
+				scheduleNotDoneRequest.setFlgFicticious(false);
+
+				// Cancela agenda sin ir a PSI
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+				
+				
+			} 						
+		} catch (Exception e) {
+			return false;
+		}
+		listLog.add(statusLog);
+		update.set("log_status", listLog);
 		// Actualizar provision
 		provisionRepository.updateProvision(provision, update);
-
-		// Actualiza el agendamiento
-		trazabilidadScheduleApi.updateSchedule(generateScheduleRequest(provision, appointment, range, dateString2));
-
 		return true;
 	}
 

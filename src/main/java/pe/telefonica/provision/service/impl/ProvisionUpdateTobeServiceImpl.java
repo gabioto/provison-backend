@@ -391,15 +391,15 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 				//CANCELA AGENDA
 				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
 				// Cancelar agenda Localmente
-				if(provision.getHasSchedule() == true) {
-					scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
-					scheduleNotDoneRequest.setRequestType(provision.getActivityType());
-					scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
-					scheduleNotDoneRequest.setFlgFicticious(false);
+			
+				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
+				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
+				scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
+				scheduleNotDoneRequest.setFlgFicticious(false);
 
-					// Cancela agenda sin ir a PSI
-					trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
-				}
+				// Cancela agenda sin ir a PSI
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+				
 			 }
 		}catch (Exception e) {
 			return false;
@@ -691,17 +691,17 @@ public class ProvisionUpdateTobeServiceImpl extends ProvisionUpdateServiceImpl i
 				//hara que se envie SMS desde job
 				update.set("notifications.into_send_notify", false);
 				//CANCELA AGENDA
-				if(provision.getHasSchedule() == true) {
-					ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
-					// Solo cancelar agenda sin ir a PSI
-					scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
-					scheduleNotDoneRequest.setRequestType(provision.getActivityType());
-					scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
-					scheduleNotDoneRequest.setFlgFicticious(false);
+				
+				ScheduleNotDoneRequest scheduleNotDoneRequest = new ScheduleNotDoneRequest();
+				// Solo cancelar agenda sin ir a PSI
+				scheduleNotDoneRequest.setRequestId(provision.getIdProvision());
+				scheduleNotDoneRequest.setRequestType(provision.getActivityType());
+				scheduleNotDoneRequest.setStPsiCode(provision.getXaIdSt());
+				scheduleNotDoneRequest.setFlgFicticious(false);
 
-					// Cancela agenda sin ir a PSI
-					trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
-				}
+				// Cancela agenda sin ir a PSI
+				trazabilidadScheduleApi.cancelLocalSchedule(scheduleNotDoneRequest);
+				
 				
 			} 						
 		} catch (Exception e) {

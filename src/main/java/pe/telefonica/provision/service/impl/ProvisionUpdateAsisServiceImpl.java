@@ -130,10 +130,13 @@ public class ProvisionUpdateAsisServiceImpl extends ProvisionUpdateServiceImpl i
 					: speech;
 
 			if (provisionStatus.equalsIgnoreCase(Status.IN_TOA.getStatusName())) {
-				Update update = new Update();
-				if (provision.getCommercialOp().equals(Constants.OP_COMMERCIAL_MIGRACION)) {
+				
+				Update update =  new Update();
+					System.out.println(provision.getCommercialOp());			
+				if (provision.getCommercialOp()!= null && provision.getCommercialOp().equals(Constants.OP_COMMERCIAL_MIGRACION)) {
 					Parameter objParams = paramsRepository.getMessage(Constants.MESSAGE_RETURN);
 					if (objParams != null) {
+						
 						update.set("text_return", objParams.getValue());
 					}
 				}

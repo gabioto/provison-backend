@@ -91,6 +91,10 @@ public final class Constants {
 	public static final String MSG_PRO_SCHEDULE_TECHNICIAN_KEY = "MSG_PRO_SCHEDULE_TECHNICIAN_KEY";
 	public static final String MSG_PRO_WOPRENOTDONE = "MSG_PRO_WOPRENOTDONE";
 
+	// SMS para invitar a reagedar una orden en not_done con motivo ausente
+	// por el momento se usa esta constante, luego se validará si se utiliza otra.
+	public static final String MSG_PRO_OUTBOUND_INTOA_WITHOUT_SCHEDULE = "MSG_PRO_OUTBOUND_INTOA_WITHOUT_SCHEDULE";
+	
 	// Codigos de los endpoints de PSI
 	public static final String PSI_CODE_CAPACITY = "201";
 	public static final String PSI_CODE_SCHEDULE = "202";

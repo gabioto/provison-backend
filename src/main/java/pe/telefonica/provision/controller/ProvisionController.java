@@ -2022,18 +2022,26 @@ public class ProvisionController {
 						request.getHeader().getMessageId(), request.getHeader().getTimestamp(), timestamp,
 						request.getBody().getActivityType(), request.getHeader().getAppName());				
 			} else if (provision.getActivityId() != null) {
-				provision = provisionService.updateActivity(provision.getIdProvision(), provision.getActivityId(), request.getBody().getIndicador());
-				if (provision.getIdProvision() == null) {
-					status = HttpStatus.BAD_REQUEST;
-					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
-							String.valueOf(status.value()), "Error Actualización actividad", null);
-					apiResponse.setBody(null);					
+				if(provision.getActiveStatus().equals(Constants.PROVISION_STATUS_PRENOTDONE)) {
+					provision = provisionService.updateActivity(provision.getIdProvision(), provision.getActivityId(), request.getBody().getIndicador());
+					if (provision.getIdProvision() == null) {
+						status = HttpStatus.BAD_REQUEST;
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+								String.valueOf(status.value()), "Error Actualización actividad", null);
+						apiResponse.setBody(null);					
+					} else {
+						status = HttpStatus.OK;
+						apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
+								String.valueOf(status.value()), "Actualización actividad", null);
+						apiResponse.setBody(provision);
+					}
 				} else {
-					status = HttpStatus.OK;
+					status = HttpStatus.NOT_ACCEPTABLE;
 					apiResponse = new ApiResponse<>(Constants.APP_NAME_PROVISION, Constants.OPER_UPDATE_ACTIVITY,
-							String.valueOf(status.value()), "Actualización actividad", null);
-					apiResponse.setBody(provision);
+							String.valueOf(status.value()), "Tiempo de espera agotado", null);
+					apiResponse.setBody(null);	
 				}
+				
 			} else {
 				status = HttpStatus.NOT_FOUND;
 				apiResponse = new ApiResponse<ProvisionDetailTrazaDto>(Constants.APP_NAME_PROVISION,

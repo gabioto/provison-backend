@@ -89,4 +89,5 @@ public class DateUtil {
 		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-5:00"));
 		return dateFormat.format(date);
 	}
+	
 }

@@ -20,6 +20,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+		<genesis.version>1.4.3</genesis.version>
 	</properties>
 
 	<dependencies>
@@ -83,7 +84,11 @@
 			<artifactId>jersey-bundle</artifactId>
 			<version>1.19.3</version>
 		</dependency>
-
+		<dependency>
+            <groupId>com.tdp.genesis.core</groupId>
+            <artifactId>genesis-core</artifactId>
+            <version>${genesis.version}</version>
+        </dependency>
 	</dependencies>
 
 	<build>

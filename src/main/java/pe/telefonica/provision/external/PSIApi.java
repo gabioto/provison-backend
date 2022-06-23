@@ -242,7 +242,7 @@ public class PSIApi extends ConfigRestTemplate {
 	
 	public String tokenDecrypt(String token) {
 		String key = System.getenv("SECRET_ENCRYPT_KEY");
-		String pass =  System.getenv("SECRET_ENCRYPT_KEY");
+		String pass =  System.getenv("SECRET_ENCRYPT_PASS");
         String accessDecrypt=""; 
 		try {
 			SecretKey secretKey = AesUtil.getSecretKeyFromPassword(pass, key);

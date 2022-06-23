@@ -1,10 +1,20 @@
 package pe.telefonica.provision.external;
 
 import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
+import java.util.logging.Logger;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +38,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.tdp.genesis.core.security.aes.AesUtil;
 
 import pe.telefonica.provision.conf.ExternalApi;
 import pe.telefonica.provision.conf.IBMSecuritySeguridad;
@@ -44,12 +55,20 @@ import pe.telefonica.provision.util.constants.Constants;
 import pe.telefonica.provision.util.exception.FunctionalErrorException;
 import pe.telefonica.provision.util.exception.ServerNotFoundException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 @Component
 public class PSIApi extends ConfigRestTemplate {
 	private static final Log log = LogFactory.getLog(PSIApi.class);
 
 	final Gson gson = new Gson();
-
+	private Logger logger;
 	@Autowired
 	private OAuthTokenRepository oAuthTokenRepository;
 
@@ -218,7 +237,21 @@ public class PSIApi extends ConfigRestTemplate {
 			psiTokenGenerated = getTokenFromPSI(customerName, true);
 		}
 
-		return psiTokenGenerated;
+		return tokenDecrypt(psiTokenGenerated);
+	}
+	
+	public String tokenDecrypt(String token) {
+		String key = System.getenv("SECRET_ENCRYPT_KEY");
+		String pass =  System.getenv("SECRET_ENCRYPT_PASS");
+        String accessDecrypt=""; 
+		try {
+			SecretKey secretKey = AesUtil.getSecretKeyFromPassword(pass, key);
+			accessDecrypt = AesUtil.decryptString(token, secretKey);
+        }catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
+                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException | InvalidKeySpecException e) {
+        	logger.warning("Error decrypting the access" + e.getMessage());
+        }
+		return accessDecrypt;
 	}
 
 	private String stringToMD5(String string) {

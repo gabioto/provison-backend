@@ -104,8 +104,8 @@
 				<configuration>
 					<schemaVersion>V2</schemaVersion>
 					<authType>azure_cli</authType>
-					<resourceGroup>rg-trazabilidad-prod</resourceGroup>
-					<appName>Wa-trazabilidad-msProvision-prod</appName>
+					<resourceGroup>rg-trazabilidad-cert</resourceGroup>
+					<appName>Wa-trazabilidad-msProvision-cert</appName>
 					<region>eastus2</region>					
 					<deployment>
 						<resources>
